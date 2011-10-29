@@ -1,0 +1,94 @@
+﻿/**********************************************************************************************************************
+
+	[Placeholder for eventual source license]
+
+	FileUtils.cs
+		Miscellaneous file utility functions.  .NET's directory deletion functionality leaves a lot to be desired.  In
+		particular, if windows explorer or anti-virus has an open handle to a file within the directory structure,
+		an undocumented exception can sometimes occur.  If you keep trying, with a healthy pause inbetween tries, the
+		delete will eventually go through.
+
+	(c) Copyright 2011, Bret Ambrose.  All rights reserved.
+
+**********************************************************************************************************************/
+
+using System;
+using System.IO;
+using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace PackageManager
+{
+	public static class CFileUtils
+	{
+		// Methods
+		// Public interface
+
+		// .NETs built in Delete for directories is unreliable, even with the force flag set
+		// to true.  See http://stackoverflow.com/questions/329355/cannot-delete-directory-with-directory-deletepath-true
+		public static void Clean_Directory( string directory )
+		{
+			for ( int i = 0; i < 20; i++ )
+			{
+				try
+				{
+					Clean_Directory_Aux( directory );
+					break;
+				}
+				catch ( Exception )
+				{
+					Console.WriteLine( "Trouble deleting directory " + directory );
+					Console.WriteLine( "Windows is dumb.  Trying again shortly. " );
+					Thread.Sleep( 1000 );
+				}
+			}
+		}
+
+		// Private interface
+		private static void Hacky_Delete_Directory( DirectoryInfo dir_info )
+		{
+			try
+			{
+				File.SetAttributes( dir_info.FullName, FileAttributes.Normal ); 
+				dir_info.Delete( false );
+			}
+			catch ( IOException )
+			{
+				Thread.Sleep( 0 );
+				dir_info.Delete( false );
+			}
+		}
+
+		private static void Hacky_Delete_File( FileInfo file_info )
+		{
+			File.SetAttributes( file_info.FullName, FileAttributes.Normal ); 
+			file_info.Delete();
+		}
+
+		private static void Clean_Directory_Aux( string directory )
+		{
+			DirectoryInfo directory_info = new DirectoryInfo( directory );
+
+			Queue< DirectoryInfo > unprocessed_directories = new Queue< DirectoryInfo >();
+			Stack< DirectoryInfo > pending_deletes = new Stack< DirectoryInfo >();
+
+			directory_info.GetFiles().ToList().Apply( f => f.Delete() );
+			directory_info.GetDirectories().Apply( f => unprocessed_directories.Enqueue( f ) );
+
+			while ( unprocessed_directories.Count > 0 )
+			{
+				DirectoryInfo dir = unprocessed_directories.Dequeue();
+				pending_deletes.Push( dir );
+
+				dir.GetFiles().ToList().Apply( f => Hacky_Delete_File( f ) );
+				dir.GetDirectories().Apply( f => unprocessed_directories.Enqueue( f ) );
+			}
+
+			Thread.Sleep( 0 );
+			pending_deletes.Apply( d => Hacky_Delete_Directory( d ) );
+		}
+
+
+	}
+}

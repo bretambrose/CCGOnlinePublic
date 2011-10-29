@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DF65F98E-1E9C-44F3-B71C-BE6DB4AE8BF3}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{05DAB44F-91CA-409A-BD5C-FD738C7B10CE}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Concurrency">
+      <UniqueIdentifier>{D3653C20-D44C-465D-A487-56ECDF244228}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Concurrency\Containers">
+      <UniqueIdentifier>{A0E56DC7-F1FC-4A1A-B424-B3E5DAB9A07E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{6677D897-6AE8-48C7-99B7-E168D5D54F52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MessageHandling">
+      <UniqueIdentifier>{D27FBD50-2E43-498C-89D2-FA038D6CED69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TaskScheduler">
+      <UniqueIdentifier>{3055F094-35DD-42CB-9A2E-541828958EB8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Time">
+      <UniqueIdentifier>{D85C985D-E17E-47EC-BB43-6DF21BC2DD90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Concurrency\ThreadMessages">
+      <UniqueIdentifier>{0AF71C1C-BAF0-46A7-A6B2-D4E23F2CF6EF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRC.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRCValue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\ConcurrentQueueBase.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ConcurrencyManager.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LoggingThread.h">
+      <Filter>Source Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LogInterface.h">
+      <Filter>Source Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeInfoUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\MessageHandler.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\ThreadMessageHandler.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\ThreadMessageHandlerBase.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="PriorityQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskScheduler\TaskScheduler.h">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeKeeper.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadMessages\ExchangeInterfaceMessages.h">
+      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadMessages\LoggingMessages.h">
+      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadMessages\ThreadManagementMessages.h">
+      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadMessages\ThreadMessage.h">
+      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadConnection.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadConstants.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadInterfaces.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadKey.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadMessageFrame.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadSubject.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadTaskBase.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\ConcurrentQueue.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadTaskInterface.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadStatics.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadTaskExecutionContext.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ManagerThreadTaskInterface.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskScheduler\ScheduledTask.h">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskScheduler\ScheduledTaskPolicies.h">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadKeyManager.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\ConcurrentQueueLocking.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="StructuredExceptionHandler.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TickTime.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeType.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeUtils.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ConcurrencyManager.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LoggingThread.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LogInterface.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskScheduler\TaskScheduler.cpp">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\TimeKeeper.cpp">
+      <Filter>Source Files\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadMessages\ExchangeInterfaceMessages.cpp">
+      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadMessages\ThreadManagementMessages.cpp">
+      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadConnection.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadInterfaces.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadKey.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadMessageFrame.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadTaskBase.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadStatics.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadKeyManager.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadMessages\LoggingMessages.cpp">
+      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
+    </ClCompile>
+    <ClCompile Include="StructuredExceptionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\TimeUtils.cpp">
+      <Filter>Source Files\Time</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
