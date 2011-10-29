@@ -1,3 +1,5 @@
+*.user
+*.suo
 CCGOnline/CCGOnline/External/
 CCGOnline/CCGOnline/ipch/
 CCGOnline/CCGOnline/Output/
