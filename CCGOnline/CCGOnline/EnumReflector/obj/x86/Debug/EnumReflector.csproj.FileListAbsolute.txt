@@ -1,0 +1,5 @@
+C:\GitProjects\CCGOnlinePublic\CCGOnline\CCGOnline\EnumReflector\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\GitProjects\CCGOnlinePublic\CCGOnline\CCGOnline\EnumReflector\bin\Debug\EnumReflector.exe
+C:\GitProjects\CCGOnlinePublic\CCGOnline\CCGOnline\EnumReflector\bin\Debug\EnumReflector.pdb
+C:\GitProjects\CCGOnlinePublic\CCGOnline\CCGOnline\EnumReflector\obj\x86\Debug\EnumReflector.exe
+C:\GitProjects\CCGOnlinePublic\CCGOnline\CCGOnline\EnumReflector\obj\x86\Debug\EnumReflector.pdb
