@@ -9,10 +9,10 @@ using System.Net;
 
 namespace EnumReflector
 {
-	[DataContract(Name="CFileEntry",Namespace="http://www.bretambrose.com")]
-	public sealed class CFileEntry
+	[ DataContract( Name="HeaderFile", Namespace="http://www.bretambrose.com" ) ]
+	public sealed class CHeaderFileRecord
 	{
-		public CFileEntry()
+		public CHeaderFileRecord()
 		{
 			Project = String.Empty;
 			FileNameWithPath = String.Empty;
@@ -20,7 +20,7 @@ namespace EnumReflector
 			LastModifiedTime = DateTime.Now;
 		}
 
-		public CFileEntry( string file_path, DateTime last_modified_time )
+		public CHeaderFileRecord( string file_path, DateTime last_modified_time )
 		{
 			int separator_index = file_path.IndexOf( Path.PathSeparator );
 			Project = file_path.Substring( 0, separator_index );
@@ -30,10 +30,41 @@ namespace EnumReflector
 			LastModifiedTime = last_modified_time;
 		}
 
-		public string Project { get; private set; }
+		[ DataMember( Name="File", Order = 0, IsRequired=true ) ]
 		public string FileNameWithPath { get; private set; }
+
 		public string FileName { get; private set; }
+		public string Project { get; private set; }
+
+		[ DataMember( Name="LastModified", Order = 1, IsRequired=true ) ]
 		public DateTime LastModifiedTime { get; private set; }
+	}
+
+	[ DataContract( Name="EnumEntry", Namespace="http://www.bretambrose.com" ) ]
+	public sealed class CEnumEntry
+	{
+		public CEnumEntry()
+		{
+			EntryName = string.Empty;
+			Value = 0;
+		}
+
+		public CEnumEntry( string entry_name, ulong value )
+		{
+			EntryName = entry_name;
+			Value = value;
+		}
+
+		public bool Value_Equals( CEnumEntry enum_entry )
+		{
+			return EntryName == enum_entry.EntryName && Value == enum_entry.Value;
+		}
+
+		[ DataMember( Name="EntryName", Order = 0, IsRequired=true ) ]
+		public string EntryName { get; private set; }
+
+		[ DataMember( Name="Value", Order = 1, IsRequired=true ) ]
+		public ulong Value { get; private set; }
 	}
 
 	[Flags]
@@ -43,43 +74,93 @@ namespace EnumReflector
 		IsBitfield = 1
 	}
 
-	[DataContract(Name="CEnumEntry",Namespace="http://www.bretambrose.com")]
-	public sealed class CEnumEntry
+	[ DataContract( Name="Enum", Namespace="http://www.bretambrose.com" ) ]
+	public sealed class CEnumRecord
 	{
-		public CEnumEntry()
+		public CEnumRecord()
 		{
 			Name = String.Empty;
 			Flags = EEnumFlags.None;
-			EnumEntries = new Dictionary< string, ulong >();
+			EnumEntries = new List< CEnumEntry >();
 		}
 
-		public CEnumEntry( string name, EEnumFlags flags )
+		public CEnumRecord( string name, EEnumFlags flags )
 		{
 			Name = name;
 			Flags = flags;
-			EnumEntries = new Dictionary< string, ulong >();
+			EnumEntries = new List< CEnumEntry >();
+		}
+
+		public bool Value_Equals( CEnumRecord enum_definition )
+		{
+			if ( Name != enum_definition.Name )
+			{
+				return false;
+			}
+
+			if ( Flags != enum_definition.Flags )
+			{
+				return false;
+			}
+
+			if ( EnumEntries.Count != enum_definition.EnumEntries.Count )
+			{
+				return false;
+			}
+
+			for ( int i = 0; i < EnumEntries.Count; i++ )
+			{
+				if ( !EnumEntries[ i ].Value_Equals( enum_definition.EnumEntries[ i ] ) )
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		public void Add_Entry( ulong enum_value, string value_name )
 		{
 			string upper_value_name = value_name.ToUpper();
 
-			if ( EnumEntries.ContainsKey( upper_value_name ) )
+			if ( EnumEntries.Find( e => upper_value_name == e.EntryName ) != null )
 			{
 				throw new Exception( "Duplicate enum value name ( " + upper_value_name + " ) in enum " + Name );
 			} 
 
-			EnumEntries.Add( upper_value_name, enum_value );
+			EnumEntries.Add( new CEnumEntry( upper_value_name, enum_value ) );
 		}
 
-		public IEnumerable< KeyValuePair< string, ulong > > Get_Entries()
+		public IEnumerable< CEnumEntry > Get_Entries()
 		{
 			return EnumEntries;
 		}
 
+		[ DataMember( Name="Name", Order = 0, IsRequired=true ) ]
 		public string Name { get; private set; }
+
+		[ DataMember( Name="Flags", Order = 1, IsRequired=true ) ]
 		public EEnumFlags Flags { get; private set; }
-		private Dictionary< string, ulong > EnumEntries { get; set; }
+
+		[ DataMember( Name="Entries", Order = 2, IsRequired=true ) ]
+		private List< CEnumEntry > EnumEntries { get; set; }
+	}
+
+	[ DataContract( Name="Project", Namespace="http://www.bretambrose.com" ) ]
+	public sealed class CProjectRecord
+	{
+		public CProjectRecord()
+		{
+			Name = String.Empty;
+		}
+
+		public CProjectRecord( string name )
+		{
+			Name = name.ToUpper();
+		}
+
+		[ DataMember( Name="Name", Order = 0, IsRequired=true ) ]
+		public string Name { get; private set; }
 	}
 
 	[DataContract(Name="CEnumXMLDatabase",Namespace="http://www.bretambrose.com")]
@@ -90,27 +171,32 @@ namespace EnumReflector
 
 		CEnumXMLDatabase() 
 		{ 
-			Files = new List< CFileEntry >();
-			Enums = new List< CEnumEntry >();
+			HeaderFiles = new List< CHeaderFileRecord >();
+			Enums = new List< CEnumRecord >();
+			Projects = new List< CProjectRecord >();
 		}
 
 		// Methods
 		// Public interface
 		static public void Make_Sample_Config()
 		{
-			m_Instance.Files.Clear();
+			m_Instance.Projects.Clear();
+			m_Instance.HeaderFiles.Clear();
 			m_Instance.Enums.Clear();
 
-			m_Instance.Files.Add( new CFileEntry( "TestProject\\SomeFile.h", DateTime.Now ) );
-			m_Instance.Files.Add( new CFileEntry( "TestProject\\SomeDir\\AnotherFile.h", DateTime.Now ) );
-			m_Instance.Files.Add( new CFileEntry( "AnotherProject\\AnotherFile.h", DateTime.Now ) );
+			m_Instance.Projects.Add( new CProjectRecord( "TestProject" ) );
+			m_Instance.Projects.Add( new CProjectRecord( "AnotherProject" ) );
 
-			CEnumEntry enum_entry = new CEnumEntry( "ETestEnum", EEnumFlags.None );
-			enum_entry.Add_Entry( 0, "Invalid" );
-			enum_entry.Add_Entry( 1, "Test1" );
-			enum_entry.Add_Entry( 2, "Test2" );
+			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "TestProject\\SomeFile.h", DateTime.Now ) );
+			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "TestProject\\SomeDir\\AnotherFile.h", DateTime.Now ) );
+			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "AnotherProject\\AnotherFile.h", DateTime.Now ) );
 
-			m_Instance.Enums.Add( enum_entry );
+			CEnumRecord enum_record = new CEnumRecord( "ETestEnum", EEnumFlags.None );
+			enum_record.Add_Entry( 0, "Invalid" );
+			enum_record.Add_Entry( 1, "Test1" );
+			enum_record.Add_Entry( 2, "Test2" );
+
+			m_Instance.Enums.Add( enum_record );
 		}
 
 		static public void Load_Config()
@@ -148,23 +234,31 @@ namespace EnumReflector
 			}
 		}
 
-		public void Initialize( IEnumerable< CFileEntry > file_entries, IEnumerable< CEnumEntry > enum_entries )
+		public void Initialize( IEnumerable< CProjectRecord > project_records,
+										IEnumerable< CHeaderFileRecord > file_records, 
+										IEnumerable< CEnumRecord > enum_records )
 		{
-			Files.Clear();
-			file_entries.Apply( fe => Files.Add( fe ) );
+			Projects.Clear();
+			project_records.Apply( pr => Projects.Add( pr ) );
+
+			HeaderFiles.Clear();
+			file_records.Apply( hfr => HeaderFiles.Add( hfr ) );
 
 			Enums.Clear();
-			enum_entries.Apply( ee => Enums.Add( ee ) );
+			enum_records.Apply( er => Enums.Add( er ) );
 		}
 		
 		// Properties
 		public static CEnumXMLDatabase Instance { get { return m_Instance; } }
+
+		[DataMember(Name="Projects", Order = 0, IsRequired=true)]
+		public List< CProjectRecord > Projects { get; private set; }
 		
-		[DataMember(Name="Files", Order = 1, IsRequired=true)]
-		public List< CFileEntry > Files { get; private set; }
+		[DataMember(Name="HeaderFiles", Order = 1, IsRequired=true)]
+		public List< CHeaderFileRecord > HeaderFiles { get; private set; }
 
 		[DataMember(Name="Enums", Order = 2, IsRequired=true)]
-		public List< CEnumEntry > Enums { get; private set; }
+		public List< CEnumRecord > Enums { get; private set; }
 
 		// Fields
 		private static CEnumXMLDatabase m_Instance = new CEnumXMLDatabase();

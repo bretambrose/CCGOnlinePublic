@@ -17,6 +17,8 @@ CCGOnline/CCGOnline/SharedTest/*.sdf
 CCGOnline/CCGOnline/SharedTest/Intermediate/
 CCGOnline/CCGOnline/PackageManager/bin/
 CCGOnline/CCGOnline/PackageManager/obj/
+CCGOnline/CCGOnline/EnumReflector/bin/
+CCGOnline/CCGOnline/EnumReflector/obj/
 CCGOnline/Run/Client/*.exe
 CCGOnline/Run/Client/*.pdb
 CCGOnline/Run/Client/External_DLL_64/

@@ -40,24 +40,6 @@ namespace EnumReflector
 			}
 		}
 
-		private static void Handle_Project_Subdirectory( DirectoryInfo subdirectory )
-		{
-			foreach ( var file_info in subdirectory.GetFiles( "*.vsproj" ) )
-			{
-				ProjectTracker.Register_Project( file_info );
-			}
-		}
-
-		private static void Build_Project_And_File_Sets()
-		{
-			DirectoryInfo directory_info = new DirectoryInfo( TopLevelDirectory );
-
-			foreach ( var subdirectory_info in directory_info.GetDirectories() )
-			{
-				Handle_Project_Subdirectory( subdirectory_info );
-			}
-		}
-
 		private static void Main( string[] args )
 		{
 			Process_Command_Line_Arguments( args );
@@ -66,7 +48,7 @@ namespace EnumReflector
 
 			CEnumXMLDatabase.Load_Config();
 
-			Build_Project_And_File_Sets();
+			ProjectTracker.Initialize_Project_Set();
 		}
 
 		// Properties
@@ -75,7 +57,9 @@ namespace EnumReflector
 		public static CProjectTracker ProjectTracker { get; private set; }
 		public static CHeaderFileTracker HeaderFileTracker { get; private set; }
 		public static CEnumTracker EnumTracker { get; private set; }
+
+		public static string TopLevelDirectory { get { return TOP_LEVEL_DIRECTORY; } }
 	
-		private const string TopLevelDirectory = "";
+		private const string TOP_LEVEL_DIRECTORY = "";
 	}
 }
