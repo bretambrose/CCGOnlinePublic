@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using System.Linq;
 
 namespace EnumReflector
 {
@@ -43,6 +45,8 @@ namespace EnumReflector
 			NewProjectRecord = new CProjectRecord( Path.GetFileNameWithoutExtension( project_file.FullName ) );
 			CreationState = EProjectCreationState.New;
 			State = EProjectState.Dirty;
+
+			Parse_Project_File( project_file );
 		} 
 
 		public void Initialize_Existing( FileInfo project_file )
@@ -50,6 +54,22 @@ namespace EnumReflector
 			NewProjectRecord = new CProjectRecord( Path.GetFileNameWithoutExtension( project_file.FullName ) );
 			CreationState = EProjectCreationState.Unchanged;
 			State = EProjectState.Unknown;
+
+			Parse_Project_File( project_file );
+		}
+
+		private void Parse_Project_File( FileInfo project_file )
+		{
+			XElement project_root = XElement.Load( project_file.FullName );
+			string project_path = CEnumReflector.TopLevelDirectory + project_file.Directory.Name;
+
+			foreach ( var elt in project_root.Elements().Where( e => e.Name.LocalName == "ItemGroup" ).
+														 Elements().Where( e => e.Name.LocalName == "ClInclude" ).
+														 Attributes().Where( a => a.Name.LocalName == "Include" ) )
+			{
+				string header_file_name = project_path + "\\" + elt.Value;
+				Console.WriteLine( header_file_name );
+			}
 		}
 
 		public EProjectID ID { get; private set; }
@@ -67,7 +87,7 @@ namespace EnumReflector
 		{
 		}
 
-		public void Initialize_Project_Set()
+		public void Initialize_DB_Projects()
 		{
 			foreach ( var project_record in CEnumXMLDatabase.Instance.Projects )
 			{
@@ -76,12 +96,15 @@ namespace EnumReflector
 				m_ProjectIDMap.Add( project.Name, id );
 				m_Projects.Add( id, project );
 			}
+		}
 
+		public void Initialize_File_Projects()
+		{
 			DirectoryInfo directory_info = new DirectoryInfo( CEnumReflector.TopLevelDirectory );
 
 			foreach ( var subdirectory_info in directory_info.GetDirectories() )
 			{
-				foreach ( var file_info in subdirectory_info.GetFiles( "*.vsproj" ) )
+				foreach ( var file_info in subdirectory_info.GetFiles( "*.vcxproj" ) )
 				{
 					Register_Project( file_info );
 				}
