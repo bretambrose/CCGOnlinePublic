@@ -53,6 +53,14 @@ namespace EnumReflector
 			EnumTracker.Initialize_DB_Enums();
 
 			ProjectTracker.Initialize_File_Projects();
+			EnumTracker.Initialize_Starting_Enum_States();
+
+			HeaderFileTracker.Process_Dirty_Headers();
+			EnumTracker.Process_Final_States();
+			ProjectTracker.Write_Enum_Registration_Files();
+
+			CEnumXMLDatabase.Instance.Initialize_From_Trackers( ProjectTracker.SaveRecords, HeaderFileTracker.SaveRecords, EnumTracker.SaveRecords );
+			CEnumXMLDatabase.Save_Config();
 		}
 
 		// Properties
@@ -64,6 +72,6 @@ namespace EnumReflector
 
 		public static string TopLevelDirectory { get { return TOP_LEVEL_DIRECTORY; } }
 	
-		private const string TOP_LEVEL_DIRECTORY = ".\\CCGOnline\\";
+		private const string TOP_LEVEL_DIRECTORY = "." + "\\" + "CCGOnline" + "\\";
 	}
 }

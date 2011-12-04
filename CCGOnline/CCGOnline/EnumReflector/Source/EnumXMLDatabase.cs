@@ -80,15 +80,19 @@ namespace EnumReflector
 		public CEnumRecord()
 		{
 			Name = String.Empty;
+			HeaderFileName = String.Empty;
 			Flags = EEnumFlags.None;
 			EnumEntries = new List< CEnumEntry >();
+			HeaderFileID = EHeaderFileID.Invalid;
 		}
 
-		public CEnumRecord( string name, EEnumFlags flags )
+		public CEnumRecord( string name, string header_file_name, EEnumFlags flags )
 		{
 			Name = name;
+			HeaderFileName = header_file_name;
 			Flags = flags;
 			EnumEntries = new List< CEnumEntry >();
+			HeaderFileID = EHeaderFileID.Invalid;
 		}
 
 		public bool Value_Equals( CEnumRecord enum_definition )
@@ -99,6 +103,11 @@ namespace EnumReflector
 			}
 
 			if ( Flags != enum_definition.Flags )
+			{
+				return false;
+			}
+
+			if ( HeaderFileID != enum_definition.HeaderFileID )
 			{
 				return false;
 			}
@@ -139,11 +148,16 @@ namespace EnumReflector
 		[ DataMember( Name="Name", Order = 0, IsRequired=true ) ]
 		public string Name { get; private set; }
 
-		[ DataMember( Name="Flags", Order = 1, IsRequired=true ) ]
+		[ DataMember( Name="HeaderFile", Order = 1, IsRequired=true ) ]
+		public string HeaderFileName { get; private set; }
+
+		[ DataMember( Name="Flags", Order = 2, IsRequired=true ) ]
 		public EEnumFlags Flags { get; private set; }
 
-		[ DataMember( Name="Entries", Order = 2, IsRequired=true ) ]
+		[ DataMember( Name="Entries", Order = 3, IsRequired=true ) ]
 		private List< CEnumEntry > EnumEntries { get; set; }
+
+		public EHeaderFileID HeaderFileID { get; set; }
 	}
 
 	[ DataContract( Name="Project", Namespace="http://www.bretambrose.com" ) ]
@@ -191,7 +205,7 @@ namespace EnumReflector
 			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "TestProject\\SomeDir\\AnotherFile.h", DateTime.Now ) );
 			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "AnotherProject\\AnotherFile.h", DateTime.Now ) );
 
-			CEnumRecord enum_record = new CEnumRecord( "ETestEnum", EEnumFlags.None );
+			CEnumRecord enum_record = new CEnumRecord( "ETestEnum", "TestProject\\SomeFile.h", EEnumFlags.None );
 			enum_record.Add_Entry( 0, "Invalid" );
 			enum_record.Add_Entry( 1, "Test1" );
 			enum_record.Add_Entry( 2, "Test2" );
@@ -234,9 +248,9 @@ namespace EnumReflector
 			}
 		}
 
-		public void Initialize( IEnumerable< CProjectRecord > project_records,
-										IEnumerable< CHeaderFileRecord > file_records, 
-										IEnumerable< CEnumRecord > enum_records )
+		public void Initialize_From_Trackers( IEnumerable< CProjectRecord > project_records,
+														  IEnumerable< CHeaderFileRecord > file_records, 
+														  IEnumerable< CEnumRecord > enum_records )
 		{
 			Projects.Clear();
 			project_records.Apply( pr => Projects.Add( pr ) );
