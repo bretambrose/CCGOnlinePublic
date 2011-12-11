@@ -57,6 +57,10 @@ namespace EnumReflector
 			ProjectID = project_id;
 		}
 
+		public void Reparse_Enums()
+		{
+		}
+
 		public EHeaderFileID ID { get; private set; }
 		public EProjectID ProjectID { get; private set; }
 		public string FileNameWithPath { get { return OldHeaderFileRecord != null ? OldHeaderFileRecord.FileNameWithPath : NewHeaderFileRecord.FileNameWithPath; } }
@@ -113,6 +117,13 @@ namespace EnumReflector
 
 		public void Process_Dirty_Headers()
 		{
+			foreach ( var header in m_HeaderFiles.Values )
+			{
+				if ( header.CreationState == EHeaderFileCreationState.New || header.State == EHeaderFileState.Dirty )
+				{
+					header.Reparse_Enums();
+				}
+			}
 		}
 
 		public CHeaderFile Get_Header_ID_By_File_Path( string header_file_path )
