@@ -187,7 +187,7 @@ namespace EnumReflector
 														 Elements().Where( e => e.Name.LocalName == "ClInclude" ).
 														 Attributes().Where( a => a.Name.LocalName == "Include" ) )
 			{
-				string header_file_name = project_path + Path.PathSeparator + elt.Value;
+				string header_file_name = project_path + Path.DirectorySeparatorChar + elt.Value;
 
 				FileInfo header_file_info = new FileInfo( header_file_name );
 				CHeaderFileRecord new_header_record = new CHeaderFileRecord( header_file_name, header_file_info.LastWriteTime );
@@ -196,14 +196,19 @@ namespace EnumReflector
 			}
 		}
 
+		private string Build_Registration_Directory_Path()
+		{
+			return CEnumReflector.TopLevelDirectory + NewProjectRecord.CaseName + Path.DirectorySeparatorChar + "GeneratedCode" + Path.DirectorySeparatorChar;
+		}
+
 		private string Build_Registration_Header_File_Name()
 		{
-			return CEnumReflector.TopLevelDirectory + NewProjectRecord.Name + Path.PathSeparator + "Register" + NewProjectRecord.Name + "Enums.h";
+			return Build_Registration_Directory_Path() + "Register" + NewProjectRecord.CaseName + "Enums.h";
 		}
 
 		private string Build_Registration_CPP_File_Name()
 		{
-			return CEnumReflector.TopLevelDirectory + NewProjectRecord.Name + Path.PathSeparator + "Register" + NewProjectRecord.Name + "Enums.cpp";
+			return Build_Registration_Directory_Path() + "Register" + NewProjectRecord.CaseName + "Enums.cpp";
 		}
 
 		private string Build_Register_Function_Signature()

@@ -22,7 +22,7 @@ namespace EnumReflector
 
 		public CHeaderFileRecord( string file_path, DateTime last_modified_time )
 		{
-			int separator_index = file_path.IndexOf( Path.PathSeparator );
+			int separator_index = file_path.IndexOf( Path.DirectorySeparatorChar );
 			Project = file_path.Substring( 0, separator_index );
 			FileNameWithPath = file_path;
 			FileName = Path.GetFileName( file_path );
@@ -166,15 +166,19 @@ namespace EnumReflector
 		public CProjectRecord()
 		{
 			Name = String.Empty;
+			CaseName = String.Empty;
 		}
 
 		public CProjectRecord( string name )
 		{
+			CaseName = name;
 			Name = name.ToUpper();
 		}
 
 		[ DataMember( Name="Name", Order = 0, IsRequired=true ) ]
 		public string Name { get; private set; }
+
+		public string CaseName { get; private set; }
 	}
 
 	[DataContract(Name="CEnumXMLDatabase",Namespace="http://www.bretambrose.com")]
