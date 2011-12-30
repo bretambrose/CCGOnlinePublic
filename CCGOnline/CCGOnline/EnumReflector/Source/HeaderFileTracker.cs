@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace EnumReflector
 {
@@ -59,6 +60,111 @@ namespace EnumReflector
 
 		public void Reparse_Enums()
 		{
+			using ( FileStream fs = File.Open( NewHeaderFileRecord.FileNameWithPath, FileMode.Open ) )
+			using ( TextReader tr = new StreamReader( fs ) )
+			{
+				bool in_enum_definition = false;
+				string header_string = tr.ReadToEnd();
+				int current_line_start = 0;
+				int current_line_end = 0;
+				int definition_start = 0;
+				int definition_end = 0;
+				while ( current_line_start < header_string.Length )
+				{
+					int current_line_pos = Skip_Line_Whitespace( header_string, current_line_start );
+					current_line_end = Find_Current_Line_End( header_string, current_line_start );
+
+					if ( Substring_Compare( header_string, current_line_pos, REFLECTION_DIRECTIVE ) )
+					{
+						current_line_pos = Skip_Line_Whitespace( header_string, current_line_pos + 3 );
+						if ( Substring_Compare( header_string, current_line_pos, ENUM_PREFIX ) )
+						{
+							current_line_pos += 4;
+							if ( Substring_Compare( header_string, current_line_pos, ENUM_BEGIN_DIRECTIVE ) )
+							{
+								if ( in_enum_definition )
+								{
+									throw new Exception( "Processed two consecutive EnumBegin directives." );
+								}
+								else
+								{
+									in_enum_definition = true;
+									definition_start = current_line_start;
+								}
+							}
+							else if ( Substring_Compare( header_string, current_line_start, ENUM_END_DIRECTIVE ) )
+							{
+								if ( !in_enum_definition )
+								{
+									throw new Exception( "Processed two consecutive EnumEnd directives." );
+								}
+								else
+								{
+									in_enum_definition = false;
+									definition_end = current_line_end;
+
+									string parse_string = header_string.Substring( definition_start, definition_end - definition_start + 1 );
+									CEnumASTUtils.Parse_Enum_Definition( parse_string, NewHeaderFileRecord.FileName );
+								}
+							}
+						}
+					}
+
+					current_line_start = current_line_end + 1;
+					while ( current_line_start < header_string.Length )
+					{
+						char current_char = header_string[ current_line_start ];
+						if ( current_char != '\n' && current_char != '\r' )
+						{
+							break;
+						}
+
+						current_line_start++;
+					}
+				}
+			}
+		}
+
+		private int Skip_Line_Whitespace( string value, int index )
+		{
+			char current_char = value[ index ];
+			while ( current_char == '\t' || current_char == ' ' )
+			{
+				current_char = value[ ++index ];
+			}
+
+			return index;
+		}
+
+		private int Find_Current_Line_End( string value, int index )
+		{
+			char current_char = value[ index ];
+			while ( current_char != '\r' && current_char != '\n' )
+			{
+				current_char = value[ ++index ];
+			}
+
+			return index;
+		}
+
+		private bool Substring_Compare( string base_string, int index, string compare_string )
+		{
+			int compare_string_length = compare_string.Length;
+
+			if ( index + compare_string_length > base_string.Length )
+			{
+				return false;
+			}
+
+			for ( int i = 0; i < compare_string_length; i++ )
+			{
+				if ( base_string[ i + index ] != compare_string[ i ] )
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		public EHeaderFileID ID { get; private set; }
@@ -69,6 +175,11 @@ namespace EnumReflector
 
 		public CHeaderFileRecord OldHeaderFileRecord { get; private set; }
 		public CHeaderFileRecord NewHeaderFileRecord { get; private set; }
+
+		private const string REFLECTION_DIRECTIVE = @"//:";
+		private const string ENUM_PREFIX = @"Enum";
+		private const string ENUM_BEGIN_DIRECTIVE = @"Begin";
+		private const string ENUM_END_DIRECTIVE = @"End";
 	}
 
 	public class CHeaderFileTracker

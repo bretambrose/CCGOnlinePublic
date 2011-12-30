@@ -190,6 +190,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
   <ItemGroup>
     <ClCompile Include="ConcurrencyManagerTests.cpp" />
     <ClCompile Include="ConcurrentQueueTests.cpp" />
+    <ClCompile Include="EnumConversionTests.cpp" />
     <ClCompile Include="ExceptionHandlingTests.cpp" />
     <ClCompile Include="LoggingTests.cpp" />
     <ClCompile Include="PriorityQueueTests.cpp" />

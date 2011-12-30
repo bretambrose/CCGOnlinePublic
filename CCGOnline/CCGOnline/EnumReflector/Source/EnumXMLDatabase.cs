@@ -192,33 +192,12 @@ namespace EnumReflector
 
 		// Methods
 		// Public interface
-		static public void Make_Sample_Config()
-		{
-			m_Instance.Projects.Clear();
-			m_Instance.HeaderFiles.Clear();
-			m_Instance.Enums.Clear();
-
-			m_Instance.Projects.Add( new CProjectRecord( "TestProject" ) );
-			m_Instance.Projects.Add( new CProjectRecord( "AnotherProject" ) );
-
-			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "TestProject\\SomeFile.h", DateTime.Now ) );
-			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "TestProject\\SomeDir\\AnotherFile.h", DateTime.Now ) );
-			m_Instance.HeaderFiles.Add( new CHeaderFileRecord( "AnotherProject\\AnotherFile.h", DateTime.Now ) );
-
-			CEnumRecord enum_record = new CEnumRecord( "ETestEnum", "TestProject\\SomeFile.h", EEnumFlags.None );
-			enum_record.Add_Entry( 0, "Invalid" );
-			enum_record.Add_Entry( 1, "Test1" );
-			enum_record.Add_Entry( 2, "Test2" );
-
-			m_Instance.Enums.Add( enum_record );
-		}
-
 		static public void Load_Config()
 		{
 			try
 			{
 				DataContractSerializer serializer = new DataContractSerializer( typeof( CEnumXMLDatabase ) );
-				using ( Stream stream = File.OpenRead( FileName ) )
+				using ( Stream stream = File.OpenRead( Build_Filename() ) )
 				{
 					m_Instance = serializer.ReadObject( stream ) as CEnumXMLDatabase;
 				}
@@ -236,7 +215,7 @@ namespace EnumReflector
 				DataContractSerializer serializer = new DataContractSerializer( typeof( CEnumXMLDatabase ) );
 				XmlWriterSettings output_settings = new XmlWriterSettings() { Indent = true };
 				
-				using ( XmlWriter writer = XmlWriter.Create( FileName, output_settings ) )
+				using ( XmlWriter writer = XmlWriter.Create( Build_Filename(), output_settings ) )
 				{
 					serializer.WriteObject( writer, m_Instance );
 				}
@@ -262,6 +241,11 @@ namespace EnumReflector
 			enum_records.Apply( er => Enums.Add( er ) );
 		}
 		
+		private static string Build_Filename()
+		{
+			return FileNamePrefix + CEnumReflector.BuildSuffix + ".xml";
+		}
+
 		// Properties
 		public static CEnumXMLDatabase Instance { get { return m_Instance; } }
 
@@ -277,7 +261,7 @@ namespace EnumReflector
 		// Fields
 		private static CEnumXMLDatabase m_Instance = new CEnumXMLDatabase();
 		
-		private const string FileName = "Run/Tools/Data/XML/EnumReflectionDB.xml";
+		private const string FileNamePrefix = "Run/Tools/Data/XML/EnumReflectionDB";
 						
 	}	
 }

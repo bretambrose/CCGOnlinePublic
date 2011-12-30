@@ -152,6 +152,9 @@
     <ClInclude Include="Time\TimeUtils.h">
       <Filter>Source Files\Time</Filter>
     </ClInclude>
+    <ClInclude Include="EnumConversion.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -213,6 +216,9 @@
     </ClCompile>
     <ClCompile Include="Time\TimeUtils.cpp">
       <Filter>Source Files\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="EnumConversion.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

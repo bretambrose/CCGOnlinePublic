@@ -185,6 +185,7 @@
     <ClInclude Include="Concurrency\ThreadTaskInterface.h" />
     <ClInclude Include="CRC.h" />
     <ClInclude Include="CRCValue.h" />
+    <ClInclude Include="EnumConversion.h" />
     <ClInclude Include="Logging\LoggingThread.h" />
     <ClInclude Include="Logging\LogInterface.h" />
     <ClInclude Include="MessageHandling\MessageHandler.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="Concurrency\ThreadStatics.cpp" />
     <ClCompile Include="Concurrency\ThreadTaskBase.cpp" />
     <ClCompile Include="CRC.cpp" />
+    <ClCompile Include="EnumConversion.cpp" />
     <ClCompile Include="Logging\LoggingThread.cpp" />
     <ClCompile Include="Logging\LogInterface.cpp" />
     <ClCompile Include="Shared.cpp" />

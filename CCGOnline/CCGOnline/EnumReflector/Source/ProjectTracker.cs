@@ -126,7 +126,16 @@ namespace EnumReflector
 		{
 			cpp_text.Append( "\tCEnumConverter::Register_Enum( \"" );
 			cpp_text.Append( enum_record.Name );
-			cpp_text.Append( "\" );\n" );
+			cpp_text.Append( "\", " );
+			if ( ( enum_record.Flags & EEnumFlags.IsBitfield ) != 0 )
+			{
+				cpp_text.Append( "CEP_BITFIELD" );
+			}
+			else
+			{
+				cpp_text.Append( "CEP_NONE" );
+			}
+			cpp_text.Append( " );\n" );
 
 			foreach ( var entry in enum_record.Get_Entries() )
 			{

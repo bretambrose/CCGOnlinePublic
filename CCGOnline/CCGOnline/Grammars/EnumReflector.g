@@ -1,7 +1,7 @@
 grammar EnumReflector;
 
 options {
-    language=CSharp2;
+    language=CSharp3;
     output=AST;
 }
 
@@ -39,16 +39,16 @@ value_assignment
 	: EQUALS! integer_constant ;
 
 last_enum_entry
-	: ID value_assignment? enum_conversion_tag? ;
+	: ID^ value_assignment? enum_conversion_tag? ;
 
 non_last_enum_entry
-	: ID value_assignment? COMMA! enum_conversion_tag? ;
+	: ID^ value_assignment? COMMA! enum_conversion_tag? ;
 	
 enum_entry_list
-	: non_last_enum_entry* last_enum_entry ;
+	: LBRACE^ non_last_enum_entry* last_enum_entry  RBRACE! ;
 
 enum_definition
-	: ENUM^ ID LBRACE! enum_entry_list RBRACE! SEMICOLON! ;
+	: ENUM^ ID enum_entry_list SEMICOLON! ;
 
 enum_properties
 	: BITFIELD ;
@@ -59,7 +59,7 @@ enum_begin_meta
 enum_end_meta
 	: META! ENUM_END^ ;
 
-top_rule
+public parse
 	: enum_begin_meta enum_definition enum_end_meta ;
 									
 /*
@@ -69,7 +69,7 @@ ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
 
 WHITESPACE  
-	:   ( ' ' | '\t' | '\r' | '\n' ) {$channel=HIDDEN;} ;
+	:   ( ' ' | '\t' | '\r' | '\n' ) {$channel=Hidden;} ;
 
 STRING
     	:  '"' ( ~('\\'|'"') )* '"' ;
