@@ -1,4 +1,26 @@
-﻿using System;
+﻿/**********************************************************************************************************************
+
+	ProjectTracker.cs		
+ 		A pair of classes for tracking the C++ projects that get analyzed by the tool.
+ 
+	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+**********************************************************************************************************************/
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -32,6 +54,7 @@ namespace EnumReflector
 
 	public class CProject
 	{
+		// Construction
 		public CProject( EProjectID id, CProjectRecord old_project_record )
 		{
 			ID = id;
@@ -52,6 +75,7 @@ namespace EnumReflector
 			Parse_Project_File( project_file );
 		} 
 
+		// Public interface
 		public void Initialize_Existing( FileInfo project_file )
 		{
 			NewProjectRecord = new CProjectRecord( Path.GetFileNameWithoutExtension( project_file.FullName ) );
@@ -63,15 +87,25 @@ namespace EnumReflector
 
 		public void Write_Enum_Registration_Files()
 		{
+			string generated_code_directory = Build_Registration_Directory_Path();
+			if ( !Directory.Exists( generated_code_directory ) )
+			{
+				Directory.CreateDirectory( generated_code_directory );
+			}
+
 			string header_file_name = Build_Registration_Header_File_Name();
-			StringBuilder header_file_text = Build_Header_Text( header_file_name );
-			File.WriteAllText( header_file_name, header_file_text.ToString() );
+			if ( !File.Exists( header_file_name ) )
+			{
+				StringBuilder header_file_text = Build_Header_Text( Path.GetFileName( header_file_name ) );
+				File.WriteAllText( header_file_name, header_file_text.ToString() );
+			}
 
 			string cpp_file_name = Build_Registration_CPP_File_Name();
-			StringBuilder cpp_file_text = Build_CPP_Text( cpp_file_name );
+			StringBuilder cpp_file_text = Build_CPP_Text( Path.GetFileName( cpp_file_name ) );
 			File.WriteAllText( cpp_file_name, cpp_file_text.ToString() );
 		}
 
+		// Private interface
 		private StringBuilder Build_Header_Text( string file_name )
 		{
 			StringBuilder header_text = new StringBuilder();
@@ -80,12 +114,23 @@ namespace EnumReflector
 
 			string ifdef_guard_name = Build_Ifdef_Guard();
 
-			header_text.Append( "#ifndef " + ifdef_guard_name + "\n" );
-			header_text.Append( "#define " + ifdef_guard_name + "\n\n" );
+			header_text.Append( "#ifndef " );
+			header_text.Append( ifdef_guard_name );
+			header_text.Append( END_OF_LINE );
+			header_text.Append( "#define " );
+			header_text.Append( ifdef_guard_name );
+			header_text.Append( END_OF_LINE );
+			header_text.Append( END_OF_LINE );
 
-			header_text.Append( Build_Register_Function_Signature() + ";\n\n" );
+			header_text.Append( Build_Register_Function_Signature() );
+			header_text.Append( ";" );
+			header_text.Append( END_OF_LINE );
+			header_text.Append( END_OF_LINE );
 
-			header_text.Append( "#endif // " + ifdef_guard_name + "\n" );
+			header_text.Append( "#endif // " );
+			header_text.Append( ifdef_guard_name );
+			header_text.Append( END_OF_LINE );
+
 			return header_text;
 		}
 
@@ -95,7 +140,12 @@ namespace EnumReflector
 
 			Add_Top_Of_File_Comment( cpp_text, file_name );
 
-			cpp_text.Append( "#include \"EnumConversion.h\"\n\n" );
+			cpp_text.Append( "#include \"stdafx.h\"" );
+			cpp_text.Append( END_OF_LINE );
+			cpp_text.Append( END_OF_LINE );
+			cpp_text.Append( "#include \"EnumConversion.h\"" );
+			cpp_text.Append( END_OF_LINE );
+			cpp_text.Append( END_OF_LINE );
 
 			List< CEnumRecord > project_enums = new List< CEnumRecord >();
 			CEnumReflector.EnumTracker.Build_Project_Enum_List( ID, project_enums );
@@ -104,20 +154,23 @@ namespace EnumReflector
 			{
 				cpp_text.Append( "enum " );
 				cpp_text.Append( enum_record.Name );
-				cpp_text.Append( ";\n" );
+				cpp_text.Append( ";" );
+				cpp_text.Append( END_OF_LINE );
 			}
 
-			cpp_text.Append( "\n" );
+			cpp_text.Append( END_OF_LINE );
 			cpp_text.Append( Build_Register_Function_Signature() );
-			cpp_text.Append( "\n" );
-			cpp_text.Append( "{\n" );
+			cpp_text.Append( END_OF_LINE );
+			cpp_text.Append( "{" );
+			cpp_text.Append( END_OF_LINE );
 
 			foreach ( var enum_record in project_enums )
 			{
 				Add_Enum_Conversions( cpp_text, enum_record );
 			}
 
-			cpp_text.Append( "}\n" );
+			cpp_text.Append( "}" );
+			cpp_text.Append( END_OF_LINE );
 
 			return cpp_text;
 		}
@@ -135,7 +188,8 @@ namespace EnumReflector
 			{
 				cpp_text.Append( "CEP_NONE" );
 			}
-			cpp_text.Append( " );\n" );
+			cpp_text.Append( " );" );
+			cpp_text.Append( END_OF_LINE );
 
 			foreach ( var entry in enum_record.Get_Entries() )
 			{
@@ -145,16 +199,21 @@ namespace EnumReflector
 				cpp_text.Append( entry.EntryName );
 				cpp_text.Append( "\", " );
 				cpp_text.Append( entry.Value );
-				cpp_text.Append( " );\n" );
+				cpp_text.Append( " );" );
+				cpp_text.Append( END_OF_LINE );
 			}
 
-			cpp_text.Append( "\n" );
+			cpp_text.Append( END_OF_LINE );
 		}
 
 		private void Add_Top_Of_File_Comment( StringBuilder file_text, string file_name )
 		{
-			file_text.Append( "/**********************************************************************************************************************\n\n" );
-			file_text.Append( "\t" + file_name + "\n" );
+			file_text.Append( "/**********************************************************************************************************************" );
+			file_text.Append( END_OF_LINE );
+			file_text.Append( END_OF_LINE );
+			file_text.Append( "\t" );
+			file_text.Append( file_name );
+			file_text.Append( END_OF_LINE );
 			file_text.Append( @"		A component that registers project-specific enum conversions.
 		DO NOT EDIT THIS FILE; it is automatically generated.
 
@@ -175,7 +234,8 @@ namespace EnumReflector
 
 **********************************************************************************************************************/" );
 
-			file_text.Append( "\n\n" );
+			file_text.Append( END_OF_LINE );
+			file_text.Append( END_OF_LINE );
 		}
 
 		private void Parse_Project_File( FileInfo project_file )
@@ -189,8 +249,24 @@ namespace EnumReflector
 			{
 				string header_file_name = project_path + Path.DirectorySeparatorChar + elt.Value;
 
+				string []split_directory = header_file_name.Split( Path.DirectorySeparatorChar );
+				bool is_generated = false;
+				for ( int i = 0; i + 1 < split_directory.Length; i++ )
+				{
+					if ( split_directory[ i ] == "GeneratedCode" )
+					{
+						is_generated = true;
+						break;
+					}
+				}
+
+				if ( is_generated )
+				{
+					continue;
+				}
+
 				FileInfo header_file_info = new FileInfo( header_file_name );
-				CHeaderFileRecord new_header_record = new CHeaderFileRecord( header_file_name, header_file_info.LastWriteTime );
+				CHeaderFileRecord new_header_record = new CHeaderFileRecord( header_file_name, NewProjectRecord.Name, header_file_info.LastWriteTime );
 				
 				CEnumReflector.HeaderFileTracker.Register_Header_File( ID, new_header_record );
 			}
@@ -213,14 +289,15 @@ namespace EnumReflector
 
 		private string Build_Register_Function_Signature()
 		{
-			return "void Register_" + NewProjectRecord.Name + "_Enums( void )";
+			return "void Register_" + NewProjectRecord.CaseName + "_Enums( void )";
 		}
 
 		private string Build_Ifdef_Guard()
 		{
-			return "REGISTER_" + NewProjectRecord.Name.ToUpper() + "_ENUMS_H";
+			return "REGISTER_" + NewProjectRecord.Name + "_ENUMS_H";
 		}
 
+		// Properties
 		public EProjectID ID { get; private set; }
 		public string Name { get { return OldProjectRecord != null ? OldProjectRecord.Name : NewProjectRecord.Name; } }
 		public EProjectCreationState CreationState { get; private set; }
@@ -228,14 +305,20 @@ namespace EnumReflector
 
 		public CProjectRecord OldProjectRecord { get; private set; }
 		public CProjectRecord NewProjectRecord { get; private set; }
+
+		// Constants
+		private const string END_OF_LINE = "\r\n";
 	}
 
 	public class CProjectTracker
 	{
+		// Construction
 		public CProjectTracker()
 		{
 		}
 
+		// Methods
+		// Public interface
 		public void Initialize_DB_Projects()
 		{
 			foreach ( var project_record in CEnumXMLDatabase.Instance.Projects )
@@ -276,10 +359,37 @@ namespace EnumReflector
 			return m_Projects[ id ];
 		}
 
+		public CProject Get_Project_By_Name( string project_name )
+		{
+			EProjectID project_id = EProjectID.Invalid;
+			if ( !m_ProjectIDMap.TryGetValue( project_name.ToUpper(), out project_id ) )
+			{
+				return null;
+			}
+
+			return Get_Project_By_ID( project_id );
+		}
+
+		// Private interface
+		private bool Should_Skip_Project( string project_name )
+		{
+			if ( project_name == "GTEST-MD" || project_name == "PLATFORM" || project_name == "PLATFORMTEST" )
+			{
+				return true;
+			}
+
+			return false;
+		}
+
 		private void Register_Project( FileInfo project_file )
 		{
 			string project_name = Path.GetFileNameWithoutExtension( project_file.Name );
 			string upper_project_name = project_name.ToUpper();
+
+			if ( Should_Skip_Project( upper_project_name ) )
+			{
+				return;
+			}
 
 			CProject existing_project = Get_Project_By_Name( upper_project_name );
 			if ( existing_project != null )
@@ -298,17 +408,6 @@ namespace EnumReflector
 		private EProjectID Allocate_Project_ID()
 		{
 			return m_NextAllocatedID++;
-		}
-
-		private CProject Get_Project_By_Name( string project_name )
-		{
-			EProjectID project_id = EProjectID.Invalid;
-			if ( !m_ProjectIDMap.TryGetValue( project_name, out project_id ) )
-			{
-				return null;
-			}
-
-			return Get_Project_By_ID( project_id );
 		}
 
 		// Properties

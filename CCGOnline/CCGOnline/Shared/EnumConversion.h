@@ -32,16 +32,21 @@ enum EConvertibleEnumProperties
 
 class CConvertibleEnum;
 
+// A simple static class with registration and conversion functions for enums
+// Registration should be done at startup time before any concurrency is established.
+// After that, multiple threads should be able to safely call Convert functions without worry of
+// conflice
 class CEnumConverter
 {
 	public:
 
 		static void Cleanup( void );
 
-		static void Register_Enum( const std::string &enum_name, EConvertibleEnumProperties properties );
-		
+		// Registration
+		static void Register_Enum( const std::string &enum_name, EConvertibleEnumProperties properties );	
 		static void Register_Enum_Entry( const std::string &enum_name, const std::string &entry_name, uint64 entry_value );
 
+		// Conversion
 		template < typename T >
 		static bool Convert( const std::string &enum_name, const std::string &entry_name, T &output_value )
 		{
@@ -62,7 +67,7 @@ class CEnumConverter
 	private:
 
 		static bool Convert_Internal( const std::string &enum_name, const std::string &entry_name, uint64 &output_value );
-		static bool Convert_Internal( const std::string &enum_name, uint64 output_value, std::string &entry_name );
+		static bool Convert_Internal( const std::string &enum_name, uint64 value, std::string &entry_name );
 
 		static CConvertibleEnum *Find_Enum( const std::string &enum_name );
 

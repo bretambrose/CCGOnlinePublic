@@ -25,6 +25,7 @@
 #include "ServerShared.h"
 
 #include "Shared.h"
+#include "GeneratedCode/RegisterServerSharedEnums.h"
 
 /**********************************************************************************************************************
 	NServerShared::Initialize_Server_Shared -- Initializes the ServerShared library and all its ancestors
@@ -33,6 +34,7 @@
 void NServerShared::Initialize( void )
 {
 	NShared::Initialize();
+	Register_ServerShared_Enums();
 }
 
 /**********************************************************************************************************************

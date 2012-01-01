@@ -1,4 +1,27 @@
-﻿using System;
+﻿/**********************************************************************************************************************
+
+	EnumTracker.cs
+		A pair of classes for tracking the before (cached in an XML "DB") and after (header file read and parsed)
+		states of a tagged enum.
+
+	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+**********************************************************************************************************************/
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +53,7 @@ namespace EnumReflector
 
 	public class CEnum
 	{
+		// Construction
 		public CEnum( EEnumID id, CEnumRecord old_enum_record )
 		{
 			ID = id;
@@ -48,9 +72,10 @@ namespace EnumReflector
 			State = EEnumState.Dirty;
 		} 
 
-		public void Initialize_Existing( EHeaderFileID header_id, CEnumRecord new_record )
+		// Methods
+		// Public interface
+		public void Initialize_Existing( CEnumRecord new_record )
 		{
-			OldEnumRecord.HeaderFileID = header_id;
 			NewEnumRecord = new_record;
 			CreationState = EEnumCreationState.Unchanged;
 			State = NewEnumRecord.Value_Equals( OldEnumRecord ) ? EEnumState.Unchanged : EEnumState.Dirty;
@@ -61,9 +86,21 @@ namespace EnumReflector
 			OldEnumRecord.HeaderFileID = id;
 		}
 
+		public void Promote_To_Unchanged()
+		{
+			if ( NewEnumRecord != null || CreationState != EEnumCreationState.Deleted )
+			{
+				throw new Exception( "Illegal promotion to unchanged state for enum " + Name );
+			}
+
+			CreationState = EEnumCreationState.Unchanged;
+			NewEnumRecord = OldEnumRecord;	// ugly but safe, avoids having to write a clone
+		}
+
+		// Properties
 		public EEnumID ID { get; private set; }
 		public string Name { get { return OldEnumRecord != null ? OldEnumRecord.Name : NewEnumRecord.Name; } }
-		public string HeaderFileName { get { return OldEnumRecord != null ? OldEnumRecord.HeaderFileName : NewEnumRecord.HeaderFileName; } }
+		public string FileNameWithPath { get { return OldEnumRecord != null ? OldEnumRecord.FileNameWithPath : NewEnumRecord.FileNameWithPath; } }
 		public EEnumCreationState CreationState { get; private set; }
 		public EEnumState State { get; set; }
 
@@ -73,10 +110,13 @@ namespace EnumReflector
 
 	public class CEnumTracker
 	{
+		// Construction
 		public CEnumTracker()
 		{
 		}
 
+		// Methods
+		// Private interface
 		public void Initialize_DB_Enums()
 		{
 			foreach ( var enum_record in CEnumXMLDatabase.Instance.Enums )
@@ -88,11 +128,33 @@ namespace EnumReflector
 			}
 		}
 
+		public void Initialize_Parsed_Enum( CEnumRecord record )
+		{
+			EEnumID id = EEnumID.Invalid;
+			if ( m_EnumIDMap.TryGetValue( record.Name, out id ) )
+			{
+				CEnum enum_instance = null;
+				if ( !m_Enums.TryGetValue( id, out enum_instance ) )
+				{
+					throw new Exception( "Internal error: enum id mapping exists, but not enum instance could be found" );
+				}
+
+				enum_instance.Initialize_Existing( record );
+			}
+			else
+			{
+				id = Allocate_Enum_ID();
+				CEnum enum_instance = new CEnum( id, record.HeaderFileID, record );
+				m_EnumIDMap.Add( enum_instance.Name, id );
+				m_Enums.Add( id, enum_instance );
+			}
+		}
+		
 		public void Initialize_Starting_Enum_States()
 		{
 			foreach ( var enum_pair in m_Enums )
 			{
-				CHeaderFile header_file = CEnumReflector.HeaderFileTracker.Get_Header_ID_By_File_Path( enum_pair.Value.HeaderFileName );
+				CHeaderFile header_file = CEnumReflector.HeaderFileTracker.Get_Header_ID_By_File_Path( enum_pair.Value.FileNameWithPath );
 				enum_pair.Value.Set_Old_Header_ID( header_file.ID );
 
 				if ( header_file.State == EHeaderFileState.Unchanged )
@@ -114,6 +176,17 @@ namespace EnumReflector
 		{
 			foreach ( var en in m_Enums.Values )
 			{
+				// deleted is the default state for existing enums; if the header the enum is defined in is unchanged, then this
+				// enum didn't change
+				if ( en.CreationState == EEnumCreationState.Deleted )
+				{
+					CHeaderFile header_file = CEnumReflector.HeaderFileTracker.Get_Header_File_By_ID( en.OldEnumRecord.HeaderFileID );
+					if ( header_file != null && header_file.State == EHeaderFileState.Unchanged )
+					{
+						en.Promote_To_Unchanged();
+					}
+				}
+
 				if ( en.CreationState == EEnumCreationState.Unchanged && en.NewEnumRecord.Value_Equals( en.OldEnumRecord ) )
 				{
 					continue;
@@ -160,6 +233,7 @@ namespace EnumReflector
 			return m_Enums[ id ];
 		}
 
+		// Private interface
 		private void Mark_Owning_Project_Dirty( EHeaderFileID header_id )
 		{
 			CHeaderFile header_file = CEnumReflector.HeaderFileTracker.Get_Header_File_By_ID( header_id );

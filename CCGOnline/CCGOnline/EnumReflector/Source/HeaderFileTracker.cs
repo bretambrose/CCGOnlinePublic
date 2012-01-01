@@ -1,4 +1,28 @@
-﻿using System;
+﻿/**********************************************************************************************************************
+
+	HeaderFileTracker.cs		
+ 		A pair of classes for tracking the before (cached in an XML "DB") and after (header file read and parsed)
+		states of a C++ header file.  Unlike enums, before and after doesn't make a whole lot of sense here
+		but I've kept it for symmetry preservation.
+ 
+	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+**********************************************************************************************************************/
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +54,7 @@ namespace EnumReflector
 
 	public class CHeaderFile
 	{
+		// Construction
 		public CHeaderFile( EHeaderFileID id, CHeaderFileRecord old_header_file_record )
 		{
 			ID = id;
@@ -50,11 +75,18 @@ namespace EnumReflector
 			State = EHeaderFileState.Dirty;
 		} 
 
+		// Methods
+		// Public interface
 		public void Initialize_Existing( EProjectID project_id, CHeaderFileRecord new_record )
 		{
 			NewHeaderFileRecord = new_record;
 			CreationState = EHeaderFileCreationState.Unchanged;
 			State = ( NewHeaderFileRecord.LastModifiedTime > OldHeaderFileRecord.LastModifiedTime ) ? EHeaderFileState.Dirty : EHeaderFileState.Unchanged;
+			ProjectID = project_id;
+		}
+
+		public void Set_Project_ID( EProjectID project_id )
+		{
 			ProjectID = project_id;
 		}
 
@@ -92,7 +124,7 @@ namespace EnumReflector
 									definition_start = current_line_start;
 								}
 							}
-							else if ( Substring_Compare( header_string, current_line_start, ENUM_END_DIRECTIVE ) )
+							else if ( Substring_Compare( header_string, current_line_pos, ENUM_END_DIRECTIVE ) )
 							{
 								if ( !in_enum_definition )
 								{
@@ -103,8 +135,11 @@ namespace EnumReflector
 									in_enum_definition = false;
 									definition_end = current_line_end;
 
+									// with the enum definition split out, parse it and analyze the AST in order to extract all the needed information
 									string parse_string = header_string.Substring( definition_start, definition_end - definition_start + 1 );
-									CEnumASTUtils.Parse_Enum_Definition( parse_string, NewHeaderFileRecord.FileName );
+									CEnumRecord new_record = CEnumASTUtils.Parse_Enum_Definition( parse_string, NewHeaderFileRecord.FileNameWithPath );
+
+									CEnumReflector.EnumTracker.Initialize_Parsed_Enum( new_record );
 								}
 							}
 						}
@@ -122,13 +157,19 @@ namespace EnumReflector
 						current_line_start++;
 					}
 				}
+
+				if ( in_enum_definition )
+				{
+					throw new Exception( "Enum reflection directive was not properly closed" );
+				}
 			}
 		}
 
+		// Private interface
 		private int Skip_Line_Whitespace( string value, int index )
 		{
 			char current_char = value[ index ];
-			while ( current_char == '\t' || current_char == ' ' )
+			while ( current_char == '\t' || current_char == ' ' && index + 1 < value.Length )
 			{
 				current_char = value[ ++index ];
 			}
@@ -139,7 +180,7 @@ namespace EnumReflector
 		private int Find_Current_Line_End( string value, int index )
 		{
 			char current_char = value[ index ];
-			while ( current_char != '\r' && current_char != '\n' )
+			while ( current_char != '\r' && current_char != '\n' && index + 1 < value.Length )
 			{
 				current_char = value[ ++index ];
 			}
@@ -167,6 +208,7 @@ namespace EnumReflector
 			return true;
 		}
 
+		// Properties
 		public EHeaderFileID ID { get; private set; }
 		public EProjectID ProjectID { get; private set; }
 		public string FileNameWithPath { get { return OldHeaderFileRecord != null ? OldHeaderFileRecord.FileNameWithPath : NewHeaderFileRecord.FileNameWithPath; } }
@@ -176,6 +218,7 @@ namespace EnumReflector
 		public CHeaderFileRecord OldHeaderFileRecord { get; private set; }
 		public CHeaderFileRecord NewHeaderFileRecord { get; private set; }
 
+		// Constants
 		private const string REFLECTION_DIRECTIVE = @"//:";
 		private const string ENUM_PREFIX = @"Enum";
 		private const string ENUM_BEGIN_DIRECTIVE = @"Begin";
@@ -184,10 +227,13 @@ namespace EnumReflector
 
 	public class CHeaderFileTracker
 	{
+		// Construction
 		public CHeaderFileTracker()
 		{
 		}
 
+		// Methods
+		// Public Interface
 		public void Initialize_DB_Header_Files()
 		{
 			foreach ( var header_file_record in CEnumXMLDatabase.Instance.HeaderFiles )
@@ -201,7 +247,10 @@ namespace EnumReflector
 
 		public CHeaderFile Get_Header_File_By_ID( EHeaderFileID id )
 		{
-			return m_HeaderFiles[ id ];
+			CHeaderFile header_file = null;
+			m_HeaderFiles.TryGetValue( id, out header_file );
+
+			return header_file;
 		}
 
 		public void Register_Header_File( EProjectID project_id, CHeaderFileRecord header_record )
@@ -223,6 +272,17 @@ namespace EnumReflector
 				CHeaderFile header_file = new CHeaderFile( header_id, project_id, header_record );
 				m_HeaderFileIDMap.Add( header_file.FileNameWithPath, header_id );
 				m_HeaderFiles.Add( header_id, header_file );
+			}
+		}
+
+		public void Initialize_Starting_Header_Projects()
+		{
+			foreach ( var header_file in m_HeaderFiles.Values )
+			{
+				string project_name = header_file.NewHeaderFileRecord != null ? header_file.NewHeaderFileRecord.Project : header_file.OldHeaderFileRecord.Project;
+
+				CProject project = CEnumReflector.ProjectTracker.Get_Project_By_Name( project_name );
+				header_file.Set_Project_ID( project.ID );
 			}
 		}
 
@@ -248,6 +308,7 @@ namespace EnumReflector
 			return Get_Header_File_By_ID( id );
 		}
 
+		// Private interface
 		private EHeaderFileID Allocate_Header_File_ID()
 		{
 			return m_NextAllocatedID++;

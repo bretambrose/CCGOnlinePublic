@@ -9,6 +9,9 @@
       <UniqueIdentifier>{32B9B57B-5F48-42DE-BE62-7E63E93BB381}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\GeneratedCode">
+      <UniqueIdentifier>{e45fd725-ceee-41d4-be95-73bc1cba7182}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="small.ico">
@@ -31,6 +34,9 @@
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedCode\RegisterCCGOClientEnums.h">
+      <Filter>Source Files\GeneratedCode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -38,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="CCGOClient.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedCode\RegisterCCGOClientEnums.cpp">
+      <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

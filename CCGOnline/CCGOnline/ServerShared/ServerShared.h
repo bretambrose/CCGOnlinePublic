@@ -27,6 +27,6 @@ namespace NServerShared
 {
 	void Initialize( void );
 	void Shutdown( void );
-}
+} 
 
 #endif // SERVER_SHARED_H

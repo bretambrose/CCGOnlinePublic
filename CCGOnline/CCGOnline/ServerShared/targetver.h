@@ -32,3 +32,4 @@
 #include <SDKDDKVer.h>
 
 #endif // WIN32
+

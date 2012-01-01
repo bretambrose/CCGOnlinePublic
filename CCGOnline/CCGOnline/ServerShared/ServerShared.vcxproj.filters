@@ -9,6 +9,9 @@
       <UniqueIdentifier>{1841FECF-19E2-4911-A7FB-947A8999D275}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\GeneratedCode">
+      <UniqueIdentifier>{f4c2b417-bdc4-41b9-8eec-4730145fa3b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -20,6 +23,9 @@
     <ClInclude Include="ServerShared.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedCode\RegisterServerSharedEnums.h">
+      <Filter>Source Files\GeneratedCode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -27,6 +33,9 @@
     </ClCompile>
     <ClCompile Include="ServerShared.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedCode\RegisterServerSharedEnums.cpp">
+      <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

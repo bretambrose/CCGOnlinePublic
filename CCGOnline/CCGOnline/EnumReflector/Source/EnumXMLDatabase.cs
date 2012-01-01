@@ -1,4 +1,27 @@
-﻿using System;
+﻿/**********************************************************************************************************************
+
+	EnumXMLDatabase.cs
+		A wrapper class for reading and writing (from/to XML) all the project file, header file, and enum definition data needed
+		in order to efficiently and correctly incrementally update and emit the auto-generated enum conversion code.
+
+	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+**********************************************************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization;
@@ -12,6 +35,7 @@ namespace EnumReflector
 	[ DataContract( Name="HeaderFile", Namespace="http://www.bretambrose.com" ) ]
 	public sealed class CHeaderFileRecord
 	{
+		// Construction
 		public CHeaderFileRecord()
 		{
 			Project = String.Empty;
@@ -20,29 +44,32 @@ namespace EnumReflector
 			LastModifiedTime = DateTime.Now;
 		}
 
-		public CHeaderFileRecord( string file_path, DateTime last_modified_time )
+		public CHeaderFileRecord( string file_path, string project_name, DateTime last_modified_time )
 		{
-			int separator_index = file_path.IndexOf( Path.DirectorySeparatorChar );
-			Project = file_path.Substring( 0, separator_index );
+			Project = project_name;
 			FileNameWithPath = file_path;
 			FileName = Path.GetFileName( file_path );
 
 			LastModifiedTime = last_modified_time;
 		}
 
+		// Properties
 		[ DataMember( Name="File", Order = 0, IsRequired=true ) ]
 		public string FileNameWithPath { get; private set; }
 
 		public string FileName { get; private set; }
+
+		[ DataMember( Name="Project", Order = 1, IsRequired=true ) ]
 		public string Project { get; private set; }
 
-		[ DataMember( Name="LastModified", Order = 1, IsRequired=true ) ]
+		[ DataMember( Name="LastModified", Order = 2, IsRequired=true ) ]
 		public DateTime LastModifiedTime { get; private set; }
 	}
 
 	[ DataContract( Name="EnumEntry", Namespace="http://www.bretambrose.com" ) ]
 	public sealed class CEnumEntry
 	{
+		// Construction
 		public CEnumEntry()
 		{
 			EntryName = string.Empty;
@@ -55,11 +82,14 @@ namespace EnumReflector
 			Value = value;
 		}
 
+		// Methods
+		// Public interface
 		public bool Value_Equals( CEnumEntry enum_entry )
 		{
 			return EntryName == enum_entry.EntryName && Value == enum_entry.Value;
 		}
 
+		// Properties
 		[ DataMember( Name="EntryName", Order = 0, IsRequired=true ) ]
 		public string EntryName { get; private set; }
 
@@ -77,24 +107,27 @@ namespace EnumReflector
 	[ DataContract( Name="Enum", Namespace="http://www.bretambrose.com" ) ]
 	public sealed class CEnumRecord
 	{
+		// Construction
 		public CEnumRecord()
 		{
 			Name = String.Empty;
-			HeaderFileName = String.Empty;
+			FileNameWithPath = String.Empty;
 			Flags = EEnumFlags.None;
 			EnumEntries = new List< CEnumEntry >();
 			HeaderFileID = EHeaderFileID.Invalid;
 		}
 
-		public CEnumRecord( string name, string header_file_name, EEnumFlags flags )
+		public CEnumRecord( string name, string file_name_with_path, EEnumFlags flags )
 		{
 			Name = name;
-			HeaderFileName = header_file_name;
+			FileNameWithPath = file_name_with_path;
 			Flags = flags;
 			EnumEntries = new List< CEnumEntry >();
 			HeaderFileID = EHeaderFileID.Invalid;
 		}
 
+		// Methods
+		// Public interface
 		public bool Value_Equals( CEnumRecord enum_definition )
 		{
 			if ( Name != enum_definition.Name )
@@ -145,11 +178,12 @@ namespace EnumReflector
 			return EnumEntries;
 		}
 
+		// Properties
 		[ DataMember( Name="Name", Order = 0, IsRequired=true ) ]
 		public string Name { get; private set; }
 
-		[ DataMember( Name="HeaderFile", Order = 1, IsRequired=true ) ]
-		public string HeaderFileName { get; private set; }
+		[ DataMember( Name="FileNameWithPath", Order = 1, IsRequired=true ) ]
+		public string FileNameWithPath { get; private set; }
 
 		[ DataMember( Name="Flags", Order = 2, IsRequired=true ) ]
 		public EEnumFlags Flags { get; private set; }
@@ -163,6 +197,7 @@ namespace EnumReflector
 	[ DataContract( Name="Project", Namespace="http://www.bretambrose.com" ) ]
 	public sealed class CProjectRecord
 	{
+		// Construction
 		public CProjectRecord()
 		{
 			Name = String.Empty;
@@ -175,6 +210,7 @@ namespace EnumReflector
 			Name = name.ToUpper();
 		}
 
+		// Properties
 		[ DataMember( Name="Name", Order = 0, IsRequired=true ) ]
 		public string Name { get; private set; }
 
@@ -245,9 +281,10 @@ namespace EnumReflector
 			enum_records.Apply( er => Enums.Add( er ) );
 		}
 		
+		// Private interface
 		private static string Build_Filename()
 		{
-			return FileNamePrefix + CEnumReflector.BuildSuffix + ".xml";
+			return FileNamePrefix + ".xml";
 		}
 
 		// Properties

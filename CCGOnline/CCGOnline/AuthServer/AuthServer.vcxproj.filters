@@ -9,6 +9,9 @@
       <UniqueIdentifier>{4A79F85B-6293-40DD-AB73-D50FFE1EAF52}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\GeneratedCode">
+      <UniqueIdentifier>{4788e31d-80fb-4f0f-a3fd-ef6aadfbee7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -17,6 +20,9 @@
     <ClInclude Include="targetver.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedCode\RegisterAuthServerEnums.h">
+      <Filter>Source Files\GeneratedCode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -24,6 +30,9 @@
     </ClCompile>
     <ClCompile Include="AuthServer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedCode\RegisterAuthServerEnums.cpp">
+      <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

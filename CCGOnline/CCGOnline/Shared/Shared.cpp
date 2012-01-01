@@ -29,6 +29,7 @@
 #include "Concurrency/ThreadStatics.h"
 #include "PlatformTime.h"
 #include "PlatformProcess.h"
+#include "GeneratedCode/RegisterSharedEnums.h"
 
 /**********************************************************************************************************************
 	NShared::Initialize -- Initializes all the static process-wide systems in the Shared library
@@ -41,6 +42,8 @@ void NShared::Initialize( void )
 	CLogInterface::Initialize_Static( NPlatform::Get_Service_Name(), LL_LOW );
 	CThreadStatics::Initialize();
 	CPlatformTime::Initialize();	// does not have a corresponding shutdown function
+
+	Register_Shared_Enums();
 }
 
 /**********************************************************************************************************************

@@ -26,20 +26,24 @@
 #include "EnumConversion.h"
 #include "StringUtils.h"
 
+// A simple, hidden class that contains all the conversion information for a single enum
 class CConvertibleEnum 
 {
 	public:
 
+		// Construction
 		CConvertibleEnum( const std::string &name, EConvertibleEnumProperties properties );
 
+		// Accessors
 		const std::string &Get_Name( void ) const { return Name; }
-
 		EConvertibleEnumProperties Get_Properties( void ) const { return Properties; }
 
+		// Conversion registration
+		void Register_Entry( const std::string &entry_name, uint64 value );
+
+		// Conversion
 		bool Convert( const std::string &entry_name, uint64 &output_value ) const;
 		bool Convert( uint64 output_value, std::string &entry_name ) const;
-
-		void Register_Entry( const std::string &entry_name, uint64 value );
 
 	private:
 
@@ -49,15 +53,22 @@ class CConvertibleEnum
 		bool Convert_Bitfield_Internal( const std::string &mask_name, uint64 &output_value ) const;
 		bool Convert_Bitfield_Internal( uint64 value, std::string &mask_name ) const;
 
+		// Data
 		std::string Name;
 
 		EConvertibleEnumProperties Properties;
 
 		stdext::hash_map< std::string, uint64 > NameToValueTable;
 		stdext::hash_map< uint64, std::string > ValueToNameTable;
-
 };
 
+/**********************************************************************************************************************
+	CConvertibleEnum::CConvertibleEnum -- constructor
+
+		name -- name of the enum
+		properties -- any special properties the enum has (bitfield)
+
+**********************************************************************************************************************/
 CConvertibleEnum::CConvertibleEnum( const std::string &name, EConvertibleEnumProperties properties ) :
 	Name( name ),
 	Properties( properties ),
@@ -66,6 +77,15 @@ CConvertibleEnum::CConvertibleEnum( const std::string &name, EConvertibleEnumPro
 {
 }
 
+/**********************************************************************************************************************
+	CConvertibleEnum::Convert -- top level function to convert between a string and an integer value
+
+		entry_name -- string to convert from
+		output_value -- output parameter for the integer value
+
+		Returns: success/failure
+
+**********************************************************************************************************************/
 bool CConvertibleEnum::Convert( const std::string &entry_name, uint64 &output_value ) const
 {
 	if ( ( Properties & CEP_BITFIELD ) != 0 )
@@ -78,18 +98,34 @@ bool CConvertibleEnum::Convert( const std::string &entry_name, uint64 &output_va
 	}
 }
 
-bool CConvertibleEnum::Convert( uint64 output_value, std::string &entry_name ) const
+/**********************************************************************************************************************
+	CConvertibleEnum::Convert -- top level function to convert between an integer value and a string
+
+		value -- integer to convert from
+		entry_name -- output parameter for the corresponding string value
+
+		Returns: success/failure
+
+**********************************************************************************************************************/
+bool CConvertibleEnum::Convert( uint64 value, std::string &entry_name ) const
 {
 	if ( ( Properties & CEP_BITFIELD ) != 0 )
 	{
-		return Convert_Bitfield_Internal( output_value, entry_name );
+		return Convert_Bitfield_Internal( value, entry_name );
 	}
 	else
 	{
-		return Convert_Internal( output_value, entry_name );
+		return Convert_Internal( value, entry_name );
 	}
 }
 
+/**********************************************************************************************************************
+	CConvertibleEnum::Register_Entry -- registers a string and integer value pair as convertible
+
+		entry_name -- corresponding string value
+		value -- integer to convert to/from
+
+**********************************************************************************************************************/
 void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64 value )
 {
 	std::string upper_entry_name;
@@ -105,6 +141,15 @@ void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64 val
 	ValueToNameTable[ value ] = upper_entry_name;
 }
 
+/**********************************************************************************************************************
+	CConvertibleEnum::Convert_Internal -- internal function to convert from a string to an integer value
+
+		entry_name -- string value to convert from
+		output_value -- output parameter for the integer to convert to
+
+		Returns: success/failure
+
+**********************************************************************************************************************/
 bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64 &output_value ) const
 {
 	std::string upper_entry_name;
@@ -120,6 +165,15 @@ bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64 &
 	return true;
 }
 
+/**********************************************************************************************************************
+	CConvertibleEnum::Convert_Internal -- internal function to convert from an integer value to a string
+
+		value -- integer to convert from
+		entry_name -- output parameter for the string value 
+
+		Returns: success/failure
+
+**********************************************************************************************************************/
 bool CConvertibleEnum::Convert_Internal( uint64 value, std::string &entry_name ) const
 {
 	auto iter = ValueToNameTable.find( value );
@@ -132,6 +186,16 @@ bool CConvertibleEnum::Convert_Internal( uint64 value, std::string &entry_name )
 	return true;
 }
 
+/**********************************************************************************************************************
+	Skip_Separators -- scans from a position within a raw character sequence until the string end is found or a non
+		separator character ( space, tab, and | ) is found
+
+		string_buffer -- raw character sequence to scan
+		index -- position within the string to start the can from
+
+		Returns: position of the first non-separator character or the end of the string
+
+**********************************************************************************************************************/
 static uint32 Skip_Separators( const char *string_buffer, uint32 index )
 {
 	char current_char = *( string_buffer + index );
@@ -143,6 +207,16 @@ static uint32 Skip_Separators( const char *string_buffer, uint32 index )
 	return index;
 }
 
+/**********************************************************************************************************************
+	Skip_Non_Separators -- scans from a position within a raw character sequence until the string end is found or a 
+		separator character ( space, tab, and | ) is found
+
+		string_buffer -- raw character sequence to scan
+		index -- position within the string to start the can from
+
+		Returns: position of the first separator character or the end of the string
+
+**********************************************************************************************************************/
 static uint32 Skip_Non_Separators( const char *string_buffer, uint32 index )
 {
 	char current_char = *( string_buffer + index );
@@ -154,6 +228,15 @@ static uint32 Skip_Non_Separators( const char *string_buffer, uint32 index )
 	return index;
 }
 
+/**********************************************************************************************************************
+	CConvertibleEnum::Convert_Bitfield_Internal -- internal function to convert from a bitfield string to an integer value
+
+		mask_name -- bitfield string value to convert from
+		output_value -- output parameter for the integer to convert to
+
+		Returns: success/failure
+
+**********************************************************************************************************************/
 bool CConvertibleEnum::Convert_Bitfield_Internal( const std::string &mask_name, uint64 &output_value ) const
 {
 	const char *raw_characters = mask_name.c_str();
@@ -180,6 +263,15 @@ bool CConvertibleEnum::Convert_Bitfield_Internal( const std::string &mask_name, 
 	return true;
 }
 
+/**********************************************************************************************************************
+	CConvertibleEnum::Convert_Bitfield_Internal -- internal function to convert from a bitfield integer value to a string
+
+		value -- bitfield integer to convert from
+		entry_name -- output parameter for the string value 
+
+		Returns: success/failure
+
+**********************************************************************************************************************/
 bool CConvertibleEnum::Convert_Bitfield_Internal( uint64 value, std::string &mask_name ) const
 {
 	if ( value == 0 )
@@ -219,11 +311,14 @@ bool CConvertibleEnum::Convert_Bitfield_Internal( uint64 value, std::string &mas
 	return true;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 stdext::hash_map< std::string, CConvertibleEnum * > CEnumConverter::Enums;
 
+/**********************************************************************************************************************
+	CEnumConverter::Cleanup -- deletes the enum objects used to perform conversions
+
+**********************************************************************************************************************/
 void CEnumConverter::Cleanup( void )
 {
 	for ( auto iter = Enums.begin(); iter != Enums.end(); ++iter )
@@ -234,6 +329,13 @@ void CEnumConverter::Cleanup( void )
 	Enums.clear();
 }
 
+/**********************************************************************************************************************
+	CEnumConverter::Register_Enum -- instantiates an enum conversion object for the supplied enum
+
+		enum_name -- name of the enum to register conversion entries for
+		properties -- any special properties that the enum has (bitfield)
+
+**********************************************************************************************************************/
 void CEnumConverter::Register_Enum( const std::string &enum_name, EConvertibleEnumProperties properties )
 {
 	std::string upper_enum_name;
@@ -244,7 +346,15 @@ void CEnumConverter::Register_Enum( const std::string &enum_name, EConvertibleEn
 	CConvertibleEnum *enum_object = new CConvertibleEnum( enum_name, properties );
 	Enums[ upper_enum_name ] = enum_object;
 }
-		
+
+/**********************************************************************************************************************
+	CEnumConverter::Register_Enum_Entry -- registers a string<->integer conversion pair within an enum
+
+		enum_name -- name of the enum to register a conversion entry for
+		entry_name -- string representation of the enum entry value
+		entry_value -- integer value of the enum entry
+
+**********************************************************************************************************************/		
 void CEnumConverter::Register_Enum_Entry( const std::string &enum_name, const std::string &entry_name, uint64 entry_value )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_name );
@@ -253,6 +363,14 @@ void CEnumConverter::Register_Enum_Entry( const std::string &enum_name, const st
 	enum_object->Register_Entry( entry_name, entry_value );
 }
 
+/**********************************************************************************************************************
+	CEnumConverter::Find_Enum -- searches for the conversion object for the named enum
+
+		enum_name -- name of the enum to register a conversion entry for
+
+		Returns: the conversion object for the name enum, or null
+
+**********************************************************************************************************************/	
 CConvertibleEnum *CEnumConverter::Find_Enum( const std::string &enum_name )
 {
 	std::string upper_enum_name;
@@ -267,6 +385,14 @@ CConvertibleEnum *CEnumConverter::Find_Enum( const std::string &enum_name )
 	return iter->second;
 }
 
+/**********************************************************************************************************************
+	CEnumConverter::Convert_Internal -- converts from a string to an integer for the supplied enum
+
+		enum_name -- name of the enum this is a conversion operation for
+		entry_name -- string value to convert from
+		output_value -- output parameter for the corresponding integer value
+
+**********************************************************************************************************************/	
 bool CEnumConverter::Convert_Internal( const std::string &enum_name, const std::string &entry_name, uint64 &output_value )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_name );
@@ -278,7 +404,15 @@ bool CEnumConverter::Convert_Internal( const std::string &enum_name, const std::
 	return enum_object->Convert( entry_name, output_value );
 }
 
-bool CEnumConverter::Convert_Internal( const std::string &enum_name, uint64 output_value, std::string &entry_name )
+/**********************************************************************************************************************
+	CEnumConverter::Convert_Internal -- converts from an integer to a string for the supplied enum
+
+		enum_name -- name of the enum this is a conversion operation for
+		value -- integer value to convert from
+		entry_name -- output parameter for the corresponding string value
+
+**********************************************************************************************************************/	
+bool CEnumConverter::Convert_Internal( const std::string &enum_name, uint64 value, std::string &entry_name )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_name );
 	if ( enum_object == nullptr )
@@ -286,6 +420,6 @@ bool CEnumConverter::Convert_Internal( const std::string &enum_name, uint64 outp
 		return false;
 	}
 
-	return enum_object->Convert( output_value, entry_name );
+	return enum_object->Convert( value, entry_name );
 }
 

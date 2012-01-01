@@ -29,7 +29,7 @@
 #include <sqlext.h>
 #include <sqltypes.h>
 
-
+#include "GeneratedCode\RegisterAuthServerEnums.h"
 #include "Logging/LogInterface.h"
 
 void SQL_Stuff( void )
@@ -96,17 +96,28 @@ void Exception_Test_1( void )
 	Exception_Test_2();
 }
 
+namespace NAuthServer
+{
+	void Initialize( void )
+	{
+		NServerShared::Initialize();
+		Register_AuthServer_Enums();
+	}
+
+	void Shutdown( void )
+	{
+		NServerShared::Shutdown();
+	}
+}
+
 int main( int /*argc*/, wchar_t* /*argv*/[] )
 {
-	NServerShared::Initialize();
-
-	DEBUG_ASSERT( false );
-	FATAL_ASSERT( false );
+	NAuthServer::Initialize();
 
 	//SQL_Stuff();
 	//Exception_Test_1();
 
-	NServerShared::Shutdown();
+	NAuthServer::Shutdown();
 
 	return 0;
 }

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	SharedTest.cpp
-		the entry point for the console application that runs all the shared library tests
+	ReflectionTests.h
+		defines unit tests for enum reflection
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,34 +20,31 @@
 
 **********************************************************************************************************************/
 
-#include "stdafx.h"
-
-#include "Shared.h"
-#include "GeneratedCode/RegisterSharedTestEnums.h"
-
-namespace NSharedTest
+#ifndef REFLECTION_TESTS_H
+#define REFLECTION_TESTS_H
+ 
+//:EnumBegin()
+enum EReflectionTest
 {
-	void Initialize( void )
-	{
-		NShared::Initialize();
-		Register_SharedTest_Enums();
-	}
+	RT_INVALID = 0,		//:EnumEntry( "Invalid" )
 
-	void Shutdown( void )
-	{
-		NShared::Shutdown();
-	}
-}
+	RT_ENTRY1 = 2,			//:EnumEntry( "Entry1" )
+	RT_ENTRY2 = 0x04,		//:EnumEntry( "Entry2" )
+	RT_ENTRY3,				//:EnumEntry( "Entry3" )
+	RT_ENTRY4				//:EnumEntry( "Entry4" )
+};
+//:EnumEnd
 
-int main(int argc, wchar_t* argv[])
+//:EnumBegin( BITFIELD )
+enum EReflectionBitfieldTest
 {
-	NSharedTest::Initialize();
+	RBT_NONE = 0x0,					//:EnumEntry( "None" )
 
-	::testing::InitGoogleTest(&argc, argv);
-	RUN_ALL_TESTS();
+	RBT_BIT1			= 1 << 0,		//:EnumEntry( "Bit1" )
+	RBT_BIT2			= 1 << 1,		//:EnumEntry( "Bit2" )
+	RBT_BIT3			= 1 << 2,		//:EnumEntry( "Bit3" )
+	RBT_BIT8			= 1 << 7			//:EnumEntry( "Bit8" )
+};
+//:EnumEnd
 
-	NSharedTest::Shutdown();
-
-	return 0;
-}
-
+#endif // REFLECTION_TESTS_H

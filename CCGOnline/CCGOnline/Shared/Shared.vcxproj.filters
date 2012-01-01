@@ -30,6 +30,9 @@
     <Filter Include="Source Files\Concurrency\ThreadMessages">
       <UniqueIdentifier>{0AF71C1C-BAF0-46A7-A6B2-D4E23F2CF6EF}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GeneratedCode">
+      <UniqueIdentifier>{7f91654a-0135-4b22-8178-5f5989858a65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -155,6 +158,9 @@
     <ClInclude Include="EnumConversion.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="GeneratedCode\RegisterSharedEnums.h">
+      <Filter>Source Files\GeneratedCode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -219,6 +225,9 @@
     </ClCompile>
     <ClCompile Include="EnumConversion.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedCode\RegisterSharedEnums.cpp">
+      <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

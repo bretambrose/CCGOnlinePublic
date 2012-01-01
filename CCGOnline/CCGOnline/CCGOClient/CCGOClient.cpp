@@ -26,6 +26,22 @@
 #include "WindowsWrapper.h"
 
 #include <tchar.h>
+#include "GeneratedCode\RegisterCCGOClientEnums.h"
+#include "Shared.h"
+
+namespace NCCGOClient
+{
+	void Initialize( void )
+	{
+		NShared::Initialize();
+		Register_CCGOClient_Enums();
+	}
+
+	void Shutdown( void )
+	{
+		NShared::Shutdown();
+	}
+}
 
 #define MAX_LOADSTRING 100
 
@@ -47,6 +63,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+
+	NCCGOClient::Initialize();
 
  	// TODO: Place code here.
 	MSG msg;
@@ -74,6 +92,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 	}
+
+	NCCGOClient::Shutdown();
 
 	return (int) msg.wParam;
 }

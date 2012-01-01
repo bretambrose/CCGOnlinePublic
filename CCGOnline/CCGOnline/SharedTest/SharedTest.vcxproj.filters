@@ -9,6 +9,9 @@
       <UniqueIdentifier>{7CD4E87F-8FE5-48E3-B66A-63A68A71CF3B}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\GeneratedCode">
+      <UniqueIdentifier>{8d773894-9655-446c-82b7-ae326fde6b13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -16,6 +19,12 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReflectionTests.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedCode\RegisterSharedTestEnums.h">
+      <Filter>Source Files\GeneratedCode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +75,12 @@
     </ClCompile>
     <ClCompile Include="EnumConversionTests.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectionTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp">
+      <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
