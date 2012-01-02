@@ -239,6 +239,8 @@ namespace EnumReflector
 			CHeaderFile header_file = CEnumReflector.HeaderFileTracker.Get_Header_File_By_ID( header_id );
 			CProject project = CEnumReflector.ProjectTracker.Get_Project_By_ID( header_file.ProjectID );
 
+			CLogInterface.Write_Line( "Marking project " + project.Name + " dirty due to header file " + header_file.FileNameWithPath );
+
 			project.State = EProjectState.Dirty;
 		}
 

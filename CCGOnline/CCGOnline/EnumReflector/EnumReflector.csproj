@@ -58,6 +58,7 @@
     <Compile Include="Source\EnumXMLDatabase.cs" />
     <Compile Include="Source\HeaderFileTracker.cs" />
     <Compile Include="Source\LinqUtils.cs" />
+    <Compile Include="Source\LogInterface.cs" />
     <Compile Include="Source\ProjectTracker.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

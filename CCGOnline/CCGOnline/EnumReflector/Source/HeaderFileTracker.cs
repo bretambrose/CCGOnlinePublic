@@ -92,6 +92,7 @@ namespace EnumReflector
 
 		public void Reparse_Enums()
 		{
+			CLogInterface.Write_Line( "Parsing file: " + NewHeaderFileRecord.FileNameWithPath );
 			using ( FileStream fs = File.Open( NewHeaderFileRecord.FileNameWithPath, FileMode.Open ) )
 			using ( TextReader tr = new StreamReader( fs ) )
 			{

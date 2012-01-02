@@ -87,6 +87,8 @@ namespace EnumReflector
 
 		public void Write_Enum_Registration_Files()
 		{
+			CLogInterface.Write_Line( "Writing enum registration files for project: " + Name );
+
 			string generated_code_directory = Build_Registration_Directory_Path();
 			if ( !Directory.Exists( generated_code_directory ) )
 			{
@@ -373,9 +375,12 @@ namespace EnumReflector
 		// Private interface
 		private bool Should_Skip_Project( string project_name )
 		{
-			if ( project_name == "GTEST-MD" || project_name == "PLATFORM" || project_name == "PLATFORMTEST" )
+			for ( int i = 0; i < SKIPPED_PROJECTS.Length; ++i )
 			{
-				return true;
+				if ( project_name == SKIPPED_PROJECTS[ i ] )
+				{
+					return true;
+				}
 			}
 
 			return false;
@@ -391,6 +396,7 @@ namespace EnumReflector
 				return;
 			}
 
+			CLogInterface.Write_Line( "Found project: " + project_name );
 			CProject existing_project = Get_Project_By_Name( upper_project_name );
 			if ( existing_project != null )
 			{
@@ -417,5 +423,7 @@ namespace EnumReflector
 		private Dictionary< EProjectID, CProject > m_Projects = new Dictionary< EProjectID, CProject >();
 		private Dictionary< string, EProjectID > m_ProjectIDMap = new Dictionary< string, EProjectID >();
 		private EProjectID m_NextAllocatedID = EProjectID.Invalid + 1;
+
+		private static string[] SKIPPED_PROJECTS = { "GTEST-MD", "PLATFORM", "PLATFORMTEST" };
 	}
 }

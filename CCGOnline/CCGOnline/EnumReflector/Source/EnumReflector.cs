@@ -92,20 +92,27 @@ namespace EnumReflector
 
 			// Prevent multiple copies of EnumReflector from interfering with one another if a batch build is in progress
 			// Runs after the first should detect no changes and not do any writes
-			if ( !global_lock.WaitOne( TimeSpan.FromSeconds( 2.0 ), false ) )
+			if ( !global_lock.WaitOne() )
 			{
-				return 0;
+				return 1;
 			}
 
 			int error_level = 0;
 			try
 			{
-				Process_Command_Line_Arguments( args );
-
+				DateTime start_time = DateTime.Now;
 				Directory.SetCurrentDirectory( "../.." );
+
+				CLogInterface.Initialize();
+
+				CLogInterface.Write_Line( "EnumReflector" );
+				CLogInterface.Write_Line( "Starting processing" );
+
+				Process_Command_Line_Arguments( args );
 
 				if ( Mode != EExecutionMode.Clean )
 				{
+					CLogInterface.Write_Line( "Reading previous run XML DB" );
 					CEnumXMLDatabase.Load_Config();
 				}
 
@@ -113,27 +120,39 @@ namespace EnumReflector
 				HeaderFileTracker.Initialize_DB_Header_Files();
 				EnumTracker.Initialize_DB_Enums();
 
+				CLogInterface.Write_Line( "Scanning all projects" );
 				ProjectTracker.Initialize_File_Projects();
 				HeaderFileTracker.Initialize_Starting_Header_Projects();
 				EnumTracker.Initialize_Starting_Enum_States();
 
+				CLogInterface.Write_Line( "Processing dirty header files" );
 				HeaderFileTracker.Process_Dirty_Headers();
 				EnumTracker.Process_Final_States();
+
+				CLogInterface.Write_Line( "Writing enum registration files" );
 				ProjectTracker.Write_Enum_Registration_Files();
 
+				CLogInterface.Write_Line( "Writing XML DB" );
 				CEnumXMLDatabase.Instance.Initialize_From_Trackers( ProjectTracker.SaveRecords, HeaderFileTracker.SaveRecords, EnumTracker.SaveRecords );
 				CEnumXMLDatabase.Save_Config();
+
+				DateTime end_time = DateTime.Now;
+				TimeSpan run_time = end_time.Subtract( start_time );
+				CLogInterface.Write_Line( "Total time taken: " + run_time.ToString() );
 			}
 			catch ( Exception e )
 			{
-				Console.WriteLine( "Exception: " + e.Message );
-				Console.WriteLine( "See EnumReflectorLog.txt for run details" );
-				Console.WriteLine( "\nHit any key to continue" );
+				CLogInterface.On_Exception( e );
+
+				Console.WriteLine( "There was an error running the EnumReflector." );
+				Console.WriteLine( "See " + CLogInterface.Get_Log_File_Name() + " for details.\n" );
+				Console.WriteLine( "Hit any key to continue" );
 				Console.ReadKey();
 				error_level = 1;
 			}
 			finally
 			{
+				CLogInterface.Shutdown();
 				global_lock.ReleaseMutex();
 			}
 

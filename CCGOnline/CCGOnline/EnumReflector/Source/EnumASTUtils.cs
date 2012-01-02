@@ -87,7 +87,7 @@ namespace EnumReflector
 			}
 
 			string enum_name = tree_adapter.GetText( enum_name_node );
-			Console.WriteLine( "Processing Enum " + enum_name + ", Flags = " + flags.ToString() );
+			CLogInterface.Write_Line( "Processing Enum " + enum_name + ", Flags = " + flags.ToString() );
 
 			CEnumRecord enum_record = new CEnumRecord( enum_name, file_name_with_path, flags );
 			enum_record.HeaderFileID = CEnumReflector.HeaderFileTracker.Get_Header_ID_By_File_Path( file_name_with_path ).ID;
@@ -154,7 +154,7 @@ namespace EnumReflector
 
 				if ( entry_conversion_name != null )
 				{
-					Console.WriteLine( "Enum " + enum_name + ": Register entry " + entry_conversion_name + " with value " + current_value.ToString() );
+					CLogInterface.Write_Line( "Enum " + enum_name + ": Register entry " + entry_conversion_name + " with value " + current_value.ToString() );
 					enum_record.Add_Entry( (ulong)current_value, entry_conversion_name );
 				}
 
