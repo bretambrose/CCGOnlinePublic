@@ -17,10 +17,10 @@ CCGOnline/CCGOnline/ServerShared/Intermediate/
 CCGOnline/CCGOnline/ServerShared/GeneratedCode/
 CCGOnline/CCGOnline/Shared/Intermediate/
 CCGOnline/CCGOnline/Shared/GeneratedCode
-CCGOnline/CCGOnline/gtest/*.sdf
 CCGOnline/CCGOnline/gtest/Intermediate/
 CCGOnline/CCGOnline/gtest/GeneratedCode/
-CCGOnline/CCGOnline/SharedTest/*.sdf
+CCGOnline/CCGOnline/pugixml/Intermediate/
+CCGOnline/CCGOnline/pugixml/GeneratedCode/
 CCGOnline/CCGOnline/SharedTest/Intermediate/
 CCGOnline/CCGOnline/SharedTest/GeneratedCode/
 CCGOnline/CCGOnline/PackageManager/bin/
