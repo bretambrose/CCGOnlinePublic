@@ -1,5 +1,7 @@
 CCGOnlinePublic
 
+For build/installation instructions, see the companion file, README_Build.txt.
+
 I don't expect anyone to actually fork (or god forbid, develop and make pull requests on) any of my public projects here.  The primary purpose of these public projects is to serve as a public "this-is-the-sort-of-work-I-do" documentation for people or organizations who might be interested in knowing/evaluating that sort of thing.  Ultimately, all my projects are, first and foremost, learning vehicles for new subject areas as well as experiments in "better practices" in terms of developing good habits.
 
 The eventual goal for this project is a client-server platform for some old Wizards of the Coast collectible card games (hence CCG) that my college friends and I used to love to play.  Given that this is done in my spare time with a son on the way, it will take a good number of years to finish.  I began work on this project in July 2011, and moved it from private to public repository in October 2011.
