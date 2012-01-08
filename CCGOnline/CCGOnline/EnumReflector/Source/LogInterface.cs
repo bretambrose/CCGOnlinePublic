@@ -43,7 +43,9 @@ namespace EnumReflector
 			string[] file_names  = Directory.GetFiles( directory_path );
 			foreach ( string file_name in file_names )
 			{
-				if ( file_name.EndsWith( ".txt" ) && file_name.StartsWith( "EnumReflectorLog_" ) )
+				string local_name = Path.GetFileName( file_name );
+
+				if ( local_name.EndsWith( ".txt" ) && local_name.StartsWith( "EnumReflectorLog_" ) )
 				{
 					FileInfo log_file = new FileInfo( file_name );
 					DateTime last_write_time = log_file.LastWriteTime;
