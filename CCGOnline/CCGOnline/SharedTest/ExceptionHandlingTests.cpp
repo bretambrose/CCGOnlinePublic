@@ -62,7 +62,7 @@ class ExceptionHandlingTests : public testing::Test
 
 void Exception_Level_3( void )
 {
-	RaiseException( 1, 0, 0, NULL );
+	RaiseException( 1, 0, 0, nullptr );
 }
 
 void Exception_Level_2( void )

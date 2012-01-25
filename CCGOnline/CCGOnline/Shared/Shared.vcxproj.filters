@@ -33,6 +33,9 @@
     <Filter Include="Source Files\GeneratedCode">
       <UniqueIdentifier>{7f91654a-0135-4b22-8178-5f5989858a65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\XML">
+      <UniqueIdentifier>{793d6836-37dc-46fb-b2c0-a49d0fc03a6b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -161,6 +164,18 @@
     <ClInclude Include="GeneratedCode\RegisterSharedEnums.h">
       <Filter>Source Files\GeneratedCode</Filter>
     </ClInclude>
+    <ClInclude Include="XML\PrimitiveXMLSerializers.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\XMLSerializationRegistrar.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLSerializerInterface.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\XMLLoadableManager.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -228,6 +243,15 @@
     </ClCompile>
     <ClCompile Include="GeneratedCode\RegisterSharedEnums.cpp">
       <Filter>Source Files\GeneratedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\PrimitiveXMLSerializers.cpp">
+      <Filter>Source Files\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\XMLLoadableManager.cpp">
+      <Filter>Source Files\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\XMLSerializationRegistrar.cpp">
+      <Filter>Source Files\XML</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -127,14 +127,14 @@ bool CAssertSystem::Assert_Handler( const char *expression_string, const char *f
 	int result = 0;
 	if ( force_crash )
 	{
-		::MessageBox( NULL, assert_string.c_str(), L"FATAL ASSERT!", MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3 );
+		::MessageBox( nullptr, assert_string.c_str(), L"FATAL ASSERT!", MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3 );
 		int32 *null_dereference = nullptr;
 		*null_dereference = 5;
 		return false;
 	}
 	else
 	{
-		result = ::MessageBox( NULL, assert_string.c_str(), L"Assertion Failure!", MB_YESNO | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3 );
+		result = ::MessageBox( nullptr, assert_string.c_str(), L"Assertion Failure!", MB_YESNO | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3 );
 	}
 
 	if ( result == IDYES )

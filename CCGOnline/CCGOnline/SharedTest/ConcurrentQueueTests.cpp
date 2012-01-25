@@ -67,5 +67,5 @@ TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr )
 	ASSERT_TRUE( items[ 1 ]->Get_Source_Key() == MANAGER_THREAD_KEY );
 
 	delete message_queue;
-	message_queue = NULL;
+	message_queue = nullptr;
 }

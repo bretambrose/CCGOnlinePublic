@@ -87,12 +87,12 @@ std::wstring NPlatform::Format_OS_Error_Message( uint32 error_code )
 	wchar_t msg_buffer[ 1024 ];
 
 	::FormatMessageW( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-							NULL,
+							nullptr,
 							error_code,
 							MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
 							(LPTSTR) &msg_buffer,
 							sizeof( msg_buffer ), 
-							NULL );
+							nullptr );
 
 	return std::wstring( msg_buffer );
 }

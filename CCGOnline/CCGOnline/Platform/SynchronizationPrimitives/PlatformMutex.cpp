@@ -59,7 +59,7 @@ class CSimpleWin32Mutex : public ISimplePlatformMutex
 		typedef ISimplePlatformMutex BASECLASS;
 
 		CSimpleWin32Mutex( void ) :
-			Mutex( ::CreateMutex( NULL, false, NULL ) )
+			Mutex( ::CreateMutex( nullptr, false, nullptr ) )
 		{
 		}
 

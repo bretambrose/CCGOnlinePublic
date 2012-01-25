@@ -56,7 +56,7 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 	STACKFRAME64 stack_frame;
 	HANDLE current_process = ::GetCurrentProcess();
 
-	if ( initial_context == NULL )
+	if ( initial_context == nullptr )
 	{
 		// Use current context.
 		//
@@ -125,7 +125,7 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 	{
 		// get the current stack frame
 		PCONTEXT walk_context = ( machine_type == IMAGE_FILE_MACHINE_I386 ) ? nullptr : &local_context;
-		success = ::StackWalk64( machine_type, current_process, GetCurrentThread(), &stack_frame, walk_context, NULL, SymFunctionTableAccess64, SymGetModuleBase64, NULL ) == TRUE;
+		success = ::StackWalk64( machine_type, current_process, GetCurrentThread(), &stack_frame, walk_context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, NULL ) == TRUE;
 		if ( !success )
 		{
 			info.Set_Symbol_Error( NPlatform::Format_OS_Error_Message( ::GetLastError() ) );
@@ -149,7 +149,7 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 		p_symbol->SizeOfStruct = sizeof( SYMBOL_INFOW );
 		p_symbol->MaxNameLen = MAX_SYMBOL_NAME_LENGTH;
 	
-		success = ::SymFromAddrW( current_process, address, NULL, p_symbol ) == TRUE;
+		success = ::SymFromAddrW( current_process, address, nullptr, p_symbol ) == TRUE;
 		if ( !success )
 		{
 			info.Set_Symbol_Error( NPlatform::Format_OS_Error_Message( ::GetLastError() ) );
@@ -321,7 +321,7 @@ void CPlatformExceptionHandler::Shutdown( void )
 	::RemoveVectoredExceptionHandler( WindowsExceptionHandler );
 
 	delete ExceptionLock;
-	ExceptionLock = NULL;
+	ExceptionLock = nullptr;
 
 	if ( SymbolsLoaded )
 	{
@@ -367,7 +367,7 @@ bool CPlatformExceptionHandler::Load_Symbols( std::wstring &error_message )
 	symbol_options |= SYMOPT_LOAD_LINES;
 	::SymSetOptions( symbol_options );
 
-	if ( !::SymInitializeW( ::GetCurrentProcess(), NULL, TRUE ) )
+	if ( !::SymInitializeW( ::GetCurrentProcess(), nullptr, TRUE ) )
 	{
 		error_message = NPlatform::Format_OS_Error_Message( ::GetLastError() );
 		return false;

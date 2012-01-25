@@ -85,7 +85,7 @@ class CThreadTaskBaseTester
 		{
 			CThreadStatics::Set_Current_Thread_Task( ThreadTask.get() );
 
-			CThreadTaskExecutionContext context( NULL );
+			CThreadTaskExecutionContext context( nullptr );
 			ThreadTask->Service( time_seconds, context );
 
 			CThreadStatics::Set_Current_Thread_Task( nullptr );

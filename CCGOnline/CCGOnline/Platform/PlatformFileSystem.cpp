@@ -68,7 +68,7 @@ bool NPlatform::Directory_Exists( const std::wstring &path )
 **********************************************************************************************************************/
 bool NPlatform::Create_Directory( const std::wstring &path )
 {
-	return ::CreateDirectoryW( path.c_str(), NULL ) != 0;
+	return ::CreateDirectoryW( path.c_str(), nullptr ) != 0;
 } 
 
 /**********************************************************************************************************************

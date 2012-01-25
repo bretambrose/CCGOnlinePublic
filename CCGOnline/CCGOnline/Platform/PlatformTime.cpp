@@ -124,10 +124,10 @@ uint64 CPlatformTime::Get_Raw_Time( void )
 uint64 CPlatformTime::Get_File_Write_Raw_Time( const std::wstring &file_name )
 {
 	FILETIME write_time;
-	HANDLE file_handle = ::CreateFileW( file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,  OPEN_EXISTING, 0, NULL );
+	HANDLE file_handle = ::CreateFileW( file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,  OPEN_EXISTING, 0, nullptr );
 	FATAL_ASSERT( file_handle != INVALID_HANDLE_VALUE );
 
-	::GetFileTime( file_handle, NULL, NULL, &write_time );
+	::GetFileTime( file_handle, nullptr, nullptr, &write_time );
 
 	::CloseHandle( file_handle );
 
