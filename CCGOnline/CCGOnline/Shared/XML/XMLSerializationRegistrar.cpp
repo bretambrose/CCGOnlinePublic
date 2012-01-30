@@ -24,28 +24,41 @@
 
 #include "XMLSerializationRegistrar.h"
 
-stdext::hash_map< Loki::TypeInfo, XMLSerializerCreationDelegate, STypeInfoContainerHelper > XMLSerializationRegistrar::SerializerCreationDelegateTable;
 
-void XMLSerializationRegistrar::Register_Serializer( const std::type_info &type_id, XMLSerializerCreationDelegate creation_delegate )
+stdext::hash_map< Loki::TypeInfo, IXMLSerializerFactory *, STypeInfoContainerHelper > CXMLSerializationRegistrar::SerializerFactoryTable;
+
+void CXMLSerializationRegistrar::Shutdown( void )
+{
+	for ( auto iter = SerializerFactoryTable.begin(); iter != SerializerFactoryTable.end(); ++iter )
+	{
+		delete iter->second;
+	}
+
+	SerializerFactoryTable.clear();
+}
+ 
+void CXMLSerializationRegistrar::Register_Serializer_Internal( const std::type_info &type_id, IXMLSerializerFactory *factory )
 {
 	Loki::TypeInfo key( type_id );
 
-	FATAL_ASSERT( SerializerCreationDelegateTable.find( key ) == SerializerCreationDelegateTable.end() );
-	SerializerCreationDelegateTable[ key ] = creation_delegate;
+	FATAL_ASSERT( SerializerFactoryTable.find( key ) == SerializerFactoryTable.end() );
+	SerializerFactoryTable[ key ] = factory;
 }
 
-IXMLSerializer *XMLSerializationRegistrar::Create_Serializer( const std::type_info &type_id )
+IXMLSerializer *CXMLSerializationRegistrar::Create_Serializer( const std::type_info &type_id )
 {
-	Loki::TypeInfo key( type_id );
+	return Create_Serializer( Loki::TypeInfo( type_id ) );
+}
 
-	auto iter = SerializerCreationDelegateTable.find( key );
-	if ( iter != SerializerCreationDelegateTable.end() )
+IXMLSerializer *CXMLSerializationRegistrar::Create_Serializer( const Loki::TypeInfo &type_info )
+{
+	auto iter = SerializerFactoryTable.find( type_info );
+	if ( iter != SerializerFactoryTable.end() )
 	{
-		return iter->second();
+		return iter->second->Create_Serializer();
 	}
 
 	FATAL_ASSERT( false );
 
 	return nullptr;
 }
-

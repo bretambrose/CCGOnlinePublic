@@ -29,17 +29,76 @@ class IXMLSerializer;
 
 typedef FastDelegate0< IXMLSerializer * > XMLSerializerCreationDelegate;
 
-class XMLSerializationRegistrar
+class IXMLSerializerFactory
 {
 	public:
 
-		static void Register_Serializer( const std::type_info &type_id, XMLSerializerCreationDelegate creation_delegate );
+		virtual ~IXMLSerializerFactory() {}
 
-		static IXMLSerializer *Create_Serializer( const std::type_info &type_id );
+		virtual IXMLSerializer *Create_Serializer( void ) const = 0;
+};
+
+class CBaseXMLSerializerFactory : public IXMLSerializerFactory
+{
+	public:
+
+		CBaseXMLSerializerFactory( XMLSerializerCreationDelegate creation_delegate ) :
+			CreationDelegate( creation_delegate )
+		{}
+
+		virtual IXMLSerializer *Create_Serializer( void ) const 
+		{ 
+			return CreationDelegate(); 
+		}
 
 	private:
 
-		static stdext::hash_map< Loki::TypeInfo, XMLSerializerCreationDelegate, STypeInfoContainerHelper > SerializerCreationDelegateTable;
+		XMLSerializerCreationDelegate CreationDelegate;
+};
+
+template < typename T >
+class CPointerXMLSerializerFactory : public IXMLSerializerFactory
+{
+	public:
+
+		CPointerXMLSerializerFactory( XMLSerializerCreationDelegate creation_delegate ) :
+			CreationDelegate( creation_delegate )
+		{}
+
+		virtual IXMLSerializer *Create_Serializer( void ) const 
+		{ 
+			return new CPointerXMLSerializer< T >( CreationDelegate() ); 
+		}
+
+	private:
+
+		XMLSerializerCreationDelegate CreationDelegate;
+};
+
+class CXMLSerializationRegistrar
+{
+	public:
+
+		static void Shutdown( void );
+
+		template< typename T >
+		static void Register_Serializer( XMLSerializerCreationDelegate creation_delegate )
+		{
+			Register_Serializer_Internal( typeid( T ), new CBaseXMLSerializerFactory( creation_delegate ) );
+			Register_Serializer_Internal( typeid( T * ), new CPointerXMLSerializerFactory< T >( creation_delegate ) );
+		}
+
+		static IXMLSerializer *Create_Serializer( const std::type_info &type_id );
+		static IXMLSerializer *Create_Serializer( const Loki::TypeInfo &type_info );
+
+		template< typename T >
+		static IXMLSerializer *Create_Serializer( void ) { return Create_Serializer( typeid( T ) ); }
+
+	private:
+
+		static void Register_Serializer_Internal( const std::type_info &type_id, IXMLSerializerFactory *factory );
+
+		static stdext::hash_map< Loki::TypeInfo, IXMLSerializerFactory *, STypeInfoContainerHelper > SerializerFactoryTable;
 
 };
 

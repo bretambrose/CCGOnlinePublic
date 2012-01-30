@@ -82,5 +82,8 @@
     <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp">
       <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
+    <ClCompile Include="XMLLoadableTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

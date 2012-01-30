@@ -23,8 +23,9 @@
 #include "stdafx.h"
 
 #include "PrimitiveXMLSerializers.h"
+#include "XMLSerializationRegistrar.h"
 #include "pugixml.h"
-#include "StringUtils.h"
+
 
 template < typename T >
 class CXMLIntegerSerializer : public IXMLSerializer
@@ -127,7 +128,7 @@ class CXMLBoolSerializer : public IXMLSerializer
 		{
 			std::wstring node_value( xml_node.child_value() );
 			bool value = false;
-			if ( _wcsnicmp( node_value.c_str(), L"TRUE", node_value.size() ) == 0 || _wcsnicmp( node_value.c_str(), L"YES", node_value.size() ) )
+			if ( _wcsnicmp( node_value.c_str(), L"TRUE", node_value.size() ) == 0 || _wcsnicmp( node_value.c_str(), L"YES", node_value.size() ) == 0 )
 			{
 				value = true;
 			}
@@ -137,85 +138,43 @@ class CXMLBoolSerializer : public IXMLSerializer
 		}
 };
 
-namespace XMLSerializers
+namespace XMLSerialization
 {
-	IXMLSerializer *Create_Serializer( const int8 & /*member*/ ) { return new CXMLIntegerSerializer< int8 >; }
-	IXMLSerializer *Create_Serializer( const uint8 & /*member*/ ) { return new CXMLUnsignedIntegerSerializer< uint8 >; }
-	IXMLSerializer *Create_Serializer( const int16 & /*member*/ ) { return new CXMLIntegerSerializer< int16 >; }
-	IXMLSerializer *Create_Serializer( const uint16 & /*member*/ ) { return new CXMLUnsignedIntegerSerializer< uint16 >; }
-	IXMLSerializer *Create_Serializer( const int32 & /*member*/ ) { return new CXMLIntegerSerializer< int32 >; }
-	IXMLSerializer *Create_Serializer( const uint32 & /*member*/ ) { return new CXMLUnsignedIntegerSerializer< uint32 >; }
-	IXMLSerializer *Create_Serializer( const int64 & /*member*/ ) { return new CXMLIntegerSerializer< int64 >; }
-	IXMLSerializer *Create_Serializer( const uint64 & /*member*/ ) { return new CXMLUnsignedIntegerSerializer< uint64 >; }
-	IXMLSerializer *Create_Serializer( const std::wstring & /*member*/ ) { return new CXMLWideStringSerializer; }
-	IXMLSerializer *Create_Serializer( const std::string & /*member*/ ) { return new CXMLStringSerializer; }
-	IXMLSerializer *Create_Serializer( const double & /*member*/ ) { return new CXMLDoubleSerializer< double >; }
-	IXMLSerializer *Create_Serializer( const float & /*member*/ ) { return new CXMLDoubleSerializer< float >; }
-	IXMLSerializer *Create_Serializer( const bool & /*member*/ ) { return new CXMLBoolSerializer; }
+	IXMLSerializer *Create_Int8_Serializer( void ) { return new CXMLIntegerSerializer< int8 >; }
+	IXMLSerializer *Create_UInt8_Serializer( void ) { return new CXMLUnsignedIntegerSerializer< uint8 >; }
+	IXMLSerializer *Create_Int16_Serializer( void ) { return new CXMLIntegerSerializer< int16 >; }
+	IXMLSerializer *Create_UInt16_Serializer( void ) { return new CXMLUnsignedIntegerSerializer< uint16 >; }
+	IXMLSerializer *Create_Int32_Serializer( void ) { return new CXMLIntegerSerializer< int32 >; }
+	IXMLSerializer *Create_UInt32_Serializer( void ) { return new CXMLUnsignedIntegerSerializer< uint32 >; }
+	IXMLSerializer *Create_Int64_Serializer( void ) { return new CXMLIntegerSerializer< int64 >; }
+	IXMLSerializer *Create_UInt64_Serializer( void ) { return new CXMLUnsignedIntegerSerializer< uint64 >; }
+	IXMLSerializer *Create_WString_Serializer( void ) { return new CXMLWideStringSerializer; }
+	IXMLSerializer *Create_String_Serializer( void ) { return new CXMLStringSerializer; }
+	IXMLSerializer *Create_Double_Serializer( void ) { return new CXMLDoubleSerializer< double >; }
+	IXMLSerializer *Create_Float_Serializer( void ) { return new CXMLDoubleSerializer< float >; }
+	IXMLSerializer *Create_Bool_Serializer( void ) { return new CXMLBoolSerializer; }
 
+	void Register_Primitive_Serializers( void )
+	{
+		CXMLSerializationRegistrar::Register_Serializer< int8 >( Create_Int8_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< uint8 >( Create_UInt8_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< int16 >( Create_Int16_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< uint16 >( Create_UInt16_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< int32 >( Create_Int32_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< uint32 >( Create_UInt32_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< int64 >( Create_Int64_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< uint64 >( Create_UInt64_Serializer );	
+		CXMLSerializationRegistrar::Register_Serializer< std::wstring >( Create_WString_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< std::string >( Create_String_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< double >( Create_Double_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< float >( Create_Float_Serializer );
+		CXMLSerializationRegistrar::Register_Serializer< bool >( Create_Bool_Serializer );
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-COrderedCompositeXMLSerializer::COrderedCompositeXMLSerializer( void *dummy_object ) :
-	MemberRecords(),
-	DummyBase( dummy_object )
-{
-}
-
-COrderedCompositeXMLSerializer::~COrderedCompositeXMLSerializer()
-{
-	for ( uint32 i = 0; i < MemberRecords.size(); ++i )
-	{
-		delete MemberRecords[ i ].second.second;
-	}
-
-	MemberRecords.clear();
-}
-
-void COrderedCompositeXMLSerializer::Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
-{
-	uint32 member_index = 0;
-	uint8 *byte_base_ptr = reinterpret_cast< uint8 * >( destination );
-
-	for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
-	{
-		FATAL_ASSERT( member_index < MemberRecords.size() );
-
-		std::wstring node_name( iter.name() );
-		std::wstring upper_name;
-		NStringUtils::To_Upper_Case( node_name, upper_name );
-
-		for ( ; member_index < MemberRecords.size() && node_name != MemberRecords[ member_index ].first; member_index++ )
-		{
-			;
-		}
-
-		FATAL_ASSERT( member_index < MemberRecords.size() );
-
-		IXMLSerializer *serializer = MemberRecords[ member_index ].second.second;
-		uint8 *member_ptr = byte_base_ptr + MemberRecords[ member_index ].second.first;
-
-		serializer->Load_From_XML( iter, member_ptr );
-
-		member_index++;
-	}
-}
-
-void COrderedCompositeXMLSerializer::Add_Serializer( IXMLSerializer *serializer, const std::wstring &element_name, void *dummy_member )
-{
-	std::wstring upper_name;
-	NStringUtils::To_Upper_Case( element_name, upper_name );
-
-	uint8 *base_byte_ptr = reinterpret_cast< uint8 * >( DummyBase );
-	uint8 *member_byte_ptr = reinterpret_cast< uint8 * >( dummy_member );
-
-	uint64 offset = member_byte_ptr - base_byte_ptr;
-
-	MemberRecords.push_back( std::make_pair< std::wstring, XMLMemberRecordType >( upper_name, XMLMemberRecordType( offset, serializer ) ) );
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 
 CUnorderedCompositeXMLSerializer::CUnorderedCompositeXMLSerializer( void *dummy_object ) :
 	MemberRecords(),
@@ -266,3 +225,5 @@ void CUnorderedCompositeXMLSerializer::Add_Serializer( IXMLSerializer *serialize
 
 	MemberRecords.insert( std::make_pair< std::wstring, XMLMemberRecordType >( upper_name, XMLMemberRecordType( offset, serializer ) ) );
 }
+
+*/

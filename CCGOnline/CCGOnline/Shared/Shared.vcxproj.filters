@@ -173,7 +173,7 @@
     <ClInclude Include="XMLSerializerInterface.h">
       <Filter>Source Files\XML</Filter>
     </ClInclude>
-    <ClInclude Include="XML\XMLLoadableManager.h">
+    <ClInclude Include="XML\XMLLoadableTable.h">
       <Filter>Source Files\XML</Filter>
     </ClInclude>
   </ItemGroup>
@@ -245,9 +245,6 @@
       <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
     <ClCompile Include="XML\PrimitiveXMLSerializers.cpp">
-      <Filter>Source Files\XML</Filter>
-    </ClCompile>
-    <ClCompile Include="XML\XMLLoadableManager.cpp">
       <Filter>Source Files\XML</Filter>
     </ClCompile>
     <ClCompile Include="XML\XMLSerializationRegistrar.cpp">

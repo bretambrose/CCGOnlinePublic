@@ -207,7 +207,7 @@
     <ClInclude Include="TypeInfoUtils.h" />
     <ClInclude Include="XMLSerializerInterface.h" />
     <ClInclude Include="XML\PrimitiveXMLSerializers.h" />
-    <ClInclude Include="XML\XMLLoadableManager.h" />
+    <ClInclude Include="XML\XMLLoadableTable.h" />
     <ClInclude Include="XML\XMLSerializationRegistrar.h" />
   </ItemGroup>
   <ItemGroup>
@@ -239,7 +239,6 @@
     <ClCompile Include="Time\TimeKeeper.cpp" />
     <ClCompile Include="Time\TimeUtils.cpp" />
     <ClCompile Include="XML\PrimitiveXMLSerializers.cpp" />
-    <ClCompile Include="XML\XMLLoadableManager.cpp" />
     <ClCompile Include="XML\XMLSerializationRegistrar.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

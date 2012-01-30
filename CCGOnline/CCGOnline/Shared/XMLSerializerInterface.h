@@ -32,6 +32,7 @@ class IXMLSerializer
 {
 	public:
 
+		IXMLSerializer( void ) {}
 		virtual ~IXMLSerializer() {}
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const = 0;
