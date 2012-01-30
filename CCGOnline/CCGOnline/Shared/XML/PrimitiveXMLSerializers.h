@@ -229,7 +229,7 @@ class CVectorXMLSerializer : public IXMLSerializer
 			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
 			{
 				dest->push_back( T() );
-				EntrySerializer->Load_From_XML( iter, &dest[ dest.size() - 1 ] );
+				EntrySerializer->Load_From_XML( iter, &( *dest )[ dest->size() - 1 ] );
 			}
 		}
 
