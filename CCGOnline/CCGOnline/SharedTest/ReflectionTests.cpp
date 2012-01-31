@@ -28,63 +28,59 @@
 TEST( ReflectionTests, Normal )
 {
 	EReflectionTest converted_value = RT_INVALID;
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionTest", "Entry1", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "Entry1", converted_value ) );
 	ASSERT_TRUE( converted_value == RT_ENTRY1 );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionTest", "eNTRy2", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "eNTRy2", converted_value ) );
 	ASSERT_TRUE( converted_value == RT_ENTRY2 );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionTest", "eNTRy3", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "eNTRy3", converted_value ) );
 	ASSERT_TRUE( converted_value == RT_ENTRY3 );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionTest", "eNTRy4", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "eNTRy4", converted_value ) );
 	ASSERT_TRUE( converted_value == RT_ENTRY4 );
 
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionTes", "Entry1", converted_value ) );
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionTest", "Entryy1", converted_value ) );
+	ASSERT_FALSE( CEnumConverter::Convert( "Entryy1", converted_value ) );
 
 	std::string converted_entry;
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionTest", RT_ENTRY2, converted_entry ) );
+	ASSERT_TRUE( CEnumConverter::Convert( RT_ENTRY2, converted_entry ) );
 	ASSERT_TRUE( converted_entry == "ENTRY2" );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionTest", RT_INVALID, converted_entry ) );
+	ASSERT_TRUE( CEnumConverter::Convert( RT_INVALID, converted_entry ) );
 	ASSERT_TRUE( converted_entry == "INVALID" );
 
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionTes", 3, converted_entry ) );
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionTest", 10, converted_entry ) );
+	ASSERT_FALSE( CEnumConverter::Convert( static_cast< EReflectionTest >( 10 ), converted_entry ) );
 }
 
 TEST( ReflectionTests, Bitfield )
 {
 	EReflectionBitfieldTest converted_value = RBT_NONE;
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", "NoNe", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "NoNe", converted_value ) );
 	ASSERT_TRUE( converted_value == RBT_NONE );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", "Bit3", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "Bit3", converted_value ) );
 	ASSERT_TRUE( converted_value == 4 );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", "BIt3|Bit1", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "BIt3|Bit1", converted_value ) );
 	ASSERT_TRUE( converted_value == 5 );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", "Bit2| BiT8", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "Bit2| BiT8", converted_value ) );
 	ASSERT_TRUE( converted_value == 130 );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", "BIT1| Bit2|Bit3 |Bit8", converted_value ) );
+	ASSERT_TRUE( CEnumConverter::Convert( "BIT1| Bit2|Bit3 |Bit8", converted_value ) );
 	ASSERT_TRUE( converted_value == 135 );
 
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionBitfieldTes", "Bit1", converted_value ) );
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionBitfieldTest", "Bitt1", converted_value ) );
+	ASSERT_FALSE( CEnumConverter::Convert( "Bitt1", converted_value ) );
 
 	std::string converted_entry;
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", 3, converted_entry ) );
+	ASSERT_TRUE( CEnumConverter::Convert( static_cast< EReflectionBitfieldTest >( 3 ), converted_entry ) );
 	ASSERT_TRUE( converted_entry == "BIT1 | BIT2" );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", 0, converted_entry ) );
+	ASSERT_TRUE( CEnumConverter::Convert( static_cast< EReflectionBitfieldTest >( 0 ), converted_entry ) );
 	ASSERT_TRUE( converted_entry == "NONE" );
 
-	ASSERT_TRUE( CEnumConverter::Convert( "EReflectionBitfieldTest", 7, converted_entry ) );
+	ASSERT_TRUE( CEnumConverter::Convert( static_cast< EReflectionBitfieldTest >( 7 ), converted_entry ) );
 	ASSERT_TRUE( converted_entry == "BIT1 | BIT2 | BIT3" );
 
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionBitfieldTes", 3, converted_entry ) );
-	ASSERT_FALSE( CEnumConverter::Convert( "EReflectionBitfieldTest", 16, converted_entry ) );
+	ASSERT_FALSE( CEnumConverter::Convert( static_cast< EReflectionBitfieldTest >( 16 ), converted_entry ) );
 }

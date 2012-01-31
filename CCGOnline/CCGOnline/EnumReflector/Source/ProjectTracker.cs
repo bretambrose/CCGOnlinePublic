@@ -179,7 +179,9 @@ namespace EnumReflector
 
 		private void Add_Enum_Conversions( StringBuilder cpp_text, CEnumRecord enum_record )
 		{
-			cpp_text.Append( "\tCEnumConverter::Register_Enum( \"" );
+			cpp_text.Append( "\tCEnumConverter::Register_Enum< " );
+			cpp_text.Append( enum_record.Name );
+			cpp_text.Append( " >( \"" );
 			cpp_text.Append( enum_record.Name );
 			cpp_text.Append( "\", " );
 			if ( ( enum_record.Flags & EEnumFlags.IsBitfield ) != 0 )
@@ -196,12 +198,12 @@ namespace EnumReflector
 			foreach ( var entry in enum_record.Get_Entries() )
 			{
 				cpp_text.Append( "\tCEnumConverter::Register_Enum_Entry( \"" );
-				cpp_text.Append( enum_record.Name );
-				cpp_text.Append( "\", \"" );
 				cpp_text.Append( entry.EntryName );
-				cpp_text.Append( "\", " );
+				cpp_text.Append( "\", static_cast< " );
+				cpp_text.Append( enum_record.Name );
+				cpp_text.Append( " >( " );
 				cpp_text.Append( entry.Value );
-				cpp_text.Append( " );" );
+				cpp_text.Append( " ) );" );
 				cpp_text.Append( END_OF_LINE );
 			}
 

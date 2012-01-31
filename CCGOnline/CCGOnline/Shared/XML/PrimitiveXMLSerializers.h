@@ -271,47 +271,59 @@ class CPointerXMLSerializer : public IXMLSerializer
 		IXMLSerializer *TSerializer;
 };
 
-
-/*
-
 template< typename T >
-class CPointerVectorXMLSerializer : public IXMLSerializer
+class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 {
 	public:
 
-		CPointerVectorXMLSerializer( IXMLSerializer *entry_serializer ) :
-			EntrySerializer( entry_serializer )
+		CEnumPolymorphicXMLSerializer( void ) :
+			Serializers(),
+			EnumTypeInfo( typeid( T ) )
 		{
-			FATAL_ASSERT( EntrySerializer != nullptr );
 		}
 
-		virtual ~CPointerVectorXMLSerializer()
+		virtual ~CEnumPolymorphicXMLSerializer()
 		{
-			if ( EntrySerializer != nullptr )
+			for ( auto iter = Serializers.begin(); iter != Serializers.end(); ++iter )
 			{
-				delete EntrySerializer;
-				EntrySerializer = nullptr;
+				delete iter->second;
 			}
+
+			Serializers.clear();
 		}
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
-			std::vector< T * > *dest = reinterpret_cast< std::vector< T * > * >( destination );
+			pugi::xml_attribute attrib = xml_node.attribute( L"Type" );
 
-			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
+			T type_value;
+			std::string attribute_value;
+			NStringUtils::WideString_To_String( attrib.value() );
+
+			if ( !CEnumConverter::Convert( attribute_value, type_value ) )
 			{
-				T *object = new T;
-				EntrySerializer->Load_From_XML( iter, object );
-
-				dest->push_back( object );
+				FATAL_ASSERT( false );
 			}
+
+			IXMLSerializer *serializer = Serializers.find( type_value ).second;
+
+			serializer->Load_From_XML( xml_node, destination );
+		}
+
+		void Add( T key, IXMLSerializer *serializer )
+		{
+			FATAL_ASSERT( Serializers.find( key ) == Serializers.end() );
+
+			Serializers[ key ] = serializer;
 		}
 
 	private:
 
-		IXMLSerializer *EntrySerializer;
+		std::type_info EnumTypeInfo;
+
+		stdext::hash_map< T, IXMLSerializer * > Serializers;
 };
 
-*/
+
 
 #endif // PRIMITIVE_XML_SERIALIZERS_H
