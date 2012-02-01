@@ -128,7 +128,9 @@ class CXMLBoolSerializer : public IXMLSerializer
 		{
 			std::wstring node_value( xml_node.child_value() );
 			bool value = false;
-			if ( _wcsnicmp( node_value.c_str(), L"TRUE", node_value.size() ) == 0 || _wcsnicmp( node_value.c_str(), L"YES", node_value.size() ) == 0 )
+			if ( _wcsnicmp( node_value.c_str(), L"TRUE", node_value.size() ) == 0 || 
+				  _wcsnicmp( node_value.c_str(), L"YES", node_value.size() ) == 0 ||
+				  _wcsnicmp( node_value.c_str(), L"1", node_value.size() ) == 0 )
 			{
 				value = true;
 			}

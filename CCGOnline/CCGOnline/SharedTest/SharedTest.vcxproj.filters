@@ -26,6 +26,9 @@
     <ClInclude Include="GeneratedCode\RegisterSharedTestEnums.h">
       <Filter>Source Files\GeneratedCode</Filter>
     </ClInclude>
+    <ClInclude Include="XMLLoadableTests.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -82,7 +85,7 @@
     <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp">
       <Filter>Source Files\GeneratedCode</Filter>
     </ClCompile>
-    <ClCompile Include="XMLLoadableTest.cpp">
+    <ClCompile Include="XMLLoadableTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

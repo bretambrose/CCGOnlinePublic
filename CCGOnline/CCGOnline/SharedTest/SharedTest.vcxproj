@@ -188,6 +188,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClInclude Include="ReflectionTests.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="XMLLoadableTests.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConcurrencyManagerTests.cpp" />
@@ -213,7 +214,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClCompile Include="ThreadMessageHandlerTests.cpp" />
     <ClCompile Include="ThreadTaskTests.cpp" />
     <ClCompile Include="TimeTests.cpp" />
-    <ClCompile Include="XMLLoadableTest.cpp" />
+    <ClCompile Include="XMLLoadableTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

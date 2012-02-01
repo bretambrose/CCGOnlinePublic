@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 
+#include "XMLLoadableTests.h"
 #include "XML/XMLLoadableTable.h"
 #include "XML/XMLSerializationRegistrar.h"
 #include "XML/PrimitiveXMLSerializers.h"
@@ -242,6 +243,8 @@ class CBaseXMLTest
 			BaseInt32( 0 )
 		{}
 
+		virtual ~CBaseXMLTest() {}
+
 		static IXMLSerializer *Create_Serializer( void )
 		{
 			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
@@ -370,6 +373,8 @@ class CVectorEntry
 			Integer( 0 )
 		{}
 
+		virtual ~CVectorEntry() {}
+
 		static IXMLSerializer *Create_Serializer( void )
 		{
 			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
@@ -472,7 +477,143 @@ TEST_F( XMLLoadableTests, Compound_Vector_Serializers )
 	ASSERT_TRUE( entry->Get_Bool() == true );
 }
 
-TEST_F( XMLLoadableTests, Polymorphic_Loadable_Table )
+class CPolyBase
+{
+	public:
+
+		CPolyBase( void ) :
+			String( "" )
+		{}
+
+		virtual ~CPolyBase() {}
+
+		static IXMLSerializer *Create_Serializer( void )
+		{
+			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+
+			serializer->Add( L"String", &CPolyBase::String );
+
+			return serializer;
+		}
+
+		const std::string &Get_String( void ) const { return String; }
+
+	private:
+
+		std::string String;
+};
+
+class CPolyDerived1 : public CPolyBase
+{
+	public:
+
+		typedef CPolyBase BASECLASS;
+
+		CPolyDerived1( void ) :
+			BASECLASS(),
+			Bool( false )
+		{}
+
+		static IXMLSerializer *Create_Serializer( void )
+		{
+			CCompositeXMLSerializer *serializer = static_cast< CCompositeXMLSerializer * >( CXMLSerializationRegistrar::Create_Serializer< BASECLASS >() );
+
+			serializer->Add( L"Bool", &CPolyDerived1::Bool );
+
+			return serializer;
+		}
+
+		bool Get_Bool( void ) const { return Bool; }
+
+	private:
+
+		bool Bool;
+};
+
+class CPolyDerived2 : public CPolyBase
+{
+	public:
+
+		typedef CPolyBase BASECLASS;
+
+		CPolyDerived2( void ) :
+			BASECLASS(),
+			Integer( 0 )
+		{}
+
+		static IXMLSerializer *Create_Serializer( void )
+		{
+			CCompositeXMLSerializer *serializer = static_cast< CCompositeXMLSerializer * >( CXMLSerializationRegistrar::Create_Serializer< BASECLASS >() );
+
+			serializer->Add( L"Integer", &CPolyDerived2::Integer );
+
+			return serializer;
+		}
+
+		int32 Get_Integer( void ) const { return Integer; }
+
+	private:
+
+		int32 Integer;
+};
+
+class CPolyVectorTest
+{
+	public:
+
+		CPolyVectorTest( void ) :
+			Entries()
+		{}
+
+		static IXMLSerializer *Create_Serializer( void )
+		{
+			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+
+			CEnumPolymorphicXMLSerializer< EPolySerializerTestTypes > *entry_serializer = new CEnumPolymorphicXMLSerializer< EPolySerializerTestTypes >;
+			entry_serializer->Add( PSTT_CLASS1, CXMLSerializationRegistrar::Create_Serializer< CPolyDerived1 * >() );
+			entry_serializer->Add( PSTT_CLASS2, CXMLSerializationRegistrar::Create_Serializer< CPolyDerived2 * >() );
+
+			serializer->Add( L"Entries", &CPolyVectorTest::Entries, new CVectorXMLSerializer< CPolyBase * >( entry_serializer ) );
+
+			return serializer;
+		}
+
+		const std::vector< CPolyBase * > &Get_Entries( void ) const { return Entries; }
+
+	private:
+
+		std::vector< CPolyBase * > Entries;
+
+};
+
+TEST_F( XMLLoadableTests, Polymorphic_Serializer )
+{
+	CXMLSerializationRegistrar::Register_Serializer< CPolyBase >( CPolyBase::Create_Serializer );
+	CXMLSerializationRegistrar::Register_Serializer< CPolyDerived1 >( CPolyDerived1::Create_Serializer );
+	CXMLSerializationRegistrar::Register_Serializer< CPolyDerived2 >( CPolyDerived2::Create_Serializer );
+	CXMLSerializationRegistrar::Register_Serializer< CPolyVectorTest >( CPolyVectorTest::Create_Serializer );
+
+	CPolyVectorTest test;
+	std::wstring xml_blob( L"<Test><Entries><Entry Type=\"CPolyDerived1\"><String>poly1</String><Bool>1</Bool></Entry><Entry Type=\"CPolyDerived2\"><String>poly2</String><Integer>42</Integer></Entry></Entries></Test>" );
+
+	pugi::xml_document doc;
+	doc.load( xml_blob.c_str() );
+
+	IXMLSerializer *serializer = CXMLSerializationRegistrar::Create_Serializer< CPolyVectorTest >();
+	serializer->Load_From_XML( doc.first_child(), &test );
+
+	ASSERT_TRUE( test.Get_Entries().size() == 2 );
+
+	CPolyDerived1 *poly1 = static_cast< CPolyDerived1 * >( test.Get_Entries()[ 0 ] );
+	ASSERT_TRUE( poly1->Get_String() == "poly1" );
+	ASSERT_TRUE( poly1->Get_Bool() == true );	
+
+	CPolyDerived2 *poly2 = static_cast< CPolyDerived2 * >( test.Get_Entries()[ 1 ] );
+	ASSERT_TRUE( poly2->Get_String() == "poly2" );
+	ASSERT_TRUE( poly2->Get_Integer() == 42 );	
+}
+
+TEST_F( XMLLoadableTests, Loadable_Table )
 {
 }
 

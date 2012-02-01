@@ -26,6 +26,7 @@
 #include "XMLSerializerInterface.h"
 #include "pugixml.h"
 #include "StringUtils.h"
+#include "EnumConversion.h"
 
 namespace XMLSerialization
 {
@@ -277,8 +278,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 	public:
 
 		CEnumPolymorphicXMLSerializer( void ) :
-			Serializers(),
-			EnumTypeInfo( typeid( T ) )
+			Serializers()
 		{
 		}
 
@@ -298,14 +298,14 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 
 			T type_value;
 			std::string attribute_value;
-			NStringUtils::WideString_To_String( attrib.value() );
+			NStringUtils::WideString_To_String( attrib.value(), attribute_value );
 
 			if ( !CEnumConverter::Convert( attribute_value, type_value ) )
 			{
 				FATAL_ASSERT( false );
 			}
 
-			IXMLSerializer *serializer = Serializers.find( type_value ).second;
+			IXMLSerializer *serializer = Serializers.find( type_value )->second;
 
 			serializer->Load_From_XML( xml_node, destination );
 		}
@@ -318,8 +318,6 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 		}
 
 	private:
-
-		std::type_info EnumTypeInfo;
 
 		stdext::hash_map< T, IXMLSerializer * > Serializers;
 };
