@@ -34,4 +34,15 @@ enum EPolySerializerTestTypes
 };
 //:EnumEnd
 
+//:EnumBegin()
+enum ETableTestClass
+{
+	ETTC_INVALID = 0,		
+
+	ETTC_BERSERKER,		//:EnumEntry( "Berserker" )
+	ETTC_JANITOR,			//:EnumEntry( "Janitor" )
+	ETTC_BARD				//:EnumEntry( "Bard" )
+};
+//:EnumEnd
+
 #endif // XML_LOADABLE_TESTS_H

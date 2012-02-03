@@ -75,6 +75,35 @@ class CPointerXMLSerializerFactory : public IXMLSerializerFactory
 		XMLSerializerCreationDelegate CreationDelegate;
 };
 
+template < typename T >
+class CEnumXMLSerializerFactory : public IXMLSerializerFactory
+{
+	public:
+
+		CEnumXMLSerializerFactory( void ) {}
+
+		virtual IXMLSerializer *Create_Serializer( void ) const 
+		{ 
+			return new CEnumXMLSerializer< T >; 
+		}
+
+};
+
+template < typename T >
+class CEnumPointerXMLSerializerFactory : public IXMLSerializerFactory
+{
+	public:
+
+		CEnumPointerXMLSerializerFactory( void ) {}
+
+		virtual IXMLSerializer *Create_Serializer( void ) const 
+		{ 
+			return new CEnumPointerXMLSerializer< T >; 
+		}
+
+};
+
+
 class CXMLSerializationRegistrar
 {
 	public:
@@ -86,6 +115,13 @@ class CXMLSerializationRegistrar
 		{
 			Register_Serializer_Internal( typeid( T ), new CBaseXMLSerializerFactory( creation_delegate ) );
 			Register_Serializer_Internal( typeid( T * ), new CPointerXMLSerializerFactory< T >( creation_delegate ) );
+		}
+
+		template< typename T >
+		static void Register_Enum_Serializer( void )
+		{
+			Register_Serializer_Internal( typeid( T ), new CEnumXMLSerializerFactory< T > );
+			Register_Serializer_Internal( typeid( T * ), new CEnumPointerXMLSerializerFactory< T > );
 		}
 
 		static IXMLSerializer *Create_Serializer( const std::type_info &type_id );

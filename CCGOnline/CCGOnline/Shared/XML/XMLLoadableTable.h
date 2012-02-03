@@ -26,25 +26,16 @@
 #include "XMLSerializerInterface.h"
 #include "pugixml.h"
 
-typedef FastDelegate1< const pugi::xml_node &, bool > XMLSerializerPredicate;
-
-template< typename T, typename S >
-T *Creation_Function( void )
-{
-	return new S;
-}
-
 template< typename T, typename K = uint64 >
 class CXMLLoadableTable
 {
 	public:
 
-		typedef FastDelegate1< T *, K > KeyExtractionDelegate;
-		typedef FastDelegate0< T * > LoadableCreationDelegate;
+		typedef FastDelegate1< T *, const K & > KeyExtractionDelegate;
 
-		CXMLLoadableTable( KeyExtractionDelegate key_extractor ) :
+		CXMLLoadableTable( KeyExtractionDelegate key_extractor, IXMLSerializer *serializer = nullptr ) :
 			KeyExtractor( key_extractor ),
-			CustomSerializers(),
+			Serializer( serializer ),
 			Loadables()
 		{
 		}
@@ -57,16 +48,12 @@ class CXMLLoadableTable
 			}
 
 			Loadables.clear();
-			CustomSerializers.clear();
-		}
 
-		// implicit constraint: S must derive from T
-		template< typename S >
-		void Register_Custom_Serializer( XMLSerializerPredicate predicate, FastDelegate0< T * > creation_delegate )
-		{
-			LoadableCreationDelegate loadable_creator( Creation_Function< T, S > );
-			
-			CustomSerializers.push_back( std::make_pair( predicate, loadable_creator ) );
+			if ( Serializer != nullptr )
+			{
+				delete Serializer;
+				Serializer = nullptr;
+			}
 		}
 
 		void Load( const std::string &file_name ) 
@@ -75,44 +62,25 @@ class CXMLLoadableTable
 			pugi::xml_parse_result result = doc.load_file( file_name );
 			FATAL_ASSERT( result == true );
 
-			Load( doc.child( "Objects" ) );
+			Load( doc );
 		}
 
-		void Load( const pugi::xml_node &xml_node ) 
+		void Load( const pugi::xml_document &xml_doc ) 
 		{
-			std::hash_map< Loki::TypeInfo, IXMLSerializer *, STypeInfoContainerHelper > serializers;
+			IXMLSerializer *serializer = Serializer;
+			if ( serializer == nullptr )
+			{
+				serializer = CXMLSerializationRegistrar::Create_Serializer( typeid( T * ) );
+			}
 
-			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
+			pugi::xml_node top = xml_doc.child( L"Objects" );
+			for ( pugi::xml_node iter = top.first_child(); iter; iter = iter.next_sibling() )
 			{
 				T *loadable = nullptr;
-				for ( uint32 i = 0; i < CustomSerializers.size(); ++i )
-				{
-					if ( CustomSerializers[ i ].first( iter ) )
-					{
-						loadable = ( CustomSerializers[ i ].second )();
-						break;
-					}
-				}
 
-				if ( loadable == nullptr )
-				{
-					loadable = new T;
-				}
+				serializer->Load_From_XML( iter, &loadable );
 
-				IXMLSerializer *serializer = nullptr;
-				Loki::TypeInfo loadable_type( typeof( *loadable ) );
-				auto s_iter = serializers.find( loadable_type );
-				if ( s_iter == serializers.end() )
-				{
-					serializer = XMLSerializationRegistrar::Create_Serializer( ?? );
-					serializers[ loadable_type ] = serializer;
-				}
-				else
-				{
-					serializer = s_iter->second;
-				}
-
-				serializer->Load_From_XML( iter, loadable );
+				FATAL_ASSERT( loadable != nullptr );
 
 				K key = KeyExtractor( loadable );
 				FATAL_ASSERT( Loadables.find( key ) == Loadables.end() );
@@ -120,9 +88,9 @@ class CXMLLoadableTable
 				Loadables[ key ] = loadable;
 			}
 
-			for ( auto s_iter = serializers.begin(); s_iter != serializers.end(); ++s_iter )
+			if ( Serializer == nullptr )
 			{
-				delete s_iter->second;
+				delete serializer;
 			}
 		}
 
@@ -141,7 +109,7 @@ class CXMLLoadableTable
 
 		KeyExtractionDelegate KeyExtractor;
 
-		std::vector< std::pair< XMLSerializerPredicate, FastDelegate0< T * > > > CustomSerializers;
+		IXMLSerializer *Serializer;
 
 		stdext::hash_map< K, const T * > Loadables;
 };

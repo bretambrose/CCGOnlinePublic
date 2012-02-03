@@ -613,7 +613,71 @@ TEST_F( XMLLoadableTests, Polymorphic_Serializer )
 	ASSERT_TRUE( poly2->Get_Integer() == 42 );	
 }
 
+class CTableTest
+{
+	public:
+
+		CTableTest( void ) :
+			Name( "" ),
+			HitPoints( 0 ),
+			Class( ETTC_INVALID )
+		{}
+
+		virtual ~CTableTest() {}
+
+		static IXMLSerializer *Create_Serializer( void )
+		{
+			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+
+			serializer->Add( L"Name", &CTableTest::Name );
+			serializer->Add( L"HitPoints", &CTableTest::HitPoints );
+			serializer->Add( L"Class", &CTableTest::Class );
+
+			return serializer;
+		}
+
+		const std::string &Get_Name( void ) const { return Name; }
+		uint32 Get_Hit_Points( void ) const { return HitPoints; }
+		ETableTestClass Get_Class( void ) const { return Class; }
+
+		static const std::string &Get_Name( CTableTest *table_test )
+		{
+			return table_test->Get_Name();
+		}
+
+	private:
+
+		std::string Name;
+
+		uint32 HitPoints;
+
+		ETableTestClass Class;
+};
+
+
 TEST_F( XMLLoadableTests, Loadable_Table )
 {
+	CXMLSerializationRegistrar::Register_Serializer< CTableTest >( CTableTest::Create_Serializer );
+	CXMLSerializationRegistrar::Register_Enum_Serializer< ETableTestClass >();
+	
+	CXMLLoadableTable< CTableTest, std::string > loadable_table( CTableTest::Get_Name );
+
+	std::wstring xml_blob( L"<Objects><Object><Name>Bret</Name><HitPoints>5</HitPoints><Class>Janitor</Class></Object><Object><Name>Peti</Name><HitPoints>50</HitPoints><Class>Berserker</Class></Object></Objects>" );
+
+	pugi::xml_document doc;
+	doc.load( xml_blob.c_str() );
+
+	loadable_table.Load( doc );
+
+	const CTableTest *test1 = loadable_table.Get_Object( "Bret" );
+	ASSERT_TRUE( test1->Get_Name() == "Bret" );
+	ASSERT_TRUE( test1->Get_Hit_Points() == 5 );
+	ASSERT_TRUE( test1->Get_Class() == ETTC_JANITOR );
+
+	const CTableTest *test2 = loadable_table.Get_Object( "Peti" );
+	ASSERT_TRUE( test2->Get_Name() == "Peti" );
+	ASSERT_TRUE( test2->Get_Hit_Points() == 50 );
+	ASSERT_TRUE( test2->Get_Class() == ETTC_BERSERKER );
+
 }
 

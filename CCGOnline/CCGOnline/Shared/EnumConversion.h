@@ -69,6 +69,19 @@ class CEnumConverter
 		}
 
 		template < typename T >
+		static bool Convert( const std::wstring &entry_name, T &output_value )
+		{
+			std::string usable_entry_name;
+			NStringUtils::WideString_To_String( entry_name, usable_entry_name );
+
+			uint64 converted_value = 0;
+			bool success = Convert_Internal( typeid( T ), usable_entry_name, converted_value );
+			output_value = static_cast< T >( converted_value );
+
+			return success;
+		}
+
+		template < typename T >
 		static bool Convert( T output_value, std::string &entry_name )
 		{
 			uint64 converted_value = static_cast< uint64 >( output_value );

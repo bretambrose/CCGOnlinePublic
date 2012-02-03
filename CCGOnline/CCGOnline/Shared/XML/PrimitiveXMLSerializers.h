@@ -273,6 +273,49 @@ class CPointerXMLSerializer : public IXMLSerializer
 };
 
 template< typename T >
+class CEnumXMLSerializer : public IXMLSerializer
+{
+	public:
+
+		CEnumXMLSerializer( void ) {}
+
+		virtual ~CEnumXMLSerializer() {}
+
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
+		{
+			T *dest = reinterpret_cast< T * >( destination );
+
+			if ( !CEnumConverter::Convert( xml_node.child_value(), *dest ) )
+			{
+				FATAL_ASSERT( false );
+			}
+		}
+
+};
+
+template< typename T >
+class CEnumPointerXMLSerializer : public IXMLSerializer
+{
+	public:
+
+		CEnumPointerXMLSerializer( void ) {}
+
+		virtual ~CEnumPointerXMLSerializer() {}
+
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
+		{
+			T **dest = reinterpret_cast< T ** >( destination );
+			*dest = new T;
+
+			if ( !CEnumConverter::Convert( xml_node.child_value(), **dest ) )
+			{
+				FATAL_ASSERT( false );
+			}
+		}
+
+};
+
+template< typename T >
 class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 {
 	public:
