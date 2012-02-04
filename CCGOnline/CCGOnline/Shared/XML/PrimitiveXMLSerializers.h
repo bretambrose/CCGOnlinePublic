@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	PrimitiveXMLSerializers.h
-		??
+		Definitions for a variety of xml serialization objects for basic types
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -35,6 +35,7 @@ namespace XMLSerialization
 
 typedef std::pair< uint64, IXMLSerializer * > XMLMemberRecordType;
 
+// The base class for the serializer for compound types: classes and structs
 class CCompositeXMLSerializer : public IXMLSerializer
 {
 	public:
@@ -78,6 +79,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 		virtual void Add_Member_Record( const std::wstring &member_name, const XMLMemberRecordType &member_record ) = 0;
 };
 
+// A composite serializer where the member elements must appear in a specific order
 class COrderedCompositeXMLSerializer : public CCompositeXMLSerializer
 {
 	public:
@@ -141,7 +143,7 @@ class COrderedCompositeXMLSerializer : public CCompositeXMLSerializer
 		std::vector< std::pair< std::wstring, XMLMemberRecordType > > MemberRecords;
 };
 
-
+// A composite serializer where the member elements can appear in any specific order
 class CUnorderedCompositeXMLSerializer : public CCompositeXMLSerializer
 {
 	public:
@@ -198,6 +200,7 @@ class CUnorderedCompositeXMLSerializer : public CCompositeXMLSerializer
 
 };
 
+// A serializer for a std::vector of some type
 template< typename T >
 class CVectorXMLSerializer : public IXMLSerializer
 {
@@ -239,6 +242,7 @@ class CVectorXMLSerializer : public IXMLSerializer
 		IXMLSerializer *EntrySerializer;
 };
 
+// A serializer for a pointer to some type
 template< typename T >
 class CPointerXMLSerializer : public IXMLSerializer
 {
@@ -272,6 +276,7 @@ class CPointerXMLSerializer : public IXMLSerializer
 		IXMLSerializer *TSerializer;
 };
 
+// A serializer for an enum
 template< typename T >
 class CEnumXMLSerializer : public IXMLSerializer
 {
@@ -293,6 +298,7 @@ class CEnumXMLSerializer : public IXMLSerializer
 
 };
 
+// A serializer for a pointer to an enum
 template< typename T >
 class CEnumPointerXMLSerializer : public IXMLSerializer
 {
@@ -315,6 +321,7 @@ class CEnumPointerXMLSerializer : public IXMLSerializer
 
 };
 
+// A serializer for the base class of a class hierarchy, where all leaves of the hierarchy have a corresponding enum entry
 template< typename T >
 class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 {

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	XMLLoadableTable.h
-		??
+		Definition for a container of XML loadable objects keyed by some type/function
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -33,8 +33,9 @@ class CXMLLoadableTable
 
 		typedef FastDelegate1< T *, const K & > KeyExtractionDelegate;
 
-		CXMLLoadableTable( KeyExtractionDelegate key_extractor, IXMLSerializer *serializer = nullptr ) :
+		CXMLLoadableTable( KeyExtractionDelegate key_extractor, const wchar_t *top_child = nullptr, IXMLSerializer *serializer = nullptr ) :
 			KeyExtractor( key_extractor ),
+			TopChildName( top_child ? top_child : L"Objects" ),
 			Serializer( serializer ),
 			Loadables()
 		{
@@ -73,7 +74,7 @@ class CXMLLoadableTable
 				serializer = CXMLSerializationRegistrar::Create_Serializer( typeid( T * ) );
 			}
 
-			pugi::xml_node top = xml_doc.child( L"Objects" );
+			pugi::xml_node top = xml_doc.child( TopChildName.c_str() );
 			for ( pugi::xml_node iter = top.first_child(); iter; iter = iter.next_sibling() )
 			{
 				T *loadable = nullptr;
@@ -108,6 +109,8 @@ class CXMLLoadableTable
 	private:
 
 		KeyExtractionDelegate KeyExtractor;
+
+		std::wstring TopChildName;
 
 		IXMLSerializer *Serializer;
 

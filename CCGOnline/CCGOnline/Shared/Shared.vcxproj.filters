@@ -36,6 +36,9 @@
     <Filter Include="Source Files\XML">
       <UniqueIdentifier>{793d6836-37dc-46fb-b2c0-a49d0fc03a6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\SlashCommands">
+      <UniqueIdentifier>{a94ceaed-e039-4a4a-891e-1cd692dce0ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

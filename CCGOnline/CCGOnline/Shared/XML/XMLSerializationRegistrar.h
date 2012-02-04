@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	XMLSerializationRegistrar.h
-		??
+		A component containing a registrar of xml serializers, indexed by type.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -29,6 +29,11 @@ class IXMLSerializer;
 
 typedef FastDelegate0< IXMLSerializer * > XMLSerializerCreationDelegate;
 
+// Serializer factories are a simple class hierarchy that lets us delay and compose serialization which we couldn't
+// otherwise do with C++ delegates.  For example, given a serializer for type T, by delaying and wrapping in a class
+// we can create a serializer (factory) for type T * automatically.  If there's a way of taking a function delegate
+// and creating another modified function delegate (ie T serializer creator to T * serializer creator) then I could
+// remove this.
 class IXMLSerializerFactory
 {
 	public:
@@ -103,7 +108,7 @@ class CEnumPointerXMLSerializerFactory : public IXMLSerializerFactory
 
 };
 
-
+// Tracks creation proxies for all xml serializers
 class CXMLSerializationRegistrar
 {
 	public:

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	XMLSerializationRegistrar.cpp
-		A component containing ??
+		A component containing a registrar of xml serializers, indexed by type.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -27,6 +27,10 @@
 
 stdext::hash_map< Loki::TypeInfo, IXMLSerializerFactory *, STypeInfoContainerHelper > CXMLSerializationRegistrar::SerializerFactoryTable;
 
+/**********************************************************************************************************************
+	CXMLSerializationRegistrar::Shutdown -- cleans up all the serialization proxies held by the registrar
+
+**********************************************************************************************************************/	
 void CXMLSerializationRegistrar::Shutdown( void )
 {
 	for ( auto iter = SerializerFactoryTable.begin(); iter != SerializerFactoryTable.end(); ++iter )
@@ -37,6 +41,13 @@ void CXMLSerializationRegistrar::Shutdown( void )
 	SerializerFactoryTable.clear();
 }
  
+/**********************************************************************************************************************
+	CXMLSerializationRegistrar::Register_Serializer_Internal -- connects a type with its serializer factory
+
+		type_id -- type info of the serializer being registered
+		factory -- factory for the type's serializer
+
+**********************************************************************************************************************/	
 void CXMLSerializationRegistrar::Register_Serializer_Internal( const std::type_info &type_id, IXMLSerializerFactory *factory )
 {
 	Loki::TypeInfo key( type_id );
@@ -45,11 +56,27 @@ void CXMLSerializationRegistrar::Register_Serializer_Internal( const std::type_i
 	SerializerFactoryTable[ key ] = factory;
 }
 
+/**********************************************************************************************************************
+	CXMLSerializationRegistrar::Create_Serializer -- creates a serializer, given a type
+
+		type_id -- type info of the serializer that needs to be created
+
+	Returns: a serializer for that type if one has been registered, otherwise null
+
+**********************************************************************************************************************/	
 IXMLSerializer *CXMLSerializationRegistrar::Create_Serializer( const std::type_info &type_id )
 {
 	return Create_Serializer( Loki::TypeInfo( type_id ) );
 }
 
+/**********************************************************************************************************************
+	CXMLSerializationRegistrar::Create_Serializer -- creates a serializer, given a type
+
+		type_info -- type info of the serializer that needs to be created
+
+	Returns: a serializer for that type if one has been registered, otherwise null
+
+**********************************************************************************************************************/	
 IXMLSerializer *CXMLSerializationRegistrar::Create_Serializer( const Loki::TypeInfo &type_info )
 {
 	auto iter = SerializerFactoryTable.find( type_info );

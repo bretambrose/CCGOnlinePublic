@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	PrimitiveXMLSerializers.cpp
-		A component containing 
+		A component containing XML serializer definitions
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -26,7 +26,7 @@
 #include "XMLSerializationRegistrar.h"
 #include "pugixml.h"
 
-
+// A serializer for a signed integer type of templatized-width
 template < typename T >
 class CXMLIntegerSerializer : public IXMLSerializer
 {
@@ -46,6 +46,7 @@ class CXMLIntegerSerializer : public IXMLSerializer
 		}
 };
 
+// A serializer for an unsigned integer type of templatized-width
 template < typename T >
 class CXMLUnsignedIntegerSerializer : public IXMLSerializer
 {
@@ -65,6 +66,7 @@ class CXMLUnsignedIntegerSerializer : public IXMLSerializer
 		}
 };
 
+// A serializer for a floating point type of templatized-width
 template < typename T >
 class CXMLDoubleSerializer : public IXMLSerializer
 {
@@ -84,6 +86,7 @@ class CXMLDoubleSerializer : public IXMLSerializer
 		}
 };
 
+// A serializer for std::wstring
 class CXMLWideStringSerializer : public IXMLSerializer
 {
 	public:
@@ -100,6 +103,7 @@ class CXMLWideStringSerializer : public IXMLSerializer
 		}
 };
 
+// A serializer for std::string
 class CXMLStringSerializer : public IXMLSerializer
 {
 	public:
@@ -117,6 +121,7 @@ class CXMLStringSerializer : public IXMLSerializer
 		}
 };
 
+// A serializer for a boolean data member
 class CXMLBoolSerializer : public IXMLSerializer
 {
 	public:
@@ -142,6 +147,7 @@ class CXMLBoolSerializer : public IXMLSerializer
 
 namespace XMLSerialization
 {
+	// Creation functions for XML serializers for primitive types
 	IXMLSerializer *Create_Int8_Serializer( void ) { return new CXMLIntegerSerializer< int8 >; }
 	IXMLSerializer *Create_UInt8_Serializer( void ) { return new CXMLUnsignedIntegerSerializer< uint8 >; }
 	IXMLSerializer *Create_Int16_Serializer( void ) { return new CXMLIntegerSerializer< int16 >; }
@@ -173,59 +179,3 @@ namespace XMLSerialization
 		CXMLSerializationRegistrar::Register_Serializer< bool >( Create_Bool_Serializer );
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
-
-CUnorderedCompositeXMLSerializer::CUnorderedCompositeXMLSerializer( void *dummy_object ) :
-	MemberRecords(),
-	DummyBase( dummy_object )
-{
-}
-
-CUnorderedCompositeXMLSerializer::~CUnorderedCompositeXMLSerializer()
-{
-	for ( auto iter = MemberRecords.begin(); iter != MemberRecords.end(); ++iter )
-	{
-		delete iter->second.second;
-	}
-
-	MemberRecords.clear();
-}
-
-void CUnorderedCompositeXMLSerializer::Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
-{
-	uint8 *byte_base_ptr = reinterpret_cast< uint8 * >( destination );
-
-	for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
-	{
-		std::wstring node_name( iter.name() );
-		std::wstring upper_name;
-		NStringUtils::To_Upper_Case( node_name, upper_name );
-
-		auto member_iter = MemberRecords.find( upper_name );
-		FATAL_ASSERT( member_iter != MemberRecords.end() );
-
-		IXMLSerializer *serializer = member_iter->second.second;
-		uint8 *member_ptr = byte_base_ptr + member_iter->second.first;
-
-		serializer->Load_From_XML( iter, member_ptr );
-	}
-}
-
-void CUnorderedCompositeXMLSerializer::Add_Serializer( IXMLSerializer *serializer, const std::wstring &element_name, void *dummy_member )
-{
-	std::wstring upper_name;
-	NStringUtils::To_Upper_Case( element_name, upper_name );
-	FATAL_ASSERT( MemberRecords.find( upper_name ) == MemberRecords.end() );
-
-	uint8 *base_byte_ptr = reinterpret_cast< uint8 * >( DummyBase );
-	uint8 *member_byte_ptr = reinterpret_cast< uint8 * >( dummy_member );
-
-	uint64 offset = member_byte_ptr - base_byte_ptr;
-
-	MemberRecords.insert( std::make_pair< std::wstring, XMLMemberRecordType >( upper_name, XMLMemberRecordType( offset, serializer ) ) );
-}
-
-*/
