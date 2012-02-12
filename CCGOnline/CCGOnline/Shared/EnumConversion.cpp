@@ -314,6 +314,7 @@ bool CConvertibleEnum::Convert_Bitfield_Internal( uint64 value, std::string &mas
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 stdext::hash_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > CEnumConverter::Enums;
+stdext::hash_map< std::string, CConvertibleEnum * > CEnumConverter::EnumsByName;
 
 /**********************************************************************************************************************
 	CEnumConverter::Cleanup -- deletes the enum objects used to perform conversions
@@ -327,6 +328,7 @@ void CEnumConverter::Cleanup( void )
 	}
 
 	Enums.clear();
+	EnumsByName.clear();
 }
 
 /**********************************************************************************************************************
@@ -342,8 +344,13 @@ void CEnumConverter::Register_Enum_Internal( const std::type_info &enum_type_id,
 	Loki::TypeInfo enum_type_info( enum_type_id );
 	FATAL_ASSERT( Enums.find( enum_type_info ) == Enums.end() );
 
+	std::string upper_enum_name;
+	NStringUtils::To_Upper_Case( enum_name, upper_enum_name );
+	FATAL_ASSERT( EnumsByName.find( upper_enum_name ) == EnumsByName.end() );
+
 	CConvertibleEnum *enum_object = new CConvertibleEnum( enum_name, properties );
 	Enums[ enum_type_info ] = enum_object;
+	EnumsByName[ upper_enum_name ] = enum_object;
 }
 
 /**********************************************************************************************************************
@@ -376,6 +383,28 @@ CConvertibleEnum *CEnumConverter::Find_Enum( const std::type_info &enum_type_id 
 
 	auto iter = Enums.find( enum_type_info );
 	if ( iter == Enums.end() )
+	{
+		return nullptr;
+	}
+
+	return iter->second;
+}
+
+/**********************************************************************************************************************
+	CEnumConverter::Find_Enum -- searches for the conversion object for the named enum
+
+		enum_name -- name of the enum to find
+
+		Returns: the conversion object for the name enum, or null
+
+**********************************************************************************************************************/	
+CConvertibleEnum *CEnumConverter::Find_Enum( const std::string &enum_name )
+{
+	std::string upper_enum_name;
+	NStringUtils::To_Upper_Case( enum_name, upper_enum_name );
+
+	auto iter = EnumsByName.find( upper_enum_name );
+	if ( iter == EnumsByName.end() )
 	{
 		return nullptr;
 	}
@@ -421,3 +450,24 @@ bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, uint6
 	return enum_object->Convert( value, entry_name );
 }
 
+/**********************************************************************************************************************
+	CEnumConverter::Convert -- converts from a string to an integer for the supplied enum
+
+		enum_name -- name of the enum this is a conversion operation for
+		entry_name -- string value to convert from
+		output_value -- output parameter for the corresponding integer value
+
+**********************************************************************************************************************/	
+bool CEnumConverter::Convert( const std::string &enum_name, const std::wstring &entry_name, uint64 &output_value )
+{
+	CConvertibleEnum *enum_object = Find_Enum( enum_name );
+	if ( enum_object == nullptr )
+	{
+		return false;
+	}
+
+	std::string usable_entry_name;
+	NStringUtils::WideString_To_String( entry_name, usable_entry_name );
+
+	return enum_object->Convert( usable_entry_name, output_value );
+}

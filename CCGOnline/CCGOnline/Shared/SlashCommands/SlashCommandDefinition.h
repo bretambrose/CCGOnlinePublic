@@ -1,8 +1,7 @@
 /**********************************************************************************************************************
 
-	XMLSerializerInterface.h
-		A pure virtual interface for the XML serializer hierarchy.  This class hierarchy enables static XML
-		serialization (just loading atm) of C++ class hierarchies.
+	SlashCommandDefinition.h
+		A component containing the definition of a slash command
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,24 +20,31 @@
 
 **********************************************************************************************************************/
 
-#ifndef XML_SERIALIZER_INTERFACE_H
-#define XML_SERIALIZER_INTERFACE_H
+#ifndef SLASH_COMMAND_DEFINITION_H
+#define SLASH_COMMAND_DEFINITION_H
 
-namespace pugi
-{
-	class xml_node;
-}
+#include <regex>
 
-class IXMLSerializer
+class CSlashCommandDataDefinition;
+
+class CSlashCommandDefinition
 {
 	public:
 
-		IXMLSerializer( void ) {}
-		virtual ~IXMLSerializer() {}
+		CSlashCommandDefinition( const CSlashCommandDataDefinition *data_definition );
+		~CSlashCommandDefinition() {}
 
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const = 0;
-		virtual void Load_From_XML( const wchar_t * /*value*/, void * /*destination*/ ) const { FATAL_ASSERT( false ); }
+		const CSlashCommandDataDefinition *Get_Data_Definition( void ) const { return DataDefinition; }
 
+		bool Is_Family( void ) const { return DataDefinition == nullptr; }
+
+		const std::tr1::wregex &Get_Param_Match_Expression( void ) const { return ParamMatchExpression; }
+
+	private:
+
+		const CSlashCommandDataDefinition *DataDefinition;
+
+		std::tr1::wregex ParamMatchExpression;
 };
 
-#endif // XML_SERIALIZER_INTERFACE_H
+#endif // SLASH_COMMAND_DEFINITION_H

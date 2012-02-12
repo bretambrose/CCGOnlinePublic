@@ -30,7 +30,9 @@
 #include "PlatformTime.h"
 #include "PlatformProcess.h"
 #include "GeneratedCode/RegisterSharedEnums.h"
-#include "XML/PrimitiveXMLSerializers.h"
+#include "SharedXMLSerializerRegistration.h"
+#include "XML/XMLSerializationRegistrar.h"
+#include "SlashCommands/SlashCommandManager.h"
 
 /**********************************************************************************************************************
 	NShared::Initialize -- Initializes all the static process-wide systems in the Shared library
@@ -43,9 +45,11 @@ void NShared::Initialize( void )
 	CLogInterface::Initialize_Static( NPlatform::Get_Service_Name(), LL_LOW );
 	CThreadStatics::Initialize();
 	CPlatformTime::Initialize();	// does not have a corresponding shutdown function
-	XMLSerialization::Register_Primitive_Serializers();
 
 	Register_Shared_Enums();
+	Register_Shared_XML_Serializers();
+
+	CSlashCommandManager::Initialize();
 }
 
 /**********************************************************************************************************************
@@ -54,6 +58,8 @@ void NShared::Initialize( void )
 **********************************************************************************************************************/
 void NShared::Shutdown( void )
 {
+	CSlashCommandManager::Shutdown();
+	CXMLSerializationRegistrar::Shutdown();
 	CThreadStatics::Shutdown();
 	CLogInterface::Shutdown_Static();
 	CStructuredExceptionHandler::Shutdown();

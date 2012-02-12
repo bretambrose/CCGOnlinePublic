@@ -1,8 +1,7 @@
 /**********************************************************************************************************************
 
-	XMLSerializerInterface.h
-		A pure virtual interface for the XML serializer hierarchy.  This class hierarchy enables static XML
-		serialization (just loading atm) of C++ class hierarchies.
+	SlashCommandDefinition.cpp
+		A component containing the definition of a slash command
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,24 +20,13 @@
 
 **********************************************************************************************************************/
 
-#ifndef XML_SERIALIZER_INTERFACE_H
-#define XML_SERIALIZER_INTERFACE_H
+#include "stdafx.h"
 
-namespace pugi
+#include "SlashCommandDefinition.h"
+#include "SlashCommandDataDefinition.h"
+
+CSlashCommandDefinition::CSlashCommandDefinition( const CSlashCommandDataDefinition *data_definition ) :
+	DataDefinition( data_definition ),
+	ParamMatchExpression( data_definition != nullptr ? data_definition->Build_Command_Matcher() : L"" )
 {
-	class xml_node;
 }
-
-class IXMLSerializer
-{
-	public:
-
-		IXMLSerializer( void ) {}
-		virtual ~IXMLSerializer() {}
-
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const = 0;
-		virtual void Load_From_XML( const wchar_t * /*value*/, void * /*destination*/ ) const { FATAL_ASSERT( false ); }
-
-};
-
-#endif // XML_SERIALIZER_INTERFACE_H

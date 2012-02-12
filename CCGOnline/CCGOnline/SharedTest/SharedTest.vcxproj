@@ -200,6 +200,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClCompile Include="PriorityQueueTests.cpp" />
     <ClCompile Include="ReflectionTests.cpp" />
     <ClCompile Include="SharedTest.cpp" />
+    <ClCompile Include="SlashCommandTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

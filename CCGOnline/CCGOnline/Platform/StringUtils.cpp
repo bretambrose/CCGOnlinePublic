@@ -126,3 +126,263 @@ void NStringUtils::To_Upper_Case( const std::wstring &source, std::wstring &dest
 	delete buffer;
 }
 
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, int32 &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, uint32 &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, int64 &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, uint64 &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, std::wstring &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, std::string &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, float &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, double &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert( const std::wstring &source, bool &value ) 
+{
+	return Convert_Raw( source.c_str(), value );
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, int32 &value ) 
+{
+	wchar_t *end_ptr = nullptr;
+	value = wcstol( source, &end_ptr, 10 );
+
+	return *end_ptr == 0;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, uint32 &value ) 
+{
+	wchar_t *end_ptr = nullptr;
+	value = wcstoul( source, &end_ptr, 10 );
+	
+	return *end_ptr == 0;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, int64 &value ) 
+{
+	wchar_t *end_ptr = nullptr;
+	value = _wcstoi64( source, &end_ptr, 10 );
+	
+	return *end_ptr == 0;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, uint64 &value ) 
+{
+	wchar_t *end_ptr = nullptr;
+	value = _wcstoui64( source, &end_ptr, 10 );
+
+	return *end_ptr == 0;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, std::wstring &value ) 
+{
+	value = source;
+	return true;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, std::string &value ) 
+{
+	WideString_To_String( source, value );
+	return true;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, float &value ) 
+{
+	wchar_t *end_ptr = nullptr;
+	double value_d = wcstod( source, &end_ptr );
+	value = static_cast< float >( value_d );
+	
+	return *end_ptr == 0;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, double &value ) 
+{
+	wchar_t *end_ptr = nullptr;
+	value = wcstod( source, &end_ptr );
+	
+	return *end_ptr == 0;
+}
+
+/**********************************************************************************************************************
+	NStringUtils::Convert_Raw - converts a wide string to a built-in value type
+
+		source -- source wide string
+		value -- output parameter to store conversion in
+
+	Returns: conversion success/failure
+**********************************************************************************************************************/
+bool NStringUtils::Convert_Raw( const wchar_t *source, bool &value ) 
+{
+	value = false;
+	if ( _wcsicmp( source, L"TRUE" ) == 0 || _wcsicmp( source, L"YES" ) == 0 || _wcsicmp( source, L"1" ) == 0 )
+	{
+		value = true;
+	}
+
+	return true;
+}

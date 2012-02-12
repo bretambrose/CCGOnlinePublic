@@ -43,67 +43,13 @@ class XMLLoadableTests : public testing::Test
 
 };
 
-struct SOrderedCompositeXMLTest
-{
-	public:
-
-		static IXMLSerializer *Create_Serializer( void )
-		{
-			COrderedCompositeXMLSerializer *serializer = new COrderedCompositeXMLSerializer;
-
-			serializer->Add( L"Byte", &SOrderedCompositeXMLTest::Byte );
-			serializer->Add( L"Word", &SOrderedCompositeXMLTest::Word );
-			serializer->Add( L"WString", &SOrderedCompositeXMLTest::WString );
-			serializer->Add( L"Double", &SOrderedCompositeXMLTest::Double );
-
-			return serializer;
-		}
-
-		int8 Byte;
-		uint32 Word;
-		std::wstring *WString;
-		double Double;
-};
-
-TEST_F( XMLLoadableTests, Ordered_Composite_Serializer )
-{
-	CXMLSerializationRegistrar::Register_Serializer< SOrderedCompositeXMLTest >( SOrderedCompositeXMLTest::Create_Serializer );
-
-	IXMLSerializer *serializer = CXMLSerializationRegistrar::Create_Serializer< SOrderedCompositeXMLTest >();
-
-	SOrderedCompositeXMLTest test;
-	std::wstring xml_blob( L"<Test><Byte>5</Byte><Word>4096</Word><WString>goog</WString><Double>5.5</Double></Test>" );
-
-	pugi::xml_document doc;
-	doc.load( xml_blob.c_str() );
-
-	serializer->Load_From_XML( doc.first_child(), &test );
-
-	ASSERT_TRUE( test.Byte == 5 );
-	ASSERT_TRUE( test.Word == 4096 );
-	ASSERT_TRUE( *(test.WString) == L"goog" );
-	ASSERT_TRUE( test.Double == 5.5 );
-
-	std::wstring xml_blob2( L"<Test><Word>4</Word><WString>blah</WString></Test>" );
-
-	pugi::xml_document doc2;
-	doc2.load( xml_blob2.c_str() );
-
-	serializer->Load_From_XML( doc2.first_child(), &test );
-
-	ASSERT_TRUE( test.Byte == 5 );
-	ASSERT_TRUE( test.Word == 4 );
-	ASSERT_TRUE( *(test.WString) == L"blah" );
-	ASSERT_TRUE( test.Double == 5.5 );
-}
-
 struct SUnorderedCompositeXMLTest
 {
 	public:
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"UShort", &SUnorderedCompositeXMLTest::UShort );
 			serializer->Add( L"Bigint", &SUnorderedCompositeXMLTest::Bigint );
@@ -161,7 +107,7 @@ struct SInnerCompositeXMLTest1
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"UShort", &SInnerCompositeXMLTest1::UShort );
 			serializer->Add( L"Bigint", &SInnerCompositeXMLTest1::Bigint );
@@ -179,7 +125,7 @@ struct SInnerCompositeXMLTest2
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"String", &SInnerCompositeXMLTest2::String );
 			serializer->Add( L"Float", &SInnerCompositeXMLTest2::Float );
@@ -197,7 +143,7 @@ struct SOuterCompositeXMLTest
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"Inner1", &SOuterCompositeXMLTest::Inner1 );
 			serializer->Add( L"Double", &SOuterCompositeXMLTest::Double );
@@ -247,7 +193,7 @@ class CBaseXMLTest
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"BaseString", &CBaseXMLTest::BaseString );
 			serializer->Add( L"BaseInt32", &CBaseXMLTest::BaseInt32 );
@@ -326,7 +272,7 @@ class CPrimitiveVectorXMLTest
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"Strings", &CPrimitiveVectorXMLTest::Strings, new CVectorXMLSerializer< std::string > );
 			serializer->Add( L"Integers", &CPrimitiveVectorXMLTest::Integers, new CVectorXMLSerializer< int32 * > );
@@ -377,7 +323,7 @@ class CVectorEntry
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"String", &CVectorEntry::String );
 			serializer->Add( L"Integer", &CVectorEntry::Integer );
@@ -432,7 +378,7 @@ class CVectorXMLTest
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"Entries", &CVectorXMLTest::Entries, new CVectorXMLSerializer< CVectorEntry > );
 			serializer->Add( L"EntryPointers", &CVectorXMLTest::EntryPointers, new CVectorXMLSerializer< CVectorEntry * >( CXMLSerializationRegistrar::Create_Serializer< CDerivedVectorEntry * >() ) );
@@ -489,7 +435,7 @@ class CPolyBase
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"String", &CPolyBase::String );
 
@@ -567,7 +513,7 @@ class CPolyVectorTest
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			CEnumPolymorphicXMLSerializer< EPolySerializerTestTypes > *entry_serializer = new CEnumPolymorphicXMLSerializer< EPolySerializerTestTypes >;
 			entry_serializer->Add( PSTT_CLASS1, CXMLSerializationRegistrar::Create_Serializer< CPolyDerived1 * >() );
@@ -627,7 +573,7 @@ class CTableTest
 
 		static IXMLSerializer *Create_Serializer( void )
 		{
-			CUnorderedCompositeXMLSerializer *serializer = new CUnorderedCompositeXMLSerializer;
+			CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
 
 			serializer->Add( L"Name", &CTableTest::Name );
 			serializer->Add( L"HitPoints", &CTableTest::HitPoints );
@@ -639,11 +585,6 @@ class CTableTest
 		const std::string &Get_Name( void ) const { return Name; }
 		uint32 Get_Hit_Points( void ) const { return HitPoints; }
 		ETableTestClass Get_Class( void ) const { return Class; }
-
-		static const std::string &Get_Name( CTableTest *table_test )
-		{
-			return table_test->Get_Name();
-		}
 
 	private:
 
@@ -660,7 +601,7 @@ TEST_F( XMLLoadableTests, Loadable_Table )
 	CXMLSerializationRegistrar::Register_Serializer< CTableTest >( CTableTest::Create_Serializer );
 	CXMLSerializationRegistrar::Register_Enum_Serializer< ETableTestClass >();
 	
-	CXMLLoadableTable< CTableTest, std::string > loadable_table( CTableTest::Get_Name );
+	CXMLLoadableTable< std::string, CTableTest > loadable_table( &CTableTest::Get_Name );
 
 	std::wstring xml_blob( L"<Objects><Object><Name>Bret</Name><HitPoints>5</HitPoints><Class>Janitor</Class></Object><Object><Name>Peti</Name><HitPoints>50</HitPoints><Class>Berserker</Class></Object></Objects>" );
 

@@ -74,11 +74,7 @@ class CEnumConverter
 			std::string usable_entry_name;
 			NStringUtils::WideString_To_String( entry_name, usable_entry_name );
 
-			uint64 converted_value = 0;
-			bool success = Convert_Internal( typeid( T ), usable_entry_name, converted_value );
-			output_value = static_cast< T >( converted_value );
-
-			return success;
+			return Convert( usable_entry_name, output_value );
 		}
 
 		template < typename T >
@@ -88,9 +84,12 @@ class CEnumConverter
 			return Convert_Internal( typeid( T ), converted_value, entry_name );
 		}
 
+		static bool Convert( const std::string &enum_name, const std::wstring &entry_name, uint64 &output_value );
+
 	private:
 
 		static CConvertibleEnum *Find_Enum( const std::type_info &enum_type_id );
+		static CConvertibleEnum *Find_Enum( const std::string &enum_name );
 
 		static void Register_Enum_Internal( const std::type_info &enum_type_id, const std::string &upper_enum_name, EConvertibleEnumProperties properties );
 		static void Register_Enum_Entry_Internal( const std::type_info &enum_type_id, const std::string &entry_name, uint64 entry_value );
@@ -99,6 +98,7 @@ class CEnumConverter
 		static bool Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::string &entry_name );
 
 		static stdext::hash_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > Enums;
+		static stdext::hash_map< std::string, CConvertibleEnum * > EnumsByName;
 };
 
 #endif // ENUM_CONVERSION_H

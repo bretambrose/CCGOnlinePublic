@@ -27,6 +27,7 @@
 #include "pugixml.h"
 #include "StringUtils.h"
 #include "EnumConversion.h"
+#include "XMLSerializationRegistrar.h"
 
 namespace XMLSerialization
 {
@@ -43,8 +44,62 @@ class CCompositeXMLSerializer : public IXMLSerializer
 		typedef IXMLSerializer BASECLASS;
 
 		CCompositeXMLSerializer( void ) :
-			BASECLASS()
+			BASECLASS(),
+			MemberRecords()
 		{}
+
+		virtual ~CCompositeXMLSerializer()
+		{
+			for ( auto iter = MemberRecords.begin(); iter != MemberRecords.end(); ++iter )
+			{
+				delete iter->second.second;
+			}
+
+			MemberRecords.clear();
+		}
+
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
+		{
+			uint8 *byte_base_ptr = reinterpret_cast< uint8 * >( destination );
+
+			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
+			{
+				std::wstring node_name( iter.name() );
+				std::wstring upper_name;
+				NStringUtils::To_Upper_Case( node_name, upper_name );
+
+				auto member_iter = MemberRecords.find( upper_name );
+				FATAL_ASSERT( member_iter != MemberRecords.end() );
+
+				IXMLSerializer *serializer = member_iter->second.second;
+				uint8 *member_ptr = byte_base_ptr + member_iter->second.first;
+
+				serializer->Load_From_XML( iter, member_ptr );
+			}
+
+			for ( pugi::xml_attribute att_iter = xml_node.first_attribute(); att_iter; att_iter = att_iter.next_attribute() )
+			{
+				std::wstring attribute_name( att_iter.name() );
+				std::wstring upper_attribute_name;
+				NStringUtils::To_Upper_Case( attribute_name, upper_attribute_name );
+
+				auto record_iter = MemberRecords.find( upper_attribute_name );
+				if ( record_iter == MemberRecords.end() )
+				{
+					if ( upper_attribute_name == L"TYPE" )
+					{
+						continue;
+					}
+
+					FATAL_ASSERT( false );
+				}
+
+				IXMLSerializer *serializer = record_iter->second.second;
+				uint8 *member_ptr = byte_base_ptr + record_iter->second.first;
+
+				serializer->Load_From_XML( att_iter.value(), member_ptr );
+			}
+		}
 
 		template< typename T, typename S >
 		void Add( const std::wstring &element_name, S T::* dummy_member )
@@ -74,118 +129,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 			Add_Member_Record( upper_name,  XMLMemberRecordType( offset, serializer ) );
 		}
 
-	protected:
-
-		virtual void Add_Member_Record( const std::wstring &member_name, const XMLMemberRecordType &member_record ) = 0;
-};
-
-// A composite serializer where the member elements must appear in a specific order
-class COrderedCompositeXMLSerializer : public CCompositeXMLSerializer
-{
-	public:
-
-		typedef CCompositeXMLSerializer BASECLASS;
-
-		COrderedCompositeXMLSerializer( void ) :
-			BASECLASS(),
-			MemberRecords()
-		{}
-
-		virtual ~COrderedCompositeXMLSerializer()
-		{
-			for ( auto iter = MemberRecords.begin(); iter != MemberRecords.end(); ++iter )
-			{
-				delete iter->second.second;
-			}
-
-			MemberRecords.clear();
-		}
-
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
-		{
-			uint32 member_index = 0;
-			uint8 *byte_base_ptr = reinterpret_cast< uint8 * >( destination );
-
-			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
-			{
-				FATAL_ASSERT( member_index < MemberRecords.size() );
-
-				std::wstring node_name( iter.name() );
-				std::wstring upper_name;
-				NStringUtils::To_Upper_Case( node_name, upper_name );
-
-				for ( ; member_index < MemberRecords.size() && upper_name != MemberRecords[ member_index ].first; member_index++ )
-				{
-					;
-				}
-
-				FATAL_ASSERT( member_index < MemberRecords.size() );
-
-				IXMLSerializer *serializer = MemberRecords[ member_index ].second.second;
-				uint8 *member_ptr = byte_base_ptr + MemberRecords[ member_index ].second.first;
-
-				serializer->Load_From_XML( iter, member_ptr );
-
-				member_index++;
-			}
-
-		}
-
-	protected:
-
-		virtual void Add_Member_Record( const std::wstring &member_name, const XMLMemberRecordType &member_record )
-		{
-			MemberRecords.push_back( std::make_pair( member_name, member_record ) );
-		}
-
 	private:
-
-		std::vector< std::pair< std::wstring, XMLMemberRecordType > > MemberRecords;
-};
-
-// A composite serializer where the member elements can appear in any specific order
-class CUnorderedCompositeXMLSerializer : public CCompositeXMLSerializer
-{
-	public:
-
-		typedef CCompositeXMLSerializer BASECLASS;
-
-		CUnorderedCompositeXMLSerializer( void ) :
-			BASECLASS(),
-			MemberRecords()
-		{}
-
-		virtual ~CUnorderedCompositeXMLSerializer()
-		{
-			for ( auto iter = MemberRecords.begin(); iter != MemberRecords.end(); ++iter )
-			{
-				delete iter->second.second;
-			}
-
-			MemberRecords.clear();
-		}
-
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
-		{
-			uint8 *byte_base_ptr = reinterpret_cast< uint8 * >( destination );
-
-			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
-			{
-				std::wstring node_name( iter.name() );
-				std::wstring upper_name;
-				NStringUtils::To_Upper_Case( node_name, upper_name );
-
-				auto member_iter = MemberRecords.find( upper_name );
-				FATAL_ASSERT( member_iter != MemberRecords.end() );
-
-				IXMLSerializer *serializer = member_iter->second.second;
-				uint8 *member_ptr = byte_base_ptr + member_iter->second.first;
-
-				serializer->Load_From_XML( iter, member_ptr );
-			}
-		}
-
-	protected:
 
 		virtual void Add_Member_Record( const std::wstring &member_name, const XMLMemberRecordType &member_record )
 		{
@@ -193,11 +137,8 @@ class CUnorderedCompositeXMLSerializer : public CCompositeXMLSerializer
 
 			MemberRecords[ member_name ] = member_record;
 		}
-				 
-	private:
 
 		stdext::hash_map< std::wstring, XMLMemberRecordType > MemberRecords;
-
 };
 
 // A serializer for a std::vector of some type
@@ -288,14 +229,18 @@ class CEnumXMLSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
 			T *dest = reinterpret_cast< T * >( destination );
 
-			if ( !CEnumConverter::Convert( xml_node.child_value(), *dest ) )
+			if ( !CEnumConverter::Convert( value, *dest ) )
 			{
 				FATAL_ASSERT( false );
 			}
 		}
-
 };
 
 // A serializer for a pointer to an enum
@@ -310,15 +255,19 @@ class CEnumPointerXMLSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
 			T **dest = reinterpret_cast< T ** >( destination );
 			*dest = new T;
 
-			if ( !CEnumConverter::Convert( xml_node.child_value(), **dest ) )
+			if ( !CEnumConverter::Convert( value, **dest ) )
 			{
 				FATAL_ASSERT( false );
 			}
 		}
-
 };
 
 // A serializer for the base class of a class hierarchy, where all leaves of the hierarchy have a corresponding enum entry

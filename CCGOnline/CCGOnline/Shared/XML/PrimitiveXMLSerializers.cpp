@@ -37,9 +37,14 @@ class CXMLIntegerSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
-			int64 node_value = _wcstoi64( xml_node.child_value(), nullptr, 10 );
-			int32 error = errno;
-			FATAL_ASSERT( error == 0 );
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
+			int64 node_value = 0;
+			bool result = NStringUtils::Convert_Raw( value, node_value );
+			FATAL_ASSERT( result );
 
 			T *dest_ptr = reinterpret_cast< T * >( destination );
 			*dest_ptr = static_cast< T >( node_value );
@@ -57,9 +62,14 @@ class CXMLUnsignedIntegerSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
-			uint64 node_value = _wcstoui64( xml_node.child_value(), nullptr, 10 );
-			int32 error = errno;
-			FATAL_ASSERT( error == 0 );
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
+			uint64 node_value = 0;
+			bool result = NStringUtils::Convert_Raw( value, node_value );
+			FATAL_ASSERT( result );
 
 			T *dest_ptr = reinterpret_cast< T * >( destination );
 			*dest_ptr = static_cast< T >( node_value );
@@ -77,9 +87,14 @@ class CXMLDoubleSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
-			double node_value = _wtof( xml_node.child_value() );
-			int32 error = errno;
-			FATAL_ASSERT( error == 0 );
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
+			double node_value = 0;
+			bool result = NStringUtils::Convert_Raw( value, node_value );
+			FATAL_ASSERT( result );
 
 			T *dest_ptr = reinterpret_cast< T * >( destination );
 			*dest_ptr = static_cast< T >( node_value );
@@ -96,7 +111,12 @@ class CXMLWideStringSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
-			std::wstring node_value( xml_node.child_value() );
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
+			std::wstring node_value( value );
 
 			std::wstring *dest_ptr = reinterpret_cast< std::wstring * >( destination );
 			*dest_ptr = node_value;
@@ -113,8 +133,13 @@ class CXMLStringSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
 			std::string node_value;
-			NStringUtils::WideString_To_String( xml_node.child_value(), node_value );
+			NStringUtils::WideString_To_String( value, node_value );
 
 			std::string *dest_ptr = reinterpret_cast< std::string * >( destination );
 			*dest_ptr = node_value;
@@ -131,17 +156,17 @@ class CXMLBoolSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
 		{
-			std::wstring node_value( xml_node.child_value() );
-			bool value = false;
-			if ( _wcsnicmp( node_value.c_str(), L"TRUE", node_value.size() ) == 0 || 
-				  _wcsnicmp( node_value.c_str(), L"YES", node_value.size() ) == 0 ||
-				  _wcsnicmp( node_value.c_str(), L"1", node_value.size() ) == 0 )
-			{
-				value = true;
-			}
+			Load_From_XML( xml_node.child_value(), destination );
+		}
+
+		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		{
+			bool node_value = false;
+			bool result = NStringUtils::Convert_Raw( value, node_value );
+			FATAL_ASSERT( result );
 
 			bool *dest_ptr = reinterpret_cast< bool * >( destination );
-			*dest_ptr = value;
+			*dest_ptr = node_value;
 		}
 };
 

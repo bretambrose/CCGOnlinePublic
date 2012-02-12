@@ -25,16 +25,21 @@
 
 #include "XMLSerializerInterface.h"
 #include "pugixml.h"
+#include "XMLSerializationRegistrar.h"
 
-template< typename T, typename K = uint64 >
+template< typename K, typename T >
 class CXMLLoadableTable
 {
 	public:
 
-		typedef FastDelegate1< T *, const K & > KeyExtractionDelegate;
+		//typedef FastDelegate1< const T *, const K & > KeyExtractionDelegate;
+		typedef const K & ( T::* KeyExtractorMemberFunction )( void ) const ;
+		typedef void ( T::* PostLoadMemberFunction )( void );
+		typedef typename stdext::hash_map< K, const T * >::const_iterator TableIterator;
 
-		CXMLLoadableTable( KeyExtractionDelegate key_extractor, const wchar_t *top_child = nullptr, IXMLSerializer *serializer = nullptr ) :
+		CXMLLoadableTable( KeyExtractorMemberFunction key_extractor, const wchar_t *top_child = nullptr, IXMLSerializer *serializer = nullptr ) :
 			KeyExtractor( key_extractor ),
+			PostLoad(),
 			TopChildName( top_child ? top_child : L"Objects" ),
 			Serializer( serializer ),
 			Loadables()
@@ -60,7 +65,7 @@ class CXMLLoadableTable
 		void Load( const std::string &file_name ) 
 		{
 			pugi::xml_document doc;
-			pugi::xml_parse_result result = doc.load_file( file_name );
+			pugi::xml_parse_result result = doc.load_file( file_name.c_str() );
 			FATAL_ASSERT( result == true );
 
 			Load( doc );
@@ -80,10 +85,14 @@ class CXMLLoadableTable
 				T *loadable = nullptr;
 
 				serializer->Load_From_XML( iter, &loadable );
+				if ( PostLoad != nullptr )
+				{
+					(loadable->*PostLoad)();
+				}
 
 				FATAL_ASSERT( loadable != nullptr );
 
-				K key = KeyExtractor( loadable );
+				K key = (loadable->*KeyExtractor)();
 				FATAL_ASSERT( Loadables.find( key ) == Loadables.end() );
 
 				Loadables[ key ] = loadable;
@@ -106,9 +115,23 @@ class CXMLLoadableTable
 			return nullptr;
 		}
 
+		void Add_Object( T *object )
+		{
+			K key = object->Get_Key();
+			FATAL_ASSERT( Loadables.find( key ) == Loadables.end() );
+
+			Loadables[ key ] = object;
+		}
+
+		TableIterator cbegin( void ) const { return Loadables.cbegin(); }
+		TableIterator cend( void ) const { return Loadables.cend(); }
+
+		void Set_Post_Load_Function( PostLoadMemberFunction post_load ) { PostLoad = post_load; }
+
 	private:
 
-		KeyExtractionDelegate KeyExtractor;
+		KeyExtractorMemberFunction KeyExtractor;
+		PostLoadMemberFunction PostLoad;
 
 		std::wstring TopChildName;
 

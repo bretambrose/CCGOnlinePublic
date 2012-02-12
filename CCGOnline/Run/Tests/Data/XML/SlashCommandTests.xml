@@ -1,0 +1,39 @@
+<Commands>
+	<SlashCommand>
+		<Command>Test1</Command>
+
+		<Params>
+			<Param type="uint32"/>
+		</Params>
+	</SlashCommand>
+
+	<SlashCommand>
+		<Command>Test</Command>
+		<SubCommand>Subtest</SubCommand>
+
+		<Params>
+			<Param type="int32"/>
+			<Param type="string"/>
+		</Params>
+	</SlashCommand>
+
+	<SlashCommand>
+		<Command>Test</Command>
+		<SubCommand>Subby</SubCommand>
+
+		<Params>
+			<Param type="bool"/>
+			<Param type="double"/>
+			<Param type="int64" optional="true" default="666"/>
+		</Params>
+	</SlashCommand>
+
+	<SlashCommand>
+		<Command>saytest</Command>
+
+		<Params>
+			<Param type="wstring" capture="true"/>
+		</Params>
+	</SlashCommand>
+
+</Commands>

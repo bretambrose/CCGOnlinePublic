@@ -179,6 +179,21 @@
     <ClInclude Include="XML\XMLLoadableTable.h">
       <Filter>Source Files\XML</Filter>
     </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandDefinition.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedXMLSerializerRegistration.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandManager.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandInstance.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandDataDefinition.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -252,6 +267,21 @@
     </ClCompile>
     <ClCompile Include="XML\XMLSerializationRegistrar.cpp">
       <Filter>Source Files\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandDefinition.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedXMLSerializerRegistration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandManager.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandInstance.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandDataDefinition.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

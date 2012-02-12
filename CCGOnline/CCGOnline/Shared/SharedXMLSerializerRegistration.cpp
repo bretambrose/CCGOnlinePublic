@@ -1,8 +1,7 @@
 /**********************************************************************************************************************
 
-	XMLSerializerInterface.h
-		A pure virtual interface for the XML serializer hierarchy.  This class hierarchy enables static XML
-		serialization (just loading atm) of C++ class hierarchies.
+	SharedXMLSerializerRegistration.cpp
+		A component containing the registration function for all xml serializers used in the shared library
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,24 +20,19 @@
 
 **********************************************************************************************************************/
 
-#ifndef XML_SERIALIZER_INTERFACE_H
-#define XML_SERIALIZER_INTERFACE_H
+#include "stdafx.h"
 
-namespace pugi
+#include "SharedXMLSerializerRegistration.h"
+
+#include "XML/PrimitiveXMLSerializers.h"
+#include "XML/XMLSerializationRegistrar.h"
+#include "SlashCommands/SlashCommandDataDefinition.h"
+
+void NShared::Register_Shared_XML_Serializers( void )
 {
-	class xml_node;
+	XMLSerialization::Register_Primitive_Serializers();
+
+	CXMLSerializationRegistrar::Register_Enum_Serializer< ESlashCommandParamType >();
+	CXMLSerializationRegistrar::Register_Serializer< CSlashCommandParam >( CSlashCommandParam::Create_Serializer );
+	CXMLSerializationRegistrar::Register_Serializer< CSlashCommandDataDefinition >( CSlashCommandDataDefinition::Create_Serializer );
 }
-
-class IXMLSerializer
-{
-	public:
-
-		IXMLSerializer( void ) {}
-		virtual ~IXMLSerializer() {}
-
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const = 0;
-		virtual void Load_From_XML( const wchar_t * /*value*/, void * /*destination*/ ) const { FATAL_ASSERT( false ); }
-
-};
-
-#endif // XML_SERIALIZER_INTERFACE_H
