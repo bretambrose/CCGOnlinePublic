@@ -25,16 +25,23 @@
 
 class CSlashCommandDefinition;
 
+// A class representing an instance/invokation of a slash command.
 class CSlashCommandInstance
 {
 	public:
 
+		// Construction/destruction
 		CSlashCommandInstance( void );
 		~CSlashCommandInstance() {}
 
+		// Operations
 		bool Parse( const std::wstring &command, const CSlashCommandDefinition *definition, std::wstring &error_msg );
 
 		void Reset( void );
+
+		// Accessors
+		const std::wstring &Get_Command( void ) const { return Command; }
+		const std::wstring &Get_Sub_Command( void ) const { return SubCommand; }
 
 		uint32 Get_Param_Count( void ) { return static_cast< uint32 >( Params.size() ); }
 
@@ -48,6 +55,7 @@ class CSlashCommandInstance
 		bool Get_Param( uint32 index, double &value ) const;
 		bool Get_Param( uint32 index, bool &value ) const;
 
+		// Todo: put an IsEnum compile-time restriction on this, compile-time assert on other path
 		template< typename T >
 		bool Get_Param( uint32 index, T &value ) const
 		{
@@ -61,6 +69,7 @@ class CSlashCommandInstance
 
 	private:
 
+		// Data
 		std::wstring Command;
 		std::wstring SubCommand;
 

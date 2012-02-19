@@ -44,15 +44,18 @@ enum ESlashCommandParamType
 };
 //:EnumEnd
 
+// A class containing the static data of a single parameter to a slash command
 class CSlashCommandParam
 {
 	public:
 
+		// Construction/Destruction
 		CSlashCommandParam( void );
 		~CSlashCommandParam() {}
 
 		static IXMLSerializer *Create_Serializer( void );
 
+		// Accessors
 		ESlashCommandParamType Get_Type( void ) const { return Type; }
 		const std::string &Get_Sub_Type( void ) const { return SubType; }
 		const std::wstring &Get_Default( void ) const { return Default; }
@@ -60,6 +63,7 @@ class CSlashCommandParam
 		bool Is_Optional( void ) const { return Optional; }
 		bool Should_Capture( void ) const { return Capture; }
 
+		// Validation and Defaults
 		bool Is_Value_Valid( const std::wstring &value ) const;
 
 		void Initialize_Default( void );
@@ -67,25 +71,30 @@ class CSlashCommandParam
 
 	private:
 
+		// Data
 		ESlashCommandParamType Type;
-		std::string SubType;
-		std::wstring Default;
+		std::string SubType;		// If Type is SCPT_ENUM, this contains the name of the enum
+		std::wstring Default;	// Default value override for this parameter
 
-		bool Optional;
-		bool Capture;
+		bool Optional;				// Is this parameter optional?
+		bool Capture;				// Should this parameter capture all remaining input?  As an example, think of the chat part of a chat command.
 };
 
+// A class containing the static data defining a slash command
 class CSlashCommandDataDefinition
 {
 	public:
 
+		// Construction/Destruction
 		CSlashCommandDataDefinition( void );
 		~CSlashCommandDataDefinition() {}
 
+		// Serialization
 		void Post_Load_XML( void );
 
 		static IXMLSerializer *Create_Serializer( void );
 
+		// Accessors
 		const std::wstring &Get_Command( void ) const { return Command; }
 		const std::wstring &Get_Sub_Command( void ) const { return SubCommand; }
 		const std::wstring &Get_Shortcut( void ) const { return Shortcut; }
@@ -109,13 +118,12 @@ class CSlashCommandDataDefinition
 		std::wstring Shortcut;
 		std::wstring Help;
 
-		// unserialized
-		std::wstring Key;
+		std::wstring Key;		// unserialized, derived from Command and SubCommand
 
 		std::vector< CSlashCommandParam > Params;
 
-		uint32 RequiredParamCount;
-		uint32 TotalCaptureGroupCount;
+		uint32 RequiredParamCount;				// unserialized, derived from Params properties
+		uint32 TotalCaptureGroupCount;		// unserialized, derived from various properties
 };
 
 #endif // SLASH_COMMAND_DEFINITION_H

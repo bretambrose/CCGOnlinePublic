@@ -27,13 +27,17 @@
 
 class CSlashCommandDataDefinition;
 
+// A wrapper class for all static data; we split the pattern matching regex away from the rest of the derived data
+// so that a definition with a null data definition can represent a command family (clumsy)
 class CSlashCommandDefinition
 {
 	public:
 
+		// Construction/destruction
 		CSlashCommandDefinition( const CSlashCommandDataDefinition *data_definition );
 		~CSlashCommandDefinition() {}
 
+		// Accessors
 		const CSlashCommandDataDefinition *Get_Data_Definition( void ) const { return DataDefinition; }
 
 		bool Is_Family( void ) const { return DataDefinition == nullptr; }
@@ -42,6 +46,7 @@ class CSlashCommandDefinition
 
 	private:
 
+		// Data
 		const CSlashCommandDataDefinition *DataDefinition;
 
 		std::tr1::wregex ParamMatchExpression;

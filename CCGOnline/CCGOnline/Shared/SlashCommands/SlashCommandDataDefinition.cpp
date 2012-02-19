@@ -27,6 +27,10 @@
 #include "SlashCommandManager.h"
 #include "StringUtils.h"
 
+/**********************************************************************************************************************
+	CSlashCommandParam::CSlashCommandParam -- default constructor
+		
+**********************************************************************************************************************/
 CSlashCommandParam::CSlashCommandParam( void ) :
 	Type( SCPT_INVALID ),
 	SubType( "" ),
@@ -36,6 +40,11 @@ CSlashCommandParam::CSlashCommandParam( void ) :
 {
 }
 
+/**********************************************************************************************************************
+	CSlashCommandParam::Create_Serializer -- creates an XML serializer for this class
+
+	Returns: an XML serializer for this class		
+**********************************************************************************************************************/
 IXMLSerializer *CSlashCommandParam::Create_Serializer( void )
 {
 	CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
@@ -49,6 +58,13 @@ IXMLSerializer *CSlashCommandParam::Create_Serializer( void )
 	return serializer;
 }
 
+/**********************************************************************************************************************
+	CSlashCommandParam::Is_Value_Valid -- checks if a string value is valid based on the parameter's type information
+
+		value -- string value to check for validity
+
+	Returns: true if valid, false otherwise	
+**********************************************************************************************************************/
 bool CSlashCommandParam::Is_Value_Valid( const std::wstring &value ) const
 {
 	switch ( Type )
@@ -118,6 +134,10 @@ bool CSlashCommandParam::Is_Value_Valid( const std::wstring &value ) const
 	}
 }
 
+/**********************************************************************************************************************
+	CSlashCommandParam::Initialize_Default -- Sets the Default member to something appropriate if it was not set in data
+	
+**********************************************************************************************************************/
 void CSlashCommandParam::Initialize_Default( void )
 {
 	if ( Default.size() > 0 )
@@ -156,6 +176,10 @@ void CSlashCommandParam::Initialize_Default( void )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**********************************************************************************************************************
+	CSlashCommandDataDefinition::CSlashCommandDataDefinition -- default constructor
+	
+**********************************************************************************************************************/
 CSlashCommandDataDefinition::CSlashCommandDataDefinition( void ) :
 	Command( L"" ),
 	SubCommand( L"" ),
@@ -168,7 +192,12 @@ CSlashCommandDataDefinition::CSlashCommandDataDefinition( void ) :
 {
 }
 
+/**********************************************************************************************************************
+	CSlashCommandDataDefinition::Create_Serializer -- creates an XML serializer for this class
 
+	Returns: a new XML serializer
+	
+**********************************************************************************************************************/
 IXMLSerializer *CSlashCommandDataDefinition::Create_Serializer( void )
 {
 	CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
@@ -183,6 +212,14 @@ IXMLSerializer *CSlashCommandDataDefinition::Create_Serializer( void )
 	return serializer;
 }
 
+/**********************************************************************************************************************
+	CSlashCommandDataDefinition::Get_Param -- gets the definition of a specific parameter to this command
+
+		index -- index of the parameter to retrieve data for
+
+	Returns: pointer to the parameter's data, or NULL if out of bounds
+	
+**********************************************************************************************************************/
 const CSlashCommandParam *CSlashCommandDataDefinition::Get_Param( uint32 index ) const
 {
 	if ( index < Params.size() )
@@ -193,6 +230,11 @@ const CSlashCommandParam *CSlashCommandDataDefinition::Get_Param( uint32 index )
 	return nullptr;
 }
 
+/**********************************************************************************************************************
+	CSlashCommandDataDefinition::Post_Load_XML -- a function to initialize members whose values are derived from
+		data loaded from XML, as well as validate the data that was loaded
+	
+**********************************************************************************************************************/
 void CSlashCommandDataDefinition::Post_Load_XML( void )
 {
 	std::wstring key = CSlashCommandManager::Concat_Command( Command, SubCommand );
@@ -200,7 +242,7 @@ void CSlashCommandDataDefinition::Post_Load_XML( void )
 
 	TotalCaptureGroupCount = Get_Match_Param_Start_Index();
 
-	// Validate optional and capture remaining
+	// Validate default value, optional, and capture remaining
 	bool optional_encountered = false;
 	for ( uint32 i = 0; i < Params.size(); ++i )
 	{
@@ -213,21 +255,30 @@ void CSlashCommandDataDefinition::Post_Load_XML( void )
 
 		bool capture_remaining = param.Should_Capture();
 
-		FATAL_ASSERT( !capture_remaining || i + 1 == Params.size() );
-		FATAL_ASSERT( !( optional_encountered && !is_optional ) );
+		FATAL_ASSERT( !capture_remaining || i + 1 == Params.size() );	//	A capture remaining parameter may only be the last parameter in the list
+		FATAL_ASSERT( !( optional_encountered && !is_optional ) );		// Once an optional parameter is encountered, all succeeding parameters must be optional
 
 		param.Initialize_Default();
-		FATAL_ASSERT( param.Is_Default_Valid() );
+		FATAL_ASSERT( param.Is_Default_Valid() );								// Make sure the default makes sense
 
 		if ( !is_optional )
 		{
 			RequiredParamCount++;
 		}
 
+		// The regular expression per parameter normally has two capture groups, but the capture remaining expression only has 1
 		TotalCaptureGroupCount += capture_remaining ? 1 : 2;
 	}
 }
 
+/**********************************************************************************************************************
+	CSlashCommandDataDefinition::Build_Command_Matcher -- constructs a regular expression that we'll use to parse commands
+		of this type.
+
+	Returns: a regular expression string that will correctly extract the command, subcommand, and all parameters into
+		capture groups
+	
+**********************************************************************************************************************/
 std::wstring CSlashCommandDataDefinition::Build_Command_Matcher( void ) const
 {
 	std::wstring match_string;
