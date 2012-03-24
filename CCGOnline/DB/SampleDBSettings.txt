@@ -1,0 +1,5 @@
+SYSTEMPassword=
+ServerAccount=ccgserver
+ServerPassword=CCG5erver
+DevAccount=ccgdev
+DevPassword=CCGdev#

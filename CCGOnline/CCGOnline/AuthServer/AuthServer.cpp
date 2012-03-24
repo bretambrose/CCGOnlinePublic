@@ -51,7 +51,7 @@ void SQL_Stuff( void )
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
-											 (SQLWCHAR *)L"dsn=NetrunnerTest", 
+											 (SQLWCHAR *)L"dsn=ODBCTestDS", 
 											 SQL_NTS, 
 											 output_connection_buffer, 
 											 1024, 
@@ -76,6 +76,28 @@ void SQL_Stuff( void )
 	}
 
 	SQLFreeHandle( SQL_HANDLE_ENV, dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+void Sql_Stuff2( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR source_name[ 256 ];
+	SQLWCHAR description[ 1024 ];
+	SQLSMALLINT source_name_size = 0;
+	SQLSMALLINT description_size = 0;
+
+	while ( error_code != SQL_NO_DATA )
+	{
+		error_code = SQLDataSources( env_handle, SQL_FETCH_NEXT, source_name, sizeof( source_name ), &source_name_size, description, sizeof( description ), &description_size );
+	}
+
 	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
 }
 
@@ -114,6 +136,7 @@ int main( int /*argc*/, wchar_t* /*argv*/[] )
 {
 	NAuthServer::Initialize();
 
+	Sql_Stuff2();
 	//SQL_Stuff();
 	//Exception_Test_1();
 
