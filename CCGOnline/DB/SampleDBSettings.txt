@@ -1,5 +1,8 @@
-SYSTEMPassword=
-ServerAccount=ccgserver
+SystemAccount=SYSTEM
+SystemPassword=
+ServerAccount=CCGSERVER
 ServerPassword=CCG5erver
-DevAccount=ccgdev
+DevAccount=CCG
 DevPassword=CCGdev#
+ReportAccount=CCGREPORT
+ReportPassword=CCGRep0rt

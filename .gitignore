@@ -50,6 +50,7 @@ CCGOnline/Run/Tools/Temp/
 CCGOnline/Run/Tools/Data/XML/OutputManifest.xml
 CCGOnline/Run/Tools/Data/XML/EnumReflectionDB.xml
 CCGOnline/DB/Logs/
+CCGOnline/DB/Temp/
 CCGOnline/DB/Python/__pycache__/
 CCGOnline/DB/DBSettings.txt
 
