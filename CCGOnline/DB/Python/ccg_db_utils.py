@@ -52,9 +52,12 @@ def BuildTempSQLFile( sql_script_file_path, log_file_name ):
 
     with open( temp_filename, "w" ) as temp_file:
 
-        temp_file.write( "\tset feedback off\n\n" )        
-        temp_file.write( "\t@" + full_script_path + "\n" )
-
+        temp_file.write( "set feedback off;\n\n" )        
+        # temp_file.write( "DECLARE\n" )
+        # temp_file.write( "BEGIN\n" )
+        temp_file.write( "@" + full_script_path + ";\n" )
+        # temp_file.write( "DBMS_OUTPUT.PUT_LINE( 'test' );\n" )
+        # temp_file.write( "END;\n" )
         temp_file.write( "/\n" )
         temp_file.write( "\nquit\n" )
 
@@ -67,8 +70,6 @@ def InitLogFiles( log_file_name ):
         os.mkdir( "Logs" )
 
     # Open log files.
-    # ( base, ext ) = os.path.splitext( sql_script_path )
-    # sql_file_name = os.path.basename( base )
     stdout_file_name = "Logs/" + log_file_name + "_output.txt"
     stderr_file_name = "Logs/" + log_file_name + "_error.txt"
 
