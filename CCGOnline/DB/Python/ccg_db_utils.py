@@ -4,6 +4,11 @@ import os
 import random
 import time
 
+def SQLException( Exception ):
+    def __init__( self, error_code, filename ):
+        self.ErrorCode = error_code
+        self.FileName = filename
+
 def LoadDBSettings():
     assign_re = re.compile( "(?P<var>\w+)=(?P<value>\S*)" )
     db_kv_pairs = {}
@@ -51,14 +56,8 @@ def BuildTempSQLFile( sql_script_file_path, log_file_name ):
     temp_filename = "Temp/" + log_file_name + str( random_number ) + ".sql"
 
     with open( temp_filename, "w" ) as temp_file:
-
-        temp_file.write( "set feedback off;\n\n" )        
-        # temp_file.write( "DECLARE\n" )
-        # temp_file.write( "BEGIN\n" )
-        temp_file.write( "@" + full_script_path + ";\n" )
-        # temp_file.write( "DBMS_OUTPUT.PUT_LINE( 'test' );\n" )
-        # temp_file.write( "END;\n" )
-        temp_file.write( "/\n" )
+        temp_file.write( "@" + full_script_path + "\n" )
+        # temp_file.write( "/\n" )
         temp_file.write( "\nquit\n" )
 
     return temp_filename
@@ -110,24 +109,36 @@ def CCGRunDBScriptsAux( user, sql_script_path_list, log_file_name ):
     try:
         os.chdir( ".." )
 
+        CleanTempFiles()
         stdout_file_name, stderr_file_name = InitLogFiles( log_file_name )
-        
+                        
         with open( stdout_file_name, "w" ) as test_log_file, open( stderr_file_name, "w" ) as test_error_file:
 
             for sql_script_file_path in sql_script_path_list:
 
-                CleanTempFiles()
                 temp_filename = BuildTempSQLFile( sql_script_file_path, log_file_name )
                 if temp_filename != None:                       
-                    print( "Processing using temp file: " + temp_filename )
+                    print( "Processing " + sql_script_file_path + " using temp file: " + temp_filename )
+                    test_log_file.write( "\n***************************************************************\n" )
+                    test_log_file.write( "Processing file: " + sql_script_file_path + "\n\n" )
+                    test_log_file.flush()
                     
                     # build the argument list
                     command_line_args = "-S " + username + "/" + password + " @" + temp_filename
                     print( "Command line args: " + command_line_args )
      
                     # Execute the SQL script
-                    subprocess.call( "SQLPlus.exe " + command_line_args, stdout = test_log_file, stderr = test_error_file )                   
- 
+                    return_code = subprocess.call( "SQLPlus.exe " + command_line_args, stdout = test_log_file, stderr = test_error_file )
+                    if return_code != 0:
+                        test_log_file.write( "PLSQL Error: " + str( return_code ) + "\n" )
+                        test_log_file.write( "*****ABORTING script execution*****\n" )
+                        test_log_file.flush()
+                        raise SQLException( return_code, sql_script_file_path )
+
+    except SQLException as sql_exception:
+        print( "SQL Error ( " + str( sql_exception.ErrorCode ) + " ) while executing file: " + sql_exception.FileName )
+        raise sql_exception
+    
     finally:
         end_time = time.clock()
         print( "Total Time: " + str( end_time - base_start_time ) + " seconds" )
@@ -143,7 +154,7 @@ def CCGRunDBScripts( user, sql_script_path_list, log_file_name ):
     try:
         CCGRunDBScriptsAux( user, sql_script_path_list, log_file_name )
         print( "Success!" )
-
+       
     except:
         print( "There were errors =(" )
         

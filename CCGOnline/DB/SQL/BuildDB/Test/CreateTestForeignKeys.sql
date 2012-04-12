@@ -8,5 +8,6 @@ ALTER TABLE d_account_products
 
 ALTER TABLE d_account_product_state_log
   ADD CONSTRAINT d_account_product_state_log_f1 FOREIGN KEY (account_product_id) REFERENCES d_account_products(account_product_id);
-
+ALTER TABLE d_account_product_state_log
+  ADD CONSTRAINT d_account_product_state_log_f2 FOREIGN KEY (status) REFERENCES e_game_product_statuses(game_product_status_id);
   
