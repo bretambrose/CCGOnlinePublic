@@ -43,23 +43,66 @@ def CleanTempFiles():
     for file_name in os.listdir( "Temp" ):
         os.remove( "Temp/" + file_name )
 
+def Build_SQL_Temp_File( temp_file, filename_list ):
+    for filename in filename_list:
+        temp_file.write( "@" + filename + "\n" )
+
+    temp_file.write( "\nquit\n" )
+
+def Build_PL_SQL_Temp_File( temp_file, filename_list ):
+    for filename in filename_list:
+        temp_file.write( "@" + filename + "\n" )
+
+    temp_file.write( "/\n" )
+    temp_file.write( "\nquit\n" )
+
+def Build_Procedure_Temp_File( temp_file, filename_list ):
+
+    for filename in filename_list:
+        proc_name, ext = os.path.splitext( os.path.basename( filename ) )
+        temp_file.write( "\n@" + filename + "\n" )
+        temp_file.write( "/\n\n" )
+        temp_file.write( "DECLARE\n" )
+        temp_file.write( "\terror_count NUMBER(10);\n" )
+        temp_file.write( "BEGIN\n" )        
+        temp_file.write( "\tSELECT COUNT( * ) INTO error_count FROM user_errors ue WHERE ue.TYPE = 'PROCEDURE' AND ue.NAME = UPPER( '" + proc_name + "' );\n" )
+        temp_file.write( "\tIF error_count <> 0 THEN\n" )
+        temp_file.write( "\t\tDBMS_OUTPUT.PUT_LINE( 'Error compiling procedure: " + proc_name + "' );\n" )
+        temp_file.write( "\t\tRAISE_APPLICATION_ERROR( -20000, 'Error compiling procedure: " + proc_name + "' );\n" )
+        temp_file.write( "\tEND IF;\n" )
+        temp_file.write( "END;\n" )
+        temp_file.write( "/\n" )
+
+    temp_file.write( "\n/\n" )
+    temp_file.write( "\nquit\n" )
     
-def BuildTempSQLFile( sql_script_file_path, log_file_name ):
+def BuildTempSQLFile( sql_script_file_path, script_type, log_file_name ):
     full_script_path = "SQL/" + sql_script_file_path
         
     # make sure sql script exists
     if os.path.exists( full_script_path ) == False:
-        print( "SQL Script not found: " + full_script_path )
+        print( "File not found: " + full_script_path )
         return None
 
+    filename_list = []
+    
+    if os.path.isdir( full_script_path ):
+        for filename in os.listdir( full_script_path ):
+            filename_list.append( full_script_path + "/" + filename )
+    else:
+       filename_list.append( full_script_path )
+       
     random_number = random.randint( 0, 1000000 )
     temp_filename = "Temp/" + log_file_name + str( random_number ) + ".sql"
 
     with open( temp_filename, "w" ) as temp_file:
-        temp_file.write( "@" + full_script_path + "\n" )
-        # temp_file.write( "/\n" )
-        temp_file.write( "\nquit\n" )
-
+        if script_type == "PROC":
+            Build_Procedure_Temp_File( temp_file, filename_list )
+        elif script_type == "PL":
+            Build_PL_SQL_Temp_File( temp_file, filename_list )
+        else:
+            Build_SQL_Temp_File( temp_file, filename_list )
+            
     return temp_filename
 
 
@@ -78,7 +121,7 @@ def InitLogFiles( log_file_name ):
     return ( stdout_file_name, stderr_file_name )
 
 
-def CCGRunDBScriptsAux( user, sql_script_path_list, log_file_name ):
+def CCGRunDBScriptsAux( user, sql_script_list, log_file_name ):
 
     base_start_time = time.clock()
     
@@ -114,9 +157,9 @@ def CCGRunDBScriptsAux( user, sql_script_path_list, log_file_name ):
                         
         with open( stdout_file_name, "w" ) as test_log_file, open( stderr_file_name, "w" ) as test_error_file:
 
-            for sql_script_file_path in sql_script_path_list:
+            for sql_script_file_path, script_type in sql_script_list:
 
-                temp_filename = BuildTempSQLFile( sql_script_file_path, log_file_name )
+                temp_filename = BuildTempSQLFile( sql_script_file_path, script_type, log_file_name )
                 if temp_filename != None:                       
                     print( "Processing " + sql_script_file_path + " using temp file: " + temp_filename )
                     test_log_file.write( "\n***************************************************************\n" )
@@ -145,8 +188,8 @@ def CCGRunDBScriptsAux( user, sql_script_path_list, log_file_name ):
         os.chdir( old_directory )
 
         
-def CCGRunDBScript( user, sql_script_path, log_file_name ):
-    CCGRunDBScripts( user, [ sql_script_path ], log_file_name )
+def CCGRunDBScript( user, sql_script_path, script_type, log_file_name ):
+    CCGRunDBScripts( user, [ ( sql_script_path, script_type ) ], log_file_name )
 
 
 def CCGRunDBScripts( user, sql_script_path_list, log_file_name ):
