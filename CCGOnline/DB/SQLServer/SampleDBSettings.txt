@@ -1,0 +1,12 @@
+DB=AZAZEL-PC\CCGONLINE
+SystemAccount=sa
+SystemPassword=
+TestServerAccount=testserver
+TestServerPassword=TEST5erver
+TestDevAccount=test
+TestDevPassword=TESTdev#
+CCGServerAccount=ccgserver
+CCGServerPassword=CCG5erver
+CCGDevAccount=ccg
+CCGDevPassword=CCGdev#
+

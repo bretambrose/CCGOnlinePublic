@@ -49,8 +49,12 @@ CCGOnline/Run/Tools/Logs/
 CCGOnline/Run/Tools/Temp/
 CCGOnline/Run/Tools/Data/XML/OutputManifest.xml
 CCGOnline/Run/Tools/Data/XML/EnumReflectionDB.xml
-CCGOnline/DB/Logs/
-CCGOnline/DB/Temp/
-CCGOnline/DB/Python/__pycache__/
-CCGOnline/DB/DBSettings.txt
+CCGOnline/DB/Oracle/Logs/
+CCGOnline/DB/Oracle/Temp/
+CCGOnline/DB/Oracle/Python/__pycache__/
+CCGOnline/DB/Oracle/DBSettings.txt
+CCGOnline/DB/SQLServer/Logs/
+CCGOnline/DB/SQLServer/Temp/
+CCGOnline/DB/SQLServer/Python/__pycache__/
+CCGOnline/DB/SQLServer/DBSettings.txt
 

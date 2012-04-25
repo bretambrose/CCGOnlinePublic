@@ -33,7 +33,7 @@ CREATE TABLE d_accounts
     account_id NUMBER(19),
     account_email VARCHAR2(255) NOT NULL,
     upper_account_email VARCHAR2(255) NOT NULL,
-    password_hash INTEGER NOT NULL,
+    password_hash VARCHAR2(32) NOT NULL,
     nickname VARCHAR2(32) NOT NULL,
     upper_nickname VARCHAR2(32) NOT NULL,
     nickname_sequence_id NUMBER(10) NOT NULL,

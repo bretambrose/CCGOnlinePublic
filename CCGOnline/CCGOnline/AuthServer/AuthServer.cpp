@@ -79,7 +79,7 @@ void SQL_Stuff( void )
 	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
 }
 
-void Sql_Stuff2( void )
+void Enumerate_Data_Sources( void )
 {
 	SQLHENV env_handle = 0;
 	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
@@ -98,6 +98,521 @@ void Sql_Stuff2( void )
 		error_code = SQLDataSources( env_handle, SQL_FETCH_NEXT, source_name, sizeof( source_name ), &source_name_size, description, sizeof( description ), &description_size );
 	}
 
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+void Test_Oracle_Connection( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHDBC dbc_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_DBC, env_handle, &dbc_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
+	SQLSMALLINT output_size = 0;
+
+	error_code = SQLDriverConnect( dbc_handle, 
+											 0, 
+											 (SQLWCHAR *)L"Driver={Oracle in OraDb11g_home1};Dbq=ORCL;Uid=TESTSERVER;Pwd=TEST5erver;", 
+											 SQL_NTS, 
+											 output_connection_buffer, 
+											 1024, 
+											 &output_size, 
+											 SQL_DRIVER_COMPLETE );
+	if ( error_code == SQL_SUCCESS )
+	{
+		SQLDisconnect( dbc_handle );
+	}
+	else
+	{
+		SQLSMALLINT text_length = 0;
+		SQLINTEGER sql_error_code = 0;
+		SQLWCHAR error_buffer[ 1024 ] = { 0 };
+		SQLWCHAR sql_state[ 6 ] = { 0 };
+
+		error_code = SQLError( env_handle, dbc_handle, SQL_NULL_HSTMT, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		while ( error_code == SQL_SUCCESS )
+		{
+			error_code = SQLError( env_handle, dbc_handle, SQL_NULL_HSTMT, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		}
+	}
+
+	SQLFreeHandle( SQL_HANDLE_ENV, dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+void Enumerate_Drivers( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR attributes[ 1024 ];
+	SQLWCHAR description[ 1024 ];
+	SQLSMALLINT attributes_size = 0;
+	SQLSMALLINT description_size = 0;
+
+	while ( error_code != SQL_NO_DATA )
+	{
+		error_code = SQLDrivers( env_handle, SQL_FETCH_NEXT, description, sizeof( description ), &description_size, attributes, sizeof( attributes ), &attributes_size );
+	}
+
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+struct SAddAccountInput
+{
+	SQLCHAR	EmailValue[ 256 ];
+	SQLLEN EmailLengthIndicator;
+
+	SQLCHAR	Nickname[ 33 ];
+	SQLLEN NicknameLengthIndicator;
+
+	SQLCHAR	PasswordHash[ 33 ];
+	SQLLEN PasswordHashLengthIndicator;
+
+};
+
+void Test_Oracle_Procedure_Call_Input_Only( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHDBC dbc_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_DBC, env_handle, &dbc_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
+	SQLSMALLINT output_size = 0;
+
+	error_code = SQLDriverConnect( dbc_handle, 
+											 0, 
+											 (SQLWCHAR *)L"Driver={Oracle in OraDb11g_home1};Dbq=ORCL;Uid=TESTSERVER;Pwd=TEST5erver;", 
+											 SQL_NTS, 
+											 output_connection_buffer, 
+											 1024, 
+											 &output_size, 
+											 SQL_DRIVER_COMPLETE );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	// int32 auto_commit_value = SQL_AUTOCOMMIT_OFF;
+	error_code = SQLSetConnectAttr( dbc_handle, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) SQL_AUTOCOMMIT_OFF, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHSTMT statement_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_STMT, dbc_handle, &statement_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SAddAccountInput test_input[ 2 ];
+	strcpy_s( (char * )test_input[ 0 ].EmailValue, 256, "noob@noobsauce.com" );
+	test_input[ 0 ].EmailLengthIndicator = SQL_NTS;
+	strcpy_s( (char * )test_input[ 0 ].Nickname, 33, "Nooblar" );
+	test_input[ 0 ].NicknameLengthIndicator = SQL_NTS;
+	strcpy_s( (char * )test_input[ 0 ].PasswordHash, 33, "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" );
+	test_input[ 0 ].PasswordHashLengthIndicator = SQL_NTS;
+
+	strcpy_s( (char * )test_input[ 1 ].EmailValue, 256, "loser@loserville.edu" );
+	test_input[ 1 ].EmailLengthIndicator = SQL_NTS;
+	strcpy_s( (char * )test_input[ 1 ].Nickname, 33, "Loser" );
+	test_input[ 1 ].NicknameLengthIndicator = SQL_NTS;
+	strcpy_s( (char * )test_input[ 1 ].PasswordHash, 33, "F1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" );
+	test_input[ 1 ].PasswordHashLengthIndicator = SQL_NTS;
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) sizeof( SAddAccountInput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindParameter( statement_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, 256, 0, test_input[ 0 ].EmailValue, 256, &test_input[ 0 ].EmailLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindParameter( statement_handle, 2, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, 33, 0, test_input[ 0 ].Nickname, 33, &test_input[ 0 ].NicknameLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindParameter( statement_handle, 3, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, 33, 0, test_input[ 0 ].PasswordHash, 33, &test_input[ 0 ].PasswordHashLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) 2, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	std::wstring statement_text( L"{call test.add_account(?,?,?)}" );
+	error_code = SQLExecDirect( statement_handle, (SQLWCHAR *)statement_text.c_str(), SQL_NTS );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	if ( error_code == SQL_SUCCESS )
+	{
+		error_code = SQLEndTran( SQL_HANDLE_DBC, dbc_handle, SQL_COMMIT );
+		FATAL_ASSERT( error_code == SQL_SUCCESS );
+	}
+	else
+	{
+		SQLSMALLINT text_length = 0;
+		SQLINTEGER sql_error_code = 0;
+		SQLWCHAR error_buffer[ 1024 ] = { 0 };
+		SQLWCHAR sql_state[ 6 ] = { 0 };
+
+		error_code = SQLError( env_handle, dbc_handle, SQL_NULL_HSTMT, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		while ( error_code == SQL_SUCCESS )
+		{
+			error_code = SQLError( env_handle, dbc_handle, SQL_NULL_HSTMT, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		}
+	}
+
+	SQLFreeHandle( SQL_HANDLE_STMT, statement_handle );
+	SQLDisconnect( dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_DBC, dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+struct STestDescribeResultSetInput
+{
+	SQLCHAR	EmailValue[ 256 ];
+	SQLLEN EmailLengthIndicator;
+
+};
+
+void Test_Oracle_Procedure_Call_Analyze_Output( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHDBC dbc_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_DBC, env_handle, &dbc_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
+	SQLSMALLINT output_size = 0;
+
+	error_code = SQLDriverConnect( dbc_handle, 
+											 0, 
+											 (SQLWCHAR *)L"Driver={Oracle in OraDb11g_home1};Dbq=ORCL;Uid=TESTSERVER;Pwd=TEST5erver;", 
+											 SQL_NTS, 
+											 output_connection_buffer, 
+											 1024, 
+											 &output_size, 
+											 SQL_DRIVER_COMPLETE );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	// int32 auto_commit_value = SQL_AUTOCOMMIT_OFF;
+	error_code = SQLSetConnectAttr( dbc_handle, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) SQL_AUTOCOMMIT_OFF, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHSTMT statement_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_STMT, dbc_handle, &statement_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	STestDescribeResultSetInput test_input[ 1 ];
+	strcpy_s( (char * )test_input[ 0 ].EmailValue, 256, "bretambrose@gmail.com" );
+	test_input[ 0 ].EmailLengthIndicator = SQL_NTS;
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) sizeof( STestDescribeResultSetInput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindParameter( statement_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, 256, 0, test_input[ 0 ].EmailValue, 256, &test_input[ 0 ].EmailLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) 1, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	std::wstring statement_text( L"{call test.get_account_by_email(?)}" );
+	error_code = SQLExecDirect( statement_handle, (SQLWCHAR *)statement_text.c_str(), SQL_NTS );
+
+	if ( error_code == SQL_SUCCESS )
+	{
+		SQLSMALLINT column_count = 0;
+		error_code = SQLNumResultCols( statement_handle, &column_count );
+		FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+		SQLWCHAR column_name[ 33 ];
+		SQLSMALLINT column_name_length = 0;
+		SQLSMALLINT column_type = 0;
+		SQLULEN column_size = 0;
+		SQLSMALLINT scale = 0;
+		SQLSMALLINT nullable = 0;
+		for ( int32 i = 1; i <= column_count; ++i )
+		{
+			error_code = SQLDescribeCol( statement_handle, (SQLUSMALLINT) i, column_name, sizeof( column_name ), &column_name_length, &column_type, &column_size, &scale, &nullable );
+			FATAL_ASSERT( error_code == SQL_SUCCESS );
+		}
+
+		error_code = SQLEndTran( SQL_HANDLE_DBC, dbc_handle, SQL_COMMIT );
+		FATAL_ASSERT( error_code == SQL_SUCCESS );
+	}
+	else
+	{
+		SQLSMALLINT text_length = 0;
+		SQLINTEGER sql_error_code = 0;
+		SQLWCHAR error_buffer[ 1024 ] = { 0 };
+		SQLWCHAR sql_state[ 6 ] = { 0 };
+
+		error_code = SQLError( env_handle, dbc_handle, SQL_NULL_HSTMT, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		while ( error_code == SQL_SUCCESS )
+		{
+			error_code = SQLError( env_handle, dbc_handle, SQL_NULL_HSTMT, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		}
+	}
+
+	SQLFreeHandle( SQL_HANDLE_STMT, statement_handle );
+	SQLDisconnect( dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_DBC, dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+struct STestGetResultSetInput
+{
+	SQLCHAR	EmailValue[ 256 ];
+	SQLLEN EmailLengthIndicator;
+
+};
+
+struct STestGetResultSetOutput
+{
+	SQLCHAR AccountID[11];
+	SQLLEN AccountIDLengthIndicator;
+
+	SQLCHAR	Nickname[ 33 ];
+	SQLLEN NicknameLengthIndicator;
+
+	SQLUINTEGER NicknameSequenceID;
+	SQLLEN NicknameSequenceIDLengthIndicator;
+};
+
+void Test_Oracle_Procedure_Call_Get_Output( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHDBC dbc_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_DBC, env_handle, &dbc_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
+	SQLSMALLINT output_size = 0;
+
+	error_code = SQLDriverConnect( dbc_handle, 
+											 0, 
+											 (SQLWCHAR *)L"Driver={Oracle in OraDb11g_home1};Dbq=ORCL;Uid=TESTSERVER;Pwd=TEST5erver;", 
+											 SQL_NTS, 
+											 output_connection_buffer, 
+											 1024, 
+											 &output_size, 
+											 SQL_DRIVER_COMPLETE );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetConnectAttr( dbc_handle, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) SQL_AUTOCOMMIT_OFF, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHSTMT statement_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_STMT, dbc_handle, &statement_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	STestGetResultSetInput test_input[ 1 ];
+	strcpy_s( (char * )test_input[ 0 ].EmailValue, 256, "bretambrose@gmail.com" );
+	test_input[ 0 ].EmailLengthIndicator = SQL_NTS;
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) sizeof( STestGetResultSetInput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindParameter( statement_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, 256, 0, test_input[ 0 ].EmailValue, 256, &test_input[ 0 ].EmailLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) 1, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	std::wstring statement_text( L"{call test.get_account_by_email(?)}" );
+	error_code = SQLExecDirect( statement_handle, (SQLWCHAR *)statement_text.c_str(), SQL_NTS );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	STestGetResultSetOutput test_output[ 3 ];
+	SQLLEN row_statuses[ 3 ];
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_BIND_TYPE, (SQLPOINTER) sizeof( STestGetResultSetOutput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) 3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_STATUS_PTR, row_statuses, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	int64 rows_fetched = 0;
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROWS_FETCHED_PTR, (SQLPOINTER) &rows_fetched, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 1, SQL_C_CHAR, test_output[ 0 ].AccountID, 17, &test_output[ 0 ].AccountIDLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 2, SQL_C_CHAR, test_output[ 0 ].Nickname, 33, &test_output[ 0 ].NicknameLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 3, SQL_C_ULONG, &test_output[ 0 ].NicknameSequenceID, 0, &test_output[ 0 ].NicknameSequenceIDLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	while ( error_code == SQL_SUCCESS )
+	{
+		error_code = SQLFetchScroll( statement_handle, SQL_FETCH_NEXT, 0 );
+	}
+
+	if ( error_code == SQL_NO_DATA_FOUND )
+	{
+		error_code = SQLEndTran( SQL_HANDLE_DBC, dbc_handle, SQL_COMMIT );
+		FATAL_ASSERT( error_code == SQL_SUCCESS );
+	}
+	else
+	{
+		SQLSMALLINT text_length = 0;
+		SQLINTEGER sql_error_code = 0;
+		SQLWCHAR error_buffer[ 1024 ] = { 0 };
+		SQLWCHAR sql_state[ 6 ] = { 0 };
+
+		error_code = SQLError( env_handle, dbc_handle, statement_handle, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		while ( error_code == SQL_SUCCESS )
+		{
+			error_code = SQLError( env_handle, dbc_handle, statement_handle, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+		}
+	}
+
+	SQLFreeHandle( SQL_HANDLE_STMT, statement_handle );
+	SQLDisconnect( dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_DBC, dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+void Test_Oracle_Procedure_Call_Multi_Output( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHDBC dbc_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_DBC, env_handle, &dbc_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
+	SQLSMALLINT output_size = 0;
+
+	error_code = SQLDriverConnect( dbc_handle, 
+											 0, 
+											 (SQLWCHAR *)L"Driver={Oracle in OraDb11g_home1};Dbq=ORCL;Uid=TESTSERVER;Pwd=TEST5erver;", 
+											 SQL_NTS, 
+											 output_connection_buffer, 
+											 1024, 
+											 &output_size, 
+											 SQL_DRIVER_COMPLETE );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetConnectAttr( dbc_handle, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) SQL_AUTOCOMMIT_OFF, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHSTMT statement_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_STMT, dbc_handle, &statement_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	STestGetResultSetInput test_input[ 2 ];
+	strcpy_s( (char * )test_input[ 0 ].EmailValue, 256, "bretambrose@gmail.com" );
+	test_input[ 0 ].EmailLengthIndicator = SQL_NTS;
+
+	strcpy_s( (char * )test_input[ 1 ].EmailValue, 256, "petra222@yahoo.com" );
+	test_input[ 1 ].EmailLengthIndicator = SQL_NTS;
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) sizeof( STestGetResultSetInput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindParameter( statement_handle, 1, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_CHAR, 256, 0, test_input[ 0 ].EmailValue, 256, &test_input[ 0 ].EmailLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) 2, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	std::wstring statement_text( L"{call test.get_account_by_email(?)}" );
+	error_code = SQLExecDirect( statement_handle, (SQLWCHAR *)statement_text.c_str(), SQL_NTS );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	STestGetResultSetOutput test_output[ 3 ];
+	SQLLEN row_statuses[ 3 ];
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_BIND_TYPE, (SQLPOINTER) sizeof( STestGetResultSetOutput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) 3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_STATUS_PTR, row_statuses, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	int64 rows_fetched = 0;
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROWS_FETCHED_PTR, (SQLPOINTER) &rows_fetched, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 1, SQL_C_CHAR, test_output[ 0 ].AccountID, 17, &test_output[ 0 ].AccountIDLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 2, SQL_C_CHAR, test_output[ 0 ].Nickname, 33, &test_output[ 0 ].NicknameLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 3, SQL_C_ULONG, &test_output[ 0 ].NicknameSequenceID, 0, &test_output[ 0 ].NicknameSequenceIDLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLRETURN ec2 = SQL_SUCCESS;
+	while ( ec2 == SQL_SUCCESS )
+	{
+		while ( error_code == SQL_SUCCESS )
+		{
+			error_code = SQLFetchScroll( statement_handle, SQL_FETCH_NEXT, 0 );
+		}
+
+		if ( error_code == SQL_NO_DATA )
+		{
+			ec2 = SQLMoreResults( statement_handle );
+		}
+		else
+		{
+			SQLSMALLINT text_length = 0;
+			SQLINTEGER sql_error_code = 0;
+			SQLWCHAR error_buffer[ 1024 ] = { 0 };
+			SQLWCHAR sql_state[ 6 ] = { 0 };
+
+			error_code = SQLError( env_handle, dbc_handle, statement_handle, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+			while ( error_code == SQL_SUCCESS )
+			{
+				error_code = SQLError( env_handle, dbc_handle, statement_handle, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+			}
+
+			ec2 = SQL_ERROR;
+		}
+	}
+
+	if ( ec2 == SQL_NO_DATA_FOUND )
+	{
+		error_code = SQLEndTran( SQL_HANDLE_DBC, dbc_handle, SQL_COMMIT );
+		FATAL_ASSERT( error_code == SQL_SUCCESS );
+	}
+
+	SQLFreeHandle( SQL_HANDLE_STMT, statement_handle );
+	SQLDisconnect( dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_DBC, dbc_handle );
 	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
 }
 
@@ -136,7 +651,11 @@ int main( int /*argc*/, wchar_t* /*argv*/[] )
 {
 	NAuthServer::Initialize();
 
-	Sql_Stuff2();
+	//Test_Oracle_Procedure_Call_Multi_Output();
+	//Test_Oracle_Procedure_Call_Get_Output();
+	//Test_Oracle_Procedure_Call_Input_Only();
+	Test_Oracle_Connection();
+	// Sql_Stuff2();
 	//SQL_Stuff();
 	//Exception_Test_1();
 

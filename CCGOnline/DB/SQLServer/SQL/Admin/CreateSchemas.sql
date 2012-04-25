@@ -1,0 +1,26 @@
+USE testdb;
+GO
+
+CREATE SCHEMA dynamic;
+GO
+
+CREATE SCHEMA static;
+GO
+
+CREATE SCHEMA enum;
+GO
+
+USE ccgdb;
+GO
+
+CREATE SCHEMA dynamic;
+GO
+
+CREATE SCHEMA static;
+GO
+
+CREATE SCHEMA enum;
+GO
+
+
+

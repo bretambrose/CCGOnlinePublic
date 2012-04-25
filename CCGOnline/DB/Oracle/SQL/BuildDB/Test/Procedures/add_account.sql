@@ -1,7 +1,7 @@
 CREATE OR REPLACE PROCEDURE add_account( 
   p_email IN VARCHAR2,
   p_nickname IN VARCHAR2,
-  p_password_hash IN INTEGER
+  p_password_hash IN VARCHAR2
 )
 IS
   upper_email VARCHAR2(255);
@@ -20,6 +20,11 @@ BEGIN
     d_accounts
   WHERE
     upper_nickname = upper_nick;
+  
+  SELECT
+    CURRENT_TIMESTAMP INTO now
+  FROM
+    dual;
     
   INSERT INTO d_accounts
   VALUES
