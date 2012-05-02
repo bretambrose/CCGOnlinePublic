@@ -1,4 +1,5 @@
 USE testdb;
+GO
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'add_account')
 	DROP PROCEDURE dynamic.add_account;

@@ -155,6 +155,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\AuthServer\stdafx.h" />
     <ClInclude Include="DebugAssert.h" />
     <ClInclude Include="FastDelegate.h" />
     <ClInclude Include="FastDelegateBind.h" />

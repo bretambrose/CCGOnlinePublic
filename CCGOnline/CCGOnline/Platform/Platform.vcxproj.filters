@@ -5,12 +5,12 @@
       <UniqueIdentifier>{34ED141A-4A7F-41F3-80E5-27FFBF48FE11}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{8F1AEB8C-65C9-4CAB-85F6-0120E0AF9DE5}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Source Files\SynchronizationPrimitives">
       <UniqueIdentifier>{2323F5FB-4081-435E-949A-5A0DB89715CD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resource Files">
+      <UniqueIdentifier>{8F1AEB8C-65C9-4CAB-85F6-0120E0AF9DE5}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="PlatformMisc.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\AuthServer\stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

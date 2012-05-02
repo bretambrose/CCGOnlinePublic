@@ -39,6 +39,15 @@
     <Filter Include="Source Files\SlashCommands">
       <UniqueIdentifier>{a94ceaed-e039-4a4a-891e-1cd692dce0ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Database">
+      <UniqueIdentifier>{3864652a-f7de-4c4c-b212-48ce6a9d4314}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Database\Interfaces">
+      <UniqueIdentifier>{b90ad7e4-f174-42fd-aeb9-92f7021a3cc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Database\ODBCImplementation">
+      <UniqueIdentifier>{a3b94267-eece-4342-b4d1-c47ac62ed89c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -194,6 +203,45 @@
     <ClInclude Include="SlashCommands\SlashCommandDataDefinition.h">
       <Filter>Source Files\SlashCommands</Filter>
     </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseConnectionInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseEnvironmentInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseStatementInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\ODBCImplementation\ODBCEnvironment.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\ODBCImplementation\ODBCConnection.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\ODBCImplementation\ODBCStatement.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\ODBCImplementation\ODBCObjectBase.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\ODBCImplementation\ODBCFactory.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseTypes.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseParameterInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseParameterSetInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseResultColumnInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseResultSetInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -282,6 +330,21 @@
     </ClCompile>
     <ClCompile Include="SlashCommands\SlashCommandDataDefinition.cpp">
       <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\ODBCImplementation\ODBCEnvironment.cpp">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\ODBCImplementation\ODBCConnection.cpp">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\ODBCImplementation\ODBCStatement.cpp">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\ODBCImplementation\ODBCObjectBase.cpp">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\ODBCImplementation\ODBCFactory.cpp">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

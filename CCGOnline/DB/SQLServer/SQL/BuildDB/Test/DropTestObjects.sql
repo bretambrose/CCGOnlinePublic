@@ -32,6 +32,40 @@ DEALLOCATE procedure_cursor;
 
 COMMIT
 
+-- drop all functions
+BEGIN TRANSACTION
+
+DECLARE @function_name_iterator VARCHAR(255);
+DECLARE @function_schema_name_iterator VARCHAR(255);
+
+DECLARE function_cursor CURSOR FOR 
+	SELECT 
+		o.name,
+		s.name
+	FROM sys.objects AS o
+		INNER JOIN sys.schemas AS s ON
+			o.schema_id = s.schema_id
+	WHERE
+		o.type IN ( 'FN', 'IF', 'TG' );
+
+OPEN function_cursor;
+FETCH NEXT FROM function_cursor INTO @function_name_iterator, @function_schema_name_iterator;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+	DECLARE @drop_function_command VARCHAR(512);
+
+	SET @drop_function_command = 'DROP FUNCTION ' + @function_schema_name_iterator + '.' + @function_name_iterator + ';';
+	EXEC( @drop_function_command );
+
+	FETCH NEXT FROM function_cursor INTO @function_name_iterator, @function_schema_name_iterator;
+END
+
+CLOSE function_cursor;
+DEALLOCATE function_cursor;
+
+COMMIT
+
 -- drop all tables
 
 BEGIN TRANSACTION

@@ -1,4 +1,5 @@
 USE testdb;
+GO
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'get_all_accounts')
 	DROP PROCEDURE dynamic.get_all_accounts;
@@ -19,5 +20,5 @@ BEGIN
     
 END;
 
-
+GO
 

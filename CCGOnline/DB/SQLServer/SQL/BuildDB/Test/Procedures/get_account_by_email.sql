@@ -1,4 +1,5 @@
 USE testdb;
+GO
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'get_account_by_email')
 	DROP PROCEDURE dynamic.get_account_by_email;
