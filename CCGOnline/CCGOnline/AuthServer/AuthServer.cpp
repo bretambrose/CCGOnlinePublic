@@ -1409,6 +1409,98 @@ bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /
 	return true;
 }
 
+class CFetchAccountInputParams : public IDatabaseVariableSet
+{
+	public:
+
+		CFetchAccountInputParams( void ) :
+			AccountEmail()
+		{}
+
+		CFetchAccountInputParams( const std::string &account_email ) :
+			AccountEmail( account_email )
+		{}
+
+		virtual ~CFetchAccountInputParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountEmail );
+		}
+
+		DBString< 255 > AccountEmail;
+};
+
+class CFetchAccountResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CFetchAccountResultSet( void ) :
+			AccountID(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		virtual ~CFetchAccountResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBString< 32 > Nickname;
+		DBUInt32In NicknameSequenceID;
+};
+
+bool Handle_Fetch_Account( const CSlashCommandInstance &instance, std::wstring & /*error_msg*/ )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	FATAL_ASSERT( connection != nullptr );
+
+	IDatabaseStatement *statement = connection->Allocate_Statement( L"{call dynamic.get_account_by_email(?)}" );
+	FATAL_ASSERT( statement != nullptr );
+
+	std::string email;
+	instance.Get_Param( 0, email );
+
+	uint32 fetch_count = 0;
+	instance.Get_Param( 1, fetch_count );
+	FATAL_ASSERT( fetch_count > 0 );
+
+	CFetchAccountInputParams *params_array = new CFetchAccountInputParams[ fetch_count ];
+
+	for ( uint32 i = 0; i < fetch_count; i++ )
+	{
+		params_array[ i ] = CFetchAccountInputParams( email );
+	}
+
+	statement->Bind_Input( params_array, sizeof( CAddAccountInputParams ) );
+
+	CFetchAccountResultSet result_set;
+	statement->Bind_Output( &result_set, sizeof( CFetchAccountResultSet ), 1 );
+	
+	statement->Execute( fetch_count );
+
+	int64 rows_fetched = 0;
+	EFetchResultsStatusType fetch_status = FRST_ONGOING;
+	while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
+	{
+		fetch_status = statement->Fetch_Results( rows_fetched );
+	}
+
+	statement->End_Transaction( true );
+
+	connection->Release_Statement( statement );
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+
+	delete []params_array;
+
+	return true;
+}
+
 int main( int /*argc*/, wchar_t* /*argv*/[] )
 {
 	NAuthServer::Initialize();
@@ -1416,6 +1508,7 @@ int main( int /*argc*/, wchar_t* /*argv*/[] )
 	CSlashCommandManager::Initialize();
 	CSlashCommandManager::Load_Command_File( "Data/XML/SlashCommandODBCTests.xml" );
 	CSlashCommandManager::Register_Command_Handler( L"AddAccount", Handle_Add_Account );
+	CSlashCommandManager::Register_Command_Handler( L"FetchAccount", Handle_Fetch_Account );
 
 	CODBCFactory::Create_Environment();
 

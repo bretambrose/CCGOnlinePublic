@@ -146,7 +146,8 @@ enum ODBCStatementOperationType
 	ODBCSOT_BIND_COLUMN,
 
 	ODBCSOT_EXECUTE_STATEMENT,
-	ODBCSOT_COMMIT_ROLLBACK_STATEMENT
+	ODBCSOT_COMMIT_ROLLBACK_STATEMENT,
+	ODBCSOT_FETCH_RESULTS
 };
 
 CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle ) :
@@ -184,9 +185,6 @@ void CODBCStatement::Shutdown( void )
 			delete []RowStatuses;
 			RowStatuses = nullptr;
 		}
-
-		// NYI
-		//??;
 
 		SQLFreeHandle( SQL_HANDLE_STMT, StatementHandle );
 
@@ -338,9 +336,55 @@ void CODBCStatement::Execute( uint32 batch_size )
 	State = ODBCCST_PROCESS_RESULTS;
 }
 
+EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
+{
+	if ( State == ODBCCST_END_TRANSACTION || !ProcessResults )
+	{
+		return FRST_FINISHED_ALL;
+	}
+
+	if ( State == ODBCEST_FATAL_ERROR )
+	{
+		return FRST_ERROR;
+	}
+
+	FATAL_ASSERT( State == ODBCCST_PROCESS_RESULTS );
+
+	SQLRETURN error_code = SQLFetchScroll( StatementHandle, SQL_FETCH_NEXT, 0 );
+	rows_fetched = RowsFetched;
+
+	if ( error_code == SQL_NO_DATA )
+	{
+		SQLRETURN ec2 = SQLMoreResults( StatementHandle );
+		if ( ec2 == SQL_NO_DATA_FOUND )
+		{
+			State = ODBCCST_END_TRANSACTION;
+			return FRST_FINISHED_ALL;
+		}
+		else if ( ec2 != SQL_SUCCESS )
+		{
+			Update_Error_State( ODBCSOT_FETCH_RESULTS, error_code );
+			State = ODBCEST_FATAL_ERROR;
+			return FRST_ERROR;
+		}
+		else
+		{
+			return FRST_FINISHED_SET;
+		}
+	}
+	else if ( error_code != SQL_SUCCESS )
+	{
+		Update_Error_State( ODBCSOT_FETCH_RESULTS, error_code );
+		State = ODBCEST_FATAL_ERROR;
+		return FRST_ERROR;
+	}
+
+	return FRST_ONGOING;
+}
+
 void CODBCStatement::End_Transaction( bool commit )
 {
-	FATAL_ASSERT( State == ODBCCST_PROCESS_RESULTS );	// change to end later after we have result processing
+	FATAL_ASSERT( State == ODBCCST_END_TRANSACTION || ( !commit && State == ODBCEST_FATAL_ERROR ) );	
 
 	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
 	Update_Error_State( ODBCSOT_COMMIT_ROLLBACK_STATEMENT, error_code );
@@ -386,6 +430,7 @@ void CODBCStatement::Update_Error_State( ODBCStatementOperationType operation_ty
 		case ODBCSOT_BIND_COLUMN:
 		case ODBCSOT_EXECUTE_STATEMENT:
 		case ODBCSOT_COMMIT_ROLLBACK_STATEMENT:
+		case ODBCSOT_FETCH_RESULTS:
 			ErrorState = DBEST_FATAL_ERROR;
 			 
 		default:

@@ -68,4 +68,13 @@ enum EDatabaseVariableValueType
 	DVVT_BOOLEAN
 };
 
+enum EFetchResultsStatusType
+{
+	FRST_ONGOING,
+	FRST_FINISHED_SET,
+	FRST_FINISHED_ALL,
+
+	FRST_ERROR
+};
+
 #endif // DATABASE_TYPES_H

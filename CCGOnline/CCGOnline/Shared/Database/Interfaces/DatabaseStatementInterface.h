@@ -25,6 +25,7 @@
 
 enum DBStatementIDType;
 enum DBErrorStateType;
+enum EFetchResultsStatusType;
 
 class IDatabaseVariableSet;
 
@@ -44,9 +45,7 @@ class IDatabaseStatement
 		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count ) = 0;
 		virtual void Execute( uint32 batch_size ) = 0;
 		virtual void End_Transaction( bool commit ) = 0;
-
-		// WIP
-		// virtual void Process_Results( void ) = 0;
+		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched ) = 0;
 
 		virtual bool Is_Ready_For_Use( void ) const = 0;
 
