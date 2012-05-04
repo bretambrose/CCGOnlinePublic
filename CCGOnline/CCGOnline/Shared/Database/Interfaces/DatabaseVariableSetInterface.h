@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	DatabaseResultSetInterface.h
-		A component defining the abstract interface to a stored procedure's result set.
+	DatabaseVariableSetInterface.h
+		A component defining the abstract interface to a set of application variables.
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,18 +20,32 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_RESULT_SET_INTERFACE_H
-#define DATABASE_RESULT_SET_INTERFACE_H
+#ifndef DATABASE_VARIABLE_SET_INTERFACE_H
+#define DATABASE_VARIABLE_SET_INTERFACE_H
 
-class IDatabaseResultColumn;
+class IDatabaseVariable;
 
-class IDatabaseResultSet
+class IDatabaseVariableSet
 {
 	public:
 
-		virtual ~IDatabaseResultSet() {}
+		virtual ~IDatabaseVariableSet() {}
 
-		virtual void Get_Result_Columns( std::vector< IDatabaseResultColumn * > &result_columns ) = 0;
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables ) = 0;
 };
 
-#endif // DATABASE_RESULT_SET_INTERFACE_H
+class CEmptyVariableSet : public IDatabaseVariableSet
+{
+	public:
+
+		CEmptyVariableSet( void )
+		{}
+
+		virtual ~CEmptyVariableSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > & /*variables*/ )
+		{
+		}
+};
+
+#endif // DATABASE_VARIABLE_SET_INTERFACE_H

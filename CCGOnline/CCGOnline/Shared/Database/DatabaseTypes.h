@@ -33,7 +33,7 @@ enum DBErrorStateType
 };
 
 inline bool Is_Fatal_DB_Error( DBErrorStateType error ) { return error == DBEST_FATAL_ERROR; }
-inline bool Was_Database_Operation_Successful( DBErrorStateType error ) { return error == DBEST_SUCCESS && error == DBEST_WARNING; }
+inline bool Was_Database_Operation_Successful( DBErrorStateType error ) { return error == DBEST_SUCCESS || error == DBEST_WARNING; }
 
 enum DBConnectionIDType
 {
@@ -45,25 +45,27 @@ enum DBStatementIDType
 	DBSIDT_INVALID
 };
 
-enum EDatabaseParameterType
+enum EDatabaseVariableType
 {
-	DPT_INPUT,
-	DPT_INPUT_OUTPUT,
-	DPT_OUTPUT
+	DVT_INPUT,
+	DVT_INPUT_OUTPUT,
+	DVT_OUTPUT
 };
 
-enum EDatabaseParameterValueType
+enum EDatabaseVariableValueType
 {
-	DPVT_INT32,
-	DPVT_UINT32,
-	DPVT_INT64,
-	DPVT_UINT64,
-	DPVT_STRING,
-	DPVT_WSTRING,
+	DVVT_INVALID,
 
-	DPVT_FLOAT,
-	DPVT_DOUBLE,
-	DPVT_BOOLEAN
+	DVVT_INT32,
+	DVVT_UINT32,
+	DVVT_INT64,
+	DVVT_UINT64,
+	DVVT_STRING,
+	DVVT_WSTRING,
+
+	DVVT_FLOAT,
+	DVVT_DOUBLE,
+	DVVT_BOOLEAN
 };
 
 #endif // DATABASE_TYPES_H

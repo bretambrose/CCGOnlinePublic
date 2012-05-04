@@ -26,22 +26,21 @@
 
 #include "Database/DatabaseTypes.h"
 #include <sqlext.h>
-#include "Database/Interfaces/DatabaseParameterSetInterface.h"
-#include "Database/Interfaces/DatabaseParameterInterface.h"
-#include "Database/Interfaces/DatabaseResultSetInterface.h"
-#include "Database/Interfaces/DatabaseResultColumnInterface.h"
+#include <sqlucode.h>
+#include "Database/Interfaces/DatabaseVariableSetInterface.h"
+#include "Database/Interfaces/DatabaseVariableInterface.h"
 
-SQLSMALLINT Get_ODBC_Param_Type( EDatabaseParameterType parameter_type )
+SQLSMALLINT Get_ODBC_Variable_Type( EDatabaseVariableType variable_type )
 {
-	switch ( parameter_type )
+	switch ( variable_type )
 	{
-		case DPT_INPUT:
+		case DVT_INPUT:
 			return SQL_PARAM_INPUT;
 
-		case DPT_INPUT_OUTPUT:
+		case DVT_INPUT_OUTPUT:
 			return SQL_PARAM_INPUT_OUTPUT;
 
-		case DPT_OUTPUT:
+		case DVT_OUTPUT:
 			return SQL_PARAM_OUTPUT;
 
 		default:
@@ -50,33 +49,35 @@ SQLSMALLINT Get_ODBC_Param_Type( EDatabaseParameterType parameter_type )
 	}
 }
 
-SQLSMALLINT Get_ODBC_C_Value_Type( EDatabaseParameterValueType parameter_value_type )
+SQLSMALLINT Get_ODBC_C_Value_Type( EDatabaseVariableValueType variable_value_type )
 {
-	switch ( parameter_value_type )
+	switch ( variable_value_type )
 	{
-		case DPVT_INT32:
+		case DVVT_INT32:
 			return SQL_C_SLONG;
 
-		case DPVT_UINT32:
+		case DVVT_UINT32:
 			return SQL_C_ULONG;
 
-		case DPVT_INT64:
+		case DVVT_INT64:
 			return SQL_C_SBIGINT;
 
-		case DPVT_UINT64:
+		case DVVT_UINT64:
 			return SQL_C_UBIGINT;
 
-		case DPVT_STRING:
-		case DPVT_WSTRING:
+		case DVVT_STRING:
 			return SQL_C_CHAR;
 
-		case DPVT_FLOAT:
+		case DVVT_WSTRING:
+			return SQL_C_WCHAR;
+
+		case DVVT_FLOAT:
 			return SQL_C_FLOAT;
 
-		case DPVT_DOUBLE:
+		case DVVT_DOUBLE:
 			return SQL_C_DOUBLE;
 
-		case DPVT_BOOLEAN:
+		case DVVT_BOOLEAN:
 			return SQL_C_BIT;
 
 		default:
@@ -86,32 +87,31 @@ SQLSMALLINT Get_ODBC_C_Value_Type( EDatabaseParameterValueType parameter_value_t
 
 }
 
-SQLSMALLINT Get_ODBC_SQL_Value_Type( EDatabaseParameterValueType parameter_value_type )
+SQLSMALLINT Get_ODBC_SQL_Value_Type( EDatabaseVariableValueType variable_value_type )
 {
-	switch ( parameter_value_type )
+	switch ( variable_value_type )
 	{
-		case DPVT_INT32:
-		case DPVT_UINT32:
+		case DVVT_INT32:
+		case DVVT_UINT32:
 			return SQL_INTEGER;
 
-		case DPVT_INT64:
-		case DPVT_UINT64:
+		case DVVT_INT64:
+		case DVVT_UINT64:
 			return SQL_BIGINT;
 
-		case DPVT_STRING:
-		case DPVT_WSTRING:
-			return SQL_VARCHAR;
+		case DVVT_STRING:
+			return SQL_CHAR;
 
-// NYI
-/*
-		case DPVT_FLOAT:
-			return SQL_C_FLOAT;
+		case DVVT_WSTRING:
+			return SQL_WCHAR;
 
-		case DPVT_DOUBLE:
-			return SQL_C_DOUBLE;
-*/
+		case DVVT_FLOAT:
+			return SQL_FLOAT;
 
-		case DPVT_BOOLEAN:
+		case DVVT_DOUBLE:
+			return SQL_DOUBLE;
+
+		case DVVT_BOOLEAN:
 			return SQL_BIT;
 
 		default:
@@ -126,6 +126,8 @@ enum ODBCStatementStateType
 	ODBCCST_INITIALIZED,
 	ODBCCST_BOUND_INPUT,
 	ODBCCST_READY,
+	ODBCCST_PROCESS_RESULTS,
+	ODBCCST_END_TRANSACTION,
 
 	ODBCCST_SHUTDOWN,
 	ODBCEST_FATAL_ERROR
@@ -141,7 +143,10 @@ enum ODBCStatementOperationType
 	ODBCSOT_SET_RESULT_SET_ROW_COUNT,
 	ODBCSOT_SET_ROW_STATUS_ARRAY,
 	ODBCSOT_SET_ROWS_FETCHED_PTR,
-	ODBCSOT_BIND_COLUMN
+	ODBCSOT_BIND_COLUMN,
+
+	ODBCSOT_EXECUTE_STATEMENT,
+	ODBCSOT_COMMIT_ROLLBACK_STATEMENT
 };
 
 CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle ) :
@@ -191,7 +196,7 @@ void CODBCStatement::Shutdown( void )
 	State = ODBCCST_SHUTDOWN;
 }
 
-void CODBCStatement::Bind_Input( IDatabaseParameterSet *param_set, uint32 param_set_size, uint32 param_set_count )
+void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size )
 {
 	FATAL_ASSERT( State != ODBCCST_SHUTDOWN && State != ODBCEST_FATAL_ERROR );
 
@@ -200,8 +205,8 @@ void CODBCStatement::Bind_Input( IDatabaseParameterSet *param_set, uint32 param_
 		return;
 	}
 
-	std::vector< IDatabaseParameter * > parameters;
-	param_set->Get_Parameters( parameters );
+	std::vector< IDatabaseVariable * > parameters;
+	param_set->Get_Variables( parameters );
 	if ( parameters.size() > 0 )
 	{
 		SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) param_set_size, 0 );
@@ -214,9 +219,9 @@ void CODBCStatement::Bind_Input( IDatabaseParameterSet *param_set, uint32 param_
 
 		for ( uint32 i = 0; i < parameters.size(); ++i )
 		{
-			IDatabaseParameter *parameter = parameters[ i ];
+			IDatabaseVariable *parameter = parameters[ i ];
 
-			SQLSMALLINT param_type = Get_ODBC_Param_Type( parameter->Get_Parameter_Type() );
+			SQLSMALLINT param_type = Get_ODBC_Variable_Type( parameter->Get_Parameter_Type() );
 			SQLSMALLINT c_value_type = Get_ODBC_C_Value_Type( parameter->Get_Value_Type() );
 			SQLSMALLINT sql_value_type = Get_ODBC_SQL_Value_Type( parameter->Get_Value_Type() );
 			SQLUINTEGER value_size = parameter->Get_Value_Size();
@@ -234,28 +239,20 @@ void CODBCStatement::Bind_Input( IDatabaseParameterSet *param_set, uint32 param_
 				return;
 			}
 		}
-
-		error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) param_set_count, 0 );
-		Update_Error_State( ODBCSOT_SET_PARAM_SET_COUNT, error_code );
-		if ( !Was_Last_ODBC_Operation_Successful() )
-		{
-			State = ODBCEST_FATAL_ERROR;
-			return;
-		}
 	}
 
 	State = ODBCCST_BOUND_INPUT;
 }
 
-void CODBCStatement::Bind_Output( IDatabaseResultSet *result_set, uint32 result_set_size, uint32 result_set_count )
+void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count )
 {
 	if ( State != ODBCCST_BOUND_INPUT )
 	{
 		return;
 	}
 
-	std::vector< IDatabaseResultColumn * > result_columns;
-	result_set->Get_Result_Columns( result_columns );
+	std::vector< IDatabaseVariable * > result_columns;
+	result_set->Get_Variables( result_columns );
 	if ( result_columns.size() > 0 )
 	{
 		ProcessResults = true;
@@ -276,6 +273,7 @@ void CODBCStatement::Bind_Output( IDatabaseResultSet *result_set, uint32 result_
 			return;
 		}
 
+		FATAL_ASSERT( result_set_count > 0 );
 		RowStatuses = new SQLSMALLINT[ result_set_count ];
 		error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_STATUS_PTR, RowStatuses, 0 );
 		Update_Error_State( ODBCSOT_SET_ROW_STATUS_ARRAY, error_code );
@@ -295,7 +293,7 @@ void CODBCStatement::Bind_Output( IDatabaseResultSet *result_set, uint32 result_
 
 		for ( uint32 i = 0; i < result_columns.size(); ++i )
 		{
-			IDatabaseResultColumn *column = result_columns[ i ];
+			IDatabaseVariable *column = result_columns[ i ];
 			SQLSMALLINT c_value_type = Get_ODBC_C_Value_Type( column->Get_Value_Type() );
 			SQLPOINTER value_address = reinterpret_cast< SQLPOINTER >( column->Get_Value_Address() );
 			SQLINTEGER value_buffer_size = column->Get_Value_Buffer_Size();
@@ -314,6 +312,42 @@ void CODBCStatement::Bind_Output( IDatabaseResultSet *result_set, uint32 result_
 	else
 	{
 		ProcessResults = false;
+	}
+
+	State = ODBCCST_READY;
+}
+
+void CODBCStatement::Execute( uint32 batch_size )
+{
+	SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) batch_size, 0 );
+	Update_Error_State( ODBCSOT_SET_PARAM_SET_COUNT, error_code );
+	if ( !Was_Last_ODBC_Operation_Successful() )
+	{
+		State = ODBCEST_FATAL_ERROR;
+		return;
+	}
+
+	error_code = SQLExecDirect( StatementHandle, (SQLWCHAR *)StatementText.c_str(), SQL_NTS );
+	Update_Error_State( ODBCSOT_EXECUTE_STATEMENT, error_code );
+	if ( !Was_Last_ODBC_Operation_Successful() )
+	{
+		State = ODBCEST_FATAL_ERROR;
+		return;
+	}
+
+	State = ODBCCST_PROCESS_RESULTS;
+}
+
+void CODBCStatement::End_Transaction( bool commit )
+{
+	FATAL_ASSERT( State == ODBCCST_PROCESS_RESULTS );	// change to end later after we have result processing
+
+	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
+	Update_Error_State( ODBCSOT_COMMIT_ROLLBACK_STATEMENT, error_code );
+	if ( !Was_Last_ODBC_Operation_Successful() )
+	{
+		State = ODBCEST_FATAL_ERROR;
+		return;
 	}
 
 	State = ODBCCST_READY;
@@ -350,6 +384,8 @@ void CODBCStatement::Update_Error_State( ODBCStatementOperationType operation_ty
 		case ODBCSOT_SET_ROW_STATUS_ARRAY:
 		case ODBCSOT_SET_ROWS_FETCHED_PTR:
 		case ODBCSOT_BIND_COLUMN:
+		case ODBCSOT_EXECUTE_STATEMENT:
+		case ODBCSOT_COMMIT_ROLLBACK_STATEMENT:
 			ErrorState = DBEST_FATAL_ERROR;
 			 
 		default:

@@ -26,8 +26,7 @@
 enum DBStatementIDType;
 enum DBErrorStateType;
 
-class IDatabaseParameterSet;
-class IDatabaseResultSet;
+class IDatabaseVariableSet;
 
 class IDatabaseStatement
 {
@@ -41,11 +40,12 @@ class IDatabaseStatement
 		virtual DBStatementIDType Get_ID( void ) const = 0;
 		virtual const std::wstring &Get_Statement_Text( void ) const = 0;
 
-		virtual void Bind_Input( IDatabaseParameterSet *param_set, uint32 param_set_size, uint32 param_set_count ) = 0;
-		virtual void Bind_Output( IDatabaseResultSet *result_set, uint32 result_set_size, uint32 result_set_count ) = 0;
+		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size ) = 0;
+		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count ) = 0;
+		virtual void Execute( uint32 batch_size ) = 0;
+		virtual void End_Transaction( bool commit ) = 0;
 
 		// WIP
-		// virtual void Execute( void ) = 0;
 		// virtual void Process_Results( void ) = 0;
 
 		virtual bool Is_Ready_For_Use( void ) const = 0;

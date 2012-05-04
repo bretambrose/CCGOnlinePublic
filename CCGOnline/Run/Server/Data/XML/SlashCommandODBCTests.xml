@@ -1,0 +1,12 @@
+<Commands>
+	<SlashCommand>
+		<Command>AddAccount</Command>
+
+		<Params>
+			<Param type="string"/>
+			<Param type="string"/>
+			<Param type="uint32" optional="true" default="1"/>
+		</Params>
+	</SlashCommand>
+
+</Commands>

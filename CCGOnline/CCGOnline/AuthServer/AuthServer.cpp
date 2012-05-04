@@ -31,6 +31,15 @@
 
 #include "GeneratedCode\RegisterAuthServerEnums.h"
 #include "Logging/LogInterface.h"
+#include "SlashCommands/SlashCommandManager.h"
+#include "SlashCommands/SlashCommandInstance.h"
+#include "Database/ODBCImplementation/ODBCFactory.h"
+#include "Database/ODBCImplementation/ODBCParameters.h"
+#include "Database/Interfaces/DatabaseVariableSetInterface.h"
+#include "Database/Interfaces/DatabaseConnectionInterface.h"
+#include "Database/Interfaces/DatabaseStatementInterface.h"
+#include "Database/Interfaces/DatabaseEnvironmentInterface.h"
+#include <iostream>
 
 void SQL_Stuff( void )
 {
@@ -1325,11 +1334,129 @@ namespace NAuthServer
 	}
 }
 
+class CAddAccountInputParams : public IDatabaseVariableSet
+{
+	public:
+
+		CAddAccountInputParams( void ) :
+			AccountEmail(),
+			Nickname(),
+			PasswordHash()
+		{}
+
+		CAddAccountInputParams( const std::string &account_email, const std::string &nickname, const std::string &password_hash ) :
+			AccountEmail( account_email ),
+			Nickname( nickname ),
+			PasswordHash( password_hash )
+		{}
+
+		virtual ~CAddAccountInputParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &PasswordHash );
+		}
+
+		DBString< 255 > AccountEmail;
+		DBString< 32 > Nickname;
+		DBString< 32 > PasswordHash;
+};
+
+bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /*error_msg*/ )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	FATAL_ASSERT( connection != nullptr );
+
+	IDatabaseStatement *statement = connection->Allocate_Statement( L"{call dynamic.add_account(?,?,?)}" );
+	FATAL_ASSERT( statement != nullptr );
+
+	std::string email;
+	instance.Get_Param( 0, email );
+
+	std::string nickname;
+	instance.Get_Param( 1, nickname );
+
+	uint32 add_count = 0;
+	instance.Get_Param( 2, add_count );
+	FATAL_ASSERT( add_count > 0 );
+
+	CAddAccountInputParams *params_array = new CAddAccountInputParams[ add_count ];
+
+	for ( uint32 i = 0; i < add_count; i++ )
+	{
+		char suffix[ 2 ];
+		suffix[ 1 ] = 0;
+		suffix[ 0 ] = 'A' + (char) i;
+
+		params_array[ i ] = CAddAccountInputParams( email + suffix, nickname, "00001111222233334444555566667777" );
+	}
+
+	statement->Bind_Input( params_array, sizeof( CAddAccountInputParams ) );
+
+	CEmptyVariableSet result_set;
+	statement->Bind_Output( &result_set, sizeof( CEmptyVariableSet ), 1 );
+	
+	statement->Execute( add_count );
+	statement->End_Transaction( true );
+
+	connection->Release_Statement( statement );
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+
+	delete []params_array;
+
+	return true;
+}
+
 int main( int /*argc*/, wchar_t* /*argv*/[] )
 {
 	NAuthServer::Initialize();
 
-	Test_SQL_Server_Output_Params_Multi_Result_Set();
+	CSlashCommandManager::Initialize();
+	CSlashCommandManager::Load_Command_File( "Data/XML/SlashCommandODBCTests.xml" );
+	CSlashCommandManager::Register_Command_Handler( L"AddAccount", Handle_Add_Account );
+
+	CODBCFactory::Create_Environment();
+
+	bool done = false;
+	while ( !done )
+	{
+		wchar_t command_line[ 256 ];
+		std::wcin.getline( command_line, sizeof( command_line ) );
+
+		if ( _wcsicmp( command_line, L"quit" ) == 0 )
+		{
+			done = true;
+		}
+		else
+		{
+			std::wstring error_msg;
+			CSlashCommandInstance command_instance;
+			if ( CSlashCommandManager::Parse_Command( command_line, command_instance, error_msg ) )
+			{
+				std::wcout << L"Handling command\n";
+				if ( !CSlashCommandManager::Handle_Command( command_instance, error_msg ) )
+				{
+					std::wcout << L"There was an error executing the command: " << error_msg << L"\n";
+				}
+				else
+				{
+					std::wcout << L"Success!\n";
+				}
+			}
+			else
+			{
+				std::wcout << L"Parse error:" << error_msg << L"\n";
+			}	
+		}
+	}
+
+	CODBCFactory::Destroy_Environment();
+
+	CSlashCommandManager::Shutdown();
+
+	//Test_SQL_Server_Output_Params_Multi_Result_Set();
 	//Test_SQL_Server_Function_No_Results();
 	//Test_SQL_Server_Multi_Result_Set();
 	//Test_SQL_Server_Single_Result_Set();

@@ -230,16 +230,13 @@
     <ClInclude Include="Database\DatabaseTypes.h">
       <Filter>Source Files\Database</Filter>
     </ClInclude>
-    <ClInclude Include="Database\Interfaces\DatabaseParameterInterface.h">
+    <ClInclude Include="Database\ODBCImplementation\ODBCParameters.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseVariableInterface.h">
       <Filter>Source Files\Database\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Database\Interfaces\DatabaseParameterSetInterface.h">
-      <Filter>Source Files\Database\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Interfaces\DatabaseResultColumnInterface.h">
-      <Filter>Source Files\Database\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Database\Interfaces\DatabaseResultSetInterface.h">
+    <ClInclude Include="Database\Interfaces\DatabaseVariableSetInterface.h">
       <Filter>Source Files\Database\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	DatabaseResultColumnInterface.h
-		A component defining the abstract interface to an individual result column of a stored procedure.
+	DatabaseVariableInterface.h
+		A component defining the abstract interface to an individual database application variable.
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,21 +20,25 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_RESULT_COLUMN_INTERFACE_H
-#define DATABASE_RESULT_COLUMN_INTERFACE_H
+#ifndef DATABASE_VARIABLE_INTERFACE_H
+#define DATABASE_VARIABLE_INTERFACE_H
 
-enum EDatabaseParameterValueType;
+enum EDatabaseVariableType;
+enum EDatabaseVariableValueType;
 
-class IDatabaseResultColumn
+class IDatabaseVariable
 {
 	public:
 
-		virtual ~IDatabaseResultColumn() {}
+		virtual ~IDatabaseVariable() {}
 
-		virtual EDatabaseParameterValueType Get_Value_Type( void ) const = 0;
-		virtual void *Get_Value_Address( void ) const = 0;
+		virtual EDatabaseVariableType Get_Parameter_Type( void ) const = 0;			// Input only
+		virtual EDatabaseVariableValueType Get_Value_Type( void ) const = 0;
+		virtual uint32 Get_Value_Size( void ) const = 0;									// Input only
+		virtual uint32 Get_Decimals( void ) const = 0;										// Input only
+		virtual void *Get_Value_Address( void ) = 0;
 		virtual uint32 Get_Value_Buffer_Size( void ) const = 0;
-		virtual void *Get_Auxiliary_Address( void ) const = 0;
+		virtual void *Get_Auxiliary_Address( void ) = 0;
 };
 
-#endif // DATABASE_RESULT_COLUMN_INTERFACE_H
+#endif // DATABASE_PARAMETER_INTERFACE_H

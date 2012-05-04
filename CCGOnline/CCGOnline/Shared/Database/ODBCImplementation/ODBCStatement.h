@@ -44,8 +44,10 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		virtual DBStatementIDType Get_ID( void ) const { return ID; }
 		virtual const std::wstring &Get_Statement_Text( void ) const { return StatementText; }
 
-		virtual void Bind_Input( IDatabaseParameterSet *param_set, uint32 param_set_size, uint32 param_set_count );
-		virtual void Bind_Output( IDatabaseResultSet *result_set, uint32 result_set_size, uint32 result_set_count );
+		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size );
+		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count );
+		virtual void Execute( uint32 batch_size );
+		virtual void End_Transaction( bool commit );
 
 		virtual bool Is_Ready_For_Use( void ) const;
 
