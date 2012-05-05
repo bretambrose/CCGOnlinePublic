@@ -649,7 +649,7 @@ void Test_Sql_Server_Connection( void )
 	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
 	SQLSMALLINT output_size = 0;
 
-	SQLWCHAR *connection_string = (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;";
+	SQLWCHAR *connection_string = (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;";
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
@@ -712,7 +712,7 @@ void Test_SQL_Server_Input_Only( void )
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
-											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
+											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
 											 SQL_NTS, 
 											 output_connection_buffer, 
 											 1024, 
@@ -823,7 +823,7 @@ void Test_SQL_Server_Single_Result_Set( void )
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
-											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
+											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
 											 SQL_NTS, 
 											 output_connection_buffer, 
 											 1024, 
@@ -928,7 +928,7 @@ void Test_SQL_Server_Multi_Result_Set( void )
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
-											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
+											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
 											 SQL_NTS, 
 											 output_connection_buffer, 
 											 1024, 
@@ -1061,7 +1061,7 @@ void Test_SQL_Server_Function_No_Results( void )
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
-											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
+											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
 											 SQL_NTS, 
 											 output_connection_buffer, 
 											 1024, 
@@ -1199,7 +1199,7 @@ void Test_SQL_Server_Output_Params_Multi_Result_Set( void )
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
-											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
+											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
 											 SQL_NTS, 
 											 output_connection_buffer, 
 											 1024, 
@@ -1366,7 +1366,7 @@ class CAddAccountInputParams : public IDatabaseVariableSet
 
 bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /*error_msg*/ )
 {
-	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	FATAL_ASSERT( connection != nullptr );
 
 	IDatabaseStatement *statement = connection->Allocate_Statement( L"{call dynamic.add_account(?,?,?)}" );
@@ -1457,7 +1457,7 @@ class CFetchAccountResultSet : public IDatabaseVariableSet
 
 bool Handle_Fetch_Account( const CSlashCommandInstance &instance, std::wstring & /*error_msg*/ )
 {
-	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZEL-PC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	FATAL_ASSERT( connection != nullptr );
 
 	IDatabaseStatement *statement = connection->Allocate_Statement( L"{call dynamic.get_account_by_email(?)}" );
