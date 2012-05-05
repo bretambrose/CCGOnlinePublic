@@ -160,7 +160,7 @@ class DBString : public IDatabaseVariable
 		{ 
 			if ( buffer != nullptr )
 			{
-				int32 length = strlen( buffer );
+				size_t length = strlen( buffer );
 				if ( length > BUFFER_LENGTH )
 				{
 					length = BUFFER_LENGTH;

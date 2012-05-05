@@ -226,7 +226,7 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 			SQLSMALLINT decimals = static_cast< SQLSMALLINT >( parameter->Get_Decimals() );
 			SQLPOINTER value_address = reinterpret_cast< SQLPOINTER >( parameter->Get_Value_Address() );
 			SQLINTEGER value_buffer_size = parameter->Get_Value_Buffer_Size();
-			SQLINTEGER *indicator_address = reinterpret_cast< SQLINTEGER * >( parameter->Get_Auxiliary_Address() );
+			SQLLEN *indicator_address = reinterpret_cast< SQLLEN * >( parameter->Get_Auxiliary_Address() );
 			SQLUSMALLINT parameter_index = static_cast< SQLUSMALLINT >( i + 1 );
 
 			error_code = SQLBindParameter( StatementHandle, parameter_index, param_type, c_value_type, sql_value_type, value_size, decimals, value_address, value_buffer_size, indicator_address );
@@ -295,7 +295,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 			SQLSMALLINT c_value_type = Get_ODBC_C_Value_Type( column->Get_Value_Type() );
 			SQLPOINTER value_address = reinterpret_cast< SQLPOINTER >( column->Get_Value_Address() );
 			SQLINTEGER value_buffer_size = column->Get_Value_Buffer_Size();
-			SQLINTEGER *value_indicator = reinterpret_cast< SQLINTEGER * >( column->Get_Auxiliary_Address() );
+			SQLLEN *value_indicator = reinterpret_cast< SQLLEN * >( column->Get_Auxiliary_Address() );
 			SQLUSMALLINT column_index = static_cast< SQLUSMALLINT >( i + 1 );
 
 			error_code = SQLBindCol( StatementHandle, column_index, c_value_type, value_address, value_buffer_size, value_indicator );
