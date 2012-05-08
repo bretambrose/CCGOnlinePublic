@@ -39,6 +39,8 @@
 #include "Database/Interfaces/DatabaseConnectionInterface.h"
 #include "Database/Interfaces/DatabaseStatementInterface.h"
 #include "Database/Interfaces/DatabaseEnvironmentInterface.h"
+#include "Database/DatabaseVariableSet.h"
+
 #include <iostream>
 
 void SQL_Stuff( void )
@@ -1384,6 +1386,7 @@ bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /
 
 	CAddAccountInputParams *params_array = new CAddAccountInputParams[ add_count ];
 
+/*
 	for ( uint32 i = 0; i < add_count; i++ )
 	{
 		char suffix[ 2 ];
@@ -1392,6 +1395,12 @@ bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /
 
 		params_array[ i ] = CAddAccountInputParams( email + suffix, nickname, "00001111222233334444555566667777" );
 	}
+*/
+
+	for ( uint32 i = 0; i < add_count; i++ )
+	{
+		params_array[ i ] = CAddAccountInputParams( email, nickname, "00001111222233334444555566667777" );
+	}
 
 	statement->Bind_Input( params_array, sizeof( CAddAccountInputParams ) );
 
@@ -1399,6 +1408,14 @@ bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /
 	statement->Bind_Output( &result_set, sizeof( CEmptyVariableSet ), 1 );
 	
 	statement->Execute( add_count );
+
+	int64 rows_fetched = 0;
+	EFetchResultsStatusType fetch_status = FRST_ONGOING;
+	while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
+	{
+		fetch_status = statement->Fetch_Results( rows_fetched );
+	}
+
 	statement->End_Transaction( true );
 
 	connection->Release_Statement( statement );

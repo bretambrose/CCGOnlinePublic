@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	DatabaseVariableSetInterface.h
-		A component defining the abstract interface to a set of application variables.
+	DatabaseVariableSet.h
+		A component defining some base instances of a set of application variables.
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,18 +20,42 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_VARIABLE_SET_INTERFACE_H
-#define DATABASE_VARIABLE_SET_INTERFACE_H
+#ifndef DATABASE_VARIABLE_SET_H
+#define DATABASE_VARIABLE_SET_H
 
-class IDatabaseVariable;
+#include "Database/Interfaces/DatabaseVariableSetInterface.h"
 
-class IDatabaseVariableSet
+class CDatabaseInputParams : public IDatabaseVariableSet
 {
 	public:
 
-		virtual ~IDatabaseVariableSet() {}
+		CDatabaseInputParams( void ) :
+			InErrorState( false )
+		{}
 
-		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables ) = 0;
+		virtual ~CDatabaseInputParams() {}
+
+		virtual bool Is_In_Error_State( void ) const { return InErrorState; }
+		virtual bool Set_In_Error_State( bool in_error_state ) { InErrorState = in_error_state; }
+
+	private:
+
+		bool InErrorState;
+};
+
+
+class CEmptyVariableSet : public IDatabaseVariableSet
+{
+	public:
+
+		CEmptyVariableSet( void )
+		{}
+
+		virtual ~CEmptyVariableSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > & /*variables*/ )
+		{
+		}
 };
 
 #endif // DATABASE_VARIABLE_SET_INTERFACE_H

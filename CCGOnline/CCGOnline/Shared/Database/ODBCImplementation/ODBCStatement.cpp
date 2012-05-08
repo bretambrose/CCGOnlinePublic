@@ -338,7 +338,12 @@ void CODBCStatement::Execute( uint32 batch_size )
 
 EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 {
-	if ( State == ODBCCST_END_TRANSACTION || !ProcessResults )
+	if ( !ProcessResults )
+	{
+		State = ODBCCST_END_TRANSACTION;
+	}
+
+	if ( State == ODBCCST_END_TRANSACTION )
 	{
 		return FRST_FINISHED_ALL;
 	}

@@ -239,6 +239,15 @@
     <ClInclude Include="Database\Interfaces\DatabaseVariableSetInterface.h">
       <Filter>Source Files\Database\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Database\DatabaseTaskBatch.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseTaskInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseVariableSet.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

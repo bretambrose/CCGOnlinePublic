@@ -185,10 +185,13 @@
     <ClInclude Include="Concurrency\ThreadTaskInterface.h" />
     <ClInclude Include="CRC.h" />
     <ClInclude Include="CRCValue.h" />
+    <ClInclude Include="Database\DatabaseTaskBatch.h" />
     <ClInclude Include="Database\DatabaseTypes.h" />
+    <ClInclude Include="Database\DatabaseVariableSet.h" />
     <ClInclude Include="Database\Interfaces\DatabaseConnectionInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseEnvironmentInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseStatementInterface.h" />
+    <ClInclude Include="Database\Interfaces\DatabaseTaskInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseVariableInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseVariableSetInterface.h" />
     <ClInclude Include="Database\ODBCImplementation\ODBCConnection.h" />
