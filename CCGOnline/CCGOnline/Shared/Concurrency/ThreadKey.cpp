@@ -24,7 +24,7 @@
 
 #include "ThreadKey.h"
 
-#include "ThreadConstants.h"
+#include "VirtualProcessConstants.h"
 
 /**********************************************************************************************************************
 	SThreadKey::SThreadKey -- component-based constructor

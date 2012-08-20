@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	ConcurrencyManager.h
-		A component definining the central, manager class that manages all thread tasks
+		A component definining the central, manager class that manages all virtual processes
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -26,24 +26,24 @@
 #include "ThreadKey.h"
 #include "TypeInfoUtils.h"
 
-class IManagerThreadTask;
-class CReadOnlyThreadInterface;
-class CThreadConnection;
-class CPushInterfaceRequest;
-class CGetInterfaceRequest;
-class CAddThreadMessage;
-class CShutdownThreadMessage;
-class CRescheduleThreadMessage;
-class CShutdownInterfaceAcknowledgement;
-class CShutdownThreadAcknowledgement;
+class IManagedVirtualProcess;
+class CReadOnlyMailbox;
+class CVirtualProcessMailbox;
+class CPushMailboxRequest;
+class CGetMailboxRequest;
+class CAddNewVirtualProcessMessage;
+class CShutdownVirtualProcessMessage;
+class CRescheduleVirtualProcessMessage;
+class CReleaseMailboxResponse;
+class CShutdownSelfResponse;
 class CShutdownManagerMessage;
-class CWriteOnlyThreadInterface;
-class IThreadMessage;
-class IThreadMessageHandler;
-class CThreadMessageFrame;
+class CWriteOnlyMailbox;
+class IVirtualProcessMessage;
+class IVirtualProcessMessageHandler;
+class CVirtualProcessMessageFrame;
 class CTaskScheduler;
 class CTimeKeeper;
-class CThreadTaskRecord;
+class CVirtualProcessRecord;
 class CThreadKeyManager;
 
 struct STickTime;
@@ -68,7 +68,7 @@ class CConcurrencyManager
 		// Public interface
 		void Initialize( bool delete_all_logs );
 
-		void Run( const shared_ptr< IManagerThreadTask > &starting_thread );
+		void Run( const shared_ptr< IManagedVirtualProcess > &starting_process );
 
 		void Log( const std::wstring &message );
 
@@ -77,27 +77,27 @@ class CConcurrencyManager
 		friend class CConcurrencyManagerTester;
 
 		// Accessors
-		shared_ptr< CThreadTaskRecord > Get_Record( const SThreadKey &key ) const;
+		shared_ptr< CVirtualProcessRecord > Get_Record( const SThreadKey &key ) const;
 
-		shared_ptr< IManagerThreadTask > Get_Thread_Task( const SThreadKey &key ) const;
+		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process( const SThreadKey &key ) const;
 
-		shared_ptr< CWriteOnlyThreadInterface > Get_Write_Interface( const SThreadKey &key ) const;
-		shared_ptr< CReadOnlyThreadInterface > Get_Self_Read_Interface( void ) const;
+		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( const SThreadKey &key ) const;
+		shared_ptr< CReadOnlyMailbox > Get_My_Mailbox( void ) const;
 
 		shared_ptr< CTaskScheduler > Get_Task_Scheduler( ETimeType time_type ) const;
 
 		// Message handling
 		void Register_Message_Handlers( void );
-		void Register_Handler( const std::type_info &message_type_info, const shared_ptr< IThreadMessageHandler > &handler );
+		void Register_Handler( const std::type_info &message_type_info, const shared_ptr< IVirtualProcessMessageHandler > &handler );
 
-		void Handle_Message( const SThreadKey &key, const shared_ptr< const IThreadMessage > &message );
-		void Handle_Get_Interface_Request( const SThreadKey &key, const shared_ptr< const CGetInterfaceRequest > &message );
-		void Handle_Push_Interface_Request( const SThreadKey &key, const shared_ptr< const CPushInterfaceRequest > &message );
-		void Handle_Add_Thread_Message( const SThreadKey &key, const shared_ptr< const CAddThreadMessage > &message );
-		void Handle_Shutdown_Thread_Message( const SThreadKey &key, const shared_ptr< const CShutdownThreadMessage > &message );
-		void Handle_Reschedule_Thread_Message( const SThreadKey &key, const shared_ptr< const CRescheduleThreadMessage > &message );
-		void Handle_Shutdown_Interface_Acknowledgement( const SThreadKey &key, const shared_ptr< const CShutdownInterfaceAcknowledgement > &message );
-		void Handle_Shutdown_Thread_Acknowledgement( const SThreadKey &key, const shared_ptr< const CShutdownThreadAcknowledgement > &message );
+		void Handle_Message( const SThreadKey &key, const shared_ptr< const IVirtualProcessMessage > &message );
+		void Handle_Get_Mailbox_Request( const SThreadKey &key, const shared_ptr< const CGetMailboxRequest > &message );
+		void Handle_Push_Mailbox_Request( const SThreadKey &key, const shared_ptr< const CPushMailboxRequest > &message );
+		void Handle_Add_New_Virtual_Process_Message( const SThreadKey &key, const shared_ptr< const CAddNewVirtualProcessMessage > &message );
+		void Handle_Shutdown_Virtual_Process_Message( const SThreadKey &key, const shared_ptr< const CShutdownVirtualProcessMessage > &message );
+		void Handle_Reschedule_Virtual_Process_Message( const SThreadKey &key, const shared_ptr< const CRescheduleVirtualProcessMessage > &message );
+		void Handle_Release_Mailbox_Response( const SThreadKey &key, const shared_ptr< const CReleaseMailboxResponse > &message );
+		void Handle_Shutdown_Self_Response( const SThreadKey &key, const shared_ptr< const CShutdownSelfResponse > &message );
 		void Handle_Shutdown_Manager_Message( const SThreadKey &key, const shared_ptr< const CShutdownManagerMessage > &message );
 
 		// Execution
@@ -106,23 +106,23 @@ class CConcurrencyManager
 		void Service_Shutdown( void );
 		void Service_Incoming_Frames( void );
 
-		void Setup_For_Run( const shared_ptr< IManagerThreadTask > &starting_thread );
+		void Setup_For_Run( const shared_ptr< IManagedVirtualProcess > &starting_process );
 		void Shutdown( void );
 
 		// Execution helpers
-		void Execute_Thread_Task( const SThreadKey &key, double current_time_seconds );
+		void Execute_Virtual_Process( const SThreadKey &key, double current_time_seconds );
 
-		void Add_Thread( const shared_ptr< IManagerThreadTask > &thread );
+		void Add_Virtual_Process( const shared_ptr< IManagedVirtualProcess > &process );
 
-		void Send_Thread_Message( const SThreadKey &dest_key, const shared_ptr< const IThreadMessage > &message );
+		void Send_Virtual_Process_Message( const SThreadKey &dest_key, const shared_ptr< const IVirtualProcessMessage > &message );
 		void Flush_Frames( void );
 
-		void Handle_Ongoing_Interface_Requests( CThreadConnection *thread_connection );
-		void Clear_Related_Interface_Requests( const SThreadKey &key );
+		void Handle_Ongoing_Mailbox_Requests( CVirtualProcessMailbox *mailbox );
+		void Clear_Related_Mailbox_Requests( const SThreadKey &key );
 
 		// Shutdown helpers
-		void Initiate_Thread_Shutdown( const SThreadKey &key );
-		bool Is_Thread_Shutting_Down( const SThreadKey &key ) const;
+		void Initiate_Process_Shutdown( const SThreadKey &key );
+		bool Is_Process_Shutting_Down( const SThreadKey &key ) const;
 		bool Is_Manager_Shutting_Down( void ) const;
 		
 		// Time management
@@ -130,17 +130,17 @@ class CConcurrencyManager
 		void Set_Game_Time( double game_time_seconds );
 
 		// Types
-		typedef std::vector< shared_ptr< const CPushInterfaceRequest > > PersistentPushRequestCollectionType;
-		typedef std::vector< shared_ptr< const CGetInterfaceRequest > > PersistentGetRequestCollectionType;
-		typedef std::multimap< SThreadKey, shared_ptr< const CPushInterfaceRequest >, SThreadKeyContainerHelper > PushRequestCollectionType;
-		typedef std::multimap< SThreadKey, shared_ptr< const CGetInterfaceRequest >, SThreadKeyContainerHelper > GetRequestCollectionType;
+		typedef std::vector< shared_ptr< const CPushMailboxRequest > > PersistentPushRequestCollectionType;
+		typedef std::vector< shared_ptr< const CGetMailboxRequest > > PersistentGetRequestCollectionType;
+		typedef std::multimap< SThreadKey, shared_ptr< const CPushMailboxRequest >, SThreadKeyContainerHelper > PushRequestCollectionType;
+		typedef std::multimap< SThreadKey, shared_ptr< const CGetMailboxRequest >, SThreadKeyContainerHelper > GetRequestCollectionType;
 
-		typedef stdext::hash_map< SThreadKey, shared_ptr< CThreadMessageFrame >, SThreadKeyContainerHelper > FrameTableType;
-		typedef stdext::hash_map< Loki::TypeInfo, shared_ptr< IThreadMessageHandler >, STypeInfoContainerHelper > ThreadMessageHandlerTableType;
-		typedef stdext::hash_map< SThreadKey, shared_ptr< CThreadTaskRecord >, SThreadKeyContainerHelper > ThreadRecordTableType;
+		typedef stdext::hash_map< SThreadKey, shared_ptr< CVirtualProcessMessageFrame >, SThreadKeyContainerHelper > FrameTableType;
+		typedef stdext::hash_map< Loki::TypeInfo, shared_ptr< IVirtualProcessMessageHandler >, STypeInfoContainerHelper > VirtualProcessMessageHandlerTableType;
+		typedef stdext::hash_map< SThreadKey, shared_ptr< CVirtualProcessRecord >, SThreadKeyContainerHelper > VirtualProcessRecordTableType;
 
 		// Private Data
-		ThreadRecordTableType ThreadRecords;
+		VirtualProcessRecordTableType ProcessRecords;
 
 		PushRequestCollectionType					UnfulfilledPushRequests;
 		PersistentPushRequestCollectionType		PersistentPushRequests;
@@ -149,7 +149,7 @@ class CConcurrencyManager
 
 		FrameTableType PendingOutboundFrames;
 
-		ThreadMessageHandlerTableType MessageHandlers;
+		VirtualProcessMessageHandlerTableType MessageHandlers;
 
 		stdext::hash_map< ETimeType, shared_ptr< CTaskScheduler > > TaskSchedulers;
 		scoped_ptr< CTimeKeeper > TimeKeeper;

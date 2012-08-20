@@ -208,13 +208,13 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TaskSchedulerTests.cpp" />
-    <ClCompile Include="ThreadConnectionTests.cpp" />
     <ClCompile Include="ThreadKeyManagerTests.cpp" />
     <ClCompile Include="ThreadKeyTests.cpp" />
-    <ClCompile Include="ThreadMessageFrameTests.cpp" />
-    <ClCompile Include="ThreadMessageHandlerTests.cpp" />
-    <ClCompile Include="ThreadTaskTests.cpp" />
     <ClCompile Include="TimeTests.cpp" />
+    <ClCompile Include="VirtualProcessMailboxTests.cpp" />
+    <ClCompile Include="VirtualProcessMessageFrameTests.cpp" />
+    <ClCompile Include="VirtualProcessMessageHandlerTests.cpp" />
+    <ClCompile Include="VirtualProcessTests.cpp" />
     <ClCompile Include="XMLLoadableTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

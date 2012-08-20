@@ -27,9 +27,6 @@
     <Filter Include="Source Files\Time">
       <UniqueIdentifier>{D85C985D-E17E-47EC-BB43-6DF21BC2DD90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Concurrency\ThreadMessages">
-      <UniqueIdentifier>{0AF71C1C-BAF0-46A7-A6B2-D4E23F2CF6EF}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\GeneratedCode">
       <UniqueIdentifier>{7f91654a-0135-4b22-8178-5f5989858a65}</UniqueIdentifier>
     </Filter>
@@ -48,6 +45,9 @@
     <Filter Include="Source Files\Database\ODBCImplementation">
       <UniqueIdentifier>{a3b94267-eece-4342-b4d1-c47ac62ed89c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Concurrency\Messaging">
+      <UniqueIdentifier>{3e72eefd-12c3-4c6b-8392-6775bd2038d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -65,14 +65,8 @@
     <ClInclude Include="Shared.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\Containers\ConcurrentQueueBase.h">
-      <Filter>Source Files\Concurrency\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="Concurrency\ConcurrencyManager.h">
       <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Logging\LoggingThread.h">
-      <Filter>Source Files\Logging</Filter>
     </ClInclude>
     <ClInclude Include="Logging\LogInterface.h">
       <Filter>Source Files\Logging</Filter>
@@ -81,12 +75,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="MessageHandling\MessageHandler.h">
-      <Filter>Source Files\MessageHandling</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageHandling\ThreadMessageHandler.h">
-      <Filter>Source Files\MessageHandling</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageHandling\ThreadMessageHandlerBase.h">
       <Filter>Source Files\MessageHandling</Filter>
     </ClInclude>
     <ClInclude Include="PriorityQueue.h">
@@ -98,65 +86,11 @@
     <ClInclude Include="Time\TimeKeeper.h">
       <Filter>Source Files\Time</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\ThreadMessages\ExchangeInterfaceMessages.h">
-      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadMessages\LoggingMessages.h">
-      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadMessages\ThreadManagementMessages.h">
-      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadMessages\ThreadMessage.h">
-      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadConnection.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadConstants.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadInterfaces.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadKey.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadMessageFrame.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadSubject.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadTaskBase.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\Containers\ConcurrentQueue.h">
-      <Filter>Source Files\Concurrency\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadTaskInterface.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadStatics.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadTaskExecutionContext.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ManagerThreadTaskInterface.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
     <ClInclude Include="TaskScheduler\ScheduledTask.h">
       <Filter>Source Files\TaskScheduler</Filter>
     </ClInclude>
     <ClInclude Include="TaskScheduler\ScheduledTaskPolicies.h">
       <Filter>Source Files\TaskScheduler</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadKeyManager.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\Containers\ConcurrentQueueLocking.h">
-      <Filter>Source Files\Concurrency\Containers</Filter>
     </ClInclude>
     <ClInclude Include="StructuredExceptionHandler.h">
       <Filter>Source Files</Filter>
@@ -248,6 +182,72 @@
     <ClInclude Include="Database\DatabaseVariableSet.h">
       <Filter>Source Files\Database</Filter>
     </ClInclude>
+    <ClInclude Include="Concurrency\MailboxInterfaces.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadKey.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadKeyManager.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadSubject.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessBase.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessConstants.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessExecutionContext.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessInterface.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessMailbox.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessMessageFrame.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessStatics.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\ExchangeMailboxMessages.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\LoggingMessages.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\VirtualProcessManagementMessages.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\VirtualProcessMessage.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ManagedVirtualProcessInterface.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\VirtualProcessMessageHandler.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\VirtualProcessMessageHandlerBase.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LoggingVirtualProcess.h">
+      <Filter>Source Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\ConcurrentQueueInterface.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\LockingConcurrentQueue.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\TBBConcurrentQueue.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -262,9 +262,6 @@
     <ClCompile Include="Concurrency\ConcurrencyManager.cpp">
       <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\LoggingThread.cpp">
-      <Filter>Source Files\Logging</Filter>
-    </ClCompile>
     <ClCompile Include="Logging\LogInterface.cpp">
       <Filter>Source Files\Logging</Filter>
     </ClCompile>
@@ -273,36 +270,6 @@
     </ClCompile>
     <ClCompile Include="Time\TimeKeeper.cpp">
       <Filter>Source Files\Time</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadMessages\ExchangeInterfaceMessages.cpp">
-      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadMessages\ThreadManagementMessages.cpp">
-      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadConnection.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadInterfaces.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadKey.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadMessageFrame.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadTaskBase.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadStatics.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadKeyManager.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadMessages\LoggingMessages.cpp">
-      <Filter>Source Files\Concurrency\ThreadMessages</Filter>
     </ClCompile>
     <ClCompile Include="StructuredExceptionHandler.cpp">
       <Filter>Source Files</Filter>
@@ -351,6 +318,39 @@
     </ClCompile>
     <ClCompile Include="Database\ODBCImplementation\ODBCFactory.cpp">
       <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\MailboxInterfaces.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadKey.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadKeyManager.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\VirtualProcessBase.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\VirtualProcessMailbox.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\VirtualProcessMessageFrame.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\VirtualProcessStatics.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\Messaging\ExchangeMailboxMessages.cpp">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\Messaging\LoggingMessages.cpp">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\Messaging\VirtualProcessManagementMessages.cpp">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LoggingVirtualProcess.cpp">
+      <Filter>Source Files\Logging</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

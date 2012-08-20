@@ -26,7 +26,7 @@
 
 #include "ThreadKey.h"
 #include "ThreadSubject.h"
-#include "ThreadConstants.h"
+#include "VirtualProcessConstants.h"
 
 /**********************************************************************************************************************
 	CThreadKeyManager::CThreadKeyManager -- default constructor

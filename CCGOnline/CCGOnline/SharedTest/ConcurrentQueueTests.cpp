@@ -22,13 +22,13 @@
 
 #include "stdafx.h"
 
-#include "Concurrency/Containers/ConcurrentQueue.h"
-#include "Concurrency/ThreadMessages/LoggingMessages.h"
-#include "Concurrency/ThreadConstants.h"
+#include "Concurrency/Containers/TBBConcurrentQueue.h"
+#include "Concurrency/Messaging/LoggingMessages.h"
+#include "Concurrency/VirtualProcessConstants.h"
 
 TEST( ConcurrentQueueTests, Add_Remove )
 {
-	IConcurrentQueueBase< int > *int_queue = new CConcurrentQueue< int >();
+	IConcurrentQueue< int > *int_queue = new CTBBConcurrentQueue< int >();
 
 	int_queue->Add_Item( 5 );
 	int_queue->Add_Item( 10 );
@@ -49,7 +49,7 @@ static const std::wstring LOG_MESSAGE_2( L"Log Message 2" );
 
 TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr )
 {
-	IConcurrentQueueBase< shared_ptr< const CLogRequestMessage > > *message_queue = new CConcurrentQueue< shared_ptr< const CLogRequestMessage > >();
+	IConcurrentQueue< shared_ptr< const CLogRequestMessage > > *message_queue = new CTBBConcurrentQueue< shared_ptr< const CLogRequestMessage > >();
 
 	{
 		shared_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_MESSAGE_1 ) );

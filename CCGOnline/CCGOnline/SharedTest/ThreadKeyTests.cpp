@@ -23,7 +23,7 @@
 #include "stdafx.h"
 
 #include "Concurrency/ThreadKey.h"
-#include "Concurrency/ThreadConstants.h"
+#include "Concurrency/VirtualProcessConstants.h"
 
 TEST( ThreadKeyTests, Constructors )
 {

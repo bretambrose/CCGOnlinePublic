@@ -1,7 +1,8 @@
 /**********************************************************************************************************************
 
-	Shared.cpp
-		Component containing initialization and shutdown entry points for the Shared library
+	VirtualProcessMailbox.cpp
+		A component definining the class that holds both the read and write interfaces of a virtual process mailbox.  Only the
+		manager has access to this.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,46 +23,35 @@
 
 #include "stdafx.h"
 
-#include "Shared.h"
+#include "VirtualProcessMailbox.h"
 
-#include "Logging/LogInterface.h"
-#include "StructuredExceptionHandler.h"
-#include "Concurrency/VirtualProcessStatics.h"
-#include "PlatformTime.h"
-#include "PlatformProcess.h"
-#include "GeneratedCode/RegisterSharedEnums.h"
-#include "SharedXMLSerializerRegistration.h"
-#include "XML/XMLSerializationRegistrar.h"
-#include "SlashCommands/SlashCommandManager.h"
+#include "MailboxInterfaces.h"
+#include "Concurrency/Containers/TBBConcurrentQueue.h"
+#include "VirtualProcessMessageFrame.h"
+
+// Controls which concurrent queue implementation we use
+typedef CTBBConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > ProcessToProcessQueueType;
 
 /**********************************************************************************************************************
-	NShared::Initialize -- Initializes all the static process-wide systems in the Shared library
+	CVirtualProcessMailbox::CVirtualProcessMailbox -- constructor
 
+		key -- thread key of the thread these interfaces correspond to
+					
 **********************************************************************************************************************/
-void NShared::Initialize( void )
+CVirtualProcessMailbox::CVirtualProcessMailbox( const SThreadKey &key ) :
+	Key( key ),
+	Queue( new ProcessToProcessQueueType ),
+	WriteOnlyMailbox( new CWriteOnlyMailbox( key, Queue ) ),
+	ReadOnlyMailbox( new CReadOnlyMailbox( Queue ) )
 {
-	CAssertSystem::Initialize( DLogFunctionType( CLogInterface::Log ) );
-	CStructuredExceptionHandler::Initialize();
-	CLogInterface::Initialize_Static( NPlatform::Get_Service_Name(), LL_LOW );
-	CVirtualProcessStatics::Initialize();
-	CPlatformTime::Initialize();	// does not have a corresponding shutdown function
-
-	Register_Shared_Enums();
-	Register_Shared_XML_Serializers();
-
-	CSlashCommandManager::Initialize();
 }
 
 /**********************************************************************************************************************
-	NShared::Shutdown -- Shuts down and cleans up all the static process-wide systems in the Shared library
-
+	CVirtualProcessMailbox::~CVirtualProcessMailbox -- destructor
+					
 **********************************************************************************************************************/
-void NShared::Shutdown( void )
+CVirtualProcessMailbox::~CVirtualProcessMailbox()
 {
-	CSlashCommandManager::Shutdown();
-	CXMLSerializationRegistrar::Shutdown();
-	CVirtualProcessStatics::Shutdown();
-	CLogInterface::Shutdown_Static();
-	CStructuredExceptionHandler::Shutdown();
-	CAssertSystem::Shutdown();
 }
+
+

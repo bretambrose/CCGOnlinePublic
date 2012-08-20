@@ -142,8 +142,11 @@ class TPriorityQueue {
 			MovementPolicy::Set_Index( Elements[ count ], 0 );
 			Elements.pop_back();
 
-			Heapify_Push_Up( index );
-			Heapify_Push_Down( index );
+			if ( index != count )
+			{
+				Heapify_Push_Up( index );
+				Heapify_Push_Down( index );
+			}
 		}
 		
 		// Stores a copy of the top element into an output parameter

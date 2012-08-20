@@ -27,9 +27,9 @@
 
 #include <sstream>
 
-#include "LoggingThread.h"
-#include "Concurrency/ThreadStatics.h"
-#include "Concurrency/ThreadTaskInterface.h"
+#include "LoggingVirtualProcess.h"
+#include "Concurrency/VirtualProcessStatics.h"
+#include "Concurrency/VirtualProcessInterface.h"
 #include "Concurrency/ConcurrencyManager.h"
 #include "PlatformTime.h"
 #include "PlatformFileSystem.h"
@@ -37,7 +37,7 @@
 
 // Static class data member definitions
 ISimplePlatformMutex *CLogInterface::LogLock( nullptr );
-shared_ptr< IManagerThreadTask > CLogInterface::LogThread( nullptr );
+shared_ptr< IManagedVirtualProcess > CLogInterface::LogProcess( nullptr );
 
 ELogLevel CLogInterface::LogLevel( LL_LOW );
 std::wstring CLogInterface::ServiceName( L"" );
@@ -140,7 +140,7 @@ void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 		}
 	}
 
-	LogThread.reset( new CLoggingThreadTask );
+	LogProcess.reset( new CLoggingVirtualProcess );
 
 	DynamicInitialized = true;
 }
@@ -157,50 +157,50 @@ void CLogInterface::Shutdown_Dynamic( void )
 	{
 		CSimplePlatformMutexLocker lock( LogLock );
 
-		LogThread = nullptr;
+		LogProcess = nullptr;
 
 		DynamicInitialized = false;
 	}
 }
 
 /**********************************************************************************************************************
-	CLogInterface::Service_Logging -- invoke the logging thread to actually perform logging
+	CLogInterface::Service_Logging -- invoke the logging process to actually perform logging
 	
 		current_time -- current time in seconds
 		context -- execution context that the log thread should use
 		
 **********************************************************************************************************************/
-void CLogInterface::Service_Logging( double current_time, const CThreadTaskExecutionContext &context )
+void CLogInterface::Service_Logging( double current_time, const CVirtualProcessExecutionContext &context )
 {
 	CSimplePlatformMutexLocker lock( LogLock );
 
-	if ( LogThread.get() != nullptr )
+	if ( LogProcess.get() != nullptr )
 	{
-		IThreadTask *old_task = CThreadStatics::Get_Current_Thread_Task();
+		IVirtualProcess *old_process = CVirtualProcessStatics::Get_Current_Virtual_Process();
 
-		CThreadStatics::Set_Current_Thread_Task( LogThread.get() );
-		LogThread->Service( current_time, context );
-		CThreadStatics::Set_Current_Thread_Task( old_task );
-		LogThread->Flush_Partitioned_Messages();
+		CVirtualProcessStatics::Set_Current_Virtual_Process( LogProcess.get() );
+		LogProcess->Service( current_time, context );
+		CVirtualProcessStatics::Set_Current_Virtual_Process( old_process );
+		LogProcess->Flush_System_Messages();
 	}
 }
 
 /**********************************************************************************************************************
-	CLogInterface::Log -- primary logging function; forwards text to the log thread to be logged
+	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
 	
 		message -- string to be logged
 		
 **********************************************************************************************************************/
 void CLogInterface::Log( const std::wstring &message )
 {
-	IThreadTask *thread_task = CThreadStatics::Get_Current_Thread_Task();
-	if ( thread_task != nullptr )
+	IVirtualProcess *virtual_process = CVirtualProcessStatics::Get_Current_Virtual_Process();
+	if ( virtual_process != nullptr )
 	{
-		thread_task->Log( message );
+		virtual_process->Log( message );
 		return;
 	}
 
-	CConcurrencyManager *manager = CThreadStatics::Get_Concurrency_Manager();
+	CConcurrencyManager *manager = CVirtualProcessStatics::Get_Concurrency_Manager();
 	if ( manager != nullptr )
 	{
 		manager->Log( message );

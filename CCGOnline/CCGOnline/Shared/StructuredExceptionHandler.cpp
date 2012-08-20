@@ -29,11 +29,11 @@
 #include <iostream>
 #include "PlatformExceptionHandler.h"
 #include "Logging/LogInterface.h"
-#include "Concurrency/ThreadTaskExecutionContext.h"
+#include "Concurrency/VirtualProcessExecutionContext.h"
 #include "Concurrency/ThreadKey.h"
-#include "Concurrency/ThreadStatics.h"
-#include "Concurrency/ThreadTaskInterface.h"
-#include "Concurrency/ThreadConstants.h"
+#include "Concurrency/VirtualProcessStatics.h"
+#include "Concurrency/VirtualProcessInterface.h"
+#include "Concurrency/VirtualProcessConstants.h"
 #include "StructuredExceptionInfo.h"
 #include "PlatformFileSystem.h"
 #include "PlatformMisc.h"
@@ -82,7 +82,7 @@ void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredE
 {
 	// If the exception is in the scope of a thread task, record that fact
 	SThreadKey key( INVALID_THREAD_KEY );
-	IThreadTask *task = CThreadStatics::Get_Current_Thread_Task();
+	IVirtualProcess *task = CVirtualProcessStatics::Get_Current_Virtual_Process();
 	if ( task != nullptr )
 	{
 		key = task->Get_Key();
@@ -91,7 +91,7 @@ void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredE
 	shared_exception_info.Set_Thread_Key( key.Get_Key() );
 
 	// Flush all logging info to disk (by using a null context); global log mutex serializes access
-	CThreadTaskExecutionContext context( nullptr );
+	CVirtualProcessExecutionContext context( nullptr );
 	CLogInterface::Service_Logging( 0.0, context );
 
 	// Write a file containing the exception details

@@ -26,60 +26,60 @@
 #include <iostream>
 
 #include "Logging/LogInterface.h"
-#include "Logging/LoggingThread.h"
-#include "Concurrency/ThreadConnection.h"
-#include "Concurrency/ThreadConstants.h"
-#include "Concurrency/ThreadInterfaces.h"
-#include "Concurrency/ThreadMessageFrame.h"
-#include "Concurrency/ThreadMessages/ExchangeInterfaceMessages.h"
-#include "Concurrency/ThreadMessages/LoggingMessages.h"
-#include "Concurrency/ThreadMessages/ThreadManagementMessages.h"
+#include "Logging/LoggingVirtualProcess.h"
+#include "Concurrency/VirtualProcessMailbox.h"
+#include "Concurrency/VirtualProcessConstants.h"
+#include "Concurrency/MailboxInterfaces.h"
+#include "Concurrency/VirtualProcessMessageFrame.h"
+#include "Concurrency/Messaging/ExchangeMailboxMessages.h"
+#include "Concurrency/Messaging/LoggingMessages.h"
+#include "Concurrency/Messaging/VirtualProcessManagementMessages.h"
 #include "Concurrency/ThreadSubject.h"
-#include "Concurrency/ThreadTaskExecutionContext.h"
-#include "Concurrency/ThreadStatics.h"
+#include "Concurrency/VirtualProcessExecutionContext.h"
+#include "Concurrency/VirtualProcessStatics.h"
 #include "tbb/task.h"
 #include "Time/TimeType.h"
 #include "PlatformFileSystem.h"
 
-class CLoggingThreadTester
+class CLoggingVirtualProcessTester
 {
 	public:
 
-		CLoggingThreadTester( void ) :
-			LoggingThread( nullptr ),
-			LoggingConnection( nullptr )
+		CLoggingVirtualProcessTester( void ) :
+			LoggingVirtualProcess( nullptr ),
+			LoggingMailbox( nullptr )
 		{
-			LoggingThread = static_pointer_cast< CLoggingThreadTask >( CLogInterface::Get_Logging_Thread() );
+			LoggingVirtualProcess = static_pointer_cast< CLoggingVirtualProcess >( CLogInterface::Get_Logging_Process() );
 		}
 
-		~CLoggingThreadTester()
+		~CLoggingVirtualProcessTester()
 		{
-			LoggingThread = nullptr;
+			LoggingVirtualProcess = nullptr;
 		}
 
 		void Initialize( void )
 		{
-			LoggingThread->Initialize();
-			LoggingConnection.reset( new CThreadConnection( LOG_THREAD_KEY ) );
-			LoggingThread->Set_Read_Interface( LoggingConnection->Get_Reader_Interface() );
+			LoggingVirtualProcess->Initialize();
+			LoggingMailbox.reset( new CVirtualProcessMailbox( LOG_THREAD_KEY ) );
+			LoggingVirtualProcess->Set_My_Mailbox( LoggingMailbox->Get_Readable_Mailbox() );
 		}
 
 		void Service( void )
 		{
 			tbb::task *task = reinterpret_cast< tbb::task * >( 1 );
-			CThreadTaskExecutionContext context( task );
+			CVirtualProcessExecutionContext context( task );
 			CLogInterface::Service_Logging( 0.0, context );
 		}
 
-		shared_ptr< CWriteOnlyThreadInterface > Get_Write_Interface( void ) const { return LoggingConnection->Get_Writer_Interface(); }
+		shared_ptr< CWriteOnlyMailbox > Get_Writable_Mailbox( void ) const { return LoggingMailbox->Get_Writable_Mailbox(); }
 
-		shared_ptr< CLoggingThreadTask > Get_Logging_Thread( void ) const { return LoggingThread; }
+		shared_ptr< CLoggingVirtualProcess > Get_Logging_Virtual_Process( void ) const { return LoggingVirtualProcess; }
 
 	private:
 
-		shared_ptr< CLoggingThreadTask > LoggingThread;
+		shared_ptr< CLoggingVirtualProcess > LoggingVirtualProcess;
 
-		shared_ptr< CThreadConnection > LoggingConnection;
+		shared_ptr< CVirtualProcessMailbox > LoggingMailbox;
 };
 
 static const std::wstring LOG_FILE_PATTERN( L"Logs\\*.txt" );
@@ -147,25 +147,25 @@ TEST_F( LoggingTests, Direct_Logging )
 
 	ASSERT_TRUE( file_names.size() == 0 );
 
-	CLoggingThreadTester log_tester;
+	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
 
-	shared_ptr< CThreadMessageFrame > ai_frame( new CThreadMessageFrame( AI_KEY ) );
-	ai_frame->Add_Message( shared_ptr< const IThreadMessage >( new CLogRequestMessage( AI_KEY, LOG_TEST_MESSAGE ) ) );
-	ai_frame->Add_Message( shared_ptr< const IThreadMessage >( new CLogRequestMessage( AI_KEY, LOG_TEST_MESSAGE ) ) );
-	log_tester.Get_Write_Interface()->Add_Frame( ai_frame );
+	shared_ptr< CVirtualProcessMessageFrame > ai_frame( new CVirtualProcessMessageFrame( AI_KEY ) );
+	ai_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( AI_KEY, LOG_TEST_MESSAGE ) ) );
+	ai_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( AI_KEY, LOG_TEST_MESSAGE ) ) );
+	log_tester.Get_Writable_Mailbox()->Add_Frame( ai_frame );
 
-	shared_ptr< CThreadMessageFrame > manager_frame( new CThreadMessageFrame( MANAGER_THREAD_KEY ) );
-	manager_frame->Add_Message( shared_ptr< const IThreadMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_TEST_MESSAGE ) ) );
-	log_tester.Get_Write_Interface()->Add_Frame( manager_frame );
+	shared_ptr< CVirtualProcessMessageFrame > manager_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	manager_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_TEST_MESSAGE ) ) );
+	log_tester.Get_Writable_Mailbox()->Add_Frame( manager_frame );
 
-	shared_ptr< CThreadMessageFrame > db_frame( new CThreadMessageFrame( DB_KEY ) );
-	db_frame->Add_Message( shared_ptr< const IThreadMessage >( new CLogRequestMessage( DB_KEY, LOG_TEST_MESSAGE ) ) );
-	log_tester.Get_Write_Interface()->Add_Frame( db_frame );
+	shared_ptr< CVirtualProcessMessageFrame > db_frame( new CVirtualProcessMessageFrame( DB_KEY ) );
+	db_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( DB_KEY, LOG_TEST_MESSAGE ) ) );
+	log_tester.Get_Writable_Mailbox()->Add_Frame( db_frame );
 
-	shared_ptr< CThreadMessageFrame > shutdown_frame( new CThreadMessageFrame( MANAGER_THREAD_KEY ) );
-	shutdown_frame->Add_Message( shared_ptr< const IThreadMessage >( new CShutdownThreadRequest( false ) ) );
-	log_tester.Get_Write_Interface()->Add_Frame( shutdown_frame );
+	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	log_tester.Service();
 
@@ -178,13 +178,13 @@ TEST_F( LoggingTests, Direct_Logging )
 	}
 }
 
-class CDummyThread : public CThreadTaskBase
+class CDummyProcess : public CVirtualProcessBase
 {
 	public:
 		
-		typedef CThreadTaskBase BASECLASS;
+		typedef CVirtualProcessBase BASECLASS;
 
-		CDummyThread( const SThreadKey &key ) :
+		CDummyProcess( const SThreadKey &key ) :
 			BASECLASS( key )
 		{}
 
@@ -202,35 +202,35 @@ TEST_F( LoggingTests, Static_Logging )
 
 	CLogInterface::Set_Log_Level( LL_HIGH );
 
-	CLoggingThreadTester log_tester;
+	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
 
-	shared_ptr< CDummyThread > dummy_thread( new CDummyThread( AI_KEY ) );
-	dummy_thread->Initialize();
+	shared_ptr< CDummyProcess > dummy_process( new CDummyProcess( AI_KEY ) );
+	dummy_process->Initialize();
 
-	shared_ptr< CThreadConnection > dummy_connection( new CThreadConnection( AI_KEY ) );
-	dummy_thread->Set_Read_Interface( dummy_connection->Get_Reader_Interface() );
+	shared_ptr< CVirtualProcessMailbox > dummy_mailbox( new CVirtualProcessMailbox( AI_KEY ) );
+	dummy_process->Set_My_Mailbox( dummy_mailbox->Get_Readable_Mailbox() );
 
-	shared_ptr< CThreadMessageFrame > manager_frame( new CThreadMessageFrame( MANAGER_THREAD_KEY ) );
-	manager_frame->Add_Message( shared_ptr< const IThreadMessage >( new CAddInterfaceMessage( LOG_THREAD_KEY, log_tester.Get_Write_Interface() ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > manager_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	manager_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, log_tester.Get_Writable_Mailbox() ) ) );
 
-	dummy_connection->Get_Writer_Interface()->Add_Frame( manager_frame );
+	dummy_mailbox->Get_Writable_Mailbox()->Add_Frame( manager_frame );
 
-	CThreadStatics::Set_Current_Thread_Task( dummy_thread.get() );
+	CVirtualProcessStatics::Set_Current_Virtual_Process( dummy_process.get() );
 
-	CThreadTaskExecutionContext context( nullptr );
-	dummy_thread->Service( 0.0, context );
+	CVirtualProcessExecutionContext context( nullptr );
+	dummy_process->Service( 0.0, context );
 
 	LOG( LL_HIGH, L"This is another test, but I have to end with " << LOG_TEST_MESSAGE );
 	LOG( LL_HIGH, L"test: " << 5 << LOG_TEST_MESSAGE );
 
-	CThreadStatics::Set_Current_Thread_Task( nullptr );
+	CVirtualProcessStatics::Set_Current_Virtual_Process( nullptr );
 
-	dummy_thread->Flush_Partitioned_Messages();
+	dummy_process->Flush_System_Messages();
 
-	shared_ptr< CThreadMessageFrame > shutdown_frame( new CThreadMessageFrame( MANAGER_THREAD_KEY ) );
-	shutdown_frame->Add_Message( shared_ptr< const IThreadMessage >( new CShutdownThreadRequest( false ) ) );
-	log_tester.Get_Write_Interface()->Add_Frame( shutdown_frame );
+	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	log_tester.Service();
 
