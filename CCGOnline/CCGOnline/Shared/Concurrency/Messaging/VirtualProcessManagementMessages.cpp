@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	ThreadManagementMessages.h
+	VirtualProcessManagementMessages.h
 		A component containing definitions for messages that manage and/or control virtual processes
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -29,9 +29,9 @@
 /**********************************************************************************************************************
 	CAddNewVirtualProcessMessage::CAddNewVirtualProcessMessage -- constructor
 	
-		thread_task -- the thread to add to the conurrency system
-		return_interface -- should the manager return an interface to this new thread to the requesting thread?
-		forward_creator_interface -- should the manager forward the requesting thread's interface to the new thread?
+		virtual_process -- the process to add to the conurrency system
+		return_interface -- should the manager return an interface to this new process to the requesting thread?
+		forward_creator_interface -- should the manager forward the requesting process's interface to the new process?
 		
 **********************************************************************************************************************/
 CAddNewVirtualProcessMessage::CAddNewVirtualProcessMessage( const shared_ptr< IVirtualProcess > &virtual_process, bool return_mailbox, bool forward_creator_mailbox ) :

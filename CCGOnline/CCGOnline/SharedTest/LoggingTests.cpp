@@ -40,6 +40,7 @@
 #include "tbb/task.h"
 #include "Time/TimeType.h"
 #include "PlatformFileSystem.h"
+#include "Concurrency/VirtualProcessID.h"
 
 class CLoggingVirtualProcessTester
 {
@@ -59,7 +60,7 @@ class CLoggingVirtualProcessTester
 
 		void Initialize( void )
 		{
-			LoggingVirtualProcess->Initialize();
+			LoggingVirtualProcess->Initialize( EVirtualProcessID::LOGGING );
 			LoggingMailbox.reset( new CVirtualProcessMailbox( LOG_THREAD_KEY ) );
 			LoggingVirtualProcess->Set_My_Mailbox( LoggingMailbox->Get_Readable_Mailbox() );
 		}
@@ -206,7 +207,7 @@ TEST_F( LoggingTests, Static_Logging )
 	log_tester.Initialize();
 
 	shared_ptr< CDummyProcess > dummy_process( new CDummyProcess( AI_KEY ) );
-	dummy_process->Initialize();
+	dummy_process->Initialize( EVirtualProcessID::FIRST_FREE_ID );
 
 	shared_ptr< CVirtualProcessMailbox > dummy_mailbox( new CVirtualProcessMailbox( AI_KEY ) );
 	dummy_process->Set_My_Mailbox( dummy_mailbox->Get_Readable_Mailbox() );

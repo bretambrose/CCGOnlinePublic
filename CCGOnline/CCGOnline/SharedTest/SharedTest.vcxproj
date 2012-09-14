@@ -198,6 +198,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp" />
     <ClCompile Include="LoggingTests.cpp" />
     <ClCompile Include="PriorityQueueTests.cpp" />
+    <ClCompile Include="ProcessPropertiesTests.cpp" />
     <ClCompile Include="ReflectionTests.cpp" />
     <ClCompile Include="SharedTest.cpp" />
     <ClCompile Include="SlashCommandTests.cpp" />
@@ -208,8 +209,6 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TaskSchedulerTests.cpp" />
-    <ClCompile Include="ThreadKeyManagerTests.cpp" />
-    <ClCompile Include="ThreadKeyTests.cpp" />
     <ClCompile Include="TimeTests.cpp" />
     <ClCompile Include="VirtualProcessMailboxTests.cpp" />
     <ClCompile Include="VirtualProcessMessageFrameTests.cpp" />

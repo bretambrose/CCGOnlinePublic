@@ -27,15 +27,19 @@
 
 #include "MessageHandler.h"
 
-struct SThreadKey;
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
+
 class IVirtualProcessMessage;
 
 // A simple base class for all thread message handlers
-class IVirtualProcessMessageHandler : public IMessageHandler< SThreadKey, IVirtualProcessMessage >
+class IVirtualProcessMessageHandler : public IMessageHandler< EVirtualProcessID::Enum, IVirtualProcessMessage >
 {
 	public:
 
-		typedef IMessageHandler< SThreadKey, IVirtualProcessMessage > BASECLASS;
+		typedef IMessageHandler< EVirtualProcessID::Enum, IVirtualProcessMessage > BASECLASS;
 
 		IVirtualProcessMessageHandler( void ) :
 			BASECLASS()

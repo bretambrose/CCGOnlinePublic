@@ -25,7 +25,12 @@
 
 #include "VirtualProcessMessage.h"
 
-#include "Concurrency\ThreadKey.h"
+#include "Concurrency/VirtualProcessProperties.h"
+
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
 
 // A message asking the logging thread to write some information to a file
 class CLogRequestMessage : public IVirtualProcessMessage
@@ -34,19 +39,17 @@ class CLogRequestMessage : public IVirtualProcessMessage
 
 		typedef IVirtualProcessMessage BASECLASS;
 
-		CLogRequestMessage( const SThreadKey &source_key, const std::wstring &message );
+		CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message );
 		virtual ~CLogRequestMessage() {}
 
-		const SThreadKey &Get_Source_Key( void ) const { return SourceKey; }
+		const SProcessProperties &Get_Source_Properties( void ) const { return SourceProperties; }
 		const std::wstring &Get_Message( void ) const { return Message; }
 		uint64 Get_Time( void ) const { return Time; }
 
 	private:
 
-		SThreadKey SourceKey;
-
+		SProcessProperties SourceProperties;
 		std::wstring Message;
-
 		uint64 Time;
 };
 

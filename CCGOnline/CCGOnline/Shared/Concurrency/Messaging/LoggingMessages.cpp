@@ -25,16 +25,17 @@
 #include "LoggingMessages.h"
 
 #include "PlatformTime.h"
+#include "Concurrency/VirtualProcessProperties.h"
 
 /**********************************************************************************************************************
 	CLogRequestMessage::CLogRequestMessage -- constructor
 	
-		key -- key of the thread making a log request
-		message -- what to write to the thread's log file
+		source_properties -- properties of the requesting process
+		message -- what to write to the process's log file
 		
 **********************************************************************************************************************/
-CLogRequestMessage::CLogRequestMessage( const SThreadKey &source_key, const std::wstring &message ) :
-	SourceKey( source_key ),
+CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message ) :
+	SourceProperties( source_properties ),
 	Message( message ),
 	Time( CPlatformTime::Get_Raw_Time() )
 {

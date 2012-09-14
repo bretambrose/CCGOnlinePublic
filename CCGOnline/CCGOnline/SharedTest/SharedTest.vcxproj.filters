@@ -37,9 +37,6 @@
     <ClCompile Include="SharedTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadKeyTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PriorityQueueTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,9 +50,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConcurrencyManagerTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ThreadKeyManagerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LoggingTests.cpp">
@@ -89,6 +83,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VirtualProcessTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessPropertiesTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -24,31 +24,37 @@
 #ifndef VIRTUAL_PROCESS_MAILBOX_H
 #define VIRTUAL_PROCESS_MAILBOX_H
 
-#include "ThreadKey.h"
+#include "VirtualProcessProperties.h"
 
 class CWriteOnlyMailbox;
 class CReadOnlyMailbox;
 class CVirtualProcessMessageFrame;
 template < typename T > class IConcurrentQueue;
 
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
+
 // A class that holds both the read and write interfaces of a thread task
 class CVirtualProcessMailbox
 {
 	public:
 
-		CVirtualProcessMailbox( const SThreadKey &key );
+		CVirtualProcessMailbox( EVirtualProcessID::Enum process_id, const SProcessProperties &properties );
 		~CVirtualProcessMailbox();
 
 		const shared_ptr< CWriteOnlyMailbox > &Get_Writable_Mailbox( void ) const { return WriteOnlyMailbox; }
 		const shared_ptr< CReadOnlyMailbox > &Get_Readable_Mailbox( void ) const { return ReadOnlyMailbox; }
 
-		const SThreadKey &Get_Key( void ) const { return Key; }
+		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		const SProcessProperties &Get_Properties( void ) const { return Properties; }
 
 	private:
 		
-		SThreadKey Key;
+		EVirtualProcessID::Enum ProcessID;
 
-		shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > Queue;
+		SProcessProperties Properties;
 
 		shared_ptr< CWriteOnlyMailbox > WriteOnlyMailbox;
 		shared_ptr< CReadOnlyMailbox > ReadOnlyMailbox;

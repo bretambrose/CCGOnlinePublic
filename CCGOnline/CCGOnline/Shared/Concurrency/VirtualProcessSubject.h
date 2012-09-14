@@ -1,9 +1,8 @@
 /**********************************************************************************************************************
 
-	MessageHandler.h
-		A component defining a top-level base class for objects that handle a set of related message classes.  In 
-		practice these objects are simple trampolines that forward handling to a delegate while retaining type safety 
-		and generic behavior.
+	VirtualProcessSubject.h
+		A component containing the type enumerating different virtual process subjects.  The subject is the high-level
+		logical role of the process.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,19 +21,20 @@
 
 **********************************************************************************************************************/
 
-#ifndef MESSAGE_HANDLER_H
-#define MESSAGE_HANDLER_H
+#ifndef VIRTUAL_PROCESS_SUBJECT_H
+#define VIRTUAL_PROCESS_SUBJECT_H
 
-// A simple base class for all message handlers
-template< typename MessageSourceType, typename MessageBaseType >
-class IMessageHandler
+namespace EVirtualProcessSubject
 {
-	public:
+	enum Enum
+	{
+		INVALID = 0,
 
-		IMessageHandler( void ) {}
-		virtual ~IMessageHandler() {}
+		CONCURRENCY_MANAGER,
+		LOGGING,
 
-		virtual void Handle_Message( MessageSourceType source, const shared_ptr< const MessageBaseType > &message ) const = 0;
-};
+	};
+}
 
-#endif // MESSAGE_HANDLER_H
+
+#endif // VIRTUAL_PROCESS_SUBJECT_H

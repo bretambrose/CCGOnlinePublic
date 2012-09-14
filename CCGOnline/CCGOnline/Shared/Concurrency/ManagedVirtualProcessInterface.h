@@ -47,9 +47,8 @@ class IManagedVirtualProcess : public IVirtualProcess
 
 		virtual ~IManagedVirtualProcess() {}
 
-		virtual void Set_Key( const SThreadKey &key ) = 0;
-
-		virtual void Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &write_interface ) = 0;
+		virtual void Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;
+		virtual void Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;
 		virtual void Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &read_interface ) = 0;
 
 		virtual void Cleanup( void ) = 0;

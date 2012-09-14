@@ -1,8 +1,8 @@
 /**********************************************************************************************************************
 
 	ExchangeInterfaceMessages.cpp
-		A component containing definitions for messages that are needed to exchange virtual process mailboxes
-		between threads
+		A component containing definitions for messages that are needed to exchange mailboxes
+		between virtual processes
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -25,21 +25,15 @@
 
 #include "ExchangeMailboxMessages.h"
 
-#include "Concurrency/ThreadSubject.h"
 #include "Concurrency/MailboxInterfaces.h"
-#include "Concurrency/VirtualProcessConstants.h"
-
-// Defined in a cpp file in order to keep dependencies out of the header file
 
 /**********************************************************************************************************************
 	CAddMailboxMessage::CAddMailboxMessage -- constructor
 	
-		key -- thread key the supplied interface corresponds to
-		write_interface -- a write-only message passing interface to a thread task
+		write_interface -- a write-only message passing interface to a process
 		
 **********************************************************************************************************************/
-CAddMailboxMessage::CAddMailboxMessage( const SThreadKey &key, const shared_ptr< CWriteOnlyMailbox > &mailbox ) :
-	Key( key ),
+CAddMailboxMessage::CAddMailboxMessage( const shared_ptr< CWriteOnlyMailbox > &mailbox ) :
 	Mailbox( mailbox )
 {
 }

@@ -26,7 +26,12 @@
 class CTaskScheduler;
 class IVirtualProcessMessage;
 
-struct SThreadKey;
+struct SProcessProperties;
+
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
 
 // Pure virtual interface for all virtual processes
 class IVirtualProcess
@@ -36,11 +41,12 @@ class IVirtualProcess
 		IVirtualProcess( void ) {}
 		virtual ~IVirtualProcess() {}
 
-		virtual void Initialize( void ) = 0;
+		virtual void Initialize( EVirtualProcessID::Enum id ) = 0;
 
-		virtual const SThreadKey &Get_Key( void ) const = 0;
+		virtual const SProcessProperties &Get_Properties( void ) const = 0;
+		virtual EVirtualProcessID::Enum Get_ID( void ) const = 0;
 
-		virtual void Send_Virtual_Process_Message( const SThreadKey &dest_key, const shared_ptr< const IVirtualProcessMessage > &message ) = 0;
+		virtual void Send_Virtual_Process_Message( EVirtualProcessID::Enum destination_id, const shared_ptr< const IVirtualProcessMessage > &message ) = 0;
 		virtual void Log( const std::wstring &message ) = 0;
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const = 0;

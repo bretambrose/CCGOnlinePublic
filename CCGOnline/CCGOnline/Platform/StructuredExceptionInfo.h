@@ -66,8 +66,8 @@ class CStructuredExceptionInfo
 
 		// Public interface
 		// Accessors
-		uint64 Get_Thread_Key( void ) const { return ThreadKey; }
-		void Set_Thread_Key( uint64 thread_key ) { ThreadKey = thread_key; }
+		uint64 Get_Process_ID( void ) const { return ProcessID; }
+		void Set_Process_ID( uint64 process_id ) { ProcessID = process_id; }
 
 		void Add_Frame( const CStackFrame &frame ) { CallStack.push_back( frame ); }
 		const std::vector< CStackFrame > &Get_Call_Stack( void ) const { return CallStack; }
@@ -84,7 +84,7 @@ class CStructuredExceptionInfo
 	private:
 
 		// Private Data
-		uint64 ThreadKey;
+		uint64 ProcessID;
 
 		std::vector< CStackFrame > CallStack;
 

@@ -28,9 +28,10 @@
 #include <sstream>
 
 #include "LoggingVirtualProcess.h"
+#include "Concurrency/ConcurrencyManager.h"
 #include "Concurrency/VirtualProcessStatics.h"
 #include "Concurrency/VirtualProcessInterface.h"
-#include "Concurrency/ConcurrencyManager.h"
+#include "Concurrency/VirtualProcessSubject.h"
 #include "PlatformTime.h"
 #include "PlatformFileSystem.h"
 #include "SynchronizationPrimitives/PlatformMutex.h"
@@ -140,7 +141,7 @@ void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 		}
 	}
 
-	LogProcess.reset( new CLoggingVirtualProcess );
+	LogProcess.reset( new CLoggingVirtualProcess( SProcessProperties( EVirtualProcessSubject::LOGGING ) ) );
 
 	DynamicInitialized = true;
 }

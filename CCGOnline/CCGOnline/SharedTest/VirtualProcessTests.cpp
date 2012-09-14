@@ -33,10 +33,12 @@
 #include "Concurrency/Messaging/VirtualProcessManagementMessages.h"
 #include "Concurrency/Messaging/ExchangeMailboxMessages.h"
 #include "Concurrency/Messaging/LoggingMessages.h"
+#include "Concurrency/VirtualProcessID.h"
 #include "Time/TimeType.h"
 #include "TaskScheduler/ScheduledTask.h"
 #include "TaskScheduler/TaskScheduler.h"
 #include "Logging/LogInterface.h"
+
 
 class VirtualProcessTests : public testing::Test 
 {
@@ -74,7 +76,7 @@ class CVirtualProcessBaseTester
 		{
 			virtual_process->Set_Manager_Mailbox( ManagerProxy->Get_Writable_Mailbox() );
 			virtual_process->Set_My_Mailbox( SelfProxy->Get_Readable_Mailbox() );
-			virtual_process->Initialize();
+			virtual_process->Initialize( EVirtualProcessID::FIRST_FREE_ID );
 		}
 
 		~CVirtualProcessBaseTester()

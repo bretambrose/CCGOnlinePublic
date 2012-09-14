@@ -25,54 +25,52 @@
 #define EXCHANGE_INTERFACE_MESSAGES_H
 
 #include "VirtualProcessMessage.h"
-#include "Concurrency/ThreadKey.h"
+#include "Concurrency/VirtualProcessProperties.h"
 
 class CWriteOnlyMailbox;
 
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
+
 // Requests the interface to a thread tasks or set of thread tasks
-class CGetMailboxRequest : public IVirtualProcessMessage
+class CGetMailboxByPropertiesRequest : public IVirtualProcessMessage
 {
 	public:
 
 		typedef IVirtualProcessMessage BASECLASS;
 		
-		CGetMailboxRequest( const SThreadKey &source_key, const SThreadKey &target_key ) :
-			SourceKey( source_key ),
-			TargetKey( target_key )
+		CGetMailboxByPropertiesRequest( const SProcessProperties &target_properties ) :
+			TargetProperties( target_properties )
 		{}
 
-		virtual ~CGetMailboxRequest() {}
+		virtual ~CGetMailboxByPropertiesRequest() {}
 
-		const SThreadKey &Get_Source_Key( void ) const { return SourceKey; }
-		const SThreadKey &Get_Target_Key( void ) const { return TargetKey; }
+		const SProcessProperties &Get_Target_Properties( void ) const { return TargetProperties; }
 
 	private:
 
-		SThreadKey SourceKey;
-		SThreadKey TargetKey;
+		SProcessProperties TargetProperties;
 };
 
-// Requests that the interface of a thread task be pushed to another thread or set of threads
-class CPushMailboxRequest : public IVirtualProcessMessage
+class CGetMailboxByIDRequest : public IVirtualProcessMessage
 {
 	public:
 
 		typedef IVirtualProcessMessage BASECLASS;
 		
-		CPushMailboxRequest( const SThreadKey &source_key, const SThreadKey &target_key ) :
-			SourceKey( source_key ),
-			TargetKey( target_key )
+		CGetMailboxByIDRequest( EVirtualProcessID::Enum target_process_id ) :
+			TargetProcessID( target_process_id )
 		{}
 
-		virtual ~CPushMailboxRequest() {}
+		virtual ~CGetMailboxByIDRequest() {}
 
-		const SThreadKey &Get_Source_Key( void ) const { return SourceKey; }
-		const SThreadKey &Get_Target_Key( void ) const { return TargetKey; }
+		EVirtualProcessID::Enum Get_Target_Process_ID( void ) const { return TargetProcessID; }
 
 	private:
 
-		SThreadKey SourceKey;
-		SThreadKey TargetKey;
+		EVirtualProcessID::Enum TargetProcessID;
 };
 
 // Tells a thread task about an interface to another thread task
@@ -82,16 +80,13 @@ class CAddMailboxMessage : public IVirtualProcessMessage
 		
 		typedef IVirtualProcessMessage BASECLASS;
 
-		CAddMailboxMessage( const SThreadKey &key, const shared_ptr< CWriteOnlyMailbox > &mailbox );
+		CAddMailboxMessage( const shared_ptr< CWriteOnlyMailbox > &mailbox );
 
 		virtual ~CAddMailboxMessage();
 
 		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( void ) const { return Mailbox; }
-		const SThreadKey &Get_Key( void ) const { return Key; }
 
 	private:
-
-		SThreadKey Key;
 
 		shared_ptr< CWriteOnlyMailbox > Mailbox;
 };

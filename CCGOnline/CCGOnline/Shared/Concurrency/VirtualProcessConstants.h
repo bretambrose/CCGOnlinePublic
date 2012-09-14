@@ -23,16 +23,10 @@
 #ifndef VIRTUAL_PROCESS_CONSTANTS_H
 #define VIRTUAL_PROCESS_CONSTANTS_H
 
-#include "ThreadSubject.h"
-#include "ThreadKey.h"
+#include "VirtualProcessSubject.h"
+#include "VirtualProcessProperties.h"
 
-static const uint16 MINOR_KEY_ALL = 0;
-static const uint16 MAJOR_KEY_ALL = 0;
-static const uint16 INVALID_SUB_KEY = 0;
-
-static const SThreadKey LOG_THREAD_KEY( TS_LOGGING, 1, 1 );
-static const SThreadKey MANAGER_THREAD_KEY( TS_CONCURRENCY_MANAGER, 1, 1 );
-static const SThreadKey ALL_THREAD_KEY( TS_ALL, MINOR_KEY_ALL, MAJOR_KEY_ALL );
-static const SThreadKey INVALID_THREAD_KEY( 0 );
+static const SProcessProperties LOGGING_PROCESS_PROPERTIES( EVirtualProcessSubject::LOGGING );
+static const SProcessProperties MANAGER_PROCESS_PROPERTIES( EVirtualProcessSubject::CONCURRENCY_MANAGER );
 
 #endif // VIRTUAL_PROCESS_CONSTANTS_H

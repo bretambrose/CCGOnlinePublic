@@ -1,8 +1,7 @@
 /**********************************************************************************************************************
 
-	ThreadSubject.h
-		A component containing the type enumerating different thread task subjects.  The subject is the high-level
-		logical role of the thread.
+	VirtualProcessID.h
+		A component definining the enumerated ID type for virtual processes.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,24 +20,20 @@
 
 **********************************************************************************************************************/
 
-#ifndef THREAD_SUBJECT_H
-#define THREAD_SUBJECT_H
+#ifndef VIRTUAL_PROCESS_ID_H
+#define VIRTUAL_PROCESS_ID_H
 
-enum EThreadSubject
+namespace EVirtualProcessID
 {
-	TS_INVALID = 0,
-	TS_ALL = TS_INVALID,
+	enum Enum
+	{
+		INVALID = 0,
 
-	TS_CONCURRENCY_MANAGER,
-	TS_LOGIC,
-	TS_NETWORK_CONNECTION_MANAGER,
-	TS_NETWORK_CONNECTION_SET,
-	TS_AI,
-	TS_UI,
-	TS_DATABASE,
-	TS_LOGGING,
+		CONCURRENCY_MANAGER,
+		LOGGING,
 
-	TS_COUNT
-};
+		FIRST_FREE_ID
+	};
+}
 
-#endif // THREAD_SUBJECT_H
+#endif // VIRTUAL_PROCESS_ID_H

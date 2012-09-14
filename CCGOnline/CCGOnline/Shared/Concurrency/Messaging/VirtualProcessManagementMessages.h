@@ -24,12 +24,17 @@
 #define VIRTUAL_PROCESS_MANAGEMENT_MESSAGES_H
 
 #include "VirtualProcessMessage.h"
-#include "Concurrency/ThreadKey.h"
+#include "Concurrency/VirtualProcessProperties.h"
 
 class IVirtualProcess;
 
-// Thread -> Manager
-// Requests that a new thread be added to the concurrency system
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
+
+// Process -> Manager
+// Requests that a new process be added to the concurrency system
 class CAddNewVirtualProcessMessage : public IVirtualProcessMessage
 {
 	public:
@@ -51,96 +56,92 @@ class CAddNewVirtualProcessMessage : public IVirtualProcessMessage
 		bool ForwardCreatorMailbox;
 };
 
-// Thread -> Manager
-// Requests that a thread be rescheduled for execution
+// Process -> Manager
+// Requests that a process be rescheduled for execution
 class CRescheduleVirtualProcessMessage : public IVirtualProcessMessage
 {
 	public:
 
 		typedef IVirtualProcessMessage BASECLASS;
 		
-		CRescheduleVirtualProcessMessage( const SThreadKey &key, double reschedule_time ) :
-			Key( key ),
+		CRescheduleVirtualProcessMessage( double reschedule_time ) :
 			RescheduleTime( reschedule_time )
 		{}
 
 		virtual ~CRescheduleVirtualProcessMessage() {}
 
-		const SThreadKey &Get_Key( void ) const { return Key; }
 		double Get_Reschedule_Time( void ) const { return RescheduleTime; }
 
 	private:
 
-		SThreadKey Key;
-
 		double RescheduleTime;
 };
 
-// Manager -> thread
-// Tells a thread that another thread is going away soon, so stop using that thread's mailbox
+// Manager -> process
+// Tells a process that another process is going away soon, so stop using that process's mailbox
 class CReleaseMailboxRequest : public IVirtualProcessMessage
 {
 	public:
 		
 		typedef IVirtualProcessMessage BASECLASS;
 
-		CReleaseMailboxRequest( const SThreadKey &key ) :
-			Key( key )
+		CReleaseMailboxRequest( EVirtualProcessID::Enum process_id ) :
+			ProcessID( process_id )
 		{}
 
 		virtual ~CReleaseMailboxRequest() {}
 
-		const SThreadKey &Get_Key( void ) const { return Key; }
+		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
 	private:
 
-		SThreadKey Key;
+		EVirtualProcessID::Enum ProcessID;
 };
 
-// Thread -> Manager
-// Tells the manager that a thread has stopped using another virtual process's mailbox
+// Process -> Manager
+// Tells the manager that a process has stopped using another virtual process's mailbox
 class CReleaseMailboxResponse : public IVirtualProcessMessage
 {
 	public:
 		
 		typedef IVirtualProcessMessage BASECLASS;
 
-		CReleaseMailboxResponse( const SThreadKey &shutdown_key ) :
-			ShutdownKey( shutdown_key )
+		CReleaseMailboxResponse( EVirtualProcessID::Enum shutdown_process_id ) :
+			ShutdownProcessID( shutdown_process_id )
 		{}
 
 		virtual ~CReleaseMailboxResponse() {}
 
-		const SThreadKey &Get_Shutdown_Key( void ) const { return ShutdownKey; }
+		EVirtualProcessID::Enum Get_Shutdown_Process_ID( void ) const { return ShutdownProcessID; }
 
 	private:
 
-		SThreadKey ShutdownKey;
+		EVirtualProcessID::Enum ShutdownProcessID;
 };
 
-// Thread -> manager
-// Requests that the manager shut down another thread
+// Process -> manager
+// Requests that the manager shut down another process
 class CShutdownVirtualProcessMessage : public IVirtualProcessMessage
 {
 	public:
 
 		typedef IVirtualProcessMessage BASECLASS;
 		
-		CShutdownVirtualProcessMessage( const SThreadKey &key ) :
-			Key( key )
+		CShutdownVirtualProcessMessage( EVirtualProcessID::Enum process_id ) :
+			ProcessID( process_id )
 		{}
 
 		virtual ~CShutdownVirtualProcessMessage() {}
 
-		const SThreadKey &Get_Key( void ) const { return Key; }
+		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
 	private:
 
-		SThreadKey Key;
+		EVirtualProcessID::Enum ProcessID;
 };
 
-// Manager -> thread
-// Tells a thread that it should shut down and clean up any internal state
+// Manager -> process
+// Tells a process that it should shut down and clean up any internal state
 class CShutdownSelfRequest : public IVirtualProcessMessage
 {
 	public:
@@ -160,8 +161,8 @@ class CShutdownSelfRequest : public IVirtualProcessMessage
 		bool IsHardShutdown;
 };
 
-// thread -> manager
-// Tells the manager that the sending thread has successfully shut down
+// Process -> manager
+// Tells the manager that the sending process has successfully shut down
 class CShutdownSelfResponse : public IVirtualProcessMessage
 {
 	public:
@@ -176,7 +177,7 @@ class CShutdownSelfResponse : public IVirtualProcessMessage
 
 };
 
-// Thread -> Manager
+// Process -> Manager
 // Requests the entire concurrency system to be shut down
 class CShutdownManagerMessage : public IVirtualProcessMessage
 {

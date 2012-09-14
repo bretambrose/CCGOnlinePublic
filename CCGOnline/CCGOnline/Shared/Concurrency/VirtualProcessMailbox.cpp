@@ -35,15 +35,20 @@ typedef CTBBConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > Process
 /**********************************************************************************************************************
 	CVirtualProcessMailbox::CVirtualProcessMailbox -- constructor
 
-		key -- thread key of the thread these interfaces correspond to
+		process_id -- id of the process these interfaces correspond to
+		properties -- properties of the owning process
 					
 **********************************************************************************************************************/
-CVirtualProcessMailbox::CVirtualProcessMailbox( const SThreadKey &key ) :
-	Key( key ),
-	Queue( new ProcessToProcessQueueType ),
-	WriteOnlyMailbox( new CWriteOnlyMailbox( key, Queue ) ),
-	ReadOnlyMailbox( new CReadOnlyMailbox( Queue ) )
+CVirtualProcessMailbox::CVirtualProcessMailbox( EVirtualProcessID::Enum process_id, const SProcessProperties &properties ) :
+	ProcessID( process_id ),
+	Properties( properties ),
+	WriteOnlyMailbox( nullptr ),
+	ReadOnlyMailbox( nullptr )
 {
+	shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > queue( new ProcessToProcessQueueType );
+
+	WriteOnlyMailbox.reset( new CWriteOnlyMailbox( process_id, properties, queue ) );
+	ReadOnlyMailbox.reset( new CReadOnlyMailbox( queue ) );
 }
 
 /**********************************************************************************************************************

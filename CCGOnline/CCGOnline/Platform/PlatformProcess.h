@@ -28,7 +28,7 @@ namespace NPlatform
 	std::wstring Get_Exe_Name( void );
 	std::wstring Get_Service_Name( void );
 
-	uint32 Get_Self_Process_ID( void );
+	uint32 Get_Self_PID( void );
 
 	void Sleep( uint32 milliseconds );
 }

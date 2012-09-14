@@ -30,10 +30,10 @@
 #include "PlatformExceptionHandler.h"
 #include "Logging/LogInterface.h"
 #include "Concurrency/VirtualProcessExecutionContext.h"
-#include "Concurrency/ThreadKey.h"
 #include "Concurrency/VirtualProcessStatics.h"
 #include "Concurrency/VirtualProcessInterface.h"
 #include "Concurrency/VirtualProcessConstants.h"
+#include "Concurrency/VirtualProcessID.h"
 #include "StructuredExceptionInfo.h"
 #include "PlatformFileSystem.h"
 #include "PlatformMisc.h"
@@ -81,14 +81,14 @@ void CStructuredExceptionHandler::Shutdown( void )
 void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredExceptionInfo &shared_exception_info )
 {
 	// If the exception is in the scope of a thread task, record that fact
-	SThreadKey key( INVALID_THREAD_KEY );
+	EVirtualProcessID::Enum process_id = EVirtualProcessID::INVALID;
 	IVirtualProcess *task = CVirtualProcessStatics::Get_Current_Virtual_Process();
 	if ( task != nullptr )
 	{
-		key = task->Get_Key();
+		process_id = task->Get_ID();
 	}
 
-	shared_exception_info.Set_Thread_Key( key.Get_Key() );
+	shared_exception_info.Set_Process_ID( process_id );
 
 	// Flush all logging info to disk (by using a null context); global log mutex serializes access
 	CVirtualProcessExecutionContext context( nullptr );
@@ -116,7 +116,7 @@ void CStructuredExceptionHandler::Write_Exception_File( const CStructuredExcepti
 
 	exception_file << L"******************** FATAL EXCEPTION ********************\n";
 	exception_file << L"Exception: " << shared_exception_info.Get_Exception_Message() << L"\n";
-	exception_file << L"ThreadKey: " << std::hex << shared_exception_info.Get_Thread_Key() << std::dec << L"\n";
+	exception_file << L"ConcurrentProcessID: " << std::hex << shared_exception_info.Get_Process_ID() << std::dec << L"\n";
 	exception_file << L"\nCallstack:\n";
 	
 	// Iterate the call stack and write out an info line for each frame
@@ -167,7 +167,7 @@ struct SLogFileSorter
 void CStructuredExceptionHandler::Archive_Logs( void )
 {
 	std::basic_ostringstream< wchar_t > archive_name_string;
-	archive_name_string << CLogInterface::Get_Archive_Path() << NPlatform::Get_Service_Name() << L"_" << NPlatform::Get_Self_Process_ID() << L"_";
+	archive_name_string << CLogInterface::Get_Archive_Path() << NPlatform::Get_Service_Name() << L"_" << NPlatform::Get_Self_PID() << L"_";
 	archive_name_string << NPlatform::Get_Semi_Unique_ID() << L"_Crash.txt";
 
 	std::wstring archive_name = archive_name_string.rdbuf()->str();
@@ -208,7 +208,7 @@ void CStructuredExceptionHandler::Archive_Logs( void )
 std::wstring CStructuredExceptionHandler::Get_Log_File_Prefix( void )
 {
 	std::basic_ostringstream< wchar_t > prefix_string;
-	prefix_string << CLogInterface::Get_Log_Path() << NPlatform::Get_Service_Name() << L"_" << NPlatform::Get_Self_Process_ID() << L"_";
+	prefix_string << CLogInterface::Get_Log_Path() << NPlatform::Get_Service_Name() << L"_" << NPlatform::Get_Self_PID() << L"_";
 
 	return prefix_string.rdbuf()->str();
 }

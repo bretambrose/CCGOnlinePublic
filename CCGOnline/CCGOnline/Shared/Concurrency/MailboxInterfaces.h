@@ -23,26 +23,34 @@
 #ifndef MAILBOX_INTERFACES_H
 #define MAILBOX_INTERFACES_H
 
-#include "ThreadKey.h"
+#include "VirtualProcessProperties.h"
 
 class CVirtualProcessMessageFrame;
 template < typename T > class IConcurrentQueue;
+
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
 
 // The write-only mailbox of a virtual process.  Other processes talk to a process by adding messages to this
 class CWriteOnlyMailbox
 {
 	public:
 
-		CWriteOnlyMailbox( const SThreadKey &target_key, const shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > &write_queue );
+		CWriteOnlyMailbox( EVirtualProcessID::Enum process_id, const SProcessProperties &properties, const shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > &write_queue );
 		~CWriteOnlyMailbox();
 
-		const SThreadKey &Get_Target_Key( void ) const { return TargetKey; }
+		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		const SProcessProperties &Get_Properties( void ) const { return Properties; }
 
 		void Add_Frame( const shared_ptr< CVirtualProcessMessageFrame > &frame );
 
 	private:
 
-		SThreadKey TargetKey;
+		EVirtualProcessID::Enum ProcessID;
+
+		SProcessProperties Properties;
 
 		shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > WriteQueue;
 

@@ -99,7 +99,7 @@ CStackFrame::CStackFrame( uint64 address, const std::wstring &function_name, con
 
 **********************************************************************************************************************/
 CStructuredExceptionInfo::CStructuredExceptionInfo( bool is_test_exception ) :
-	ThreadKey( 0 ),
+	ProcessID( 0 ),
 	CallStack(),
 	SymbolError( L"" ),
 	ExceptionMessage( L"" ),

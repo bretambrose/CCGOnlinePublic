@@ -24,23 +24,26 @@
 #ifndef VIRTUAL_PROCESS_MESSAGE_FRAME_H
 #define VIRTUAL_PROCESS_MESSAGE_FRAME_H
 
-#include "ThreadKey.h"
-
 class IVirtualProcessMessage;
+
+namespace EVirtualProcessID
+{
+	enum Enum;
+}
 
 // A container of thread messages
 class CVirtualProcessMessageFrame
 {
 	public:
 
-		CVirtualProcessMessageFrame( const SThreadKey &key ) :
-			Key( key ),
+		CVirtualProcessMessageFrame( EVirtualProcessID::Enum process_id ) :
+			ProcessID( process_id ),
 			Messages()
 		{}
 
 		~CVirtualProcessMessageFrame();
 
-		SThreadKey Get_Key( void ) const { return Key; }
+		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
 		void Add_Message( const shared_ptr< const IVirtualProcessMessage > &message );
 
@@ -49,7 +52,7 @@ class CVirtualProcessMessageFrame
 
 	private:
 
-		SThreadKey Key;
+		EVirtualProcessID::Enum ProcessID;
 
 		std::vector< shared_ptr< const IVirtualProcessMessage > > Messages;
 

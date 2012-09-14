@@ -30,15 +30,19 @@
 /**********************************************************************************************************************
 	CWriteOnlyMailbox::CWriteOnlyMailbox -- constructor
 
-		target_key -- the key of thread that this write-only interface refers to
+		process_id -- the id of process that this write-only interface refers to
+		properties -- properties of the process that this interface corresponds to
 		write_queue -- the concurrency queue containing message frames targeted for the corresponding virtual process
 					
 **********************************************************************************************************************/
-CWriteOnlyMailbox::CWriteOnlyMailbox( const SThreadKey &target_key, 
+CWriteOnlyMailbox::CWriteOnlyMailbox( EVirtualProcessID::Enum process_id, 
+												  const SProcessProperties &properties, 
 												  const shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > &write_queue ) :
-	TargetKey( target_key ),
+	ProcessID( process_id ),
+	Properties( properties ),
 	WriteQueue( write_queue )
 {
+	FATAL_ASSERT( WriteQueue.get() != nullptr );
 }
 
 /**********************************************************************************************************************

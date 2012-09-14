@@ -28,6 +28,11 @@
 class CLogRequestMessage;
 class CLogFile;
 
+namespace EVirtualProcessSubject
+{
+	enum Enum;
+}
+
 // A class that performs logging of information to files split by thread key
 class CLoggingVirtualProcess : public CVirtualProcessBase
 {
@@ -36,11 +41,11 @@ class CLoggingVirtualProcess : public CVirtualProcessBase
 		typedef CVirtualProcessBase BASECLASS;
 
 		// Construction/destruction
-		CLoggingVirtualProcess( void );
+		CLoggingVirtualProcess( const SProcessProperties &properties );
 		virtual ~CLoggingVirtualProcess();
 
 		// CThreadTaskBase public interface
-		virtual void Initialize( void );
+		virtual void Initialize( EVirtualProcessID::Enum id );
 
 		virtual void Log( const std::wstring &message );
 
@@ -58,18 +63,18 @@ class CLoggingVirtualProcess : public CVirtualProcessBase
 
 		void Shutdown( void );
 
-		shared_ptr< CLogFile > Get_Log_File( EThreadSubject subject ) const;
+		shared_ptr< CLogFile > Get_Log_File( EVirtualProcessSubject::Enum subject ) const;
 
-		std::wstring Build_File_Name( EThreadSubject subject ) const;
-		std::wstring Build_Log_Message( const SThreadKey &source_key, const std::wstring &message, uint64 system_time ) const;
+		std::wstring Build_File_Name( EVirtualProcessSubject::Enum subject ) const;
+		std::wstring Build_Log_Message( EVirtualProcessID::Enum process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64 system_time ) const;
 
-		virtual void Handle_Shutdown_Self_Request( const SThreadKey &key, const shared_ptr< const CShutdownSelfRequest > &message );
-		void Handle_Log_Request_Message( const SThreadKey &key, const shared_ptr< const CLogRequestMessage > &message );
+		virtual void Handle_Shutdown_Self_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message );
+		void Handle_Log_Request_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CLogRequestMessage > &message );
 
-		void Handle_Log_Request_Message_Aux( const SThreadKey &key, const std::wstring &message, uint64 system_time );
+		void Handle_Log_Request_Message_Aux( EVirtualProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64 system_time );
 
 		// Private Data
-		stdext::hash_map< EThreadSubject, shared_ptr< CLogFile > > LogFiles;
+		stdext::hash_map< EVirtualProcessSubject::Enum, shared_ptr< CLogFile > > LogFiles;
 
 		uint32 PID;
 

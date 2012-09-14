@@ -26,11 +26,10 @@
 
 #include "Logging/LogInterface.h"
 #include "ManagedVirtualProcessInterface.h"
-#include "ThreadSubject.h"
+#include "VirtualProcessSubject.h"
 #include "VirtualProcessMailbox.h"
 #include "MailboxInterfaces.h"
 #include "VirtualProcessConstants.h"
-#include "ThreadKeyManager.h"
 #include "Messaging/ExchangeMailboxMessages.h"
 #include "Messaging/LoggingMessages.h"
 #include "Messaging/VirtualProcessManagementMessages.h"
@@ -48,9 +47,10 @@
 #include "VirtualProcessExecutionContext.h"
 #include "PlatformTime.h"
 #include "PlatformProcess.h"
+#include "VirtualProcessID.h"
 
 
-typedef FastDelegate2< const SThreadKey &, double, void > ExecuteProcessDelegateType;
+typedef FastDelegate2< EVirtualProcessID::Enum, double, void > ExecuteProcessDelegateType;
 
 // A scheduled task that triggers the execution of a scheduled process's service function by TBB
 class CExecuteProcessScheduledTask : public CScheduledTask
@@ -59,17 +59,17 @@ class CExecuteProcessScheduledTask : public CScheduledTask
 
 		typedef CScheduledTask BASECLASS;
 
-		CExecuteProcessScheduledTask( const ExecuteProcessDelegateType &execute_delegate, const SThreadKey &key, double execute_time_seconds ) :
+		CExecuteProcessScheduledTask( const ExecuteProcessDelegateType &execute_delegate, EVirtualProcessID::Enum process_id, double execute_time_seconds ) :
 			BASECLASS( execute_time_seconds ),
 			ExecuteDelegate( execute_delegate ),
-			Key( key )
+			ProcessID( process_id )
 		{}
 
-		const SThreadKey &Get_Key( void ) const { return Key; }
+		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
 		virtual bool Execute( double current_time_seconds, double & /*reschedule_time_seconds*/ )
 		{
-			ExecuteDelegate( Key, current_time_seconds );
+			ExecuteDelegate( ProcessID, current_time_seconds );
 
 			return false;
 		}
@@ -77,7 +77,7 @@ class CExecuteProcessScheduledTask : public CScheduledTask
 	private:
 
 		ExecuteProcessDelegateType ExecuteDelegate;
-		SThreadKey Key;
+		EVirtualProcessID::Enum ProcessID;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,11 +165,11 @@ class CVirtualProcessRecord
 
 		// Construction/destruction
 		CVirtualProcessRecord( const shared_ptr< IManagedVirtualProcess > &process, const ExecuteProcessDelegateType &execute_delegate );
-		CVirtualProcessRecord( const SThreadKey &key );
+		CVirtualProcessRecord( EVirtualProcessID::Enum process_id );
 		~CVirtualProcessRecord();
 
 		// Accessors
-		const SThreadKey &Get_Key( void ) const { return Process->Get_Key(); }
+		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
 		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process( void ) const { return Process; }
 
@@ -182,17 +182,17 @@ class CVirtualProcessRecord
 		void Add_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler, double execution_time );
 		void Remove_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler );
 
-		void Add_Pending_Shutdown_Key( const SThreadKey &key ) { PendingShutdownKeys.insert( key ); }
-		void Remove_Pending_Shutdown_Key( const SThreadKey &key ) { PendingShutdownKeys.erase( key ); }
+		void Add_Pending_Shutdown_PID( EVirtualProcessID::Enum process_id ) { PendingShutdownIDs.insert( process_id ); }
+		void Remove_Pending_Shutdown_PID( EVirtualProcessID::Enum process_id ) { PendingShutdownIDs.erase( process_id ); }
 
 		// Queries
 		bool Is_Shutting_Down( void ) const { return State == EPS_SHUTTING_DOWN_PHASE1 || State == EPS_SHUTTING_DOWN_PHASE2; }
 
-		bool Has_Pending_Shutdown_Keys( void ) const { return PendingShutdownKeys.size() > 0; }
+		bool Has_Pending_Shutdown_IDs( void ) const { return PendingShutdownIDs.size() > 0; }
 
 	private:
 
-		SThreadKey Key;
+		EVirtualProcessID::Enum ProcessID;
 
 		shared_ptr< IManagedVirtualProcess > Process;
 
@@ -204,7 +204,7 @@ class CVirtualProcessRecord
 
 		EProcessState State;
 
-		std::set< SThreadKey, SThreadKeyContainerHelper > PendingShutdownKeys;
+		std::set< EVirtualProcessID::Enum > PendingShutdownIDs;
 };
 
 /**********************************************************************************************************************
@@ -215,13 +215,13 @@ class CVirtualProcessRecord
 					
 **********************************************************************************************************************/
 CVirtualProcessRecord::CVirtualProcessRecord( const shared_ptr< IManagedVirtualProcess > &process, const ExecuteProcessDelegateType &execute_delegate ) :
-	Key( process->Get_Key() ),
+	ProcessID( process->Get_ID() ),
 	Process( process ),
-	Mailbox( new CVirtualProcessMailbox( process->Get_Key() ) ),
+	Mailbox( new CVirtualProcessMailbox( process->Get_ID(), process->Get_Properties() ) ),
 	ExecuteTask( nullptr ),
 	ExecuteDelegate( execute_delegate ),
 	State( EPS_INITIALIZING ),
-	PendingShutdownKeys()
+	PendingShutdownIDs()
 {
 }
 
@@ -231,16 +231,16 @@ CVirtualProcessRecord::CVirtualProcessRecord( const shared_ptr< IManagedVirtualP
 		key -- key of the proxy process
 					
 **********************************************************************************************************************/
-CVirtualProcessRecord::CVirtualProcessRecord( const SThreadKey &key ) :
-	Key( key ),
+CVirtualProcessRecord::CVirtualProcessRecord( EVirtualProcessID::Enum process_id ) :
+	ProcessID( process_id ),
 	Process( nullptr ),
-	Mailbox( new CVirtualProcessMailbox( key ) ),
+	Mailbox( new CVirtualProcessMailbox( process_id, MANAGER_PROCESS_PROPERTIES ) ),
 	ExecuteTask( nullptr ),
 	ExecuteDelegate(),
 	State( EPS_INITIALIZING ),
-	PendingShutdownKeys()
+	PendingShutdownIDs()
 {
-	FATAL_ASSERT( key == MANAGER_THREAD_KEY );
+	FATAL_ASSERT( process_id == EVirtualProcessID::CONCURRENCY_MANAGER );
 }
 
 /**********************************************************************************************************************
@@ -263,7 +263,7 @@ void CVirtualProcessRecord::Add_Execute_Task( const shared_ptr< CTaskScheduler >
 {
 	if ( ExecuteTask == nullptr )
 	{
-		ExecuteTask.reset( new CExecuteProcessScheduledTask( ExecuteDelegate, Get_Key(), execution_time ) );
+		ExecuteTask.reset( new CExecuteProcessScheduledTask( ExecuteDelegate, Get_Process_ID(), execution_time ) );
 	}
 	else
 	{
@@ -307,17 +307,16 @@ enum EConcurrencyManagerState
 **********************************************************************************************************************/
 CConcurrencyManager::CConcurrencyManager( void ) :
 	ProcessRecords(),
-	PersistentPushRequests(),
-	UnfulfilledPushRequests(),
+	IDToPropertiesTable(),
+	PropertiesToIDTable(),
 	PersistentGetRequests(),
-	UnfulfilledGetRequests(),
 	MessageHandlers(),
 	PendingOutboundFrames(),
 	TaskSchedulers(),
 	TimeKeeper( new CTimeKeeper ),
-	KeyManager( new CThreadKeyManager ),
 	TBBTaskSchedulerInit( new tbb::task_scheduler_init ),
-	State( ECMS_PRE_INITIALIZE )
+	State( ECMS_PRE_INITIALIZE ),
+	NextID( EVirtualProcessID::FIRST_FREE_ID )
 {
 	TaskSchedulers[ TT_REAL_TIME ] = shared_ptr< CTaskScheduler >( new CTaskScheduler );
 	TaskSchedulers[ TT_GAME_TIME ] = shared_ptr< CTaskScheduler >( new CTaskScheduler );
@@ -359,10 +358,7 @@ void CConcurrencyManager::Shutdown( void )
 	FATAL_ASSERT( State == ECMS_SHUTTING_DOWN_PHASE2 || State == ECMS_INITIALIZED || State == ECMS_PRE_INITIALIZE );
 
 	MessageHandlers.clear();
-
-	UnfulfilledPushRequests.clear();
-	PersistentPushRequests.clear();
-	UnfulfilledGetRequests.clear();
+	PersistentGetRequests.clear();
 
 	FATAL_ASSERT( ProcessRecords.size() == 0 );
 
@@ -373,16 +369,16 @@ void CConcurrencyManager::Shutdown( void )
 }
 
 /**********************************************************************************************************************
-	CConcurrencyManager::Get_Record -- gets the thread task record for a given thread key
+	CConcurrencyManager::Get_Record -- gets the process record for a given process by id
 
-		key -- key of the thread to get the task record for
+		process_id -- id of the process to get a record for
 
-		Returns: pointer to the thread task record, or null
+		Returns: pointer to the process record, or null
 					
 **********************************************************************************************************************/
-shared_ptr< CVirtualProcessRecord > CConcurrencyManager::Get_Record( const SThreadKey &key ) const
+shared_ptr< CVirtualProcessRecord > CConcurrencyManager::Get_Record( EVirtualProcessID::Enum process_id ) const
 {
-	auto iter = ProcessRecords.find( key );
+	auto iter = ProcessRecords.find( process_id );
 	if ( iter != ProcessRecords.end() )
 	{
 		return iter->second;
@@ -392,16 +388,16 @@ shared_ptr< CVirtualProcessRecord > CConcurrencyManager::Get_Record( const SThre
 }
 
 /**********************************************************************************************************************
-	CConcurrencyManager::Get_Virtual_Process -- gets the process for a given thread key
+	CConcurrencyManager::Get_Virtual_Process -- gets the process for a given process id
 
-		key -- key of the thread to get the process for
+		process_id -- id of the process to look up
 
 		Returns: pointer to the virtual process, or null
 					
 **********************************************************************************************************************/
-shared_ptr< IManagedVirtualProcess > CConcurrencyManager::Get_Virtual_Process( const SThreadKey &key ) const
+shared_ptr< IManagedVirtualProcess > CConcurrencyManager::Get_Virtual_Process( EVirtualProcessID::Enum process_id ) const
 {
-	shared_ptr< CVirtualProcessRecord > record = Get_Record( key );
+	shared_ptr< CVirtualProcessRecord > record = Get_Record( process_id );
 	if ( record != nullptr )
 	{
 		return record->Get_Virtual_Process();
@@ -435,13 +431,10 @@ void CConcurrencyManager::Setup_For_Run( const shared_ptr< IManagedVirtualProces
 	FATAL_ASSERT( ProcessRecords.size() == 0 );
 
 	// make a proxy for the manager
-	ProcessRecords[ MANAGER_THREAD_KEY ] = shared_ptr< CVirtualProcessRecord >( new CVirtualProcessRecord( MANAGER_THREAD_KEY ) );
-
-	// all threads should receive an interface to the log thread automatically
-	Handle_Push_Mailbox_Request( MANAGER_THREAD_KEY, shared_ptr< CPushMailboxRequest >( new CPushMailboxRequest( LOG_THREAD_KEY, ALL_THREAD_KEY ) ) );
+	ProcessRecords[ EVirtualProcessID::CONCURRENCY_MANAGER ] = shared_ptr< CVirtualProcessRecord >( new CVirtualProcessRecord( EVirtualProcessID::CONCURRENCY_MANAGER ) );
 
 	// Setup the logging thread and the initial thread
-	Add_Virtual_Process( CLogInterface::Get_Logging_Process() );
+	Add_Virtual_Process( CLogInterface::Get_Logging_Process(), EVirtualProcessID::LOGGING );
 	Add_Virtual_Process( shared_ptr< IManagedVirtualProcess>( starting_process ) );
 
 	// Reset time
@@ -459,27 +452,37 @@ void CConcurrencyManager::Setup_For_Run( const shared_ptr< IManagedVirtualProces
 **********************************************************************************************************************/
 void CConcurrencyManager::Add_Virtual_Process( const shared_ptr< IManagedVirtualProcess > &process )
 {
-	FATAL_ASSERT( process->Get_Key().Get_Thread_Subject() != TS_CONCURRENCY_MANAGER );
+	Add_Virtual_Process( process, Allocate_Virtual_Process_ID() );
+}
 
-	// perform any sub key allocation if necessary
-	SThreadKey new_key = KeyManager->Fill_In_Thread_Key( process->Get_Key() );
-	FATAL_ASSERT( new_key.Is_Valid() );
-	FATAL_ASSERT( ProcessRecords.find( new_key ) == ProcessRecords.end() );
+/**********************************************************************************************************************
+	CConcurrencyManager::Add_Virtual_Process -- adds a new virtual process into the concurrency system
 
-	process->Set_Key( new_key );
-	KeyManager->Add_Tracked_Thread_Key( new_key ); 
+		thread -- virtual process to add to the concurrency system
+		id -- id to bind to the process
+					
+**********************************************************************************************************************/
+void CConcurrencyManager::Add_Virtual_Process( const shared_ptr< IManagedVirtualProcess > &process, EVirtualProcessID::Enum id )
+{
+	FATAL_ASSERT( id != EVirtualProcessID::CONCURRENCY_MANAGER );
+	FATAL_ASSERT( ProcessRecords.find( id ) == ProcessRecords.end() );
+	FATAL_ASSERT( process->Get_Properties().Is_Valid() );
 
-	process->Initialize();
+	process->Initialize( id );
+	if ( id != EVirtualProcessID::LOGGING )
+	{
+		process->Set_Logging_Mailbox( Get_Mailbox( EVirtualProcessID::LOGGING ) );
+	}
 
 	// track the thread task in a task record
 	shared_ptr< CVirtualProcessRecord > process_record( new CVirtualProcessRecord( process, ExecuteProcessDelegateType( this, &CConcurrencyManager::Execute_Virtual_Process ) ) );
-	ProcessRecords[ new_key ] = process_record;
+	ProcessRecords[ id ] = process_record;
 
 	// Interface setup
 	CVirtualProcessMailbox *mailbox = process_record->Get_Mailbox();
 	Handle_Ongoing_Mailbox_Requests( mailbox );
 
-	process->Set_Manager_Mailbox( Get_Mailbox( MANAGER_THREAD_KEY ) );
+	process->Set_Manager_Mailbox( Get_Mailbox( EVirtualProcessID::CONCURRENCY_MANAGER ) );
 	process->Set_My_Mailbox( mailbox->Get_Readable_Mailbox() );
 
 	// Schedule first execution if necessary
@@ -499,77 +502,35 @@ void CConcurrencyManager::Add_Virtual_Process( const shared_ptr< IManagedVirtual
 **********************************************************************************************************************/
 void CConcurrencyManager::Handle_Ongoing_Mailbox_Requests( CVirtualProcessMailbox *mailbox )
 {
-	const SThreadKey &new_key = mailbox->Get_Key();
-	FATAL_ASSERT( !Is_Process_Shutting_Down( new_key ) );
+	EVirtualProcessID::Enum new_id = mailbox->Get_Process_ID();
+	const SProcessProperties &new_properties = mailbox->Get_Properties();
 
-	// persistent push requests
-	for ( auto iter = PersistentPushRequests.cbegin(); iter != PersistentPushRequests.cend(); ++iter )
-	{
-		const shared_ptr< const CPushMailboxRequest > &push_request = *iter;
-		const SThreadKey &source_key = push_request->Get_Source_Key();
-		if ( push_request->Get_Target_Key().Matches( new_key ) && source_key != new_key && !Is_Process_Shutting_Down( source_key ) )
-		{
-			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( source_key, Get_Mailbox( source_key ) ) );
-			Send_Virtual_Process_Message( new_key, message );
-		}
-	}
+	FATAL_ASSERT( !Is_Process_Shutting_Down( new_id ) );
 
 	// persistent get requests
 	for ( auto iter = PersistentGetRequests.cbegin(); iter != PersistentGetRequests.cend(); ++iter )
 	{
-		const shared_ptr< const CGetMailboxRequest > &get_request = *iter;
-		const SThreadKey &source_key = get_request->Get_Source_Key();
-		if ( get_request->Get_Target_Key().Matches( new_key ) && source_key != new_key && !Is_Process_Shutting_Down( source_key ) )
+		EVirtualProcessID::Enum requesting_process_id = iter->first;
+		const shared_ptr< const CGetMailboxByPropertiesRequest > &get_request = iter->second;
+		if ( get_request->Get_Target_Properties().Matches( new_properties ) && requesting_process_id != new_id && !Is_Process_Shutting_Down( requesting_process_id ) )
 		{
-			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( new_key, Get_Mailbox( new_key ) ) );
-			Send_Virtual_Process_Message( source_key, message );
+			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( Get_Mailbox( new_id ) ) );
+			Send_Virtual_Process_Message( requesting_process_id, message );
 		}
 	}
-
-	// unfulfilled single-targeted get requests
-	auto push_range = UnfulfilledPushRequests.equal_range( new_key );
-	for ( auto iter = push_range.first; iter != push_range.second; ++iter )
-	{
-		const shared_ptr< const CPushMailboxRequest > &push_request = iter->second;
-		const SThreadKey &source_key = push_request->Get_Source_Key();
-
-		if ( !Is_Process_Shutting_Down( source_key ) )
-		{
-			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( source_key, Get_Mailbox( source_key ) ) );
-			Send_Virtual_Process_Message( new_key, message );
-		}
-	}
-
-	UnfulfilledPushRequests.erase( push_range.first, push_range.second );
-
-	// unfulfilled get requests
-	auto get_range = UnfulfilledGetRequests.equal_range( new_key );
-	for ( auto iter = get_range.first; iter != get_range.second; ++iter )
-	{
-		const shared_ptr< const CGetMailboxRequest > &get_request = iter->second;
-		const SThreadKey &source_key = get_request->Get_Source_Key();
-
-		if ( !Is_Process_Shutting_Down( source_key ) )
-		{
-			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( new_key, Get_Mailbox( new_key ) ) );
-			Send_Virtual_Process_Message( source_key, message );
-		}
-	}
-
-	UnfulfilledGetRequests.erase( get_range.first, get_range.second );
 }
 
 /**********************************************************************************************************************
 	CConcurrencyManager::Get_Mailbox -- gets the write-only mailbox to a virtual process
 
-		key -- key of the virtual process to get the mailbox for
+		process_id -- id of the virtual process to get the mailbox for
 
 		Returns: a pointer to the write-only mailbox, or null
 					
 **********************************************************************************************************************/
-shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( const SThreadKey &key ) const
+shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EVirtualProcessID::Enum process_id ) const
 {
-	auto iter = ProcessRecords.find( key );
+	auto iter = ProcessRecords.find( process_id );
 	if ( iter != ProcessRecords.end() )
 	{
 		return iter->second->Get_Mailbox()->Get_Writable_Mailbox();
@@ -586,7 +547,7 @@ shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( const SThreadK
 **********************************************************************************************************************/
 shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 {
-	auto iter = ProcessRecords.find( MANAGER_THREAD_KEY );
+	auto iter = ProcessRecords.find( EVirtualProcessID::CONCURRENCY_MANAGER );
 	FATAL_ASSERT( iter != ProcessRecords.end() );
 
 	return iter->second->Get_Mailbox()->Get_Readable_Mailbox();
@@ -599,14 +560,14 @@ shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 		message -- message to send
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Send_Virtual_Process_Message( const SThreadKey &dest_key, const shared_ptr< const IVirtualProcessMessage > &message )
+void CConcurrencyManager::Send_Virtual_Process_Message( EVirtualProcessID::Enum dest_process_id, const shared_ptr< const IVirtualProcessMessage > &message )
 {
-	auto iter = PendingOutboundFrames.find( dest_key );
+	auto iter = PendingOutboundFrames.find( dest_process_id );
 	if ( iter == PendingOutboundFrames.end() )
 	{
-		shared_ptr< CVirtualProcessMessageFrame > frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+		shared_ptr< CVirtualProcessMessageFrame > frame( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
 		frame->Add_Message( message );
-		PendingOutboundFrames.insert( FrameTableType::value_type( dest_key, frame ) );
+		PendingOutboundFrames.insert( FrameTableType::value_type( dest_process_id, frame ) );
 		return;
 	}
 
@@ -619,7 +580,7 @@ void CConcurrencyManager::Send_Virtual_Process_Message( const SThreadKey &dest_k
 **********************************************************************************************************************/
 void CConcurrencyManager::Flush_Frames( void )
 {
-	std::vector< SThreadKey > sent_frames;
+	std::vector< EVirtualProcessID::Enum > sent_frames;
 
 	for ( auto frame_iterator = PendingOutboundFrames.cbegin(); frame_iterator != PendingOutboundFrames.cend(); ++frame_iterator )
 	{
@@ -636,6 +597,9 @@ void CConcurrencyManager::Flush_Frames( void )
 	{
 		PendingOutboundFrames.erase( sent_frames[ i ] );
 	}
+
+	// with the update from key to id, we should never have leftover frames
+	FATAL_ASSERT( PendingOutboundFrames.size() == 0 );
 }
 
 /**********************************************************************************************************************
@@ -681,17 +645,17 @@ void CConcurrencyManager::Service_Shutdown( void )
 	if ( ProcessRecords.size() == 2 && State != ECMS_SHUTTING_DOWN_PHASE2 )
 	{
 		// Nothing left but the log thread and our own proxy thread
-		FATAL_ASSERT( Get_Record( MANAGER_THREAD_KEY ) != nullptr && Get_Record( LOG_THREAD_KEY ) != nullptr );
+		FATAL_ASSERT( Get_Record( EVirtualProcessID::CONCURRENCY_MANAGER ) != nullptr && Get_Record( EVirtualProcessID::LOGGING ) != nullptr );
 
 		State = ECMS_SHUTTING_DOWN_PHASE2;
 
 		shared_ptr< const IVirtualProcessMessage > message( new CShutdownSelfRequest( true ) );
-		Send_Virtual_Process_Message( LOG_THREAD_KEY, message );
+		Send_Virtual_Process_Message( EVirtualProcessID::LOGGING, message );
 	}
 	else if ( ProcessRecords.size() == 1 )
 	{
 		// Log thread now gone, we're ready to quit
-		FATAL_ASSERT( Get_Record( MANAGER_THREAD_KEY ) != nullptr );
+		FATAL_ASSERT( Get_Record( EVirtualProcessID::CONCURRENCY_MANAGER ) != nullptr );
 
 		ProcessRecords.clear();
 	}
@@ -711,12 +675,12 @@ void CConcurrencyManager::Service_Incoming_Frames( void )
 	for ( uint32 i = 0; i < control_frames.size(); ++i )
 	{
 		const shared_ptr< CVirtualProcessMessageFrame > &frame = control_frames[ i ];
-		const SThreadKey &key = frame->Get_Key();
+		EVirtualProcessID::Enum source_process_id = frame->Get_Process_ID();
 
 		// iterate all messages in the frame
 		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 		{
-			Handle_Message( key, *iter );
+			Handle_Message( source_process_id, *iter );
 		}
 	}
 }
@@ -728,7 +692,7 @@ void CConcurrencyManager::Service_Incoming_Frames( void )
 		message -- message that was sent to the manager
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Message( const SThreadKey &key, const shared_ptr< const IVirtualProcessMessage > &message )
+void CConcurrencyManager::Handle_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const IVirtualProcessMessage > &message )
 {
 	const IVirtualProcessMessage *msg_base = message.get();
 
@@ -736,7 +700,7 @@ void CConcurrencyManager::Handle_Message( const SThreadKey &key, const shared_pt
 	auto iter = MessageHandlers.find( hash_key );
 	FATAL_ASSERT( iter != MessageHandlers.end() );
 
-	iter->second->Handle_Message( key, message );
+	iter->second->Handle_Message( source_process_id, message );
 }
 
 /**********************************************************************************************************************
@@ -745,8 +709,8 @@ void CConcurrencyManager::Handle_Message( const SThreadKey &key, const shared_pt
 **********************************************************************************************************************/
 void CConcurrencyManager::Register_Message_Handlers( void )
 {
-	REGISTER_THIS_HANDLER( CGetMailboxRequest, CConcurrencyManager, Handle_Get_Mailbox_Request )
-	REGISTER_THIS_HANDLER( CPushMailboxRequest, CConcurrencyManager, Handle_Push_Mailbox_Request )
+	REGISTER_THIS_HANDLER( CGetMailboxByIDRequest, CConcurrencyManager, Handle_Get_Mailbox_By_ID_Request )
+	REGISTER_THIS_HANDLER( CGetMailboxByPropertiesRequest, CConcurrencyManager, Handle_Get_Mailbox_By_Properties_Request )
 	REGISTER_THIS_HANDLER( CAddNewVirtualProcessMessage, CConcurrencyManager, Handle_Add_New_Virtual_Process_Message )
 	REGISTER_THIS_HANDLER( CShutdownVirtualProcessMessage, CConcurrencyManager, Handle_Shutdown_Virtual_Process_Message )
 	REGISTER_THIS_HANDLER( CRescheduleVirtualProcessMessage, CConcurrencyManager, Handle_Reschedule_Virtual_Process_Message )
@@ -771,13 +735,13 @@ void CConcurrencyManager::Register_Handler( const std::type_info &message_type_i
 }
 
 /**********************************************************************************************************************
-	CConcurrencyManager::Handle_Get_Mailbox_Request -- message handler for a GetMailbox request
+	CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request -- message handler for a GetMailboxByID request
 
-		key -- thread source of the request
+		source_process_id -- process source of the request
 		message -- the get mailbox request
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Get_Mailbox_Request( const SThreadKey & /*key*/, const shared_ptr< const CGetMailboxRequest > &message )
+void CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CGetMailboxByIDRequest > &message )
 {
 	// don't handle messages while shutting down
 	if ( Is_Manager_Shutting_Down() )
@@ -786,53 +750,30 @@ void CConcurrencyManager::Handle_Get_Mailbox_Request( const SThreadKey & /*key*/
 	}
 
 	// don't give out interfaces when a thread is shutting down
-	const SThreadKey &requested_key = message->Get_Target_Key();
-	const SThreadKey &source_key = message->Get_Source_Key();
-	if ( Is_Process_Shutting_Down( source_key ) )
+	EVirtualProcessID::Enum requested_process_id = message->Get_Target_Process_ID();
+	if ( Is_Process_Shutting_Down( source_process_id ) )
 	{
 		return;
 	}
 
-	if ( requested_key.Is_Unique() )
+	// it's a single-targeted request
+	shared_ptr< CVirtualProcessRecord > record = Get_Record( requested_process_id );
+	if ( record != nullptr && !record->Is_Shutting_Down() )
 	{
-		// it's a single-targeted request
-		shared_ptr< CVirtualProcessRecord > record = Get_Record( requested_key );
-		if ( record == nullptr )
-		{
-			// not yet fulfillable, track it until it can be fulfilled
-			UnfulfilledGetRequests.insert( GetRequestCollectionType::value_type( requested_key, message ) );
-		}
-		else if ( !record->Is_Shutting_Down() )
-		{
-			// fulfill the request
-			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( requested_key, record->Get_Mailbox()->Get_Writable_Mailbox() ) );
-			Send_Virtual_Process_Message( source_key, message );
-		}
-	}
-	else
-	{
-		// it's a persistent pattern-matching request, match all existing threads and track against future adds
-		for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
-		{
-			if ( message->Get_Target_Key().Matches( iter->first ) && !Is_Process_Shutting_Down( iter->first ) )
-			{
-				shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( iter->first, Get_Mailbox( iter->first ) ) );
-				Send_Virtual_Process_Message( source_key, message );
-			}
-		}
-
-		PersistentGetRequests.push_back( message );
+		// fulfill the request
+		shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( record->Get_Mailbox()->Get_Writable_Mailbox() ) );
+		Send_Virtual_Process_Message( source_process_id, message );
 	}
 }
 
 /**********************************************************************************************************************
-	CConcurrencyManager::Handle_Push_Mailbox_Request -- message handler for a PushMailbox request
+	CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request -- message handler for a GetMailboxByProperties request
 
-		key -- thread source of the request
-		message -- the push mailbox request
+		source_process_id -- process source of the request
+		message -- the get mailbox request
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Push_Mailbox_Request( const SThreadKey &key, const shared_ptr< const CPushMailboxRequest > &message )
+void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CGetMailboxByPropertiesRequest > &message )
 {
 	// don't handle messages while shutting down
 	if ( Is_Manager_Shutting_Down() )
@@ -840,63 +781,35 @@ void CConcurrencyManager::Handle_Push_Mailbox_Request( const SThreadKey &key, co
 		return;
 	}
 
-	const SThreadKey &target_key = message->Get_Target_Key();
-	const SThreadKey &source_key = message->Get_Source_Key();
-	FATAL_ASSERT( key == source_key || key == MANAGER_THREAD_KEY );
-	FATAL_ASSERT( source_key.Is_Unique() );
-
-	// don't push threads that are shutting down
-	if ( Is_Process_Shutting_Down( source_key ) )
+	// don't give out interfaces when a thread is shutting down
+	const SProcessProperties &requested_properties = message->Get_Target_Properties();
+	if ( Is_Process_Shutting_Down( source_process_id ) )
 	{
 		return;
 	}
 
-	if ( target_key.Is_Unique() )
+	// it's a persistent pattern-matching request, match all existing threads and track against future adds
+	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
 	{
-		// single target request
-		if ( ProcessRecords.find( target_key ) != ProcessRecords.end() )
+		if ( requested_properties.Matches( iter->second->Get_Virtual_Process()->Get_Properties() ) && !Is_Process_Shutting_Down( iter->first ) )
 		{
-			// it's fulfillable now, do it if the target is not shutting down
-			if ( !Is_Process_Shutting_Down( target_key ) )
-			{
-				shared_ptr< const IVirtualProcessMessage > response_message( new CAddMailboxMessage( source_key, Get_Mailbox( source_key ) ) );
-				Send_Virtual_Process_Message( target_key, response_message );
-			}
-		}
-		else
-		{
-			// wait til we can fulfill this request
-			UnfulfilledPushRequests.insert( PushRequestCollectionType::value_type( target_key, message ) );
+			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( Get_Mailbox( iter->first ) ) );
+			Send_Virtual_Process_Message( source_process_id, message );
 		}
 	}
-	else
-	{
-		// it's a pattern matching request
-		for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
-		{
-			if ( target_key.Matches( iter->first ) && !Is_Process_Shutting_Down( iter->first ) )
-			{
-				shared_ptr< const IVirtualProcessMessage > response_message( new CAddMailboxMessage( source_key, Get_Mailbox( source_key ) ) );
-				Send_Virtual_Process_Message( iter->first, response_message );
-			}
-		}
 
-		PersistentPushRequests.push_back( message );
-	}
+	PersistentGetRequests.insert( GetMailboxByPropertiesRequestCollectionType::value_type( source_process_id, message ) );
 }
 
 /**********************************************************************************************************************
 	CConcurrencyManager::Handle_Add_New_Virtual_Process_Message -- message handler for an AddNewVirtualProcess message
 
-		key -- thread source of the message
+		source_process_id -- process source of the request
 		message -- the add process message
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Add_New_Virtual_Process_Message( const SThreadKey &key, const shared_ptr< const CAddNewVirtualProcessMessage > &message )
+void CConcurrencyManager::Handle_Add_New_Virtual_Process_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CAddNewVirtualProcessMessage > &message )
 {
-	const SThreadKey &new_key = message->Get_Virtual_Process()->Get_Key();
-	FATAL_ASSERT( !Is_Process_Shutting_Down( new_key ) );
-
 	if ( Is_Manager_Shutting_Down() )
 	{
 		return;
@@ -905,18 +818,18 @@ void CConcurrencyManager::Handle_Add_New_Virtual_Process_Message( const SThreadK
 	Add_Virtual_Process( static_pointer_cast< IManagedVirtualProcess >( message->Get_Virtual_Process() ) );
 
 	// return mailbox, push mailbox options
-	if ( !Is_Process_Shutting_Down( key ) )
+	if ( !Is_Process_Shutting_Down( source_process_id ) )
 	{
 		if ( message->Should_Return_Mailbox() )
 		{
-			shared_ptr< const IVirtualProcessMessage > response_message( new CAddMailboxMessage( new_key, Get_Mailbox( new_key ) ) );
-			Send_Virtual_Process_Message( key, response_message );
+			shared_ptr< const IVirtualProcessMessage > response_message( new CAddMailboxMessage( Get_Mailbox( message->Get_Virtual_Process()->Get_ID() ) ) );
+			Send_Virtual_Process_Message( source_process_id, response_message );
 		}
 
 		if ( message->Should_Forward_Creator_Mailbox() )
 		{
-			shared_ptr< const IVirtualProcessMessage > response_message( new CAddMailboxMessage( key, Get_Mailbox( key ) ) );
-			Send_Virtual_Process_Message( message->Get_Virtual_Process()->Get_Key(), response_message );
+			shared_ptr< const IVirtualProcessMessage > response_message( new CAddMailboxMessage( Get_Mailbox( source_process_id ) ) );
+			Send_Virtual_Process_Message( message->Get_Virtual_Process()->Get_ID(), response_message );
 		}
 	}
 }
@@ -924,31 +837,30 @@ void CConcurrencyManager::Handle_Add_New_Virtual_Process_Message( const SThreadK
 /**********************************************************************************************************************
 	CConcurrencyManager::Handle_Shutdown_Virtual_Process_Message -- message handler for an ShutdownVirtualProcess message
 
-		key -- process source of the message
+		source_process_id -- process source of the message
 		message -- the shutdown process message
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Shutdown_Virtual_Process_Message( const SThreadKey & /*key*/, const shared_ptr< const CShutdownVirtualProcessMessage > &message )
+void CConcurrencyManager::Handle_Shutdown_Virtual_Process_Message( EVirtualProcessID::Enum /*source_process_id*/, const shared_ptr< const CShutdownVirtualProcessMessage > &message )
 {
 	if ( Is_Manager_Shutting_Down() )
 	{
 		return;
 	}
 
-	Initiate_Process_Shutdown( message->Get_Key() );
+	Initiate_Process_Shutdown( message->Get_Process_ID() );
 }
 
 /**********************************************************************************************************************
 	CConcurrencyManager::Handle_Reschedule_Virtual_Process_Message -- message handler for a RescheduleVirtualProcess message
 
-		key -- process source of the message
+		source_process_id -- process source of the message
 		message -- the reschedule virtual process message
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Reschedule_Virtual_Process_Message( const SThreadKey & /*key*/, const shared_ptr< const CRescheduleVirtualProcessMessage > &message )
+void CConcurrencyManager::Handle_Reschedule_Virtual_Process_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CRescheduleVirtualProcessMessage > &message )
 {
-	const SThreadKey &rescheduled_key = message->Get_Key();
-	shared_ptr< CVirtualProcessRecord > record = Get_Record( rescheduled_key );
+	shared_ptr< CVirtualProcessRecord > record = Get_Record( source_process_id );
 	if ( record == nullptr )
 	{
 		return;
@@ -962,19 +874,19 @@ void CConcurrencyManager::Handle_Reschedule_Virtual_Process_Message( const SThre
 /**********************************************************************************************************************
 	CConcurrencyManager::Handle_Release_Mailbox_Response -- message handler for a ReleaseMailbox response
 
-		key -- process source of the response
+		source_process_id -- process source of the response
 		response -- the release mailbox response
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Release_Mailbox_Response( const SThreadKey &key, const shared_ptr< const CReleaseMailboxResponse > &response )
+void CConcurrencyManager::Handle_Release_Mailbox_Response( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CReleaseMailboxResponse > &response )
 {
 	if ( Is_Manager_Shutting_Down() )
 	{
 		return;
 	}
 
-	const SThreadKey &shutdown_key = response->Get_Shutdown_Key();
-	shared_ptr< CVirtualProcessRecord > record = Get_Record( shutdown_key );
+	EVirtualProcessID::Enum shutdown_process_id = response->Get_Shutdown_Process_ID();
+	shared_ptr< CVirtualProcessRecord > record = Get_Record( shutdown_process_id );
 	if ( record == nullptr )
 	{
 		return;
@@ -982,33 +894,31 @@ void CConcurrencyManager::Handle_Release_Mailbox_Response( const SThreadKey &key
 
 	FATAL_ASSERT( record->Get_State() == EPS_SHUTTING_DOWN_PHASE1 );
 
-	record->Remove_Pending_Shutdown_Key( key );
-	if ( !record->Has_Pending_Shutdown_Keys() )
+	record->Remove_Pending_Shutdown_PID( source_process_id );
+	if ( !record->Has_Pending_Shutdown_IDs() )
 	{
 		// we've heard back from everyone; no one has a handle to this thread anymore, so we can tell it to shut down
 		record->Set_State( EPS_SHUTTING_DOWN_PHASE2 );
 
 		shared_ptr< const IVirtualProcessMessage > shutdown_request( new CShutdownSelfRequest( false ) );
-		Send_Virtual_Process_Message( shutdown_key, shutdown_request );
+		Send_Virtual_Process_Message( shutdown_process_id, shutdown_request );
 	}
 }
 
 /**********************************************************************************************************************
 	CConcurrencyManager::Handle_Shutdown_Self_Response -- message handler for a ShutdownSelf response
 
-		key -- process source of the response
+		source_process_id -- process source of the response
 		message -- the shutdown self response
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Shutdown_Self_Response( const SThreadKey &key, const shared_ptr< const CShutdownSelfResponse > & /*message*/ )
+void CConcurrencyManager::Handle_Shutdown_Self_Response( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfResponse > & /*message*/ )
 {
-	auto iter = ProcessRecords.find( key );
+	auto iter = ProcessRecords.find( source_process_id );
 	FATAL_ASSERT( iter != ProcessRecords.end() );
 	FATAL_ASSERT( iter->second->Get_State() == EPS_SHUTTING_DOWN_PHASE2 || Is_Manager_Shutting_Down() );
 
 	ProcessRecords.erase( iter );
-
-	KeyManager->Remove_Tracked_Thread_Key( key );
 }
 
 /**********************************************************************************************************************
@@ -1018,7 +928,7 @@ void CConcurrencyManager::Handle_Shutdown_Self_Response( const SThreadKey &key, 
 		message -- the shutdown manager message
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Handle_Shutdown_Manager_Message( const SThreadKey & /*key*/, const shared_ptr< const CShutdownManagerMessage > & /*message*/ )
+void CConcurrencyManager::Handle_Shutdown_Manager_Message( EVirtualProcessID::Enum /*source_process_id*/, const shared_ptr< const CShutdownManagerMessage > & /*message*/ )
 {
 	if ( Is_Manager_Shutting_Down() )
 	{
@@ -1031,7 +941,7 @@ void CConcurrencyManager::Handle_Shutdown_Manager_Message( const SThreadKey & /*
 	shared_ptr< const IVirtualProcessMessage > shutdown_thread_msg( new CShutdownSelfRequest( true ) );
 	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
 	{
-		if ( iter->first == MANAGER_THREAD_KEY || iter->first == LOG_THREAD_KEY )
+		if ( iter->first == EVirtualProcessID::CONCURRENCY_MANAGER || iter->first == EVirtualProcessID::LOGGING )
 		{
 			continue;
 		}
@@ -1060,9 +970,9 @@ shared_ptr< CTaskScheduler > CConcurrencyManager::Get_Task_Scheduler( ETimeType 
 		current_time_seconds -- current time from the process's standpoint
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Execute_Virtual_Process( const SThreadKey &key, double current_time_seconds )
+void CConcurrencyManager::Execute_Virtual_Process( EVirtualProcessID::Enum process_id, double current_time_seconds )
 {
-	auto iter = ProcessRecords.find( key );
+	auto iter = ProcessRecords.find( process_id );
 	if ( iter == ProcessRecords.end() )
 	{
 		return;
@@ -1076,7 +986,7 @@ void CConcurrencyManager::Execute_Virtual_Process( const SThreadKey &key, double
 
 	shared_ptr< IManagedVirtualProcess > thread_task_base = record->Get_Virtual_Process();
 
-	if ( key == LOG_THREAD_KEY )
+	if ( process_id == EVirtualProcessID::LOGGING )
 	{
 		CServiceLoggingThreadTBBTask &tbb_task = *new( tbb::task::allocate_root() ) CServiceLoggingThreadTBBTask( current_time_seconds );
 		tbb::task::enqueue( tbb_task );
@@ -1091,15 +1001,14 @@ void CConcurrencyManager::Execute_Virtual_Process( const SThreadKey &key, double
 /**********************************************************************************************************************
 	CConcurrencyManager::Initiate_Process_Shutdown -- guides a process into the shutdown procedire
 
-		key -- key of the process to start shutting down
+		process_id -- ID of the process to start shutting down
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Initiate_Process_Shutdown( const SThreadKey &key )
+void CConcurrencyManager::Initiate_Process_Shutdown( EVirtualProcessID::Enum process_id )
 {
-	FATAL_ASSERT( key.Is_Unique() );
-	FATAL_ASSERT( key != MANAGER_THREAD_KEY && key != LOG_THREAD_KEY );
+	FATAL_ASSERT( process_id != EVirtualProcessID::CONCURRENCY_MANAGER && process_id != EVirtualProcessID::LOGGING );
 
-	shared_ptr< CVirtualProcessRecord > shutdown_record = Get_Record( key );
+	shared_ptr< CVirtualProcessRecord > shutdown_record = Get_Record( process_id );
 	if ( shutdown_record == nullptr || shutdown_record->Is_Shutting_Down() )
 	{
 		return;
@@ -1108,114 +1017,53 @@ void CConcurrencyManager::Initiate_Process_Shutdown( const SThreadKey &key )
 	shutdown_record->Set_State( EPS_SHUTTING_DOWN_PHASE1 );
 
 	// this message can be shared and broadcast
-	shared_ptr< const IVirtualProcessMessage > release_mailbox_msg( new CReleaseMailboxRequest( key ) );
+	shared_ptr< const IVirtualProcessMessage > release_mailbox_msg( new CReleaseMailboxRequest( process_id ) );
 	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
 	{
-		if ( key == iter->first || iter->first == MANAGER_THREAD_KEY || iter->first == LOG_THREAD_KEY )
+		if ( process_id == iter->first || iter->first == EVirtualProcessID::CONCURRENCY_MANAGER || iter->first == EVirtualProcessID::LOGGING )
 		{
 			continue;
 		}
 
-		shutdown_record->Add_Pending_Shutdown_Key( iter->first );
+		shutdown_record->Add_Pending_Shutdown_PID( iter->first );
 		Send_Virtual_Process_Message( iter->first, release_mailbox_msg );
 	}
 
 	// Remove all push/get requests related to this process
-	Clear_Related_Mailbox_Requests( key );
+	Clear_Related_Mailbox_Requests( process_id );
 
 	// Move to the next state if we're not waiting on any other process acknowledgements
-	if ( !shutdown_record->Has_Pending_Shutdown_Keys() )
+	if ( !shutdown_record->Has_Pending_Shutdown_IDs() )
 	{
 		shutdown_record->Set_State( EPS_SHUTTING_DOWN_PHASE2 );
 
 		shared_ptr< const IVirtualProcessMessage > shutdown_request( new CShutdownSelfRequest( false ) );
-		Send_Virtual_Process_Message( key, shutdown_request );
+		Send_Virtual_Process_Message( process_id, shutdown_request );
 	}
 }
 
 /**********************************************************************************************************************
 	CConcurrencyManager::Clear_Related_Mailbox_Requests -- clears mailbox requests related to a thread
 
-		key -- key of the virtual process to clear mailbox requests about
+		process_id -- id of the virtual process to clear mailbox requests about
 					
 **********************************************************************************************************************/
-void CConcurrencyManager::Clear_Related_Mailbox_Requests( const SThreadKey &key )
+void CConcurrencyManager::Clear_Related_Mailbox_Requests( EVirtualProcessID::Enum process_id )
 {
-	uint32 removed = 0;
-
-	// persistent push requests
-	for ( auto iter = PersistentPushRequests.end(); iter > PersistentPushRequests.begin();  )
-	{
-		--iter;
-		if ( ( *iter )->Get_Source_Key() == key )
-		{
-			removed++;
-			std::swap( ( *iter ), *( PersistentPushRequests.end() - removed ) );
-		}
-	}
-
-	PersistentPushRequests.resize( PersistentPushRequests.size() - removed );
-
-	// persistent get requests
-	removed = 0;
-	for ( auto iter = PersistentGetRequests.end(); iter > PersistentGetRequests.begin(); )
-	{
-		--iter;
-		if ( ( *iter )->Get_Source_Key() == key )
-		{
-			removed++;
-			std::swap( ( *iter ), *( PersistentGetRequests.end() - removed ) );
-		}
-	}
-
-	PersistentGetRequests.resize( PersistentGetRequests.size() - removed );
-
-	// unfulfilled push requests
-	bool removed_one = true;
-	while ( removed_one )
-	{
-		removed_one = false;
-
-		for ( auto iter = UnfulfilledPushRequests.begin(); iter != UnfulfilledPushRequests.end(); ++iter )
-		{
-			if ( iter->second->Get_Source_Key() == key || iter->second->Get_Target_Key() == key )
-			{
-				UnfulfilledPushRequests.erase( iter );
-				removed_one = true;
-				break;
-			}
-		}
-	}
-
-	// unfulfilled get requests
-	removed_one = true;
-	while ( removed_one )
-	{
-		removed_one = false;
-
-		for ( auto iter = UnfulfilledGetRequests.begin(); iter != UnfulfilledGetRequests.end(); ++iter )
-		{
-			if ( iter->second->Get_Source_Key() == key || iter->second->Get_Target_Key() == key )
-			{
-				UnfulfilledGetRequests.erase( iter );
-				removed_one = true;
-				break;
-			}
-		}
-	}
+	PersistentGetRequests.erase( PersistentGetRequests.lower_bound( process_id ), PersistentGetRequests.upper_bound( process_id ) );
 }
 
 /**********************************************************************************************************************
 	CConcurrencyManager::Is_Process_Shutting_Down -- asks if the supplied process is in the process of shutting down
 
-		key -- key of the virtual process to check shutdown status of
+		process_id -- id of the virtual process to check shutdown status of
 
 		Returns: true if the process is shutting down, false otherwise
 					
 **********************************************************************************************************************/
-bool CConcurrencyManager::Is_Process_Shutting_Down( const SThreadKey &key ) const
+bool CConcurrencyManager::Is_Process_Shutting_Down( EVirtualProcessID::Enum process_id ) const
 {
-	shared_ptr< CVirtualProcessRecord > record = Get_Record( key );
+	shared_ptr< CVirtualProcessRecord > record = Get_Record( process_id );
 	if ( record == nullptr )
 	{
 		return false;
@@ -1245,7 +1093,7 @@ void CConcurrencyManager::Log( const std::wstring &message )
 {
 	if ( State != ECMS_SHUTTING_DOWN_PHASE2 )
 	{
-		Send_Virtual_Process_Message( LOG_THREAD_KEY, shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, message ) ) );
+		Send_Virtual_Process_Message( EVirtualProcessID::LOGGING, shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, message ) ) );
 	}
 }
 
@@ -1269,4 +1117,18 @@ double CConcurrencyManager::Get_Game_Time( void ) const
 void CConcurrencyManager::Set_Game_Time( double game_time_seconds )
 {
 	TimeKeeper->Set_Current_Time( TT_GAME_TIME, NTimeUtils::Convert_Seconds_To_Game_Ticks( game_time_seconds ) );
+}
+
+/**********************************************************************************************************************
+	CConcurrencyManager::Allocate_Virtual_Process_ID -- allocates a new process ID
+
+		Returns: a new process id
+					
+**********************************************************************************************************************/
+EVirtualProcessID::Enum CConcurrencyManager::Allocate_Virtual_Process_ID( void )
+{
+	EVirtualProcessID::Enum id = NextID;
+	NextID = static_cast< EVirtualProcessID::Enum >( NextID + 1 );
+
+	return id;
 }

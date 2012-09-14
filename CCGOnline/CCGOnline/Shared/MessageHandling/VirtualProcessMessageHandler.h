@@ -33,7 +33,7 @@ class TVirtualProcessMessageHandler : public IVirtualProcessMessageHandler
 	public:
 
 		// signature of the actual handling function for a specific message type
-		typedef FastDelegate2< const SThreadKey &, const shared_ptr< const MessageType > &, void > HandlerFunctorType;
+		typedef FastDelegate2< EVirtualProcessID::Enum, const shared_ptr< const MessageType > &, void > HandlerFunctorType;
 
 		typedef IVirtualProcessMessageHandler BASECLASS;
 
@@ -52,12 +52,12 @@ class TVirtualProcessMessageHandler : public IVirtualProcessMessageHandler
 			MessageHandler( message_handler )
 		{}
 
-		virtual void Handle_Message( const SThreadKey &source, const shared_ptr< const IVirtualProcessMessage > &message ) const
+		virtual void Handle_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const IVirtualProcessMessage > &message ) const
 		{
 			// The handlers are tracked generically so they can go in one big hash table, but our forwarding delegates
 			// have specific type signatures, requiring a down cast that preserves smart pointer reference counting
 			shared_ptr< const MessageType > down_cast_message = static_pointer_cast< const MessageType >( message );
-			MessageHandler( source, down_cast_message );
+			MessageHandler( source_process_id, down_cast_message );
 		}
 
 	private:

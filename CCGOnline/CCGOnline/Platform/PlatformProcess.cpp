@@ -33,7 +33,7 @@
 		Returns: a 32 bit process id
 
 **********************************************************************************************************************/
-uint32 NPlatform::Get_Self_Process_ID( void )
+uint32 NPlatform::Get_Self_PID( void )
 {
 	return ::GetCurrentProcessId();
 }

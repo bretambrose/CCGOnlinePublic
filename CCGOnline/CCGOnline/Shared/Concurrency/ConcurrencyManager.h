@@ -23,14 +23,14 @@
 #ifndef CONCURRENCY_MANAGER_H
 #define CONCURRENCY_MANAGER_H
 
-#include "ThreadKey.h"
+#include "VirtualProcessProperties.h"
 #include "TypeInfoUtils.h"
 
 class IManagedVirtualProcess;
 class CReadOnlyMailbox;
 class CVirtualProcessMailbox;
-class CPushMailboxRequest;
-class CGetMailboxRequest;
+class CGetMailboxByIDRequest;
+class CGetMailboxByPropertiesRequest;
 class CAddNewVirtualProcessMessage;
 class CShutdownVirtualProcessMessage;
 class CRescheduleVirtualProcessMessage;
@@ -44,7 +44,6 @@ class CVirtualProcessMessageFrame;
 class CTaskScheduler;
 class CTimeKeeper;
 class CVirtualProcessRecord;
-class CThreadKeyManager;
 
 struct STickTime;
 
@@ -54,6 +53,11 @@ enum EConcurrencyManagerState;
 namespace tbb
 {
 	class task_scheduler_init;
+}
+
+namespace EVirtualProcessID
+{
+	enum Enum;
 }
 
 // the central, manager class that manages all thread tasks
@@ -77,11 +81,11 @@ class CConcurrencyManager
 		friend class CConcurrencyManagerTester;
 
 		// Accessors
-		shared_ptr< CVirtualProcessRecord > Get_Record( const SThreadKey &key ) const;
+		shared_ptr< CVirtualProcessRecord > Get_Record( EVirtualProcessID::Enum process_id ) const;
 
-		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process( const SThreadKey &key ) const;
+		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process( EVirtualProcessID::Enum process_id ) const;
 
-		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( const SThreadKey &key ) const;
+		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( EVirtualProcessID::Enum process_id ) const;
 		shared_ptr< CReadOnlyMailbox > Get_My_Mailbox( void ) const;
 
 		shared_ptr< CTaskScheduler > Get_Task_Scheduler( ETimeType time_type ) const;
@@ -90,15 +94,15 @@ class CConcurrencyManager
 		void Register_Message_Handlers( void );
 		void Register_Handler( const std::type_info &message_type_info, const shared_ptr< IVirtualProcessMessageHandler > &handler );
 
-		void Handle_Message( const SThreadKey &key, const shared_ptr< const IVirtualProcessMessage > &message );
-		void Handle_Get_Mailbox_Request( const SThreadKey &key, const shared_ptr< const CGetMailboxRequest > &message );
-		void Handle_Push_Mailbox_Request( const SThreadKey &key, const shared_ptr< const CPushMailboxRequest > &message );
-		void Handle_Add_New_Virtual_Process_Message( const SThreadKey &key, const shared_ptr< const CAddNewVirtualProcessMessage > &message );
-		void Handle_Shutdown_Virtual_Process_Message( const SThreadKey &key, const shared_ptr< const CShutdownVirtualProcessMessage > &message );
-		void Handle_Reschedule_Virtual_Process_Message( const SThreadKey &key, const shared_ptr< const CRescheduleVirtualProcessMessage > &message );
-		void Handle_Release_Mailbox_Response( const SThreadKey &key, const shared_ptr< const CReleaseMailboxResponse > &message );
-		void Handle_Shutdown_Self_Response( const SThreadKey &key, const shared_ptr< const CShutdownSelfResponse > &message );
-		void Handle_Shutdown_Manager_Message( const SThreadKey &key, const shared_ptr< const CShutdownManagerMessage > &message );
+		void Handle_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const IVirtualProcessMessage > &message );
+		void Handle_Get_Mailbox_By_ID_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CGetMailboxByIDRequest > &message );
+		void Handle_Get_Mailbox_By_Properties_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CGetMailboxByPropertiesRequest > &message );
+		void Handle_Add_New_Virtual_Process_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CAddNewVirtualProcessMessage > &message );
+		void Handle_Shutdown_Virtual_Process_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CShutdownVirtualProcessMessage > &message );
+		void Handle_Reschedule_Virtual_Process_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CRescheduleVirtualProcessMessage > &message );
+		void Handle_Release_Mailbox_Response( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CReleaseMailboxResponse > &message );
+		void Handle_Shutdown_Self_Response( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfResponse > &message );
+		void Handle_Shutdown_Manager_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CShutdownManagerMessage > &message );
 
 		// Execution
 		void Service( void );
@@ -110,42 +114,45 @@ class CConcurrencyManager
 		void Shutdown( void );
 
 		// Execution helpers
-		void Execute_Virtual_Process( const SThreadKey &key, double current_time_seconds );
+		void Execute_Virtual_Process( EVirtualProcessID::Enum process_id, double current_time_seconds );
 
 		void Add_Virtual_Process( const shared_ptr< IManagedVirtualProcess > &process );
+		void Add_Virtual_Process( const shared_ptr< IManagedVirtualProcess > &process, EVirtualProcessID::Enum id );
 
-		void Send_Virtual_Process_Message( const SThreadKey &dest_key, const shared_ptr< const IVirtualProcessMessage > &message );
+		void Send_Virtual_Process_Message( EVirtualProcessID::Enum dest_process_id, const shared_ptr< const IVirtualProcessMessage > &message );
 		void Flush_Frames( void );
 
 		void Handle_Ongoing_Mailbox_Requests( CVirtualProcessMailbox *mailbox );
-		void Clear_Related_Mailbox_Requests( const SThreadKey &key );
+		void Clear_Related_Mailbox_Requests( EVirtualProcessID::Enum process_id );
 
 		// Shutdown helpers
-		void Initiate_Process_Shutdown( const SThreadKey &key );
-		bool Is_Process_Shutting_Down( const SThreadKey &key ) const;
+		void Initiate_Process_Shutdown( EVirtualProcessID::Enum process_id );
+		bool Is_Process_Shutting_Down( EVirtualProcessID::Enum process_id ) const;
 		bool Is_Manager_Shutting_Down( void ) const;
 		
 		// Time management
 		double Get_Game_Time( void ) const;
 		void Set_Game_Time( double game_time_seconds );
 
-		// Types
-		typedef std::vector< shared_ptr< const CPushMailboxRequest > > PersistentPushRequestCollectionType;
-		typedef std::vector< shared_ptr< const CGetMailboxRequest > > PersistentGetRequestCollectionType;
-		typedef std::multimap< SThreadKey, shared_ptr< const CPushMailboxRequest >, SThreadKeyContainerHelper > PushRequestCollectionType;
-		typedef std::multimap< SThreadKey, shared_ptr< const CGetMailboxRequest >, SThreadKeyContainerHelper > GetRequestCollectionType;
+		// Misc
+		EVirtualProcessID::Enum Allocate_Virtual_Process_ID( void );
 
-		typedef stdext::hash_map< SThreadKey, shared_ptr< CVirtualProcessMessageFrame >, SThreadKeyContainerHelper > FrameTableType;
+		// Types
+		typedef std::multimap< EVirtualProcessID::Enum, shared_ptr< const CGetMailboxByPropertiesRequest > > GetMailboxByPropertiesRequestCollectionType;
+
+		typedef stdext::hash_map< EVirtualProcessID::Enum, shared_ptr< CVirtualProcessMessageFrame > > FrameTableType;
 		typedef stdext::hash_map< Loki::TypeInfo, shared_ptr< IVirtualProcessMessageHandler >, STypeInfoContainerHelper > VirtualProcessMessageHandlerTableType;
-		typedef stdext::hash_map< SThreadKey, shared_ptr< CVirtualProcessRecord >, SThreadKeyContainerHelper > VirtualProcessRecordTableType;
+		typedef stdext::hash_map< EVirtualProcessID::Enum, shared_ptr< CVirtualProcessRecord > > VirtualProcessRecordTableType;
+
+		typedef stdext::hash_map< EVirtualProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
+		typedef std::multimap< SProcessProperties, EVirtualProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
 
 		// Private Data
 		VirtualProcessRecordTableType ProcessRecords;
+		IDToProcessPropertiesTableType IDToPropertiesTable;
+		ProcessPropertiesToIDTableType PropertiesToIDTable;
 
-		PushRequestCollectionType					UnfulfilledPushRequests;
-		PersistentPushRequestCollectionType		PersistentPushRequests;
-		GetRequestCollectionType					UnfulfilledGetRequests;
-		PersistentGetRequestCollectionType		PersistentGetRequests;
+		GetMailboxByPropertiesRequestCollectionType		PersistentGetRequests;
 
 		FrameTableType PendingOutboundFrames;
 
@@ -154,11 +161,11 @@ class CConcurrencyManager
 		stdext::hash_map< ETimeType, shared_ptr< CTaskScheduler > > TaskSchedulers;
 		scoped_ptr< CTimeKeeper > TimeKeeper;
 
-		scoped_ptr< CThreadKeyManager > KeyManager;
-
 		scoped_ptr< tbb::task_scheduler_init > TBBTaskSchedulerInit;
 
 		EConcurrencyManagerState State;
+
+		EVirtualProcessID::Enum NextID;
 };
 
 

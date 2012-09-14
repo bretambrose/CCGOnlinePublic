@@ -185,15 +185,6 @@
     <ClInclude Include="Concurrency\MailboxInterfaces.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\ThreadKey.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadKeyManager.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ThreadSubject.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
     <ClInclude Include="Concurrency\VirtualProcessBase.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
@@ -247,6 +238,15 @@
     </ClInclude>
     <ClInclude Include="Concurrency\Containers\TBBConcurrentQueue.h">
       <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessID.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessProperties.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\VirtualProcessSubject.h">
+      <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -322,12 +322,6 @@
     <ClCompile Include="Concurrency\MailboxInterfaces.cpp">
       <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="Concurrency\ThreadKey.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\ThreadKeyManager.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
     <ClCompile Include="Concurrency\VirtualProcessBase.cpp">
       <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
@@ -351,6 +345,9 @@
     </ClCompile>
     <ClCompile Include="Logging\LoggingVirtualProcess.cpp">
       <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\VirtualProcessProperties.cpp">
+      <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
