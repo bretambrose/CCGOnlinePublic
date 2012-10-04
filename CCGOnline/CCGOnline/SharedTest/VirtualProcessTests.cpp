@@ -23,7 +23,7 @@
 #include "stdafx.h"
 
 #include "Concurrency/VirtualProcessBase.h"
-#include "Concurrency/ThreadSubject.h"
+#include "Concurrency/VirtualProcessSubject.h"
 #include "Concurrency/VirtualProcessMailbox.h"
 #include "Concurrency/VirtualProcessConstants.h"
 #include "Concurrency/VirtualProcessStatics.h"
@@ -53,8 +53,8 @@ class CTestVirtualProcessTask : public CVirtualProcessBase
 
 		typedef CVirtualProcessBase BASECLASS;
 
-		CTestVirtualProcessTask( const SThreadKey &key ) :
-			BASECLASS( key )
+		CTestVirtualProcessTask( const SProcessProperties &properties ) :
+			BASECLASS( properties )
 		{}
 
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
@@ -65,18 +65,20 @@ class CTestVirtualProcessTask : public CVirtualProcessBase
 	private:
 };
 
+static const EVirtualProcessID::Enum AI_PROCESS_ID = static_cast< EVirtualProcessID::Enum >( EVirtualProcessID::FIRST_FREE_ID );
+
 class CVirtualProcessBaseTester
 {
 	public:
 
 		CVirtualProcessBaseTester( CVirtualProcessBase *virtual_process ) :
 			VirtualProcess( virtual_process ),
-			ManagerProxy( new CVirtualProcessMailbox( MANAGER_THREAD_KEY ) ),
-			SelfProxy( new CVirtualProcessMailbox( virtual_process->Get_Key() ) )
+			ManagerProxy( new CVirtualProcessMailbox( EVirtualProcessID::CONCURRENCY_MANAGER, MANAGER_PROCESS_PROPERTIES ) ),
+			SelfProxy( new CVirtualProcessMailbox( AI_PROCESS_ID, virtual_process->Get_Properties() ) )
 		{
 			virtual_process->Set_Manager_Mailbox( ManagerProxy->Get_Writable_Mailbox() );
 			virtual_process->Set_My_Mailbox( SelfProxy->Get_Readable_Mailbox() );
-			virtual_process->Initialize( EVirtualProcessID::FIRST_FREE_ID );
+			virtual_process->Initialize( AI_PROCESS_ID );
 		}
 
 		~CVirtualProcessBaseTester()
@@ -115,7 +117,9 @@ class CVirtualProcessBaseTester
 		const CVirtualProcessBase::FrameTableType &Get_Frame_Table( void ) const { return VirtualProcess->PendingOutboundFrames; }
 		const CVirtualProcessBase::MailboxTableType &Get_Mailbox_Table( void ) const { return VirtualProcess->Mailboxes; }
 
-		shared_ptr< CWriteOnlyMailbox > Get_Log_Mailbox( void ) const { return VirtualProcess->LogMailbox; }
+		shared_ptr< CWriteOnlyMailbox > Get_Logging_Mailbox( void ) const { return VirtualProcess->LoggingMailbox; }
+		void Set_Logging_Mailbox( shared_ptr< CWriteOnlyMailbox > mailbox ) { VirtualProcess->LoggingMailbox = mailbox; }
+
 		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const { return VirtualProcess->ManagerMailbox; }
 
 		shared_ptr< CVirtualProcessMessageFrame > Get_Log_Frame( void ) const { return VirtualProcess->LogFrame; }
@@ -151,14 +155,26 @@ class CBasicServiceTestTask : public CScheduledTask
 		}
 };
 
+namespace ETestVirtualProcessSubject
+{
+	enum Enum
+	{
+		AI = EVirtualProcessSubject::NEXT_FREE_VALUE,
+		DATABASE,
+		UI
+	};
+}
+
+SProcessProperties AI_PROPS( ETestVirtualProcessSubject::AI  );
+
+
 TEST_F( VirtualProcessTests, Basic_Service_And_Reschedule )
 {
 	static const double FIRST_SERVICE_TIME = 1.0;
 	static const double SECOND_SERVICE_TIME = 4.99;
 	static const double THIRD_SERVICE_TIME = 5.0;
 
-	SThreadKey test_key( TS_AI, 1, 1  );
-	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( test_key ) );
+	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( AI_PROPS ) );
 
 	ASSERT_FALSE( CVirtualProcessBaseTester::Get_Has_Process_Service_Executed() );
 
@@ -181,7 +197,6 @@ TEST_F( VirtualProcessTests, Basic_Service_And_Reschedule )
 
 		const CRescheduleVirtualProcessMessage *reschedule_message = static_cast< const CRescheduleVirtualProcessMessage * >( raw_message );
 
-		ASSERT_TRUE( reschedule_message->Get_Key() == test_key );
 		ASSERT_DOUBLE_EQ( reschedule_message->Get_Reschedule_Time(), FIRST_SERVICE_TIME + process_tester.Get_Reschedule_Interval() );
 	}
 
@@ -202,7 +217,6 @@ TEST_F( VirtualProcessTests, Basic_Service_And_Reschedule )
 
 		const CRescheduleVirtualProcessMessage *reschedule_message = static_cast< const CRescheduleVirtualProcessMessage * >( raw_message );
 
-		ASSERT_TRUE( reschedule_message->Get_Key() == test_key );
 		ASSERT_DOUBLE_EQ( reschedule_message->Get_Reschedule_Time(), THIRD_SERVICE_TIME );
 	}
 
@@ -210,42 +224,47 @@ TEST_F( VirtualProcessTests, Basic_Service_And_Reschedule )
 	ASSERT_TRUE( CVirtualProcessBaseTester::Get_Has_Process_Service_Executed() );
 }
 
-static const SThreadKey DB_KEY( TS_DATABASE, 1, 1  );
+static const SProcessProperties DB_PROPS( ETestVirtualProcessSubject::DATABASE );
+static const EVirtualProcessID::Enum DB_PROCESS_ID = static_cast< EVirtualProcessID::Enum >( EVirtualProcessID::FIRST_FREE_ID + 1 );
 
-class CSendMessageServiceTask : public CScheduledTask
+class CSendAddMailboxMessageServiceTask : public CScheduledTask
 {
 	public:
 
 		typedef CScheduledTask BASECLASS;
 
-		CSendMessageServiceTask( double execute_time_seconds ) :
-			BASECLASS( execute_time_seconds )
+		CSendAddMailboxMessageServiceTask( double execute_time_seconds, const shared_ptr< CWriteOnlyMailbox > &mailbox ) :
+			BASECLASS( execute_time_seconds ),
+			Mailbox( mailbox )
 		{}
 
 		virtual bool Execute( double time_seconds, double &reschedule_time_seconds )
 		{
 			CVirtualProcessStatics::Get_Current_Virtual_Process()->
-				Send_Virtual_Process_Message( DB_KEY, shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, shared_ptr< CWriteOnlyMailbox >( nullptr ) ) ) );
+				Send_Virtual_Process_Message( DB_PROCESS_ID, shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( Mailbox ) ) );
 
 			reschedule_time_seconds = time_seconds + .1;
 			return true;
 		}
+
+	private:
+
+		shared_ptr< CWriteOnlyMailbox > Mailbox;
 };
 
 TEST_F( VirtualProcessTests, Send_Message )
 {
-	SThreadKey test_key( TS_AI, 1, 1  );
-	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( test_key ) );
+	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( AI_PROPS ) );
 
-	shared_ptr< CScheduledTask > simple_task( new CSendMessageServiceTask( 0.0 ) );
+	shared_ptr< CScheduledTask > simple_task( new CSendAddMailboxMessageServiceTask( 0.0, process_tester.Get_Self_Proxy()->Get_Writable_Mailbox() ) );
 	process_tester.Get_Virtual_Process()->Get_Task_Scheduler()->Submit_Task( simple_task );
 
 	process_tester.Service( 1.0 );
 
 	// Verify pending message due to no interface
 	auto frame_table = process_tester.Get_Frame_Table();
-	ASSERT_TRUE( frame_table.find( DB_KEY ) != frame_table.end() );
-	shared_ptr< CVirtualProcessMessageFrame > db_frame = frame_table.find( DB_KEY )->second;
+	ASSERT_TRUE( frame_table.find( DB_PROCESS_ID ) != frame_table.end() );
+	shared_ptr< CVirtualProcessMessageFrame > db_frame = frame_table.find( DB_PROCESS_ID )->second;
 	for ( auto iter = db_frame->Get_Frame_Begin(); iter != db_frame->Get_Frame_End(); ++iter )
 	{
 		const IVirtualProcessMessage *raw_message = iter->get();
@@ -254,15 +273,14 @@ TEST_F( VirtualProcessTests, Send_Message )
 
 		const CAddMailboxMessage *add_mailbox_message = static_cast< const CAddMailboxMessage * >( raw_message );
 
-		ASSERT_TRUE( add_mailbox_message->Get_Key() == LOG_THREAD_KEY );
-		ASSERT_TRUE( add_mailbox_message->Get_Mailbox().get() == nullptr );
+		ASSERT_TRUE( add_mailbox_message->Get_Mailbox().get() == process_tester.Get_Self_Proxy()->Get_Writable_Mailbox().get() );
 	}
 
-	shared_ptr< CVirtualProcessMailbox > db_conn( new CVirtualProcessMailbox( DB_KEY ) );
+	shared_ptr< CVirtualProcessMailbox > db_conn( new CVirtualProcessMailbox( DB_PROCESS_ID, DB_PROPS ) );
 
 	// notify the thread of the db interface
-	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( DB_KEY, db_conn->Get_Writable_Mailbox() ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
+	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( db_conn->Get_Writable_Mailbox() ) ) );
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
 	process_tester.Service( 2.0 );
@@ -270,9 +288,9 @@ TEST_F( VirtualProcessTests, Send_Message )
 	// verify new interface added
 	auto interfaces = process_tester.Get_Mailbox_Table();
 	ASSERT_TRUE( interfaces.size() == 1 );	
-	ASSERT_TRUE( interfaces.find( DB_KEY ) != interfaces.end() );
+	ASSERT_TRUE( interfaces.find( DB_PROCESS_ID ) != interfaces.end() );
 
-	// verify both messages sent to the db thread's mailbox
+	// verify both (send task is recurrent) messages sent to the db thread's mailbox
 	frame_table = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( frame_table.size() == 0 );
 
@@ -290,8 +308,7 @@ TEST_F( VirtualProcessTests, Send_Message )
 
 		const CAddMailboxMessage *add_mailbox_message = static_cast< const CAddMailboxMessage * >( raw_message );
 
-		ASSERT_TRUE( add_mailbox_message->Get_Key() == LOG_THREAD_KEY );
-		ASSERT_TRUE( add_mailbox_message->Get_Mailbox().get() == nullptr );
+		ASSERT_TRUE( add_mailbox_message->Get_Mailbox().get() == process_tester.Get_Self_Proxy()->Get_Writable_Mailbox().get() );
 	}
 }
 
@@ -301,8 +318,7 @@ TEST_F( VirtualProcessTests, Add_Mailbox_And_Logging )
 	static const std::wstring LOG_MESSAGE_2( L"Log Test 2" );
 	static const std::wstring LOG_MESSAGE_3( L"Log Test 3" );
 
-	SThreadKey test_key( TS_AI, 1, 1  );
-	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( test_key ) );
+	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( AI_PROPS ) );
 
 	// vanishes because no context to route to
 	CLogInterface::Log( LOG_MESSAGE_1 );
@@ -321,22 +337,20 @@ TEST_F( VirtualProcessTests, Add_Mailbox_And_Logging )
 
 		const CLogRequestMessage *log_message = static_cast< const CLogRequestMessage * >( raw_message );
 
-		ASSERT_TRUE( log_message->Get_Source_Key() == test_key );
+		ASSERT_TRUE( log_message->Get_Source_Properties() == AI_PROPS );
 		ASSERT_TRUE( log_message->Get_Message() == LOG_MESSAGE_2 );
 	}
 	
-	shared_ptr< CVirtualProcessMailbox > log_conn( new CVirtualProcessMailbox( LOG_THREAD_KEY ) );
+	shared_ptr< CVirtualProcessMailbox > log_conn( new CVirtualProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
 
 	// notify the thread of the log interface
-	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, log_conn->Get_Writable_Mailbox() ) ) );
-	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
-
-	process_tester.Service( 2.0 );
+	process_tester.Set_Logging_Mailbox( log_conn->Get_Writable_Mailbox() );
 
 	// verify new interface added
 	ASSERT_TRUE( process_tester.Get_Mailbox_Table().size() == 0 );	// 
-	ASSERT_TRUE( process_tester.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( process_tester.Get_Logging_Mailbox().get() != nullptr );
+
+	process_tester.Service( 2.0 );
 
 	// verify second log message sent to the log thread's mailbox
 	auto frame_table = process_tester.Get_Frame_Table();
@@ -348,6 +362,7 @@ TEST_F( VirtualProcessTests, Add_Mailbox_And_Logging )
 	ASSERT_TRUE( frames.size() == 1 );
 
 	shared_ptr< CVirtualProcessMessageFrame > frame = frames[ 0 ];
+	ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
 	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 	{
 		const IVirtualProcessMessage *raw_message = iter->get();
@@ -356,7 +371,7 @@ TEST_F( VirtualProcessTests, Add_Mailbox_And_Logging )
 
 		const CLogRequestMessage *log_message = static_cast< const CLogRequestMessage * >( raw_message );
 
-		ASSERT_TRUE( log_message->Get_Source_Key() == test_key );
+		ASSERT_TRUE( log_message->Get_Source_Properties() == AI_PROPS );
 		ASSERT_TRUE( log_message->Get_Message() == LOG_MESSAGE_2 );
 	}
 
@@ -381,65 +396,56 @@ TEST_F( VirtualProcessTests, Add_Mailbox_And_Logging )
 
 		const CLogRequestMessage *log_message = static_cast< const CLogRequestMessage * >( raw_message );
 
-		ASSERT_TRUE( log_message->Get_Source_Key() == test_key );
+		ASSERT_TRUE( log_message->Get_Source_Properties() == AI_PROPS );
 		ASSERT_TRUE( log_message->Get_Message() == LOG_MESSAGE_3 );
 	}
 
 }
 
-static const SThreadKey UI_KEY( TS_UI, 1, 1 );
+static const SProcessProperties UI_PROPS( ETestVirtualProcessSubject::UI );
+static const EVirtualProcessID::Enum UI_PROCESS_ID = static_cast< EVirtualProcessID::Enum >( EVirtualProcessID::FIRST_FREE_ID + 2 );
 
-class CSendUIMessageTask : public CScheduledTask
+class CSendMailboxMessageTask : public CScheduledTask
 {
 	public:
 
 		typedef CScheduledTask BASECLASS;
 
-		CSendUIMessageTask( double execute_time_seconds ) :
-			BASECLASS( execute_time_seconds )
+		CSendMailboxMessageTask( double execute_time_seconds, const shared_ptr< CWriteOnlyMailbox > &mailbox, EVirtualProcessID::Enum target_process_id ) :
+			BASECLASS( execute_time_seconds ),
+			Mailbox( mailbox ),
+			TargetProcessID( target_process_id )
 		{}
 
 		virtual bool Execute( double /*time_seconds*/, double & /*reschedule_time_seconds*/ )
 		{
 			CVirtualProcessStatics::Get_Current_Virtual_Process()->
-				Send_Virtual_Process_Message( UI_KEY, shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, shared_ptr< CWriteOnlyMailbox >( nullptr ) ) ) );
+				Send_Virtual_Process_Message( TargetProcessID, shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( Mailbox ) ) );
 			return false;
 		}
-};
 
-class CSendDBMessageTask : public CScheduledTask
-{
-	public:
+	private:
 
-		typedef CScheduledTask BASECLASS;
-
-		CSendDBMessageTask( double execute_time_seconds ) :
-			BASECLASS( execute_time_seconds )
-		{}
-
-		virtual bool Execute( double /*time_seconds*/, double & /*reschedule_time_seconds*/ )
-		{
-			CVirtualProcessStatics::Get_Current_Virtual_Process()->
-				Send_Virtual_Process_Message( DB_KEY, shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, shared_ptr< CWriteOnlyMailbox >( nullptr ) ) ) );
-			return false;
-		}
+		shared_ptr< CWriteOnlyMailbox > Mailbox;
+		EVirtualProcessID::Enum TargetProcessID;
 };
 
 TEST_F( VirtualProcessTests, Shutdown_Interface )
 {
 	static const std::wstring LOG_MESSAGE( L"Log Test" );
 
-	SThreadKey test_key( TS_AI, 1, 1  );
-	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( test_key ) );
+	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( AI_PROPS ) );
+	EVirtualProcessID::Enum tester_id = process_tester.Get_Virtual_Process()->Get_ID();
 
-	shared_ptr< CVirtualProcessMailbox > ui_conn( new CVirtualProcessMailbox( UI_KEY ) );
+	shared_ptr< CVirtualProcessMailbox > log_conn( new CVirtualProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
+	shared_ptr< CVirtualProcessMailbox > ui_conn( new CVirtualProcessMailbox( UI_PROCESS_ID, UI_PROPS ) );
 
-	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( UI_KEY, ui_conn->Get_Writable_Mailbox() ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
+	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
 	// generate a message that goes nowhere
-	shared_ptr< CScheduledTask > db_task( new CSendDBMessageTask( 0.0 ) );
+	shared_ptr< CScheduledTask > db_task( new CSendMailboxMessageTask( 0.0, ui_conn->Get_Writable_Mailbox(), DB_PROCESS_ID ) );
 	process_tester.Get_Virtual_Process()->Get_Task_Scheduler()->Submit_Task( db_task );
 
 	process_tester.Service( 0.0 );
@@ -447,14 +453,15 @@ TEST_F( VirtualProcessTests, Shutdown_Interface )
 	// verify log interface added
 	auto mailboxes = process_tester.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 1 );	
-	ASSERT_TRUE( mailboxes.find( UI_KEY ) != mailboxes.end() );
+	ASSERT_TRUE( mailboxes.find( UI_PROCESS_ID ) != mailboxes.end() );
 
 	// verify pending message that was not able to be sent
 	auto frame_table = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( frame_table.size() == 1 );
-	ASSERT_TRUE( frame_table.find( DB_KEY ) != frame_table.end() );
+	ASSERT_TRUE( frame_table.find( DB_PROCESS_ID ) != frame_table.end() );
 
-	shared_ptr< CVirtualProcessMessageFrame > frame = frame_table.find( DB_KEY )->second;
+	shared_ptr< CVirtualProcessMessageFrame > frame = frame_table.find( DB_PROCESS_ID )->second;
+	ASSERT_TRUE( frame->Get_Process_ID() == tester_id );
 	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 	{
 		const IVirtualProcessMessage *raw_message = iter->get();
@@ -463,18 +470,17 @@ TEST_F( VirtualProcessTests, Shutdown_Interface )
 
 		const CAddMailboxMessage *add_message = static_cast< const CAddMailboxMessage * >( raw_message );
 
-		ASSERT_TRUE( add_message->Get_Key() == LOG_THREAD_KEY );
-		ASSERT_TRUE( add_message->Get_Mailbox().get() == nullptr );
+		ASSERT_TRUE( add_message->Get_Mailbox().get() == ui_conn->Get_Writable_Mailbox().get() );
 	}
 	
 	// generate a message to the ui thread which should go through
-	shared_ptr< CScheduledTask > simple_task( new CSendUIMessageTask( 1.0 ) );
+	shared_ptr< CScheduledTask > simple_task( new CSendMailboxMessageTask( 1.0, log_conn->Get_Writable_Mailbox(), UI_PROCESS_ID ) );
 	process_tester.Get_Virtual_Process()->Get_Task_Scheduler()->Submit_Task( simple_task );
 
-	// shutdown both a known interface (UI_KEY) and an unknown interface (DB_KEY)
-	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( UI_KEY ) ) );
-	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( DB_KEY ) ) );
+	// shutdown both a known interface (UI_PROCESS_ID) and an unknown interface (DB_PROCESS_ID)
+	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( MANAGER_PROCESS_ID ) );
+	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
+	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( DB_PROCESS_ID ) ) );
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	process_tester.Service( 1.0 );
@@ -501,8 +507,7 @@ TEST_F( VirtualProcessTests, Shutdown_Interface )
 
 		const CAddMailboxMessage *add_message = static_cast< const CAddMailboxMessage * >( raw_message );
 
-		ASSERT_TRUE( add_message->Get_Key() == LOG_THREAD_KEY );
-		ASSERT_TRUE( add_message->Get_Mailbox().get() == nullptr );
+		ASSERT_TRUE( add_message->Get_Mailbox().get() == log_conn->Get_Writable_Mailbox().get() );
 	}
 
 	// verify only pending messages are shutdown acknowledgements
@@ -510,7 +515,7 @@ TEST_F( VirtualProcessTests, Shutdown_Interface )
 	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
 	{
 		frame = *outer_iter;
-		ASSERT_TRUE( frame->Get_Key() == test_key );
+		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
 
 		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 		{
@@ -520,7 +525,7 @@ TEST_F( VirtualProcessTests, Shutdown_Interface )
 			{
 				const CReleaseMailboxResponse *ack_message = static_cast< const CReleaseMailboxResponse * >( raw_message );
 
-				ASSERT_TRUE( ack_message->Get_Shutdown_Key() == UI_KEY || ack_message->Get_Shutdown_Key() == DB_KEY );
+				ASSERT_TRUE( ack_message->Get_Shutdown_Process_ID() == UI_PROCESS_ID || ack_message->Get_Shutdown_Process_ID() == DB_PROCESS_ID );
 			}
 			else
 			{
@@ -534,27 +539,26 @@ TEST_F( VirtualProcessTests, Shutdown_Soft )
 {
 	static const std::wstring LOG_MESSAGE( L"Blah blah" );
 
-	SThreadKey test_key( TS_AI, 1, 1  );
-	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( test_key ) );
+	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( AI_PROPS ) );
 
-	shared_ptr< CVirtualProcessMailbox > ui_conn( new CVirtualProcessMailbox( UI_KEY ) );
-	shared_ptr< CVirtualProcessMailbox > log_conn( new CVirtualProcessMailbox( LOG_THREAD_KEY ) );
+	shared_ptr< CVirtualProcessMailbox > ui_conn( new CVirtualProcessMailbox( UI_PROCESS_ID, UI_PROPS ) );
+	shared_ptr< CVirtualProcessMailbox > log_conn( new CVirtualProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
+	process_tester.Set_Logging_Mailbox( log_conn->Get_Writable_Mailbox() );
 
-	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( MANAGER_PROCESS_ID ) );
 
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( UI_KEY, ui_conn->Get_Writable_Mailbox() ) ) );
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, log_conn->Get_Writable_Mailbox() ) ) );
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( UI_KEY ) ) );
+	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
+	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
 	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownSelfRequest( false ) ) );
 
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
 	// message going nowhere
-	shared_ptr< CScheduledTask > db_task( new CSendDBMessageTask( 0.0 ) );
+	shared_ptr< CScheduledTask > db_task( new CSendMailboxMessageTask( 0.0, log_conn->Get_Writable_Mailbox(), DB_PROCESS_ID ) );
 	process_tester.Get_Virtual_Process()->Get_Task_Scheduler()->Submit_Task( db_task );
 
 	// message to ui thread
-	shared_ptr< CScheduledTask > ui_task( new CSendUIMessageTask( 0.0 ) );
+	shared_ptr< CScheduledTask > ui_task( new CSendMailboxMessageTask( 0.0, log_conn->Get_Writable_Mailbox(), UI_PROCESS_ID ) );
 	process_tester.Get_Virtual_Process()->Get_Task_Scheduler()->Submit_Task( ui_task );
 
 	// log message
@@ -585,7 +589,7 @@ TEST_F( VirtualProcessTests, Shutdown_Soft )
 
 		const CLogRequestMessage *log_message = static_cast< const CLogRequestMessage * >( raw_message );
 
-		ASSERT_TRUE( log_message->Get_Source_Key() == test_key );
+		ASSERT_TRUE( log_message->Get_Source_Properties() == AI_PROPS );
 		ASSERT_TRUE( log_message->Get_Message() == LOG_MESSAGE );
 	}
 
@@ -603,8 +607,7 @@ TEST_F( VirtualProcessTests, Shutdown_Soft )
 
 		const CAddMailboxMessage *add_message = static_cast< const CAddMailboxMessage * >( raw_message );
 
-		ASSERT_TRUE( add_message->Get_Key() == LOG_THREAD_KEY );
-		ASSERT_TRUE( add_message->Get_Mailbox().get() == nullptr );
+		ASSERT_TRUE( add_message->Get_Mailbox().get() == log_conn->Get_Writable_Mailbox().get() );
 	}
 
 	// verify the acknowledgement messages sent to the manager
@@ -613,7 +616,7 @@ TEST_F( VirtualProcessTests, Shutdown_Soft )
 	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
 	{
 		frame = *outer_iter;
-		ASSERT_TRUE( frame->Get_Key() == test_key );
+		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
 
 		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 		{
@@ -623,7 +626,7 @@ TEST_F( VirtualProcessTests, Shutdown_Soft )
 			{
 				const CReleaseMailboxResponse *ack_message = static_cast< const CReleaseMailboxResponse * >( raw_message );
 
-				ASSERT_TRUE( ack_message->Get_Shutdown_Key() == UI_KEY );
+				ASSERT_TRUE( ack_message->Get_Shutdown_Process_ID() == UI_PROCESS_ID );
 			}
 			else
 			{
@@ -637,27 +640,26 @@ TEST_F( VirtualProcessTests, Shutdown_Hard )
 {
 	static const std::wstring LOG_MESSAGE( L"Hard shutdown" );
 
-	SThreadKey test_key( TS_AI, 1, 1  );
-	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( test_key ) );
+	CVirtualProcessBaseTester process_tester( new CTestVirtualProcessTask( AI_PROPS ) );
 
-	shared_ptr< CVirtualProcessMailbox > ui_conn( new CVirtualProcessMailbox( UI_KEY ) );
-	shared_ptr< CVirtualProcessMailbox > log_conn( new CVirtualProcessMailbox( LOG_THREAD_KEY ) );
+	shared_ptr< CVirtualProcessMailbox > ui_conn( new CVirtualProcessMailbox( UI_PROCESS_ID, UI_PROPS ) );
+	shared_ptr< CVirtualProcessMailbox > log_conn( new CVirtualProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
+	process_tester.Set_Logging_Mailbox( log_conn->Get_Writable_Mailbox() );
 
-	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	shared_ptr< CVirtualProcessMessageFrame > added_frame( new CVirtualProcessMessageFrame( MANAGER_PROCESS_ID ) );
 
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( UI_KEY, ui_conn->Get_Writable_Mailbox() ) ) );
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, log_conn->Get_Writable_Mailbox() ) ) );
-	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( UI_KEY ) ) );
+	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
+	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
 	added_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownSelfRequest( true ) ) );
 
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
 	// message going nowhere
-	shared_ptr< CScheduledTask > db_task( new CSendDBMessageTask( 0.0 ) );
+	shared_ptr< CScheduledTask > db_task( new CSendMailboxMessageTask( 0.0, log_conn->Get_Writable_Mailbox(), DB_PROCESS_ID ) );
 	process_tester.Get_Virtual_Process()->Get_Task_Scheduler()->Submit_Task( db_task );
 
 	// message to ui thread, but shouldn't get sent since it's a hard shutdown
-	shared_ptr< CScheduledTask > ui_task( new CSendUIMessageTask( 0.0 ) );
+	shared_ptr< CScheduledTask > ui_task( new CSendMailboxMessageTask( 0.0, log_conn->Get_Writable_Mailbox(), UI_PROCESS_ID ) );
 	process_tester.Get_Virtual_Process()->Get_Task_Scheduler()->Submit_Task( ui_task );
 
 	// log message
@@ -688,7 +690,7 @@ TEST_F( VirtualProcessTests, Shutdown_Hard )
 
 		const CLogRequestMessage *log_message = static_cast< const CLogRequestMessage * >( raw_message );
 
-		ASSERT_TRUE( log_message->Get_Source_Key() == test_key );
+		ASSERT_TRUE( log_message->Get_Source_Properties() == AI_PROPS );
 		ASSERT_TRUE( log_message->Get_Message() == LOG_MESSAGE );
 	}
 
@@ -702,7 +704,7 @@ TEST_F( VirtualProcessTests, Shutdown_Hard )
 	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
 	{
 		frame = *outer_iter;
-		ASSERT_TRUE( frame->Get_Key() == test_key );
+		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
 
 		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 		{
@@ -712,7 +714,7 @@ TEST_F( VirtualProcessTests, Shutdown_Hard )
 			{
 				const CReleaseMailboxResponse *ack_message = static_cast< const CReleaseMailboxResponse * >( raw_message );
 
-				ASSERT_TRUE( ack_message->Get_Shutdown_Key() == UI_KEY );
+				ASSERT_TRUE( ack_message->Get_Shutdown_Process_ID() == UI_PROCESS_ID );
 			}
 			else
 			{

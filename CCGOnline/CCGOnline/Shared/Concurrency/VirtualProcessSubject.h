@@ -33,6 +33,7 @@ namespace EVirtualProcessSubject
 		CONCURRENCY_MANAGER,
 		LOGGING,
 
+		NEXT_FREE_VALUE
 	};
 }
 

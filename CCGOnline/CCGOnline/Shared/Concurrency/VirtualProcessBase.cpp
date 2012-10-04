@@ -177,6 +177,17 @@ void CVirtualProcessBase::Send_Virtual_Process_Message( EVirtualProcessID::Enum 
 }
 
 /**********************************************************************************************************************
+	CVirtualProcessBase::Send_Manager_Message -- sends a message to the concurrency manager
+
+		message -- message to send
+					
+**********************************************************************************************************************/
+void CVirtualProcessBase::Send_Manager_Message( const shared_ptr< const IVirtualProcessMessage > &message )
+{
+	Send_Virtual_Process_Message( EVirtualProcessID::CONCURRENCY_MANAGER, message );
+}
+
+/**********************************************************************************************************************
 	CVirtualProcessBase::Flush_Regular_Messages -- sends all pending messages to their destination process; does not include
 		manager or logging processes
 					

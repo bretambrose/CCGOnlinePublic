@@ -34,7 +34,6 @@
 #include "Concurrency/Messaging/ExchangeMailboxMessages.h"
 #include "Concurrency/Messaging/LoggingMessages.h"
 #include "Concurrency/Messaging/VirtualProcessManagementMessages.h"
-#include "Concurrency/ThreadSubject.h"
 #include "Concurrency/VirtualProcessExecutionContext.h"
 #include "Concurrency/VirtualProcessStatics.h"
 #include "tbb/task.h"
@@ -61,7 +60,7 @@ class CLoggingVirtualProcessTester
 		void Initialize( void )
 		{
 			LoggingVirtualProcess->Initialize( EVirtualProcessID::LOGGING );
-			LoggingMailbox.reset( new CVirtualProcessMailbox( LOG_THREAD_KEY ) );
+			LoggingMailbox.reset( new CVirtualProcessMailbox( EVirtualProcessID::LOGGING, LOGGING_PROCESS_PROPERTIES ) );
 			LoggingVirtualProcess->Set_My_Mailbox( LoggingMailbox->Get_Readable_Mailbox() );
 		}
 
@@ -109,8 +108,12 @@ TEST_F( LoggingTests, Log_Level )
 	ASSERT_TRUE( CLogInterface::Get_Log_Level() == LL_MEDIUM );
 }
 
-static const SThreadKey AI_KEY( TS_AI, 1, 1 );
-static const SThreadKey DB_KEY( TS_DATABASE, 1, 1 );
+static const EVirtualProcessID::Enum TEST_KEY1 = static_cast< EVirtualProcessID::Enum >( EVirtualProcessID::FIRST_FREE_ID );
+static const EVirtualProcessID::Enum TEST_KEY2 = static_cast< EVirtualProcessID::Enum >( EVirtualProcessID::FIRST_FREE_ID + 1 );
+
+static const SProcessProperties TEST_PROPS1( EVirtualProcessSubject::NEXT_FREE_VALUE, 1, 1, 1 );
+static const SProcessProperties TEST_PROPS2( EVirtualProcessSubject::NEXT_FREE_VALUE + 1, 1, 1, 1 );
+
 static const std::wstring LOG_TEST_MESSAGE( L"Testing" );
 
 void Verify_Log_File( const std::wstring &file_name )
@@ -151,20 +154,20 @@ TEST_F( LoggingTests, Direct_Logging )
 	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
 
-	shared_ptr< CVirtualProcessMessageFrame > ai_frame( new CVirtualProcessMessageFrame( AI_KEY ) );
-	ai_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( AI_KEY, LOG_TEST_MESSAGE ) ) );
-	ai_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( AI_KEY, LOG_TEST_MESSAGE ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > ai_frame( new CVirtualProcessMessageFrame( TEST_KEY1 ) );
+	ai_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
+	ai_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( ai_frame );
 
-	shared_ptr< CVirtualProcessMessageFrame > manager_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	manager_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_TEST_MESSAGE ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > manager_frame( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
+	manager_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( manager_frame );
 
-	shared_ptr< CVirtualProcessMessageFrame > db_frame( new CVirtualProcessMessageFrame( DB_KEY ) );
-	db_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( DB_KEY, LOG_TEST_MESSAGE ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > db_frame( new CVirtualProcessMessageFrame( TEST_KEY2 ) );
+	db_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( TEST_PROPS2, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( db_frame );
 
-	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
 	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownSelfRequest( false ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
@@ -185,8 +188,8 @@ class CDummyProcess : public CVirtualProcessBase
 		
 		typedef CVirtualProcessBase BASECLASS;
 
-		CDummyProcess( const SThreadKey &key ) :
-			BASECLASS( key )
+		CDummyProcess( const SProcessProperties &properties ) :
+			BASECLASS( properties )
 		{}
 
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
@@ -206,16 +209,12 @@ TEST_F( LoggingTests, Static_Logging )
 	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
 
-	shared_ptr< CDummyProcess > dummy_process( new CDummyProcess( AI_KEY ) );
+	shared_ptr< CDummyProcess > dummy_process( new CDummyProcess( TEST_PROPS1 ) );
 	dummy_process->Initialize( EVirtualProcessID::FIRST_FREE_ID );
 
-	shared_ptr< CVirtualProcessMailbox > dummy_mailbox( new CVirtualProcessMailbox( AI_KEY ) );
+	shared_ptr< CVirtualProcessMailbox > dummy_mailbox( new CVirtualProcessMailbox( EVirtualProcessID::FIRST_FREE_ID, TEST_PROPS1 ) );
 	dummy_process->Set_My_Mailbox( dummy_mailbox->Get_Readable_Mailbox() );
-
-	shared_ptr< CVirtualProcessMessageFrame > manager_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	manager_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CAddMailboxMessage( LOG_THREAD_KEY, log_tester.Get_Writable_Mailbox() ) ) );
-
-	dummy_mailbox->Get_Writable_Mailbox()->Add_Frame( manager_frame );
+	dummy_process->Set_Logging_Mailbox( log_tester.Get_Writable_Mailbox() );
 
 	CVirtualProcessStatics::Set_Current_Virtual_Process( dummy_process.get() );
 
@@ -229,7 +228,7 @@ TEST_F( LoggingTests, Static_Logging )
 
 	dummy_process->Flush_System_Messages();
 
-	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
+	shared_ptr< CVirtualProcessMessageFrame > shutdown_frame( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
 	shutdown_frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownSelfRequest( false ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 

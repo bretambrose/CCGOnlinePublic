@@ -56,6 +56,7 @@ class CVirtualProcessBase : public IManagedVirtualProcess
 		virtual EVirtualProcessID::Enum Get_ID( void ) const { return ID; }
 
 		virtual void Send_Virtual_Process_Message( EVirtualProcessID::Enum dest_process_id, const shared_ptr< const IVirtualProcessMessage > &message );
+		virtual void Send_Manager_Message( const shared_ptr< const IVirtualProcessMessage > &message );
 		virtual void Log( const std::wstring &message );
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const { return TaskScheduler.get(); }

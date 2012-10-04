@@ -27,6 +27,7 @@
 #include "Concurrency/VirtualProcessMessageFrame.h"
 #include "Concurrency/Messaging/LoggingMessages.h"
 #include "Concurrency/VirtualProcessConstants.h"
+#include "Concurrency/VirtualProcessID.h"
 
 static const std::wstring LOG_MESSAGES[] = {
 	std::wstring( L"Message 1-1" ),
@@ -37,15 +38,15 @@ static const std::wstring LOG_MESSAGES[] = {
 
 TEST( VirtualProcessMailboxTests, Add_Remove )
 {
-	CVirtualProcessMailbox *mailbox = new CVirtualProcessMailbox( LOG_THREAD_KEY );
+	CVirtualProcessMailbox *mailbox = new CVirtualProcessMailbox( EVirtualProcessID::LOGGING, LOGGING_PROCESS_PROPERTIES );
 
-	shared_ptr< CVirtualProcessMessageFrame > frame1( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	frame1->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_MESSAGES[ 0 ] ) ) );
-	frame1->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_MESSAGES[ 1 ] ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > frame1( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
+	frame1->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
+	frame1->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
 
-	shared_ptr< CVirtualProcessMessageFrame > frame2( new CVirtualProcessMessageFrame( MANAGER_THREAD_KEY ) );
-	frame2->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_MESSAGES[ 2 ] ) ) );
-	frame2->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_MESSAGES[ 3 ] ) ) );
+	shared_ptr< CVirtualProcessMessageFrame > frame2( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
+	frame2->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 2 ] ) ) );
+	frame2->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 3 ] ) ) );
 
 	shared_ptr< CWriteOnlyMailbox > write_interface = mailbox->Get_Writable_Mailbox();
 	write_interface->Add_Frame( frame1 );

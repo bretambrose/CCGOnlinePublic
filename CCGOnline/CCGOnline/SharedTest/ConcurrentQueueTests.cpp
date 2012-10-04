@@ -52,19 +52,19 @@ TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr )
 	IConcurrentQueue< shared_ptr< const CLogRequestMessage > > *message_queue = new CTBBConcurrentQueue< shared_ptr< const CLogRequestMessage > >();
 
 	{
-		shared_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_MESSAGE_1 ) );
+		shared_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
 		message_queue->Add_Item( message1 );
 	}
 
-	message_queue->Add_Item( shared_ptr< const CLogRequestMessage >( new CLogRequestMessage( MANAGER_THREAD_KEY, LOG_MESSAGE_2 ) ) );
+	message_queue->Add_Item( shared_ptr< const CLogRequestMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_2 ) ) );
 
 	std::vector< shared_ptr< const CLogRequestMessage > > items;
 	message_queue->Remove_Items( items );
 
 	ASSERT_TRUE( items[ 0 ]->Get_Message() == LOG_MESSAGE_1 );
-	ASSERT_TRUE( items[ 0 ]->Get_Source_Key() == MANAGER_THREAD_KEY );
+	ASSERT_TRUE( items[ 0 ]->Get_Source_Properties() == MANAGER_PROCESS_PROPERTIES );
 	ASSERT_TRUE( items[ 1 ]->Get_Message() == LOG_MESSAGE_2 );
-	ASSERT_TRUE( items[ 1 ]->Get_Source_Key() == MANAGER_THREAD_KEY );
+	ASSERT_TRUE( items[ 1 ]->Get_Source_Properties() == MANAGER_PROCESS_PROPERTIES );
 
 	delete message_queue;
 	message_queue = nullptr;

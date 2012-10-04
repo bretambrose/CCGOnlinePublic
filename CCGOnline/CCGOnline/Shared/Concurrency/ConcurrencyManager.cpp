@@ -170,6 +170,16 @@ class CVirtualProcessRecord
 
 		// Accessors
 		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		SProcessProperties Get_Properties( void ) const {
+			if ( ProcessID == EVirtualProcessID::CONCURRENCY_MANAGER )
+			{
+				return MANAGER_PROCESS_PROPERTIES;
+			}
+			else
+			{
+				return Process->Get_Properties();
+			}
+		}
 
 		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process( void ) const { return Process; }
 
@@ -404,6 +414,26 @@ shared_ptr< IManagedVirtualProcess > CConcurrencyManager::Get_Virtual_Process( E
 	}
 
 	return shared_ptr< IManagedVirtualProcess >( nullptr );
+}
+
+/**********************************************************************************************************************
+	CConcurrencyManager::Enumerate_Virtual_Processes -- enumerates all active processes in the system; only used by
+		unit tests
+
+		processes -- output parameter for set of all processes
+					
+**********************************************************************************************************************/
+void CConcurrencyManager::Enumerate_Virtual_Processes( std::vector< shared_ptr< IManagedVirtualProcess > > &processes ) const
+{
+	processes.clear();
+
+	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
+	{
+		if ( iter->first != EVirtualProcessID::CONCURRENCY_MANAGER )
+		{
+			processes.push_back( iter->second->Get_Virtual_Process() );
+		}
+	}
 }
 
 /**********************************************************************************************************************
@@ -758,7 +788,7 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request( EVirtualProcessID::E
 
 	// it's a single-targeted request
 	shared_ptr< CVirtualProcessRecord > record = Get_Record( requested_process_id );
-	if ( record != nullptr && !record->Is_Shutting_Down() )
+	if ( record != nullptr && !record->Is_Shutting_Down() && source_process_id != requested_process_id )
 	{
 		// fulfill the request
 		shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( record->Get_Mailbox()->Get_Writable_Mailbox() ) );
@@ -791,7 +821,7 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EVirtualProc
 	// it's a persistent pattern-matching request, match all existing threads and track against future adds
 	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
 	{
-		if ( requested_properties.Matches( iter->second->Get_Virtual_Process()->Get_Properties() ) && !Is_Process_Shutting_Down( iter->first ) )
+		if ( requested_properties.Matches( iter->second->Get_Properties() ) && !Is_Process_Shutting_Down( iter->first ) && source_process_id != iter->first )
 		{
 			shared_ptr< const IVirtualProcessMessage > message( new CAddMailboxMessage( Get_Mailbox( iter->first ) ) );
 			Send_Virtual_Process_Message( source_process_id, message );

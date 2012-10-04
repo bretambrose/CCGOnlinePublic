@@ -47,6 +47,7 @@ class IVirtualProcess
 		virtual EVirtualProcessID::Enum Get_ID( void ) const = 0;
 
 		virtual void Send_Virtual_Process_Message( EVirtualProcessID::Enum destination_id, const shared_ptr< const IVirtualProcessMessage > &message ) = 0;
+		virtual void Send_Manager_Message( const shared_ptr< const IVirtualProcessMessage > &message ) = 0;
 		virtual void Log( const std::wstring &message ) = 0;
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const = 0;

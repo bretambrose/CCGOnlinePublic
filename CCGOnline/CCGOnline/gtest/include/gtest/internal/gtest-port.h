@@ -36,6 +36,9 @@
 #ifndef GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PORT_H_
 #define GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PORT_H_
 
+//#define GTEST_HAS_EXCEPTIONS 0
+//#define GTEST_HAS_SEH 0
+
 // The user can define the following macros in the build script to
 // control Google Test's behavior.  If the user doesn't define a macro
 // in this list, Google Test will define it.

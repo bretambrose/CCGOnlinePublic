@@ -25,8 +25,12 @@
 
 #include "VirtualProcessSubject.h"
 #include "VirtualProcessProperties.h"
+#include "VirtualProcessID.h"
 
 static const SProcessProperties LOGGING_PROCESS_PROPERTIES( EVirtualProcessSubject::LOGGING );
 static const SProcessProperties MANAGER_PROCESS_PROPERTIES( EVirtualProcessSubject::CONCURRENCY_MANAGER );
+
+static const EVirtualProcessID::Enum MANAGER_PROCESS_ID( EVirtualProcessID::CONCURRENCY_MANAGER );
+static const EVirtualProcessID::Enum LOGGING_PROCESS_ID( EVirtualProcessID::LOGGING );
 
 #endif // VIRTUAL_PROCESS_CONSTANTS_H

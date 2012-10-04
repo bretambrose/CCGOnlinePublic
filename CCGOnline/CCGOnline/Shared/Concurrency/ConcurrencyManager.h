@@ -84,6 +84,7 @@ class CConcurrencyManager
 		shared_ptr< CVirtualProcessRecord > Get_Record( EVirtualProcessID::Enum process_id ) const;
 
 		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process( EVirtualProcessID::Enum process_id ) const;
+		void Enumerate_Virtual_Processes( std::vector< shared_ptr< IManagedVirtualProcess > > &processes ) const;
 
 		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( EVirtualProcessID::Enum process_id ) const;
 		shared_ptr< CReadOnlyMailbox > Get_My_Mailbox( void ) const;
