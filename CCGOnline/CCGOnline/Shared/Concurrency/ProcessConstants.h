@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessID.h
-		A component definining the enumerated ID type for virtual processes.
+	ProcessConstants.h
+		A component definining a set of process related constants
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,20 +20,17 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_ID_H
-#define VIRTUAL_PROCESS_ID_H
+#ifndef PROCESS_CONSTANTS_H
+#define PROCESS_CONSTANTS_H
 
-namespace EVirtualProcessID
-{
-	enum Enum
-	{
-		INVALID = 0,
+#include "ProcessSubject.h"
+#include "ProcessProperties.h"
+#include "ProcessID.h"
 
-		CONCURRENCY_MANAGER,
-		LOGGING,
+static const SProcessProperties LOGGING_PROCESS_PROPERTIES( EProcessSubject::LOGGING );
+static const SProcessProperties MANAGER_PROCESS_PROPERTIES( EProcessSubject::CONCURRENCY_MANAGER );
 
-		FIRST_FREE_ID
-	};
-}
+static const EProcessID::Enum MANAGER_PROCESS_ID( EProcessID::CONCURRENCY_MANAGER );
+static const EProcessID::Enum LOGGING_PROCESS_ID( EProcessID::LOGGING );
 
-#endif // VIRTUAL_PROCESS_ID_H
+#endif // PROCESS_CONSTANTS_H

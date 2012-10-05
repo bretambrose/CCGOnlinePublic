@@ -185,50 +185,11 @@
     <ClInclude Include="Concurrency\MailboxInterfaces.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessBase.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessConstants.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessExecutionContext.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessInterface.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessMailbox.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessMessageFrame.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessStatics.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
     <ClInclude Include="Concurrency\Messaging\ExchangeMailboxMessages.h">
       <Filter>Source Files\Concurrency\Messaging</Filter>
     </ClInclude>
     <ClInclude Include="Concurrency\Messaging\LoggingMessages.h">
       <Filter>Source Files\Concurrency\Messaging</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\Messaging\VirtualProcessManagementMessages.h">
-      <Filter>Source Files\Concurrency\Messaging</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\Messaging\VirtualProcessMessage.h">
-      <Filter>Source Files\Concurrency\Messaging</Filter>
-    </ClInclude>
-    <ClInclude Include="Concurrency\ManagedVirtualProcessInterface.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageHandling\VirtualProcessMessageHandler.h">
-      <Filter>Source Files\MessageHandling</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageHandling\VirtualProcessMessageHandlerBase.h">
-      <Filter>Source Files\MessageHandling</Filter>
-    </ClInclude>
-    <ClInclude Include="Logging\LoggingVirtualProcess.h">
-      <Filter>Source Files\Logging</Filter>
     </ClInclude>
     <ClInclude Include="Concurrency\Containers\ConcurrentQueueInterface.h">
       <Filter>Source Files\Concurrency\Containers</Filter>
@@ -239,14 +200,53 @@
     <ClInclude Include="Concurrency\Containers\TBBConcurrentQueue.h">
       <Filter>Source Files\Concurrency\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessID.h">
+    <ClInclude Include="Concurrency\Messaging\ProcessManagementMessages.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\ProcessMessage.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ManagedProcessInterface.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessProperties.h">
+    <ClInclude Include="Concurrency\ProcessBase.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\VirtualProcessSubject.h">
+    <ClInclude Include="Concurrency\ProcessConstants.h">
       <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessExecutionContext.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessID.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessInterface.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessMailbox.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessMessageFrame.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessProperties.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessStatics.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessSubject.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\ProcessMessageHandler.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\ProcessMessageHandlerBase.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LoggingProcess.h">
+      <Filter>Source Files\Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -322,32 +322,32 @@
     <ClCompile Include="Concurrency\MailboxInterfaces.cpp">
       <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="Concurrency\VirtualProcessBase.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\VirtualProcessMailbox.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\VirtualProcessMessageFrame.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\VirtualProcessStatics.cpp">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClCompile>
     <ClCompile Include="Concurrency\Messaging\ExchangeMailboxMessages.cpp">
       <Filter>Source Files\Concurrency\Messaging</Filter>
     </ClCompile>
     <ClCompile Include="Concurrency\Messaging\LoggingMessages.cpp">
       <Filter>Source Files\Concurrency\Messaging</Filter>
     </ClCompile>
-    <ClCompile Include="Concurrency\Messaging\VirtualProcessManagementMessages.cpp">
+    <ClCompile Include="Concurrency\Messaging\ProcessManagementMessages.cpp">
       <Filter>Source Files\Concurrency\Messaging</Filter>
     </ClCompile>
-    <ClCompile Include="Logging\LoggingVirtualProcess.cpp">
-      <Filter>Source Files\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="Concurrency\VirtualProcessProperties.cpp">
+    <ClCompile Include="Concurrency\ProcessBase.cpp">
       <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessMailbox.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessMessageFrame.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessProperties.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessStatics.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LoggingProcess.cpp">
+      <Filter>Source Files\Logging</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

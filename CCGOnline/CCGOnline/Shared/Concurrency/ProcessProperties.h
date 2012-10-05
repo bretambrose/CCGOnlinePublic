@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessProperties.h
-		A component definining a struct describing the matchable properties of a virtual process
+	ProcessProperties.h
+		A component definining a struct describing the matchable properties of a process
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,8 +20,8 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_PROPERTIES_H
-#define VIRTUAL_PROCESS_PROPERTIES_H
+#ifndef PROCESS_PROPERTIES_H
+#define PROCESS_PROPERTIES_H
 
 /*
 	A struct describing properties about an execution process.  This is an immutable data structure and it is not
@@ -147,4 +147,4 @@ struct SProcessPropertiesContainerHelper
 		}
 };
 
-#endif // VIRTUAL_PROCESS_PROPERTIES_H
+#endif // PROCESS_PROPERTIES_H

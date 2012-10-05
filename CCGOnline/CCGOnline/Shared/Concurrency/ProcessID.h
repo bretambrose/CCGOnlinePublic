@@ -1,8 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessExecutionContext.h
-		A component defining a helper class that contains information about the current execution context of a virtual 
-		process.  Processes that are being run under a tbb task can use this to split/subdivide work as necessary.
+	ProcessID.h
+		A component definining the enumerated ID type for processes.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,31 +20,20 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_EXECUTION_CONTEXT_H
-#define VIRTUAL_PROCESS_EXECUTION_CONTEXT_H
+#ifndef PROCESS_ID_H
+#define PROCESS_ID_H
 
-namespace tbb
+namespace EProcessID
 {
-	class task;
+	enum Enum
+	{
+		INVALID = 0,
+
+		CONCURRENCY_MANAGER,
+		LOGGING,
+
+		FIRST_FREE_ID
+	};
 }
 
-// Defines a virtual process's execution context; currently only contains TBB info
-class CVirtualProcessExecutionContext
-{
-	public:
-
-		CVirtualProcessExecutionContext( tbb::task *spawning_task ) :
-			SpawningTask( spawning_task )
-		{
-		}
-
-		~CVirtualProcessExecutionContext() {}
-
-		tbb::task *Get_Spawning_Task( void ) const { return SpawningTask; }
-
-	private:
-
-		tbb::task *SpawningTask;
-};
-
-#endif // VIRTUAL_PROCESS_EXECUTION_CONTEXT_H
+#endif // PROCESS_ID_H

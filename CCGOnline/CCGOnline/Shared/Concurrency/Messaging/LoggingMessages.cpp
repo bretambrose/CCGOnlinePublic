@@ -25,7 +25,6 @@
 #include "LoggingMessages.h"
 
 #include "PlatformTime.h"
-#include "Concurrency/VirtualProcessProperties.h"
 
 /**********************************************************************************************************************
 	CLogRequestMessage::CLogRequestMessage -- constructor

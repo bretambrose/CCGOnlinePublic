@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMessage.h
-		A component defining the base pure virtual interface for all virtual process message classes
+	ProcessMessage.h
+		A component defining the base pure virtual interface for all process message classes
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,14 +20,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_MESSAGE_H
-#define VIRTUAL_PROCESS_MESSAGE_H
+#ifndef PROCESS_MESSAGE_H
+#define PROCESS_MESSAGE_H
 
-class IVirtualProcessMessage
+class IProcessMessage
 {
 	public:
 
-		virtual ~IVirtualProcessMessage() {}
+		virtual ~IProcessMessage() {}
 };
 
-#endif // VIRTUAL_PROCESS_MESSAGE_H
+#endif // PROCESS_MESSAGE_H

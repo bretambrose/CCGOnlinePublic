@@ -1,8 +1,8 @@
 /**********************************************************************************************************************
 
-	VirtualProcessStatics.h
-		A component containing a static class that manages the thread-local variables that hold handles to
-		the executing virtual process and the concurrency manager.
+	ProcessExecutionContext.h
+		A component defining a helper class that contains information about the current execution context of a  
+		process.  Processes that are being run under a tbb task can use this to split/subdivide work as necessary.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,33 +21,31 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_STATICS_H
-#define VIRTUAL_PROCESS_STATICS_H
+#ifndef PROCESS_EXECUTION_CONTEXT_H
+#define PROCESS_EXECUTION_CONTEXT_H
 
-class IVirtualProcess;
-class CConcurrencyManager;
+namespace tbb
+{
+	class task;
+}
 
-// Static class managing thread-local handles to the executing virtual process and the concurrency manager. 
-class CVirtualProcessStatics
+// Defines a virtual process's execution context; currently only contains TBB info
+class CProcessExecutionContext
 {
 	public:
 
-		static void Initialize( void );
-		static void Shutdown( void );
+		CProcessExecutionContext( tbb::task *spawning_task ) :
+			SpawningTask( spawning_task )
+		{
+		}
 
-		static void Set_Current_Virtual_Process( IVirtualProcess *virtual_process );
-		static void Set_Concurrency_Manager( CConcurrencyManager *manager );
+		~CProcessExecutionContext() {}
 
-		static IVirtualProcess *Get_Current_Virtual_Process( void );
-		static CConcurrencyManager *Get_Concurrency_Manager( void );
+		tbb::task *Get_Spawning_Task( void ) const { return SpawningTask; }
 
 	private:
 
-		// Thread Local storage indices
-		static uint32 VirtualProcessHandle;
-		static uint32 ConcurrencyManagerHandle;
-
-		static bool Initialized;
+		tbb::task *SpawningTask;
 };
 
-#endif // VIRTUAL_PROCESS_STATICS_H
+#endif // PROCESS_EXECUTION_CONTEXT_H

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMessageFrame.cpp
-		A component definining a container of virtual process messages.  Batching messages into a container leads to more
+	ProcessMessageFrame.cpp
+		A component definining a container of process messages.  Batching messages into a container leads to more
 		efficiency with the concurrency queues in high-traffic situations.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -23,26 +23,26 @@
 
 #include "stdafx.h"
 
-#include "VirtualProcessMessageFrame.h"
+#include "ProcessMessageFrame.h"
 
-#include "Messaging/VirtualProcessMessage.h"
+#include "Messaging/ProcessMessage.h"
 
 /**********************************************************************************************************************
-	CVirtualProcessMessageFrame::~CVirtualProcessMessageFrame -- destructor, defined internally to avoid header dependency on
-		IThreadMessage
+	CProcessMessageFrame::~CProcessMessageFrame -- destructor, defined internally to avoid header dependency on
+		IProcessMessage
 					
 **********************************************************************************************************************/
-CVirtualProcessMessageFrame::~CVirtualProcessMessageFrame()
+CProcessMessageFrame::~CProcessMessageFrame()
 {
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessMessageFrame::Add_Message -- adds a message to the container
+	CProcessMessageFrame::Add_Message -- adds a message to the container
 
 		message -- message to add to the frame
 					
 **********************************************************************************************************************/
-void CVirtualProcessMessageFrame::Add_Message( const shared_ptr< const IVirtualProcessMessage > &message )
+void CProcessMessageFrame::Add_Message( const shared_ptr< const IProcessMessage > &message )
 {
 	Messages.push_back( message );
 }

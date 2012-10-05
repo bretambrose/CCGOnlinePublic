@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMessageHandler.h
-		A component defining a generic handler for virtual process message objects.  Implemented as a simple trampoline that 
+	ProcessMessageHandler.h
+		A component defining a generic handler for process message objects.  Implemented as a simple trampoline that 
 		forwards handling to a delegate while retaining type safety and generic behavior.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -21,38 +21,38 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_MESSAGE_HANDLER_H
-#define VIRTUAL_PROCESS_MESSAGE_HANDLER_H
+#ifndef PROCESS_MESSAGE_HANDLER_H
+#define PROCESS_MESSAGE_HANDLER_H
 
-#include "VirtualProcessMessageHandlerBase.h"
+#include "ProcessMessageHandlerBase.h"
 
 // Generic handler for thread messages
 template< typename MessageType >
-class TVirtualProcessMessageHandler : public IVirtualProcessMessageHandler
+class TProcessMessageHandler : public IProcessMessageHandler
 {
 	public:
 
 		// signature of the actual handling function for a specific message type
-		typedef FastDelegate2< EVirtualProcessID::Enum, const shared_ptr< const MessageType > &, void > HandlerFunctorType;
+		typedef FastDelegate2< EProcessID::Enum, const shared_ptr< const MessageType > &, void > HandlerFunctorType;
 
-		typedef IVirtualProcessMessageHandler BASECLASS;
+		typedef IProcessMessageHandler BASECLASS;
 
-		TVirtualProcessMessageHandler( void ) :
+		TProcessMessageHandler( void ) :
 			BASECLASS(),
 			MessageHandler()
 		{}
 
-		TVirtualProcessMessageHandler( const TVirtualProcessMessageHandler &rhs ) :
+		TProcessMessageHandler( const TProcessMessageHandler< MessageType > &rhs ) :
 			BASECLASS(),
 			MessageHandler( rhs.MessageHandler )
 		{}
 
-		TVirtualProcessMessageHandler( const HandlerFunctorType &message_handler ) :
+		TProcessMessageHandler( const HandlerFunctorType &message_handler ) :
 			BASECLASS(),
 			MessageHandler( message_handler )
 		{}
 
-		virtual void Handle_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const IVirtualProcessMessage > &message ) const
+		virtual void Handle_Message( EProcessID::Enum source_process_id, const shared_ptr< const IProcessMessage > &message ) const
 		{
 			// The handlers are tracked generically so they can go in one big hash table, but our forwarding delegates
 			// have specific type signatures, requiring a down cast that preserves smart pointer reference counting
@@ -66,6 +66,6 @@ class TVirtualProcessMessageHandler : public IVirtualProcessMessageHandler
 };
 
 // Utility macro for handler registration
-#define REGISTER_THIS_HANDLER( x, y, z ) Register_Handler( typeid( x ), shared_ptr< IVirtualProcessMessageHandler >( new TVirtualProcessMessageHandler< x >( TVirtualProcessMessageHandler< x >::HandlerFunctorType( this, &y::z ) ) ) );
+#define REGISTER_THIS_HANDLER( x, y, z ) Register_Handler( typeid( x ), shared_ptr< IProcessMessageHandler >( new TProcessMessageHandler< x >( TProcessMessageHandler< x >::HandlerFunctorType( this, &y::z ) ) ) );
 
-#endif // VIRTUAL_PROCESS_MESSAGE_HANDLER_H
+#endif // PROCESS_MESSAGE_HANDLER_H

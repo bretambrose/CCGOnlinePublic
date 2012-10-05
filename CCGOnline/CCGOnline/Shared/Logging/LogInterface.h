@@ -26,9 +26,9 @@
 
 #define ENABLE_LOGGING
 
-class IManagedVirtualProcess;
+class IManagedProcess;
 class ISimplePlatformMutex;
-class CVirtualProcessExecutionContext;
+class CProcessExecutionContext;
 
 // A type enumerating the different levels of logging.  This level can be changed on the fly so that the process
 // naturally records more or less information as desired.
@@ -54,7 +54,7 @@ class CLogInterface
 		static void Shutdown_Dynamic( void );
 		
 		// Invokes the log process
-		static void Service_Logging( double current_time, const CVirtualProcessExecutionContext &context );
+		static void Service_Logging( double current_time, const CProcessExecutionContext &context );
 
 		// Access the current logging level; technically not thread-safe, but doesn't matter
 		static void Set_Log_Level( ELogLevel log_level ) { LogLevel = log_level; }
@@ -70,7 +70,7 @@ class CLogInterface
 		static void Log( const std::wstring &message );
 		static void Log( const wchar_t *message );
 
-		static shared_ptr< IManagedVirtualProcess > Get_Logging_Process( void ) { return LogProcess; }
+		static shared_ptr< IManagedProcess > Get_Logging_Process( void ) { return LogProcess; }
 
 	private:
 		
@@ -78,7 +78,7 @@ class CLogInterface
 
 		static ISimplePlatformMutex *LogLock;
 
-		static shared_ptr< IManagedVirtualProcess > LogProcess;
+		static shared_ptr< IManagedProcess > LogProcess;
 
 		static std::wstring LogPath;
 		static std::wstring LogSubdirectory;

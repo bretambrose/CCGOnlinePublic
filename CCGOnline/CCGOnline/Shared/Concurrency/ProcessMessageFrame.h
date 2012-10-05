@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMessageFrame.h
-		A component definining a container of virtual process messages.  Batching messages into a container leads to more
+	ProcessMessageFrame.h
+		A component definining a container of process messages.  Batching messages into a container leads to more
 		efficiency with the concurrency queues in high-traffic situations.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -21,41 +21,41 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_MESSAGE_FRAME_H
-#define VIRTUAL_PROCESS_MESSAGE_FRAME_H
+#ifndef PROCESS_MESSAGE_FRAME_H
+#define PROCESS_MESSAGE_FRAME_H
 
-class IVirtualProcessMessage;
+class IProcessMessage;
 
-namespace EVirtualProcessID
+namespace EProcessID
 {
 	enum Enum;
 }
 
 // A container of thread messages
-class CVirtualProcessMessageFrame
+class CProcessMessageFrame
 {
 	public:
 
-		CVirtualProcessMessageFrame( EVirtualProcessID::Enum process_id ) :
+		CProcessMessageFrame( EProcessID::Enum process_id ) :
 			ProcessID( process_id ),
 			Messages()
 		{}
 
-		~CVirtualProcessMessageFrame();
+		~CProcessMessageFrame();
 
-		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
-		void Add_Message( const shared_ptr< const IVirtualProcessMessage > &message );
+		void Add_Message( const shared_ptr< const IProcessMessage > &message );
 
-		std::vector< shared_ptr< const IVirtualProcessMessage > >::const_iterator Get_Frame_Begin( void ) const { return Messages.cbegin(); }
-		std::vector< shared_ptr< const IVirtualProcessMessage > >::const_iterator Get_Frame_End( void ) const { return Messages.cend(); }
+		std::vector< shared_ptr< const IProcessMessage > >::const_iterator Get_Frame_Begin( void ) const { return Messages.cbegin(); }
+		std::vector< shared_ptr< const IProcessMessage > >::const_iterator Get_Frame_End( void ) const { return Messages.cend(); }
 
 	private:
 
-		EVirtualProcessID::Enum ProcessID;
+		EProcessID::Enum ProcessID;
 
-		std::vector< shared_ptr< const IVirtualProcessMessage > > Messages;
+		std::vector< shared_ptr< const IProcessMessage > > Messages;
 
 };
 
-#endif // VIRTUAL_PROCESS_MESSAGE_FRAME_H
+#endif // PROCESS_MESSAGE_FRAME_H

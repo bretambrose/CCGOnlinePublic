@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessProperties.cpp
-		A component definining a struct describing the matchable properties of a virtual process
+	ProcessProperties.cpp
+		A component definining a struct describing the matchable properties of a process
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 
-#include "VirtualProcessProperties.h"
+#include "ProcessProperties.h"
 
 /**********************************************************************************************************************
 	SProcessProperties::Matches -- does the supplied property set match our implicit pattern?

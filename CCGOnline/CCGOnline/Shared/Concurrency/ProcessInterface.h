@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessInterface.h
-		A component defining the top-level pure virtual interface to a virtual process.
+	ProcessInterface.h
+		A component defining the top-level pure virtual interface to a process.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,34 +20,34 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_INTERFACE_H
-#define VIRTUAL_PROCESS_INTERFACE_H
+#ifndef PROCESS_INTERFACE_H
+#define PROCESS_INTERFACE_H
 
 class CTaskScheduler;
-class IVirtualProcessMessage;
+class IProcessMessage;
 
 struct SProcessProperties;
 
-namespace EVirtualProcessID
+namespace EProcessID
 {
 	enum Enum;
 }
 
 // Pure virtual interface for all virtual processes
-class IVirtualProcess
+class IProcess
 {
 	public:
 		
-		IVirtualProcess( void ) {}
-		virtual ~IVirtualProcess() {}
+		IProcess( void ) {}
+		virtual ~IProcess() {}
 
-		virtual void Initialize( EVirtualProcessID::Enum id ) = 0;
+		virtual void Initialize( EProcessID::Enum id ) = 0;
 
 		virtual const SProcessProperties &Get_Properties( void ) const = 0;
-		virtual EVirtualProcessID::Enum Get_ID( void ) const = 0;
+		virtual EProcessID::Enum Get_ID( void ) const = 0;
 
-		virtual void Send_Virtual_Process_Message( EVirtualProcessID::Enum destination_id, const shared_ptr< const IVirtualProcessMessage > &message ) = 0;
-		virtual void Send_Manager_Message( const shared_ptr< const IVirtualProcessMessage > &message ) = 0;
+		virtual void Send_Process_Message( EProcessID::Enum destination_id, const shared_ptr< const IProcessMessage > &message ) = 0;
+		virtual void Send_Manager_Message( const shared_ptr< const IProcessMessage > &message ) = 0;
 		virtual void Log( const std::wstring &message ) = 0;
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const = 0;
@@ -55,4 +55,4 @@ class IVirtualProcess
 		virtual void Flush_System_Messages( void ) = 0;
 };
 
-#endif // VIRTUAL_PROCESS_INTERFACE_H
+#endif // PROCESS_INTERFACE_H

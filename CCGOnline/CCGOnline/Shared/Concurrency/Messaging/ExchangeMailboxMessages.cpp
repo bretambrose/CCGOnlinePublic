@@ -2,7 +2,7 @@
 
 	ExchangeInterfaceMessages.cpp
 		A component containing definitions for messages that are needed to exchange mailboxes
-		between virtual processes
+		between processes
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 

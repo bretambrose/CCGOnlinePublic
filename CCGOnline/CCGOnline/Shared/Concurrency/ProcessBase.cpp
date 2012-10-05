@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessBase.cpp
-		A component containing the logic shared by all virtual processes.
+	ProcessBase.cpp
+		A component containing the logic shared by all processes.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,38 +22,38 @@
 
 #include "stdafx.h"
 
-#include "VirtualProcessBase.h"
+#include "ProcessBase.h"
 
-#include "MessageHandling/VirtualProcessMessageHandler.h"
+#include "MessageHandling/ProcessMessageHandler.h"
 #include "TaskScheduler/TaskScheduler.h"
-#include "VirtualProcessSubject.h"
+#include "ProcessSubject.h"
 #include "MailboxInterfaces.h"
-#include "VirtualProcessConstants.h"
-#include "VirtualProcessMessageFrame.h"
+#include "ProcessConstants.h"
+#include "ProcessMessageFrame.h"
 #include "Messaging/LoggingMessages.h"
-#include "Messaging/VirtualProcessManagementMessages.h"
+#include "Messaging/ProcessManagementMessages.h"
 #include "Messaging/ExchangeMailboxMessages.h"
-#include "VirtualProcessID.h"
+#include "ProcessID.h"
 
-enum EVirtualProcessState
+enum EProcessState
 {
-	EVPS_INITIALIZING,
-	EVPS_RUNNING,
-	EVPS_SHUTTING_DOWN_SOFT,
-	EVPS_SHUTTING_DOWN_HARD
+	EPS_INITIALIZING,
+	EPS_RUNNING,
+	EPS_SHUTTING_DOWN_SOFT,
+	EPS_SHUTTING_DOWN_HARD
 };
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::CVirtualProcessBase -- constructor
+	CProcessBase::CProcessBase -- constructor
 	
-		properties -- the properties of this virtual process
+		properties -- the properties of this process
 				
 **********************************************************************************************************************/
-CVirtualProcessBase::CVirtualProcessBase( const SProcessProperties &properties ) :
+CProcessBase::CProcessBase( const SProcessProperties &properties ) :
 	BASECLASS(),
-	ID( EVirtualProcessID::INVALID ),
+	ID( EProcessID::INVALID ),
 	Properties( properties ),
-	State( EVPS_INITIALIZING ),
+	State( EPS_INITIALIZING ),
 	PendingOutboundFrames(),
 	ManagerFrame( nullptr ),
 	LogFrame( nullptr ),
@@ -72,56 +72,56 @@ CVirtualProcessBase::CVirtualProcessBase( const SProcessProperties &properties )
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::~CVirtualProcessBase -- destructor
+	CProcessBase::~CProcessBase -- destructor
 					
 **********************************************************************************************************************/
-CVirtualProcessBase::~CVirtualProcessBase()
+CProcessBase::~CProcessBase()
 {
 	Cleanup();
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Initialize -- initializes the virtual process
+	CProcessBase::Initialize -- initializes the virtual process
 
 		id -- assigned id of this process
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Initialize( EVirtualProcessID::Enum id )
+void CProcessBase::Initialize( EProcessID::Enum id )
 {
 	ID = id;
 	Register_Message_Handlers();
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Cleanup -- cleans up the virtual process
+	CProcessBase::Cleanup -- cleans up the process
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Cleanup( void )
+void CProcessBase::Cleanup( void )
 {
 	MessageHandlers.clear();	// not really necessary
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Log -- requests a message be written to the log file for this virtual process
+	CProcessBase::Log -- requests a message be written to the log file for this virtual process
 
 		message -- message to output to the log file
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Log( const std::wstring &message )
+void CProcessBase::Log( const std::wstring &message )
 {
 	// actual logging thread should override this function and never call the baseclass
-	FATAL_ASSERT( ID != EVirtualProcessID::LOGGING );
+	FATAL_ASSERT( ID != EProcessID::LOGGING );
 
-	Send_Virtual_Process_Message( EVirtualProcessID::LOGGING, shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( Properties, message ) ) );
+	Send_Process_Message( EProcessID::LOGGING, shared_ptr< const IProcessMessage >( new CLogRequestMessage( Properties, message ) ) );
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Get_Thread_Interface -- gets the mailbox for a thread, if we have it
+	CProcessBase::Get_Mailbox -- gets the mailbox for a process, if we have it
 
 		process_id -- id of the process to get a mailbox for
 					
 **********************************************************************************************************************/
-shared_ptr< CWriteOnlyMailbox > CVirtualProcessBase::Get_Mailbox( EVirtualProcessID::Enum process_id ) const
+shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID::Enum process_id ) const
 {
 	auto interface_iter = Mailboxes.find( process_id );
 	if ( interface_iter != Mailboxes.end() )
@@ -133,29 +133,29 @@ shared_ptr< CWriteOnlyMailbox > CVirtualProcessBase::Get_Mailbox( EVirtualProces
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Send_Virtual_Process_Message -- sends a message to another virtual process
+	CProcessBase::Send_Process_Message -- sends a message to another process
 
-		dest_process_id -- id of the virtual process to send to
+		dest_process_id -- id of the process to send to
 		message -- message to send
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Send_Virtual_Process_Message( EVirtualProcessID::Enum dest_process_id, const shared_ptr< const IVirtualProcessMessage > &message )
+void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, const shared_ptr< const IProcessMessage > &message )
 {
 	// manager and logging threads are special-cased in order to avoid race conditions related to rescheduling
-	if ( dest_process_id == EVirtualProcessID::CONCURRENCY_MANAGER )
+	if ( dest_process_id == EProcessID::CONCURRENCY_MANAGER )
 	{
 		if ( ManagerFrame.get() == nullptr )
 		{
-			ManagerFrame.reset( new CVirtualProcessMessageFrame( ID ) );
+			ManagerFrame.reset( new CProcessMessageFrame( ID ) );
 		}
 		
 		ManagerFrame->Add_Message( message );
 	}
-	else if ( dest_process_id == EVirtualProcessID::LOGGING )
+	else if ( dest_process_id == EProcessID::LOGGING )
 	{
 		if ( LogFrame.get() == nullptr )
 		{
-			LogFrame.reset( new CVirtualProcessMessageFrame( ID ) );
+			LogFrame.reset( new CProcessMessageFrame( ID ) );
 		}
 		
 		LogFrame->Add_Message( message );
@@ -166,7 +166,7 @@ void CVirtualProcessBase::Send_Virtual_Process_Message( EVirtualProcessID::Enum 
 		auto iter = PendingOutboundFrames.find( dest_process_id );
 		if ( iter == PendingOutboundFrames.end() )
 		{
-			shared_ptr< CVirtualProcessMessageFrame > frame( new CVirtualProcessMessageFrame( ID ) );
+			shared_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( ID ) );
 			frame->Add_Message( message );
 			PendingOutboundFrames.insert( FrameTableType::value_type( dest_process_id, frame ) );
 			return;
@@ -177,27 +177,27 @@ void CVirtualProcessBase::Send_Virtual_Process_Message( EVirtualProcessID::Enum 
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Send_Manager_Message -- sends a message to the concurrency manager
+	CProcessBase::Send_Manager_Message -- sends a message to the concurrency manager
 
 		message -- message to send
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Send_Manager_Message( const shared_ptr< const IVirtualProcessMessage > &message )
+void CProcessBase::Send_Manager_Message( const shared_ptr< const IProcessMessage > &message )
 {
-	Send_Virtual_Process_Message( EVirtualProcessID::CONCURRENCY_MANAGER, message );
+	Send_Process_Message( EProcessID::CONCURRENCY_MANAGER, message );
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Flush_Regular_Messages -- sends all pending messages to their destination process; does not include
+	CProcessBase::Flush_Regular_Messages -- sends all pending messages to their destination process; does not include
 		manager or logging processes
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Flush_Regular_Messages( void )
+void CProcessBase::Flush_Regular_Messages( void )
 {
 	if ( !Is_Shutting_Down() )
 	{
 		// under normal circumstances, send all messages to threads we have an interface for
-		std::vector< EVirtualProcessID::Enum > sent_frames;
+		std::vector< EProcessID::Enum > sent_frames;
 
 		for ( auto frame_iterator = PendingOutboundFrames.cbegin(); frame_iterator != PendingOutboundFrames.cend(); ++frame_iterator )
 		{
@@ -221,7 +221,7 @@ void CVirtualProcessBase::Flush_Regular_Messages( void )
 		// soft shut downs allow messages to be sent arbitrarily, hard shutdowns restrict to manager or log thread only
 		for ( auto frame_iterator = PendingOutboundFrames.cbegin(); frame_iterator != PendingOutboundFrames.cend(); ++frame_iterator )
 		{
-			if ( State == EVPS_SHUTTING_DOWN_SOFT || frame_iterator->first == EVirtualProcessID::CONCURRENCY_MANAGER || frame_iterator->first == EVirtualProcessID::LOGGING )
+			if ( State == EPS_SHUTTING_DOWN_SOFT || frame_iterator->first == EProcessID::CONCURRENCY_MANAGER || frame_iterator->first == EProcessID::LOGGING )
 			{
 				shared_ptr< CWriteOnlyMailbox > writeable_mailbox = Get_Mailbox( frame_iterator->first );
 				if ( writeable_mailbox != nullptr )
@@ -237,12 +237,12 @@ void CVirtualProcessBase::Flush_Regular_Messages( void )
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Set_Manager_Mailbox -- sets the write-only interface to the concurrency manager
+	CProcessBase::Set_Manager_Mailbox -- sets the write-only interface to the concurrency manager
 
 		mailbox -- the manager's write interface
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox )
+void CProcessBase::Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox )
 {
 	FATAL_ASSERT( ManagerMailbox.get() == nullptr );
 
@@ -250,12 +250,12 @@ void CVirtualProcessBase::Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailb
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Set_Logging_Mailbox -- sets the write-only interface to the logging process
+	CProcessBase::Set_Logging_Mailbox -- sets the write-only interface to the logging process
 
 		mailbox -- the logging process's write interface
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox )
+void CProcessBase::Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox )
 {
 	FATAL_ASSERT( LoggingMailbox.get() == nullptr );
 
@@ -263,73 +263,73 @@ void CVirtualProcessBase::Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailb
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Set_My_Mailbox -- sets the read-only mailbox you own
+	CProcessBase::Set_My_Mailbox -- sets the read-only mailbox you own
 
 		mailbox -- our read-only mailbox
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &mailbox )
+void CProcessBase::Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &mailbox )
 {
 	MyMailbox = mailbox;
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Get_Elapsed_Seconds -- gets how many seconds have elapsed since this thread started executing
+	CProcessBase::Get_Elapsed_Seconds -- gets how many seconds have elapsed since this process started executing
 
-		Returns: time in seconds that this thread has been executing
+		Returns: time in seconds that this process has been executing
 					
 **********************************************************************************************************************/
-double CVirtualProcessBase::Get_Elapsed_Seconds( void ) const
+double CProcessBase::Get_Elapsed_Seconds( void ) const
 {
 	return CurrentTimeSeconds - FirstServiceTimeSeconds;
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Get_Current_Thread_Time -- gets the current execution time in seconds
+	CProcessBase::Get_Current_Process_Time -- gets the current execution time in seconds
 
 		Returns: current execution time
 					
 **********************************************************************************************************************/
-double CVirtualProcessBase::Get_Current_Thread_Time( void ) const
+double CProcessBase::Get_Current_Process_Time( void ) const
 {
 	return CurrentTimeSeconds;
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Get_Reschedule_Interval -- gets the reschedule interval in seconds
+	CProcessBase::Get_Reschedule_Interval -- gets the reschedule interval in seconds
 
 		Returns: reschedule interval
 					
 **********************************************************************************************************************/
-double CVirtualProcessBase::Get_Reschedule_Interval( void ) const
+double CProcessBase::Get_Reschedule_Interval( void ) const
 {
 	return .1;
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Get_Reschedule_Time -- gets the execution time that this process should be run again at, in seconds
+	CProcessBase::Get_Reschedule_Time -- gets the execution time that this process should be run again at, in seconds
 
 		Returns: next execution time
 					
 **********************************************************************************************************************/
-double CVirtualProcessBase::Get_Reschedule_Time( void ) const
+double CProcessBase::Get_Reschedule_Time( void ) const
 {
 	double next_task_time = TaskScheduler->Get_Next_Task_Time();
 	return std::min( CurrentTimeSeconds + Get_Reschedule_Interval(), next_task_time );
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Service -- recurrent execution logic
+	CProcessBase::Service -- recurrent execution logic
 
 		current_time_seconds -- the current time in seconds
 		context -- the tbb context that this process is being run under
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Service( double current_time_seconds, const CVirtualProcessExecutionContext & /*context*/ )
+void CProcessBase::Service( double current_time_seconds, const CProcessExecutionContext & /*context*/ )
 {
-	if ( State == EVPS_INITIALIZING )
+	if ( State == EPS_INITIALIZING )
 	{
-		State = EVPS_RUNNING;
+		State = EPS_RUNNING;
 		FirstServiceTimeSeconds = current_time_seconds;
 	}
 
@@ -343,13 +343,13 @@ void CVirtualProcessBase::Service( double current_time_seconds, const CVirtualPr
 	// message and scheduled task logic
 	Service_Message_Frames();
 
-	TaskScheduler->Service( Get_Current_Thread_Time() );
+	TaskScheduler->Service( Get_Current_Process_Time() );
 
 	FATAL_ASSERT( !( Should_Reschedule() && Is_Shutting_Down() ) );
 
 	if ( Should_Reschedule() )
 	{
-		Send_Virtual_Process_Message( EVirtualProcessID::CONCURRENCY_MANAGER, shared_ptr< const IVirtualProcessMessage >( new CRescheduleVirtualProcessMessage( Get_Reschedule_Time() ) ) );
+		Send_Manager_Message( shared_ptr< const IProcessMessage >( new CRescheduleProcessMessage( Get_Reschedule_Time() ) ) );
 	}
 
 	// Awkward but necessary due to shutdown sequence
@@ -367,10 +367,10 @@ void CVirtualProcessBase::Service( double current_time_seconds, const CVirtualPr
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Service_Message_Frames -- handles all incoming virtual process messages
+	CProcessBase::Service_Message_Frames -- handles all incoming process messages
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Service_Message_Frames( void )
+void CProcessBase::Service_Message_Frames( void )
 {
 	if ( MyMailbox.get() == nullptr )
 	{
@@ -378,14 +378,14 @@ void CVirtualProcessBase::Service_Message_Frames( void )
 	}
 
 	// get all the queued incoming messages
-	std::vector< shared_ptr< CVirtualProcessMessageFrame > > frames;
+	std::vector< shared_ptr< CProcessMessageFrame > > frames;
 	MyMailbox->Remove_Frames( frames );
 
 	// iterate each frame
 	for ( uint32 i = 0; i < frames.size(); ++i )
 	{
-		const shared_ptr< CVirtualProcessMessageFrame > &frame = frames[ i ];
-		EVirtualProcessID::Enum source_process_id = frame->Get_Process_ID();
+		const shared_ptr< CProcessMessageFrame > &frame = frames[ i ];
+		EProcessID::Enum source_process_id = frame->Get_Process_ID();
 
 		// iterate each message within the frame
 		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
@@ -396,16 +396,16 @@ void CVirtualProcessBase::Service_Message_Frames( void )
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Handle_Shutdown_Mailboxes -- services all mailboxes that are pending shutdown, either erasing
+	CProcessBase::Handle_Shutdown_Mailboxes -- services all mailboxes that are pending shutdown, either erasing
 		an associated outbound frame if we don't have the mailbox, or erasing the mailbox.  Notifies the manager
 		that each mailbox has been released.
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Handle_Shutdown_Mailboxes( void )
+void CProcessBase::Handle_Shutdown_Mailboxes( void )
 {
 	for ( auto iter = ShutdownMailboxes.cbegin(); iter != ShutdownMailboxes.cend(); ++iter )
 	{
-		EVirtualProcessID::Enum process_id = *iter;
+		EProcessID::Enum process_id = *iter;
 
 		auto interface_iter = Mailboxes.find( process_id );
 		if ( interface_iter == Mailboxes.end() )
@@ -427,33 +427,33 @@ void CVirtualProcessBase::Handle_Shutdown_Mailboxes( void )
 		Remove_Process_ID_From_Tables( process_id );
 
 		// let the manager know we've release this interface
-		Send_Virtual_Process_Message( EVirtualProcessID::CONCURRENCY_MANAGER, shared_ptr< const IVirtualProcessMessage >( new CReleaseMailboxResponse( process_id ) ) );
+		Send_Manager_Message( shared_ptr< const IProcessMessage >( new CReleaseMailboxResponse( process_id ) ) );
 	}
 
 	ShutdownMailboxes.clear();
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Should_Reschedule -- should this task be rescheduled
+	CProcessBase::Should_Reschedule -- should this task be rescheduled
 
 		Returns: true if it should be rescheduled, otherwise false
 					
 **********************************************************************************************************************/
-bool CVirtualProcessBase::Should_Reschedule( void ) const
+bool CProcessBase::Should_Reschedule( void ) const
 {
-	return State == EVPS_RUNNING;
+	return State == EPS_RUNNING;
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Handle_Message -- central message handling dispatcher
+	CProcessBase::Handle_Message -- central message handling dispatcher
 
 		key -- message sender
-		message -- the thread message to handle
+		message -- the process message to handle
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Handle_Message( EVirtualProcessID::Enum process_id, const shared_ptr< const IVirtualProcessMessage > &message )
+void CProcessBase::Handle_Message( EProcessID::Enum process_id, const shared_ptr< const IProcessMessage > &message )
 {
-	const IVirtualProcessMessage *msg_base = message.get();
+	const IProcessMessage *msg_base = message.get();
 
 	Loki::TypeInfo hash_key( typeid( *msg_base ) );
 	auto iter = MessageHandlers.find( hash_key );
@@ -463,24 +463,24 @@ void CVirtualProcessBase::Handle_Message( EVirtualProcessID::Enum process_id, co
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Register_Message_Handlers -- creates message handlers for each message that we want to receive
+	CProcessBase::Register_Message_Handlers -- creates message handlers for each message that we want to receive
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Register_Message_Handlers( void )
+void CProcessBase::Register_Message_Handlers( void )
 {
-	REGISTER_THIS_HANDLER( CAddMailboxMessage, CVirtualProcessBase, Handle_Add_Mailbox_Message )
-	REGISTER_THIS_HANDLER( CReleaseMailboxRequest, CVirtualProcessBase, Handle_Release_Mailbox_Request )
-	REGISTER_THIS_HANDLER( CShutdownSelfRequest, CVirtualProcessBase, Handle_Shutdown_Self_Request )
+	REGISTER_THIS_HANDLER( CAddMailboxMessage, CProcessBase, Handle_Add_Mailbox_Message )
+	REGISTER_THIS_HANDLER( CReleaseMailboxRequest, CProcessBase, Handle_Release_Mailbox_Request )
+	REGISTER_THIS_HANDLER( CShutdownSelfRequest, CProcessBase, Handle_Shutdown_Self_Request )
 } 
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Register_Handler -- registers a message handlers for a virtual process message
+	CProcessBase::Register_Handler -- registers a message handlers for a process message
 
 		message_type_info -- the C++ type of the message class
 		handler -- message handling delegate
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Register_Handler( const std::type_info &message_type_info, const shared_ptr< IVirtualProcessMessageHandler > &handler )
+void CProcessBase::Register_Handler( const std::type_info &message_type_info, const shared_ptr< IProcessMessageHandler > &handler )
 {
 	Loki::TypeInfo key( message_type_info );
 
@@ -490,16 +490,16 @@ void CVirtualProcessBase::Register_Handler( const std::type_info &message_type_i
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Handle_Add_Mailbox_Message -- handles the AddMailboxMessage message
+	CProcessBase::Handle_Add_Mailbox_Message -- handles the AddMailboxMessage message
 
 		source_process_id -- id of the process source of the message
 		message -- the AddMailboxMessage message
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Handle_Add_Mailbox_Message( EVirtualProcessID::Enum /*source_process_id*/, const shared_ptr< const CAddMailboxMessage > &message )
+void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process_id*/, const shared_ptr< const CAddMailboxMessage > &message )
 {
-	EVirtualProcessID::Enum add_id = message->Get_Mailbox()->Get_Process_ID();
-	FATAL_ASSERT( add_id != EVirtualProcessID::CONCURRENCY_MANAGER && add_id != EVirtualProcessID::LOGGING );
+	EProcessID::Enum add_id = message->Get_Mailbox()->Get_Process_ID();
+	FATAL_ASSERT( add_id != EProcessID::CONCURRENCY_MANAGER && add_id != EProcessID::LOGGING );
 
 	if ( Mailboxes.find( add_id ) == Mailboxes.end() )
 	{
@@ -512,72 +512,72 @@ void CVirtualProcessBase::Handle_Add_Mailbox_Message( EVirtualProcessID::Enum /*
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Handle_Release_Mailbox_Request -- handles the ReleaseMailboxRequest message
+	CProcessBase::Handle_Release_Mailbox_Request -- handles the ReleaseMailboxRequest message
 
 		source_process_id -- id of the process source of the message
 		message -- message to handle
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Handle_Release_Mailbox_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CReleaseMailboxRequest > &request )
+void CProcessBase::Handle_Release_Mailbox_Request( EProcessID::Enum source_process_id, const shared_ptr< const CReleaseMailboxRequest > &request )
 {
-	FATAL_ASSERT( source_process_id == EVirtualProcessID::CONCURRENCY_MANAGER );
+	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
 
-	EVirtualProcessID::Enum shutdown_process_id = request->Get_Process_ID();
-	FATAL_ASSERT( shutdown_process_id != EVirtualProcessID::CONCURRENCY_MANAGER && shutdown_process_id != EVirtualProcessID::LOGGING );
+	EProcessID::Enum shutdown_process_id = request->Get_Process_ID();
+	FATAL_ASSERT( shutdown_process_id != EProcessID::CONCURRENCY_MANAGER && shutdown_process_id != EProcessID::LOGGING );
 
 	ShutdownMailboxes.insert( shutdown_process_id );
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Handle_Shutdown_Self_Request -- handles the ShutdownSelf request
+	CProcessBase::Handle_Shutdown_Self_Request -- handles the ShutdownSelf request
 
 		source_process_id -- id of the process source of the message
 		message -- the ShutdownThread request
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Handle_Shutdown_Self_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message )
+void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message )
 {
-	FATAL_ASSERT( source_process_id == EVirtualProcessID::CONCURRENCY_MANAGER );
+	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
 	FATAL_ASSERT( !Is_Shutting_Down() );
 
 	if ( message->Get_Is_Hard_Shutdown() )
 	{
-		State = EVPS_SHUTTING_DOWN_HARD;
+		State = EPS_SHUTTING_DOWN_HARD;
 	}
 	else
 	{
-		State = EVPS_SHUTTING_DOWN_SOFT;
+		State = EPS_SHUTTING_DOWN_SOFT;
 	}
 
-	Send_Virtual_Process_Message( EVirtualProcessID::CONCURRENCY_MANAGER, shared_ptr< const IVirtualProcessMessage >( new CShutdownSelfResponse() ) );	
+	Send_Manager_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfResponse() ) );	
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Is_Shutting_Down -- is this virtual process in the process of shutting down?
+	CProcessBase::Is_Shutting_Down -- is this process in the process of shutting down?
 
 		Returns: true if shutting down, false otherwise
 					
 **********************************************************************************************************************/
-bool CVirtualProcessBase::Is_Shutting_Down( void ) const
+bool CProcessBase::Is_Shutting_Down( void ) const
 {
-	return State == EVPS_SHUTTING_DOWN_SOFT || State == EVPS_SHUTTING_DOWN_HARD;
+	return State == EPS_SHUTTING_DOWN_SOFT || State == EPS_SHUTTING_DOWN_HARD;
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Flush_System_Messages -- Manager and log messages get sent separately from other messages.
+	CProcessBase::Flush_System_Messages -- Manager and log messages get sent separately from other messages.
 		This function must be the last function called in this thread's execution context/tbb-execute.  The instant a reschedule
 		message is pushed to the manager, this thread may end up getting reexecuted which would cause data corruption
 		if the current execution is still ongoing.
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Flush_System_Messages( void )
+void CProcessBase::Flush_System_Messages( void )
 {
 	bool is_shutting_down = Is_Shutting_Down();
 
 	// Flush logging messages if possible
 	if ( LoggingMailbox.get() != nullptr && LogFrame.get() != nullptr )
 	{
-		shared_ptr< CVirtualProcessMessageFrame > log_frame( LogFrame );
+		shared_ptr< CProcessMessageFrame > log_frame( LogFrame );
 		LogFrame.reset();
 
 		LoggingMailbox->Add_Frame( log_frame );
@@ -592,7 +592,7 @@ void CVirtualProcessBase::Flush_System_Messages( void )
 	// Flush manager messages if possible
 	if ( ManagerMailbox.get() != nullptr && ManagerFrame.get() != nullptr )
 	{
-		shared_ptr< CVirtualProcessMessageFrame > manager_frame( ManagerFrame );
+		shared_ptr< CProcessMessageFrame > manager_frame( ManagerFrame );
 		ManagerFrame.reset();
 
 		ManagerMailbox->Add_Frame( manager_frame );
@@ -610,13 +610,13 @@ void CVirtualProcessBase::Flush_System_Messages( void )
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Remove_Process_ID_From_Tables -- removes a process id from the pair of tables mapping
+	CProcessBase::Remove_Process_ID_From_Tables -- removes a process id from the pair of tables mapping
 		process properties to/from process ids
 
 		process_id -- id of the process to remove all references to
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Remove_Process_ID_From_Tables( EVirtualProcessID::Enum process_id )
+void CProcessBase::Remove_Process_ID_From_Tables( EProcessID::Enum process_id )
 {
 	IDToProcessPropertiesTableType::iterator iter1 = IDToPropertiesTable.find( process_id );
 	if ( iter1 == IDToPropertiesTable.end() )
@@ -638,14 +638,14 @@ void CVirtualProcessBase::Remove_Process_ID_From_Tables( EVirtualProcessID::Enum
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessBase::Build_Process_ID_List_By_Properties -- builds a list of all known processes that match
+	CProcessBase::Build_Process_ID_List_By_Properties -- builds a list of all known processes that match
 		a property set
 
 		properties -- properties to match against
 		process_ids -- output vector of matching process ids
 					
 **********************************************************************************************************************/
-void CVirtualProcessBase::Build_Process_ID_List_By_Properties( const SProcessProperties &properties, std::vector< EVirtualProcessID::Enum > &process_ids ) const
+void CProcessBase::Build_Process_ID_List_By_Properties( const SProcessProperties &properties, std::vector< EProcessID::Enum > &process_ids ) const
 {
 	process_ids.clear();
 

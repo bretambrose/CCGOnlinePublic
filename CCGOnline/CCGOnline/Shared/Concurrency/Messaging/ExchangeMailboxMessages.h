@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	ExchangeMailboxMessages.h
-		A component containing definitions for virtual process messages that are needed to exchange process mailboxes
+		A component containing definitions for process messages that are needed to exchange process mailboxes
 		between processes
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -24,22 +24,22 @@
 #ifndef EXCHANGE_INTERFACE_MESSAGES_H
 #define EXCHANGE_INTERFACE_MESSAGES_H
 
-#include "VirtualProcessMessage.h"
-#include "Concurrency/VirtualProcessProperties.h"
+#include "ProcessMessage.h"
+#include "Concurrency/ProcessProperties.h"
 
 class CWriteOnlyMailbox;
 
-namespace EVirtualProcessID
+namespace EProcessID
 {
 	enum Enum;
 }
 
 // Requests the interface to a thread tasks or set of thread tasks
-class CGetMailboxByPropertiesRequest : public IVirtualProcessMessage
+class CGetMailboxByPropertiesRequest : public IProcessMessage
 {
 	public:
 
-		typedef IVirtualProcessMessage BASECLASS;
+		typedef IProcessMessage BASECLASS;
 		
 		CGetMailboxByPropertiesRequest( const SProcessProperties &target_properties ) :
 			TargetProperties( target_properties )
@@ -54,31 +54,31 @@ class CGetMailboxByPropertiesRequest : public IVirtualProcessMessage
 		SProcessProperties TargetProperties;
 };
 
-class CGetMailboxByIDRequest : public IVirtualProcessMessage
+class CGetMailboxByIDRequest : public IProcessMessage
 {
 	public:
 
-		typedef IVirtualProcessMessage BASECLASS;
+		typedef IProcessMessage BASECLASS;
 		
-		CGetMailboxByIDRequest( EVirtualProcessID::Enum target_process_id ) :
+		CGetMailboxByIDRequest( EProcessID::Enum target_process_id ) :
 			TargetProcessID( target_process_id )
 		{}
 
 		virtual ~CGetMailboxByIDRequest() {}
 
-		EVirtualProcessID::Enum Get_Target_Process_ID( void ) const { return TargetProcessID; }
+		EProcessID::Enum Get_Target_Process_ID( void ) const { return TargetProcessID; }
 
 	private:
 
-		EVirtualProcessID::Enum TargetProcessID;
+		EProcessID::Enum TargetProcessID;
 };
 
 // Tells a thread task about an interface to another thread task
-class CAddMailboxMessage : public IVirtualProcessMessage
+class CAddMailboxMessage : public IProcessMessage
 {
 	public:
 		
-		typedef IVirtualProcessMessage BASECLASS;
+		typedef IProcessMessage BASECLASS;
 
 		CAddMailboxMessage( const shared_ptr< CWriteOnlyMailbox > &mailbox );
 

@@ -22,17 +22,17 @@
 
 #include "stdafx.h"
 
-#include "LoggingVirtualProcess.h"
+#include "LoggingProcess.h"
 
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-#include "Concurrency/VirtualProcessSubject.h"
-#include "Concurrency/VirtualProcessConstants.h"
+#include "Concurrency/ProcessSubject.h"
+#include "Concurrency/ProcessConstants.h"
 #include "Concurrency/Messaging/LoggingMessages.h"
-#include "Concurrency/VirtualProcessExecutionContext.h"
-#include "MessageHandling/VirtualProcessMessageHandler.h"
+#include "Concurrency/ProcessExecutionContext.h"
+#include "MessageHandling/ProcessMessageHandler.h"
 #include "Logging/LogInterface.h"
 #include "PlatformTime.h"
 #include "PlatformProcess.h"
@@ -43,7 +43,7 @@ class CLogFile
 {
 	public:
 
-		CLogFile( EVirtualProcessSubject::Enum subject, const std::wstring &file_name ) :
+		CLogFile( EProcessSubject::Enum subject, const std::wstring &file_name ) :
 			Subject( subject ),
 			FileName( file_name ),
 			File( nullptr )
@@ -77,7 +77,7 @@ class CLogFile
 			( *File ) << data;
 		}
 
-		EVirtualProcessSubject::Enum Get_Subject( void ) const { return Subject; }
+		EProcessSubject::Enum Get_Subject( void ) const { return Subject; }
 
 		const std::wstring &Get_File_Name( void ) const { return FileName; }
 
@@ -85,7 +85,7 @@ class CLogFile
 
 	private:
 
-		EVirtualProcessSubject::Enum Subject;
+		EProcessSubject::Enum Subject;
 
 		std::wstring FileName;
 
@@ -93,12 +93,12 @@ class CLogFile
 };
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::CLoggingVirtualProcess -- default constructor
+	CLoggingProcess::CLoggingProcess -- default constructor
 	
 		properties -- process properties for the logging process
 			
 **********************************************************************************************************************/
-CLoggingVirtualProcess::CLoggingVirtualProcess( const SProcessProperties &properties ) :
+CLoggingProcess::CLoggingProcess( const SProcessProperties &properties ) :
 	BASECLASS( properties ),
 	LogFiles(),
 	PID( NPlatform::Get_Self_PID() ),
@@ -107,31 +107,31 @@ CLoggingVirtualProcess::CLoggingVirtualProcess( const SProcessProperties &proper
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::~CLoggingVirtualProcess -- destructor
+	CLoggingProcess::~CLoggingProcess -- destructor
 		
 **********************************************************************************************************************/
-CLoggingVirtualProcess::~CLoggingVirtualProcess()
+CLoggingProcess::~CLoggingProcess()
 {
 	Shutdown();
 }
 
 /**********************************************************************************************************************
-	CLoggingThreadTask::Initialize -- initializes the thread task
+	CLoggingThreadTask::Initialize -- initializes the process
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Initialize( EVirtualProcessID::Enum id )
+void CLoggingProcess::Initialize( EProcessID::Enum id )
 {
 	BASECLASS::Initialize( id );
 }
 
 /**********************************************************************************************************************
-	CLoggingThreadTask::Service -- primary execution function for this thread task
+	CLoggingThreadTask::Service -- primary execution function for this process
 
 		elapsed_seconds -- how much time has elapsed, in seconds
 		context -- the thread task execution context
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Service( double elapsed_seconds, const CVirtualProcessExecutionContext &context )
+void CLoggingProcess::Service( double elapsed_seconds, const CProcessExecutionContext &context )
 {
 	// Did we get called directly by the exception handler?
 	if ( context.Get_Spawning_Task() == nullptr )
@@ -148,10 +148,10 @@ void CLoggingVirtualProcess::Service( double elapsed_seconds, const CVirtualProc
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Shutdown -- flushes and closes all the log files
+	CLoggingProcess::Shutdown -- flushes and closes all the log files
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Shutdown( void )
+void CLoggingProcess::Shutdown( void )
 {
 	for ( auto iter = LogFiles.cbegin(); iter != LogFiles.cend(); ++iter )
 	{
@@ -162,30 +162,30 @@ void CLoggingVirtualProcess::Shutdown( void )
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Register_Message_Handlers -- registers thread message handlers specific to this process
+	CLoggingProcess::Register_Message_Handlers -- registers message handlers specific to this process
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Register_Message_Handlers( void )
+void CLoggingProcess::Register_Message_Handlers( void )
 {
 	BASECLASS::Register_Message_Handlers();
 
-	REGISTER_THIS_HANDLER( CLogRequestMessage, CLoggingVirtualProcess, Handle_Log_Request_Message );
+	REGISTER_THIS_HANDLER( CLogRequestMessage, CLoggingProcess, Handle_Log_Request_Message );
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Handle_Log_Request_Message -- handler function for all logging requests
+	CLoggingProcess::Handle_Log_Request_Message -- handler function for all logging requests
 
 		source_process_id -- the process source of the message
 		message -- the log request message
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Handle_Log_Request_Message( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CLogRequestMessage > &message )
+void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_process_id, const shared_ptr< const CLogRequestMessage > &message )
 {
 	Handle_Log_Request_Message_Aux( source_process_id, message->Get_Source_Properties(), message->Get_Message(), message->Get_Time() );
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Handle_Log_Request_Message_Aux -- handler function for all logging requests, including self
+	CLoggingProcess::Handle_Log_Request_Message_Aux -- handler function for all logging requests, including self
 		ones
 
 		source_process_id -- the process source of the message
@@ -193,7 +193,7 @@ void CLoggingVirtualProcess::Handle_Log_Request_Message( EVirtualProcessID::Enum
 		message -- the text to be written to the log file
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Handle_Log_Request_Message_Aux( EVirtualProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64 system_time )
+void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64 system_time )
 {
 	if ( IsShuttingDown )
 	{
@@ -201,7 +201,7 @@ void CLoggingVirtualProcess::Handle_Log_Request_Message_Aux( EVirtualProcessID::
 	}
 
 	// Find the appropriate log file to write to; if one does not exist, create it
-	EVirtualProcessSubject::Enum subject = properties.Get_Subject_As< EVirtualProcessSubject::Enum >();
+	EProcessSubject::Enum subject = properties.Get_Subject_As< EProcessSubject::Enum >();
 	shared_ptr< CLogFile > log_file = Get_Log_File( subject );
 	if ( log_file.get() == nullptr )
 	{
@@ -218,14 +218,14 @@ void CLoggingVirtualProcess::Handle_Log_Request_Message_Aux( EVirtualProcessID::
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Build_File_Name -- constructs the log file name to use for the supplied thread subject
+	CLoggingProcess::Build_File_Name -- constructs the log file name to use for the supplied thread subject
 
 		subject -- thread subject of the thread task that sent a logging request
 
 		Returns: the file name to use for a given thread subject
 		
 **********************************************************************************************************************/
-std::wstring CLoggingVirtualProcess::Build_File_Name( EVirtualProcessSubject::Enum subject ) const
+std::wstring CLoggingProcess::Build_File_Name( EProcessSubject::Enum subject ) const
 {
 #ifdef TOFIX
 	static std::wstring _subject_file_names[ TS_COUNT ] = 
@@ -249,14 +249,14 @@ std::wstring CLoggingVirtualProcess::Build_File_Name( EVirtualProcessSubject::En
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Get_Log_File -- gets an existing log file for a thread subject, if one exists
+	CLoggingProcess::Get_Log_File -- gets an existing log file for a thread subject, if one exists
 
 		subject -- thread subject to get the log file for
 
 		Returns: pointer to the corresponding log file, or null
 		
 **********************************************************************************************************************/
-shared_ptr< CLogFile > CLoggingVirtualProcess::Get_Log_File( EVirtualProcessSubject::Enum subject ) const
+shared_ptr< CLogFile > CLoggingProcess::Get_Log_File( EProcessSubject::Enum subject ) const
 {
 	auto iter = LogFiles.find( subject );
 	if ( iter != LogFiles.end() )
@@ -268,7 +268,7 @@ shared_ptr< CLogFile > CLoggingVirtualProcess::Get_Log_File( EVirtualProcessSubj
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Build_Log_Message -- formats a line of text in response to a logging request
+	CLoggingProcess::Build_Log_Message -- formats a line of text in response to a logging request
 
 		source_key -- key of the virtual process that sent this logging request
 		message -- the text to be logged
@@ -276,7 +276,7 @@ shared_ptr< CLogFile > CLoggingVirtualProcess::Get_Log_File( EVirtualProcessSubj
 		Returns: string containing the fully formatted line of text that should be written to the log file
 		
 **********************************************************************************************************************/
-std::wstring CLoggingVirtualProcess::Build_Log_Message( EVirtualProcessID::Enum source_process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64 system_time ) const
+std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64 system_time ) const
 {
 	uint16 subject_part = source_properties.Get_Subject();
 	uint16 major_part = source_properties.Get_Major_Part();
@@ -290,13 +290,13 @@ std::wstring CLoggingVirtualProcess::Build_Log_Message( EVirtualProcessID::Enum 
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Handle_Shutdown_Self_Request -- override of the shutdown request handler
+	CLoggingProcess::Handle_Shutdown_Self_Request -- override of the shutdown request handler
 
 		key -- key of the virtual process that sent this shutdown request
 		message -- the shutdown request itself
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Handle_Shutdown_Self_Request( EVirtualProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message )
+void CLoggingProcess::Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message )
 {
 	BASECLASS::Handle_Shutdown_Self_Request( source_process_id, message );
 
@@ -304,23 +304,23 @@ void CLoggingVirtualProcess::Handle_Shutdown_Self_Request( EVirtualProcessID::En
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Get_Time_Type -- gets the time type that should drive this process's execution
+	CLoggingProcess::Get_Time_Type -- gets the time type that should drive this process's execution
 
 		Returns: the time type by which this process should be executed
 		
 **********************************************************************************************************************/
-ETimeType CLoggingVirtualProcess::Get_Time_Type( void ) const 
+ETimeType CLoggingProcess::Get_Time_Type( void ) const 
 { 
 	return TT_REAL_TIME; 
 }
 
 /**********************************************************************************************************************
-	CLoggingVirtualProcess::Log -- logs a message to the logging thread's log file
+	CLoggingProcess::Log -- logs a message to the logging thread's log file
 
 		message -- message to log
 		
 **********************************************************************************************************************/
-void CLoggingVirtualProcess::Log( const std::wstring &message )
+void CLoggingProcess::Log( const std::wstring &message )
 {
 	Handle_Log_Request_Message_Aux( Get_ID(), Get_Properties(), message, CPlatformTime::Get_Raw_Time() );
 }

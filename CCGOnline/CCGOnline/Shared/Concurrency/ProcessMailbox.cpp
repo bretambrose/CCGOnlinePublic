@@ -1,7 +1,8 @@
 /**********************************************************************************************************************
 
-	VirtualProcessManagementMessages.h
-		A component containing definitions for messages that manage and/or control virtual processes
+	ProcessMailbox.cpp
+		A component definining the class that holds both the read and write interfaces of a process mailbox.  Only the
+		manager has access to this.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,30 +23,40 @@
 
 #include "stdafx.h"
 
-#include "VirtualProcessManagementMessages.h"
+#include "ProcessMailbox.h"
 
-#include "Concurrency\VirtualProcessInterface.h"
+#include "MailboxInterfaces.h"
+#include "Concurrency/Containers/TBBConcurrentQueue.h"
+#include "ProcessMessageFrame.h"
+
+// Controls which concurrent queue implementation we use
+typedef CTBBConcurrentQueue< shared_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
 
 /**********************************************************************************************************************
-	CAddNewVirtualProcessMessage::CAddNewVirtualProcessMessage -- constructor
-	
-		virtual_process -- the process to add to the conurrency system
-		return_interface -- should the manager return an interface to this new process to the requesting thread?
-		forward_creator_interface -- should the manager forward the requesting process's interface to the new process?
-		
+	CProcessMailbox::CProcessMailbox -- constructor
+
+		process_id -- id of the process these interfaces correspond to
+		properties -- properties of the owning process
+					
 **********************************************************************************************************************/
-CAddNewVirtualProcessMessage::CAddNewVirtualProcessMessage( const shared_ptr< IVirtualProcess > &virtual_process, bool return_mailbox, bool forward_creator_mailbox ) :
-	VirtualProcess( virtual_process ),
-	ReturnMailbox( return_mailbox ),
-	ForwardCreatorMailbox( forward_creator_mailbox )
+CProcessMailbox::CProcessMailbox( EProcessID::Enum process_id, const SProcessProperties &properties ) :
+	ProcessID( process_id ),
+	Properties( properties ),
+	WriteOnlyMailbox( nullptr ),
+	ReadOnlyMailbox( nullptr )
 {
+	shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > queue( new ProcessToProcessQueueType );
+
+	WriteOnlyMailbox.reset( new CWriteOnlyMailbox( process_id, properties, queue ) );
+	ReadOnlyMailbox.reset( new CReadOnlyMailbox( queue ) );
 }
 
 /**********************************************************************************************************************
-	CAddNewVirtualProcessMessage::~CAddNewVirtualProcessMessage -- destructor
-		
+	CProcessMailbox::~CProcessMailbox -- destructor
+					
 **********************************************************************************************************************/
-CAddNewVirtualProcessMessage::~CAddNewVirtualProcessMessage()
+CProcessMailbox::~CProcessMailbox()
 {
 }
+
 

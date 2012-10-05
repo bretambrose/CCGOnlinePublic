@@ -1,8 +1,8 @@
 /**********************************************************************************************************************
 
-	VirtualProcessStatics.h
+	ProcessStatics.h
 		A component containing a static class that manages the thread-local variables that hold handles to
-		the executing virtual process and the concurrency manager.
+		the executing process and the concurrency manager.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -23,33 +23,33 @@
 
 #include "stdafx.h"
 
-#include "VirtualProcessStatics.h"
+#include "ProcessStatics.h"
 
 #include "ConcurrencyManager.h"
-#include "VirtualProcessInterface.h"
+#include "ProcessInterface.h"
 #include "ThreadLocalStorage.h"
 
 // Static member data definitions
-uint32 CVirtualProcessStatics::VirtualProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
-uint32 CVirtualProcessStatics::ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
-bool CVirtualProcessStatics::Initialized = false;
+uint32 CProcessStatics::ProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
+uint32 CProcessStatics::ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
+bool CProcessStatics::Initialized = false;
 
 /**********************************************************************************************************************
-	CVirtualProcessStatics::Initialize -- Initialize the thread local storage needed
+	CProcessStatics::Initialize -- Initialize the thread local storage needed
 					
 **********************************************************************************************************************/
-void CVirtualProcessStatics::Initialize( void )
+void CProcessStatics::Initialize( void )
 {
 	if ( Initialized )
 	{
 		return;
 	}
 
-	FATAL_ASSERT( VirtualProcessHandle == THREAD_LOCAL_INVALID_HANDLE );
+	FATAL_ASSERT( ProcessHandle == THREAD_LOCAL_INVALID_HANDLE );
 	FATAL_ASSERT( ConcurrencyManagerHandle == THREAD_LOCAL_INVALID_HANDLE );
 
-	VirtualProcessHandle = CThreadLocalStorage::Allocate_Thread_Local_Storage();
-	FATAL_ASSERT( VirtualProcessHandle != THREAD_LOCAL_INVALID_HANDLE );
+	ProcessHandle = CThreadLocalStorage::Allocate_Thread_Local_Storage();
+	FATAL_ASSERT( ProcessHandle != THREAD_LOCAL_INVALID_HANDLE );
 
 	ConcurrencyManagerHandle = CThreadLocalStorage::Allocate_Thread_Local_Storage();
 	FATAL_ASSERT( ConcurrencyManagerHandle != THREAD_LOCAL_INVALID_HANDLE );
@@ -58,10 +58,10 @@ void CVirtualProcessStatics::Initialize( void )
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessStatics::Initialize -- Cleans up the thread local storage used
+	CProcessStatics::Initialize -- Cleans up the thread local storage used
 					
 **********************************************************************************************************************/
-void CVirtualProcessStatics::Shutdown( void )
+void CProcessStatics::Shutdown( void )
 {
 	if ( !Initialized )
 	{
@@ -70,33 +70,33 @@ void CVirtualProcessStatics::Shutdown( void )
 
 	Initialized = false;
 
-	CThreadLocalStorage::Deallocate_Thread_Local_Storage( VirtualProcessHandle );
-	VirtualProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
+	CThreadLocalStorage::Deallocate_Thread_Local_Storage( ProcessHandle );
+	ProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
 
 	CThreadLocalStorage::Deallocate_Thread_Local_Storage( ConcurrencyManagerHandle );
 	ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessStatics::Set_Current_Thread_Task -- sets the current executing thread task variable
+	CProcessStatics::Set_Current_Thread_Task -- sets the current executing thread task variable
 
 		thread_task -- the currently executing thread task
 					
 **********************************************************************************************************************/
-void CVirtualProcessStatics::Set_Current_Virtual_Process( IVirtualProcess *virtual_process )
+void CProcessStatics::Set_Current_Process( IProcess *process )
 {
 	FATAL_ASSERT( Initialized );
 
-	CThreadLocalStorage::Set_TLS_Value( VirtualProcessHandle, virtual_process );
+	CThreadLocalStorage::Set_TLS_Value( ProcessHandle, process );
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessStatics::Set_Concurrency_Manager -- sets the concurrency manager variable
+	CProcessStatics::Set_Concurrency_Manager -- sets the concurrency manager variable
 
 		manager -- the global concurrency manager
 					
 **********************************************************************************************************************/
-void CVirtualProcessStatics::Set_Concurrency_Manager( CConcurrencyManager *manager )
+void CProcessStatics::Set_Concurrency_Manager( CConcurrencyManager *manager )
 {
 	FATAL_ASSERT( Initialized );
 
@@ -104,28 +104,28 @@ void CVirtualProcessStatics::Set_Concurrency_Manager( CConcurrencyManager *manag
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessStatics::Get_Current_Thread_Task -- gets the current executing thread task variable
+	CProcessStatics::Get_Current_Process -- gets the current executing process
 
-		Returns: the currently executing thread task
+		Returns: the currently executing process or null
 					
 **********************************************************************************************************************/
-IVirtualProcess *CVirtualProcessStatics::Get_Current_Virtual_Process( void )
+IProcess *CProcessStatics::Get_Current_Process( void )
 {
 	if ( !Initialized )
 	{
 		return nullptr;
 	}
 
-	return CThreadLocalStorage::Get_TLS_Value< IVirtualProcess >( VirtualProcessHandle );
+	return CThreadLocalStorage::Get_TLS_Value< IProcess >( ProcessHandle );
 }
 
 /**********************************************************************************************************************
-	CVirtualProcessStatics::Get_Concurrency_Manager -- gets the concurrency manager variable
+	CProcessStatics::Get_Concurrency_Manager -- gets the concurrency manager variable
 
 		Returns: the global concurrency manager
 					
 **********************************************************************************************************************/
-CConcurrencyManager *CVirtualProcessStatics::Get_Concurrency_Manager( void )
+CConcurrencyManager *CProcessStatics::Get_Concurrency_Manager( void )
 {
 	if ( !Initialized )
 	{

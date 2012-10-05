@@ -1,9 +1,8 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMessageHandlerBase.h
-		A component defining a bare base class for objects that handle virtual process messages.  In practice these objects
-		are simple trampolines that forward handling to a delegate while retaining type safety and
-		generic behavior.
+	ProcessSubject.h
+		A component containing the type enumerating different process subjects.  The subject is the high-level
+		logical role of the process.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,32 +21,21 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_MESSAGE_HANDLER_BASE_H
-#define VIRTUAL_PROCESS_MESSAGE_HANDLER_BASE_H
+#ifndef PROCESS_SUBJECT_H
+#define PROCESS_SUBJECT_H
 
-#include "MessageHandler.h"
-
-namespace EVirtualProcessID
+namespace EProcessSubject
 {
-	enum Enum;
+	enum Enum
+	{
+		INVALID = 0,
+
+		CONCURRENCY_MANAGER,
+		LOGGING,
+
+		NEXT_FREE_VALUE
+	};
 }
 
-class IVirtualProcessMessage;
 
-// A simple base class for all thread message handlers
-class IVirtualProcessMessageHandler : public IMessageHandler< EVirtualProcessID::Enum, IVirtualProcessMessage >
-{
-	public:
-
-		typedef IMessageHandler< EVirtualProcessID::Enum, IVirtualProcessMessage > BASECLASS;
-
-		IVirtualProcessMessageHandler( void ) :
-			BASECLASS()
-		{}
-
-		virtual ~IVirtualProcessMessageHandler() {}
-
-};
-
-#endif // VIRTUAL_PROCESS_MESSAGE_HANDLER_BASE_H
-
+#endif // PROCESS_SUBJECT_H

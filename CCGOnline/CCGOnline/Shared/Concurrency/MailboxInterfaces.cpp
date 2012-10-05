@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	MailboxInterfaces.cpp
-		A component definining the read-only and write-only mailbox interfaces that a virtual process has
+		A component definining the read-only and write-only mailbox interfaces that a process has
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -25,19 +25,19 @@
 #include "MailboxInterfaces.h"
 
 #include "Concurrency/Containers/ConcurrentQueueInterface.h"
-#include "VirtualProcessMessageFrame.h"
+#include "ProcessMessageFrame.h"
 
 /**********************************************************************************************************************
 	CWriteOnlyMailbox::CWriteOnlyMailbox -- constructor
 
 		process_id -- the id of process that this write-only interface refers to
 		properties -- properties of the process that this interface corresponds to
-		write_queue -- the concurrency queue containing message frames targeted for the corresponding virtual process
+		write_queue -- the concurrency queue containing message frames targeted for the corresponding process
 					
 **********************************************************************************************************************/
-CWriteOnlyMailbox::CWriteOnlyMailbox( EVirtualProcessID::Enum process_id, 
+CWriteOnlyMailbox::CWriteOnlyMailbox( EProcessID::Enum process_id, 
 												  const SProcessProperties &properties, 
-												  const shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > &write_queue ) :
+												  const shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > &write_queue ) :
 	ProcessID( process_id ),
 	Properties( properties ),
 	WriteQueue( write_queue )
@@ -59,7 +59,7 @@ CWriteOnlyMailbox::~CWriteOnlyMailbox()
 		frame -- the message frame to add
 					
 **********************************************************************************************************************/
-void CWriteOnlyMailbox::Add_Frame( const shared_ptr< CVirtualProcessMessageFrame > &frame )
+void CWriteOnlyMailbox::Add_Frame( const shared_ptr< CProcessMessageFrame > &frame )
 {
 	FATAL_ASSERT( frame.get() != nullptr );
 
@@ -74,7 +74,7 @@ void CWriteOnlyMailbox::Add_Frame( const shared_ptr< CVirtualProcessMessageFrame
 		read_queue -- the concurrent queue of message frames that will get read from
 					
 **********************************************************************************************************************/
-CReadOnlyMailbox::CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > &read_queue ) :
+CReadOnlyMailbox::CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > &read_queue ) :
 	ReadQueue( read_queue )
 {
 	FATAL_ASSERT( ReadQueue.get() != nullptr );
@@ -95,7 +95,7 @@ CReadOnlyMailbox::~CReadOnlyMailbox()
 		frames -- output parameter for all the frames currently on the read queue
 					
 **********************************************************************************************************************/
-void CReadOnlyMailbox::Remove_Frames( std::vector< shared_ptr< CVirtualProcessMessageFrame > > &frames )
+void CReadOnlyMailbox::Remove_Frames( std::vector< shared_ptr< CProcessMessageFrame > > &frames )
 {
 	ReadQueue->Remove_Items( frames );
 }

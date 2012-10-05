@@ -29,11 +29,11 @@
 #include <iostream>
 #include "PlatformExceptionHandler.h"
 #include "Logging/LogInterface.h"
-#include "Concurrency/VirtualProcessExecutionContext.h"
-#include "Concurrency/VirtualProcessStatics.h"
-#include "Concurrency/VirtualProcessInterface.h"
-#include "Concurrency/VirtualProcessConstants.h"
-#include "Concurrency/VirtualProcessID.h"
+#include "Concurrency/ProcessExecutionContext.h"
+#include "Concurrency/ProcessStatics.h"
+#include "Concurrency/ProcessInterface.h"
+#include "Concurrency/ProcessConstants.h"
+#include "Concurrency/ProcessID.h"
 #include "StructuredExceptionInfo.h"
 #include "PlatformFileSystem.h"
 #include "PlatformMisc.h"
@@ -81,8 +81,8 @@ void CStructuredExceptionHandler::Shutdown( void )
 void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredExceptionInfo &shared_exception_info )
 {
 	// If the exception is in the scope of a thread task, record that fact
-	EVirtualProcessID::Enum process_id = EVirtualProcessID::INVALID;
-	IVirtualProcess *task = CVirtualProcessStatics::Get_Current_Virtual_Process();
+	EProcessID::Enum process_id = EProcessID::INVALID;
+	IProcess *task = CProcessStatics::Get_Current_Process();
 	if ( task != nullptr )
 	{
 		process_id = task->Get_ID();
@@ -91,7 +91,7 @@ void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredE
 	shared_exception_info.Set_Process_ID( process_id );
 
 	// Flush all logging info to disk (by using a null context); global log mutex serializes access
-	CVirtualProcessExecutionContext context( nullptr );
+	CProcessExecutionContext context( nullptr );
 	CLogInterface::Service_Logging( 0.0, context );
 
 	// Write a file containing the exception details

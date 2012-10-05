@@ -23,12 +23,12 @@
 #ifndef MAILBOX_INTERFACES_H
 #define MAILBOX_INTERFACES_H
 
-#include "VirtualProcessProperties.h"
+#include "ProcessProperties.h"
 
-class CVirtualProcessMessageFrame;
+class CProcessMessageFrame;
 template < typename T > class IConcurrentQueue;
 
-namespace EVirtualProcessID
+namespace EProcessID
 {
 	enum Enum;
 }
@@ -38,21 +38,21 @@ class CWriteOnlyMailbox
 {
 	public:
 
-		CWriteOnlyMailbox( EVirtualProcessID::Enum process_id, const SProcessProperties &properties, const shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > &write_queue );
+		CWriteOnlyMailbox( EProcessID::Enum process_id, const SProcessProperties &properties, const shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > &write_queue );
 		~CWriteOnlyMailbox();
 
-		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 		const SProcessProperties &Get_Properties( void ) const { return Properties; }
 
-		void Add_Frame( const shared_ptr< CVirtualProcessMessageFrame > &frame );
+		void Add_Frame( const shared_ptr< CProcessMessageFrame > &frame );
 
 	private:
 
-		EVirtualProcessID::Enum ProcessID;
+		EProcessID::Enum ProcessID;
 
 		SProcessProperties Properties;
 
-		shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > WriteQueue;
+		shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > WriteQueue;
 
 };
 
@@ -61,14 +61,14 @@ class CReadOnlyMailbox
 {
 	public:
 
-		CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > &read_queue );
+		CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > &read_queue );
 		~CReadOnlyMailbox();
 
-		void Remove_Frames( std::vector< shared_ptr< CVirtualProcessMessageFrame > > &frames );
+		void Remove_Frames( std::vector< shared_ptr< CProcessMessageFrame > > &frames );
 
 	private:
 
-		shared_ptr< IConcurrentQueue< shared_ptr< CVirtualProcessMessageFrame > > > ReadQueue;
+		shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > ReadQueue;
 
 };
 

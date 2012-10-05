@@ -1,8 +1,8 @@
 /**********************************************************************************************************************
 
-	VirtualProcessSubject.h
-		A component containing the type enumerating different virtual process subjects.  The subject is the high-level
-		logical role of the process.
+	ProcessStatics.h
+		A component containing a static class that manages the thread-local variables that hold handles to
+		the executing process and the concurrency manager.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,21 +21,33 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_SUBJECT_H
-#define VIRTUAL_PROCESS_SUBJECT_H
+#ifndef PROCESS_STATICS_H
+#define PROCESS_STATICS_H
 
-namespace EVirtualProcessSubject
+class IProcess;
+class CConcurrencyManager;
+
+// Static class managing thread-local handles to the executing process and the concurrency manager. 
+class CProcessStatics
 {
-	enum Enum
-	{
-		INVALID = 0,
+	public:
 
-		CONCURRENCY_MANAGER,
-		LOGGING,
+		static void Initialize( void );
+		static void Shutdown( void );
 
-		NEXT_FREE_VALUE
-	};
-}
+		static void Set_Current_Process( IProcess *process );
+		static void Set_Concurrency_Manager( CConcurrencyManager *manager );
 
+		static IProcess *Get_Current_Process( void );
+		static CConcurrencyManager *Get_Concurrency_Manager( void );
 
-#endif // VIRTUAL_PROCESS_SUBJECT_H
+	private:
+
+		// Thread Local storage indices
+		static uint32 ProcessHandle;
+		static uint32 ConcurrencyManagerHandle;
+
+		static bool Initialized;
+};
+
+#endif // PROCESS_STATICS_H

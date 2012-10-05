@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	LoggingMessages.h
-		A component containing definitions for virtual process messages needed to log information to files
+		A component containing definitions for process messages needed to log information to files
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -23,21 +23,21 @@
 #ifndef LOGGING_MESSAGES_H
 #define LOGGING_MESSAGES_H
 
-#include "VirtualProcessMessage.h"
+#include "ProcessMessage.h"
 
-#include "Concurrency/VirtualProcessProperties.h"
+#include "Concurrency/ProcessProperties.h"
 
-namespace EVirtualProcessID
+namespace EProcessID
 {
 	enum Enum;
 }
 
 // A message asking the logging thread to write some information to a file
-class CLogRequestMessage : public IVirtualProcessMessage
+class CLogRequestMessage : public IProcessMessage
 {
 	public:
 
-		typedef IVirtualProcessMessage BASECLASS;
+		typedef IProcessMessage BASECLASS;
 
 		CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message );
 		virtual ~CLogRequestMessage() {}

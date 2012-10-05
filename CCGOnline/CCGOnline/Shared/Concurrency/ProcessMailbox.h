@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMailbox.h
-		A component definining the class that holds both the read and write mailboxes of a virtual process.  Only the
+	ProcessMailbox.h
+		A component definining the class that holds both the read and write mailboxes of a process.  Only the
 		manager has access to this.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -21,38 +21,38 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_MAILBOX_H
-#define VIRTUAL_PROCESS_MAILBOX_H
+#ifndef PROCESS_MAILBOX_H
+#define PROCESS_MAILBOX_H
 
-#include "VirtualProcessProperties.h"
+#include "ProcessProperties.h"
 
 class CWriteOnlyMailbox;
 class CReadOnlyMailbox;
-class CVirtualProcessMessageFrame;
+class CProcessMessageFrame;
 template < typename T > class IConcurrentQueue;
 
-namespace EVirtualProcessID
+namespace EProcessID
 {
 	enum Enum;
 }
 
 // A class that holds both the read and write interfaces of a thread task
-class CVirtualProcessMailbox
+class CProcessMailbox
 {
 	public:
 
-		CVirtualProcessMailbox( EVirtualProcessID::Enum process_id, const SProcessProperties &properties );
-		~CVirtualProcessMailbox();
+		CProcessMailbox( EProcessID::Enum process_id, const SProcessProperties &properties );
+		~CProcessMailbox();
 
 		const shared_ptr< CWriteOnlyMailbox > &Get_Writable_Mailbox( void ) const { return WriteOnlyMailbox; }
 		const shared_ptr< CReadOnlyMailbox > &Get_Readable_Mailbox( void ) const { return ReadOnlyMailbox; }
 
-		EVirtualProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 		const SProcessProperties &Get_Properties( void ) const { return Properties; }
 
 	private:
 		
-		EVirtualProcessID::Enum ProcessID;
+		EProcessID::Enum ProcessID;
 
 		SProcessProperties Properties;
 
@@ -60,4 +60,4 @@ class CVirtualProcessMailbox
 		shared_ptr< CReadOnlyMailbox > ReadOnlyMailbox;
 };
 
-#endif // VIRTUAL_PROCESS_MAILBOX_H
+#endif // PROCESS_MAILBOX_H

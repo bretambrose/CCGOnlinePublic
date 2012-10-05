@@ -26,7 +26,7 @@
 
 #include "Logging/LogInterface.h"
 #include "StructuredExceptionHandler.h"
-#include "Concurrency/VirtualProcessStatics.h"
+#include "Concurrency/ProcessStatics.h"
 #include "PlatformTime.h"
 #include "PlatformProcess.h"
 #include "GeneratedCode/RegisterSharedEnums.h"
@@ -43,7 +43,7 @@ void NShared::Initialize( void )
 	CAssertSystem::Initialize( DLogFunctionType( CLogInterface::Log ) );
 	CStructuredExceptionHandler::Initialize();
 	CLogInterface::Initialize_Static( NPlatform::Get_Service_Name(), LL_LOW );
-	CVirtualProcessStatics::Initialize();
+	CProcessStatics::Initialize();
 	CPlatformTime::Initialize();	// does not have a corresponding shutdown function
 
 	Register_Shared_Enums();
@@ -60,7 +60,7 @@ void NShared::Shutdown( void )
 {
 	CSlashCommandManager::Shutdown();
 	CXMLSerializationRegistrar::Shutdown();
-	CVirtualProcessStatics::Shutdown();
+	CProcessStatics::Shutdown();
 	CLogInterface::Shutdown_Static();
 	CStructuredExceptionHandler::Shutdown();
 	CAssertSystem::Shutdown();

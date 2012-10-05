@@ -1,7 +1,9 @@
 /**********************************************************************************************************************
 
-	VirtualProcessConstants.h
-		A component definining a set of virtual process related constants
+	ProcessMessageHandlerBase.h
+		A component defining a bare base class for objects that handle process messages.  In practice these objects
+		are simple trampolines that forward handling to a delegate while retaining type safety and
+		generic behavior.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,17 +22,32 @@
 
 **********************************************************************************************************************/
 
-#ifndef VIRTUAL_PROCESS_CONSTANTS_H
-#define VIRTUAL_PROCESS_CONSTANTS_H
+#ifndef PROCESS_MESSAGE_HANDLER_BASE_H
+#define PROCESS_MESSAGE_HANDLER_BASE_H
 
-#include "VirtualProcessSubject.h"
-#include "VirtualProcessProperties.h"
-#include "VirtualProcessID.h"
+#include "MessageHandler.h"
 
-static const SProcessProperties LOGGING_PROCESS_PROPERTIES( EVirtualProcessSubject::LOGGING );
-static const SProcessProperties MANAGER_PROCESS_PROPERTIES( EVirtualProcessSubject::CONCURRENCY_MANAGER );
+namespace EProcessID
+{
+	enum Enum;
+}
 
-static const EVirtualProcessID::Enum MANAGER_PROCESS_ID( EVirtualProcessID::CONCURRENCY_MANAGER );
-static const EVirtualProcessID::Enum LOGGING_PROCESS_ID( EVirtualProcessID::LOGGING );
+class IProcessMessage;
 
-#endif // VIRTUAL_PROCESS_CONSTANTS_H
+// A simple base class for all thread message handlers
+class IProcessMessageHandler : public IMessageHandler< EProcessID::Enum, IProcessMessage >
+{
+	public:
+
+		typedef IMessageHandler< EProcessID::Enum, IProcessMessage > BASECLASS;
+
+		IProcessMessageHandler( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~IProcessMessageHandler() {}
+
+};
+
+#endif // PROCESS_MESSAGE_HANDLER_BASE_H
+
