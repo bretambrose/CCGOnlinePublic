@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMailboxTests.cpp
-		defines unit tests for thread connection related functionality
+	ProcessMailboxTests.cpp
+		defines unit tests for process-to-process communication related functionality
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,12 +22,12 @@
 
 #include "stdafx.h"
 
-#include "Concurrency/VirtualProcessMailbox.h"
+#include "Concurrency/ProcessMailbox.h"
 #include "Concurrency/MailboxInterfaces.h"
-#include "Concurrency/VirtualProcessMessageFrame.h"
+#include "Concurrency/ProcessMessageFrame.h"
 #include "Concurrency/Messaging/LoggingMessages.h"
-#include "Concurrency/VirtualProcessConstants.h"
-#include "Concurrency/VirtualProcessID.h"
+#include "Concurrency/ProcessConstants.h"
+#include "Concurrency/ProcessID.h"
 
 static const std::wstring LOG_MESSAGES[] = {
 	std::wstring( L"Message 1-1" ),
@@ -38,28 +38,28 @@ static const std::wstring LOG_MESSAGES[] = {
 
 TEST( VirtualProcessMailboxTests, Add_Remove )
 {
-	CVirtualProcessMailbox *mailbox = new CVirtualProcessMailbox( EVirtualProcessID::LOGGING, LOGGING_PROCESS_PROPERTIES );
+	CProcessMailbox *mailbox = new CProcessMailbox( EProcessID::LOGGING, LOGGING_PROCESS_PROPERTIES );
 
-	shared_ptr< CVirtualProcessMessageFrame > frame1( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
-	frame1->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
-	frame1->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
+	shared_ptr< CProcessMessageFrame > frame1( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	frame1->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
+	frame1->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
 
-	shared_ptr< CVirtualProcessMessageFrame > frame2( new CVirtualProcessMessageFrame( EVirtualProcessID::CONCURRENCY_MANAGER ) );
-	frame2->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 2 ] ) ) );
-	frame2->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 3 ] ) ) );
+	shared_ptr< CProcessMessageFrame > frame2( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	frame2->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 2 ] ) ) );
+	frame2->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 3 ] ) ) );
 
 	shared_ptr< CWriteOnlyMailbox > write_interface = mailbox->Get_Writable_Mailbox();
 	write_interface->Add_Frame( frame1 );
 	write_interface->Add_Frame( frame2 );
 
-	std::vector< shared_ptr< CVirtualProcessMessageFrame > > frames;
+	std::vector< shared_ptr< CProcessMessageFrame > > frames;
 	shared_ptr< CReadOnlyMailbox > read_interface = mailbox->Get_Readable_Mailbox();
 	read_interface->Remove_Frames( frames );
 
 	uint32 log_index = 0;
 	for ( uint32 i = 0; i < frames.size(); ++i )
 	{
-		shared_ptr< CVirtualProcessMessageFrame > frame = frames[ i ];
+		shared_ptr< CProcessMessageFrame > frame = frames[ i ];
 		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 		{
 			shared_ptr< const CLogRequestMessage > log_request = static_pointer_cast< const CLogRequestMessage >( *iter );

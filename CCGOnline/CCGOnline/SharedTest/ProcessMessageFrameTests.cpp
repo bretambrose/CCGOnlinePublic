@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	VirtualProcessMessageFrameTests.cpp
-		defines unit tests for virtual process message frame related functionality
+	ProcessMessageFrameTests.cpp
+		defines unit tests for process message frame related functionality
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -23,9 +23,9 @@
 #include "stdafx.h"
 
 #include "Concurrency/Messaging/LoggingMessages.h"
-#include "Concurrency/VirtualProcessConstants.h"
-#include "Concurrency/VirtualProcessMessageFrame.h"
-#include "Concurrency/VirtualProcessID.h"
+#include "Concurrency/ProcessConstants.h"
+#include "Concurrency/ProcessMessageFrame.h"
+#include "Concurrency/ProcessID.h"
 
 static const std::wstring LOG_MESSAGES[] = {
 	std::wstring( L"Help I'm a message" ),
@@ -34,10 +34,10 @@ static const std::wstring LOG_MESSAGES[] = {
 
 TEST( VirtualProcessMessageFrameTests, Add_Remove )
 {
-	CVirtualProcessMessageFrame message_frame( EVirtualProcessID::LOGGING );
+	CProcessMessageFrame message_frame( EProcessID::LOGGING );
 
-	message_frame.Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
-	message_frame.Add_Message( shared_ptr< const IVirtualProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
+	message_frame.Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
+	message_frame.Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
 
 	uint32 i = 0;
 	for ( auto iter = message_frame.Get_Frame_Begin(); iter != message_frame.Get_Frame_End(); ++iter, ++i )

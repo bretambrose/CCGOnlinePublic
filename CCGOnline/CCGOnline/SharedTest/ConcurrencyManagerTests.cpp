@@ -24,12 +24,12 @@
 
 #include "Concurrency/ConcurrencyManager.h"
 #include "Concurrency/MailboxInterfaces.h"
-#include "Concurrency/VirtualProcessStatics.h"
-#include "Concurrency/VirtualProcessBase.h"
-#include "Concurrency/VirtualProcessSubject.h"
-#include "Concurrency/VirtualProcessConstants.h"
-#include "Concurrency/VirtualProcessMessageFrame.h"
-#include "Concurrency/Messaging/VirtualProcessManagementMessages.h"
+#include "Concurrency/ProcessStatics.h"
+#include "Concurrency/ProcessBase.h"
+#include "Concurrency/ProcessSubject.h"
+#include "Concurrency/ProcessConstants.h"
+#include "Concurrency/ProcessMessageFrame.h"
+#include "Concurrency/Messaging/ProcessManagementMessages.h"
 #include "Concurrency/Messaging/ExchangeMailboxMessages.h"
 #include "Logging/LogInterface.h"
 #include "Time/TimeType.h"
@@ -43,20 +43,20 @@ class ConcurrencyManagerTests : public testing::Test
 
 };
 
-class CVirtualProcessBaseExaminer
+class CProcessBaseExaminer
 {
 	public:
 
-		CVirtualProcessBaseExaminer( const shared_ptr< CVirtualProcessBase > &virtual_process ) :
-			VirtualProcess( virtual_process )
+		CProcessBaseExaminer( const shared_ptr< CProcessBase > &virtual_process ) :
+			Process( virtual_process )
 		{}
 
-		const CVirtualProcessBase::FrameTableType &Get_Pending_Outbound_Frames( void ) const { return VirtualProcess->PendingOutboundFrames; }
-		const CVirtualProcessBase::MailboxTableType &Get_Mailboxes( void ) const { return VirtualProcess->Mailboxes; }
-		shared_ptr< CReadOnlyMailbox > Get_My_Mailbox( void ) const { return VirtualProcess->MyMailbox; }
+		const CProcessBase::FrameTableType &Get_Pending_Outbound_Frames( void ) const { return Process->PendingOutboundFrames; }
+		const CProcessBase::MailboxTableType &Get_Mailboxes( void ) const { return Process->Mailboxes; }
+		shared_ptr< CReadOnlyMailbox > Get_My_Mailbox( void ) const { return Process->MyMailbox; }
 
-		shared_ptr< CWriteOnlyMailbox > Get_Log_Mailbox( void ) const { return VirtualProcess->LoggingMailbox; }
-		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const { return VirtualProcess->ManagerMailbox; }
+		shared_ptr< CWriteOnlyMailbox > Get_Log_Mailbox( void ) const { return Process->LoggingMailbox; }
+		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const { return Process->ManagerMailbox; }
 
 		bool Has_Mailbox_With_Properties( const SProcessProperties &properties ) const
 		{
@@ -72,14 +72,14 @@ class CVirtualProcessBaseExaminer
 			return false;
 		}
 
-		bool Has_Mailbox( EVirtualProcessID::Enum process_id ) const
+		bool Has_Mailbox( EProcessID::Enum process_id ) const
 		{
-			return VirtualProcess->Get_Mailbox( process_id ) != nullptr;
+			return Process->Get_Mailbox( process_id ) != nullptr;
 		}
 
 	private:
 
-		shared_ptr< CVirtualProcessBase > VirtualProcess;
+		shared_ptr< CProcessBase > Process;
 };
 
 class CConcurrencyManagerTester
@@ -95,7 +95,7 @@ class CConcurrencyManagerTester
 		{
 		}
 
-		void Setup_For_Run( const shared_ptr< IManagedVirtualProcess > &virtual_process )
+		void Setup_For_Run( const shared_ptr< IManagedProcess > &virtual_process )
 		{
 			Manager->Initialize( false );
 			Manager->Setup_For_Run( virtual_process );
@@ -113,26 +113,26 @@ class CConcurrencyManagerTester
 			}
 		}
 
-		void Add_Rescheduled_Process( EVirtualProcessID::Enum process_id ) { RescheduledProcesses.insert( process_id ); }
-		void Remove_Rescheduled_Process( EVirtualProcessID::Enum process_id ) { RescheduledProcesses.erase( process_id ); }
+		void Add_Rescheduled_Process( EProcessID::Enum process_id ) { RescheduledProcesses.insert( process_id ); }
+		void Remove_Rescheduled_Process( EProcessID::Enum process_id ) { RescheduledProcesses.erase( process_id ); }
 
 		bool Are_Rescheduled_Processes_Finished( void )
 		{
 			auto thread_set_copy = RescheduledProcesses;
 
-			std::vector< shared_ptr< CVirtualProcessMessageFrame > > frames;
+			std::vector< shared_ptr< CProcessMessageFrame > > frames;
 			shared_ptr< CReadOnlyMailbox > read_interface = Manager->Get_My_Mailbox();
 			read_interface->Remove_Frames( frames );
 
 			// go through all frames, looking for reschedule messages
 			for ( uint32 i = 0; i < frames.size(); ++i )
 			{
-				shared_ptr< CVirtualProcessMessageFrame > frame = frames[ i ];
-				EVirtualProcessID::Enum process_id = frame->Get_Process_ID();
+				shared_ptr< CProcessMessageFrame > frame = frames[ i ];
+				EProcessID::Enum process_id = frame->Get_Process_ID();
 				for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
 				{
-					const IVirtualProcessMessage *raw_message = iter->get();
-					if ( Loki::TypeInfo( typeid( *raw_message ) ) == Loki::TypeInfo( typeid( CRescheduleVirtualProcessMessage ) ) )
+					const IProcessMessage *raw_message = iter->get();
+					if ( Loki::TypeInfo( typeid( *raw_message ) ) == Loki::TypeInfo( typeid( CRescheduleProcessMessage ) ) )
 					{
 						if ( thread_set_copy.find( process_id ) != thread_set_copy.end() )
 						{
@@ -152,16 +152,16 @@ class CConcurrencyManagerTester
 			return thread_set_copy.size() == 0;
 		}
 
-		bool Has_Process( EVirtualProcessID::Enum process_id ) const { return Manager->Get_Record( process_id ) != nullptr; }
+		bool Has_Process( EProcessID::Enum process_id ) const { return Manager->Get_Record( process_id ) != nullptr; }
 		bool Has_Process_With_Properties( const SProcessProperties &properties ) const {
 			return Get_Virtual_Process_By_Property_Match( properties ) != nullptr;
 		}
 		
-		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process( EVirtualProcessID::Enum process_id ) const { return Manager->Get_Virtual_Process( process_id ); }
+		shared_ptr< IManagedProcess > Get_Virtual_Process( EProcessID::Enum process_id ) const { return Manager->Get_Process( process_id ); }
 
-		shared_ptr< IManagedVirtualProcess > Get_Virtual_Process_By_Property_Match( const SProcessProperties &properties ) const { 
-			std::vector< shared_ptr< IManagedVirtualProcess > > processes;
-			Manager->Enumerate_Virtual_Processes( processes );
+		shared_ptr< IManagedProcess > Get_Virtual_Process_By_Property_Match( const SProcessProperties &properties ) const { 
+			std::vector< shared_ptr< IManagedProcess > > processes;
+			Manager->Enumerate_Processes( processes );
 			for ( uint32 i = 0; i < processes.size(); ++i )
 			{
 				if ( properties.Matches( processes[ i ]->Get_Properties() ) )
@@ -177,8 +177,8 @@ class CConcurrencyManagerTester
 		{
 			if ( Manager->ProcessRecords.size() > 0 )
 			{
-				shared_ptr< CVirtualProcessMessageFrame > frame( new CVirtualProcessMessageFrame( MANAGER_PROCESS_ID ) );
-				frame->Add_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownManagerMessage ) );
+				shared_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
+				frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownManagerMessage ) );
 
 				shared_ptr< CWriteOnlyMailbox > write_interface = Manager->Get_Mailbox( MANAGER_PROCESS_ID );
 				write_interface->Add_Frame( frame );
@@ -208,16 +208,16 @@ class CConcurrencyManagerTester
 
 		scoped_ptr< CConcurrencyManager > Manager;
 
-		std::set< EVirtualProcessID::Enum > RescheduledProcesses;
+		std::set< EProcessID::Enum > RescheduledProcesses;
 };
 
-class CDoNothingVirtualProcess : public CVirtualProcessBase
+class CDoNothingProcess : public CProcessBase
 {
 	public:
 
-		typedef CVirtualProcessBase BASECLASS;
+		typedef CProcessBase BASECLASS;
 
-		CDoNothingVirtualProcess( const SProcessProperties &properties ) :
+		CDoNothingProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
 			ServiceCount( 0 )
 		{}
@@ -225,7 +225,7 @@ class CDoNothingVirtualProcess : public CVirtualProcessBase
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CVirtualProcessExecutionContext &context )
+		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
 		{
 			BASECLASS::Service( elapsed_seconds, context );
 
@@ -239,24 +239,24 @@ class CDoNothingVirtualProcess : public CVirtualProcessBase
 		uint32 ServiceCount;
 };
 
-namespace EManagerTestVirtualProcessSubject
+namespace EManagerTestProcessSubject
 {
 	enum Enum
 	{
-		AI = EVirtualProcessSubject::NEXT_FREE_VALUE,
+		AI = EProcessSubject::NEXT_FREE_VALUE,
 		DATABASE,
 		UI
 	};
 }
 
-static const EVirtualProcessID::Enum AI_PROCESS_ID( EVirtualProcessID::FIRST_FREE_ID );
-static const SProcessProperties AI_PROPS( EManagerTestVirtualProcessSubject::AI );
+static const EProcessID::Enum AI_PROCESS_ID( EProcessID::FIRST_FREE_ID );
+static const SProcessProperties AI_PROPS( EManagerTestProcessSubject::AI );
 
 TEST_F( ConcurrencyManagerTests, Setup )
 {
 	CConcurrencyManagerTester manager_tester;
 
-	manager_tester.Setup_For_Run( shared_ptr< IManagedVirtualProcess >( new CDoNothingVirtualProcess( AI_PROPS ) ) );
+	manager_tester.Setup_For_Run( shared_ptr< IManagedProcess >( new CDoNothingProcess( AI_PROPS ) ) );
 
 	manager_tester.Add_Rescheduled_Process( AI_PROCESS_ID );
 
@@ -267,7 +267,7 @@ TEST_F( ConcurrencyManagerTests, Setup )
 	ASSERT_TRUE( manager_tester.Has_Process( LOGGING_PROCESS_ID ) );
 
 	// process should have a log interface
-	CVirtualProcessBaseExaminer test_examiner( static_pointer_cast< CVirtualProcessBase >( manager_tester.Get_Virtual_Process( AI_PROCESS_ID ) ) );
+	CProcessBaseExaminer test_examiner( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process( AI_PROCESS_ID ) ) );
 	auto mailboxes = test_examiner.Get_Mailboxes();
 	ASSERT_TRUE( mailboxes.size() == 0 );
 	ASSERT_TRUE( test_examiner.Get_Log_Mailbox().get() != nullptr );
@@ -277,19 +277,19 @@ TEST_F( ConcurrencyManagerTests, Setup )
 
 
 
-static const SProcessProperties VP_PROPERTY1( EManagerTestVirtualProcessSubject::AI, 1, 1, 1 );
-static const SProcessProperties VP_PROPERTY2( EManagerTestVirtualProcessSubject::AI, 1, 2, 1 );
-static const SProcessProperties VP_PROPERTY3( EManagerTestVirtualProcessSubject::AI, 1, 3, 4 );
-static const SProcessProperties VP_PROPERTY4( EManagerTestVirtualProcessSubject::AI, 2, 1, 2 );
-static const SProcessProperties VP_PROPERTY5( EManagerTestVirtualProcessSubject::AI, 1, 1, 3 );
+static const SProcessProperties VP_PROPERTY1( EManagerTestProcessSubject::AI, 1, 1, 1 );
+static const SProcessProperties VP_PROPERTY2( EManagerTestProcessSubject::AI, 1, 2, 1 );
+static const SProcessProperties VP_PROPERTY3( EManagerTestProcessSubject::AI, 1, 3, 4 );
+static const SProcessProperties VP_PROPERTY4( EManagerTestProcessSubject::AI, 2, 1, 2 );
+static const SProcessProperties VP_PROPERTY5( EManagerTestProcessSubject::AI, 1, 1, 3 );
 
-class CMailboxTestThreadTask : public CDoNothingVirtualProcess
+class CMailboxTestProcess : public CDoNothingProcess
 {
 	public:
 
-		typedef CDoNothingVirtualProcess BASECLASS;
+		typedef CDoNothingProcess BASECLASS;
 
-		CMailboxTestThreadTask( const SProcessProperties &properties ) :
+		CMailboxTestProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
 			HasBeenServiced( false )
 		{}
@@ -297,7 +297,7 @@ class CMailboxTestThreadTask : public CDoNothingVirtualProcess
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CVirtualProcessExecutionContext &context )
+		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
 		{
 			if ( !HasBeenServiced )
 			{
@@ -306,25 +306,25 @@ class CMailboxTestThreadTask : public CDoNothingVirtualProcess
 				const SProcessProperties &properties = Get_Properties();
 				if ( properties == VP_PROPERTY1 )
 				{
-					Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CGetMailboxByPropertiesRequest( VP_PROPERTY2 ) ) );
+					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( VP_PROPERTY2 ) ) );
 				}
 				else if ( properties == VP_PROPERTY2 )
 				{
-					SProcessProperties multimatch( EManagerTestVirtualProcessSubject::AI, 1, 0, 0 );
-					Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
+					SProcessProperties multimatch( EManagerTestProcessSubject::AI, 1, 0, 0 );
+					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
 				}
 				else if ( properties == VP_PROPERTY3 )
 				{
-					SProcessProperties multimatch( EManagerTestVirtualProcessSubject::AI, 2, 0, 0 );
-					Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
+					SProcessProperties multimatch( EManagerTestProcessSubject::AI, 2, 0, 0 );
+					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
 				}
 				else if ( properties == VP_PROPERTY4 )
 				{
-					Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CGetMailboxByIDRequest( EVirtualProcessID::FIRST_FREE_ID ) ) );
+					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByIDRequest( EProcessID::FIRST_FREE_ID ) ) );
 				}
 				else if ( properties == VP_PROPERTY5 )
 				{
-					Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CGetMailboxByIDRequest( static_cast< EVirtualProcessID::Enum >( EVirtualProcessID::FIRST_FREE_ID + 50 ) ) ) );
+					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByIDRequest( static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 50 ) ) ) );
 				}
 			}
 
@@ -336,13 +336,13 @@ class CMailboxTestThreadTask : public CDoNothingVirtualProcess
 		bool HasBeenServiced;
 };
 
-class CSpawnMailboxPushGetVirtualProcess : public CVirtualProcessBase
+class CSpawnMailboxGetProcess : public CProcessBase
 {
 	public:
 
-		typedef CVirtualProcessBase BASECLASS;
+		typedef CProcessBase BASECLASS;
 
-		CSpawnMailboxPushGetVirtualProcess( const SProcessProperties &properties ) :
+		CSpawnMailboxGetProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
 			HasBeenServiced( false )
 		{}
@@ -350,15 +350,15 @@ class CSpawnMailboxPushGetVirtualProcess : public CVirtualProcessBase
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CVirtualProcessExecutionContext &context )
+		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
 		{
 			if ( !HasBeenServiced )
 			{
-				Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CAddNewVirtualProcessMessage( shared_ptr< IVirtualProcess >( new CMailboxTestThreadTask( VP_PROPERTY1 ) ), true, false ) ) );
-				Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CAddNewVirtualProcessMessage( shared_ptr< IVirtualProcess >( new CMailboxTestThreadTask( VP_PROPERTY2 ) ), false, true ) ) );
-				Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CAddNewVirtualProcessMessage( shared_ptr< IVirtualProcess >( new CMailboxTestThreadTask( VP_PROPERTY3 ) ), false, true ) ) );
-				Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CAddNewVirtualProcessMessage( shared_ptr< IVirtualProcess >( new CMailboxTestThreadTask( VP_PROPERTY4 ) ), false, false ) ) );
-				Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CAddNewVirtualProcessMessage( shared_ptr< IVirtualProcess >( new CMailboxTestThreadTask( VP_PROPERTY5 ) ), false, false ) ) );
+				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY1 ) ), true, false ) ) );
+				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY2 ) ), false, true ) ) );
+				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY3 ) ), false, true ) ) );
+				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY4 ) ), false, false ) ) );
+				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY5 ) ), false, false ) ) );
 
 				HasBeenServiced = true;
 			}
@@ -371,25 +371,25 @@ class CSpawnMailboxPushGetVirtualProcess : public CVirtualProcessBase
 		bool HasBeenServiced;
 };
 
-static const SProcessProperties SPAWN_PROCESS_PROPERTIES( EManagerTestVirtualProcessSubject::DATABASE, 1, 1, 1 );
+static const SProcessProperties SPAWN_PROCESS_PROPERTIES( EManagerTestProcessSubject::DATABASE, 1, 1, 1 );
 
 void Verify_Interfaces_Present( const CConcurrencyManagerTester &manager_tester )
 {
-	CVirtualProcessBaseExaminer spawn_process( static_pointer_cast< CVirtualProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( SPAWN_PROCESS_PROPERTIES ) ) );
+	CProcessBaseExaminer spawn_process( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( SPAWN_PROCESS_PROPERTIES ) ) );
 	auto mailboxes = spawn_process.Get_Mailboxes();
 	ASSERT_TRUE( mailboxes.size() == 1 );
 	ASSERT_TRUE( spawn_process.Has_Mailbox_With_Properties( VP_PROPERTY1 ) );
 	ASSERT_TRUE( spawn_process.Get_Log_Mailbox().get() != nullptr );
 	ASSERT_TRUE( spawn_process.Get_Manager_Mailbox().get() != nullptr );
 
-	CVirtualProcessBaseExaminer test_process1( static_pointer_cast< CVirtualProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY1 ) ) );
+	CProcessBaseExaminer test_process1( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY1 ) ) );
 	mailboxes = test_process1.Get_Mailboxes();
 	ASSERT_TRUE( mailboxes.size() == 1 );
 	ASSERT_TRUE( test_process1.Has_Mailbox_With_Properties( VP_PROPERTY2 ) );
 	ASSERT_TRUE( test_process1.Get_Log_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process1.Get_Manager_Mailbox().get() != nullptr );
 
-	CVirtualProcessBaseExaminer test_process2( static_pointer_cast< CVirtualProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY2 ) ) );
+	CProcessBaseExaminer test_process2( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY2 ) ) );
 	mailboxes = test_process2.Get_Mailboxes();
 	ASSERT_TRUE( mailboxes.size() == 4 );
 	ASSERT_TRUE( test_process2.Has_Mailbox_With_Properties( SPAWN_PROCESS_PROPERTIES ) );
@@ -399,7 +399,7 @@ void Verify_Interfaces_Present( const CConcurrencyManagerTester &manager_tester 
 	ASSERT_TRUE( test_process2.Get_Log_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process2.Get_Manager_Mailbox().get() != nullptr );
 
-	CVirtualProcessBaseExaminer test_process3( static_pointer_cast< CVirtualProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY3 ) ) );
+	CProcessBaseExaminer test_process3( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY3 ) ) );
 	mailboxes = test_process3.Get_Mailboxes();
 	ASSERT_TRUE( mailboxes.size() == 2 );
 	ASSERT_TRUE( test_process3.Has_Mailbox_With_Properties( SPAWN_PROCESS_PROPERTIES ) );
@@ -407,14 +407,14 @@ void Verify_Interfaces_Present( const CConcurrencyManagerTester &manager_tester 
 	ASSERT_TRUE( test_process3.Get_Log_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process3.Get_Manager_Mailbox().get() != nullptr );
 
-	CVirtualProcessBaseExaminer test_process4( static_pointer_cast< CVirtualProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY4 ) ) );
+	CProcessBaseExaminer test_process4( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY4 ) ) );
 	mailboxes = test_process4.Get_Mailboxes();
 	ASSERT_TRUE( mailboxes.size() == 1 );
-	ASSERT_TRUE( test_process4.Has_Mailbox( EVirtualProcessID::FIRST_FREE_ID ) );
+	ASSERT_TRUE( test_process4.Has_Mailbox( EProcessID::FIRST_FREE_ID ) );
 	ASSERT_TRUE( test_process4.Get_Log_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process4.Get_Manager_Mailbox().get() != nullptr );
 
-	CVirtualProcessBaseExaminer test_process5( static_pointer_cast< CVirtualProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY5 ) ) );
+	CProcessBaseExaminer test_process5( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY5 ) ) );
 	mailboxes = test_process5.Get_Mailboxes();
 	ASSERT_TRUE( mailboxes.size() == 0 );
 	ASSERT_TRUE( test_process5.Get_Log_Mailbox().get() != nullptr );
@@ -425,9 +425,9 @@ TEST_F( ConcurrencyManagerTests, Interface_Get1 )
 {
 	CConcurrencyManagerTester manager_tester;
 
-	manager_tester.Setup_For_Run( shared_ptr< IManagedVirtualProcess >( new CSpawnMailboxPushGetVirtualProcess( SPAWN_PROCESS_PROPERTIES ) ) );
+	manager_tester.Setup_For_Run( shared_ptr< IManagedProcess >( new CSpawnMailboxGetProcess( SPAWN_PROCESS_PROPERTIES ) ) );
 
-	EVirtualProcessID::Enum spawn_id = manager_tester.Get_Virtual_Process_By_Property_Match( SPAWN_PROCESS_PROPERTIES )->Get_ID();
+	EProcessID::Enum spawn_id = manager_tester.Get_Virtual_Process_By_Property_Match( SPAWN_PROCESS_PROPERTIES )->Get_ID();
 	manager_tester.Add_Rescheduled_Process( spawn_id );
 	manager_tester.Run_One_Iteration();
 	manager_tester.Run_One_Iteration();
@@ -439,11 +439,11 @@ TEST_F( ConcurrencyManagerTests, Interface_Get1 )
 	ASSERT_TRUE( manager_tester.Has_Process_With_Properties( VP_PROPERTY4 ) );
 	ASSERT_TRUE( manager_tester.Has_Process_With_Properties( VP_PROPERTY5 ) );
 
-	EVirtualProcessID::Enum vp_1 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY1 )->Get_ID();
-	EVirtualProcessID::Enum vp_2 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY2 )->Get_ID();
-	EVirtualProcessID::Enum vp_3 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY3 )->Get_ID();
-	EVirtualProcessID::Enum vp_4 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY4 )->Get_ID();
-	EVirtualProcessID::Enum vp_5 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY5 )->Get_ID();
+	EProcessID::Enum vp_1 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY1 )->Get_ID();
+	EProcessID::Enum vp_2 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY2 )->Get_ID();
+	EProcessID::Enum vp_3 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY3 )->Get_ID();
+	EProcessID::Enum vp_4 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY4 )->Get_ID();
+	EProcessID::Enum vp_5 = manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY5 )->Get_ID();
 	ASSERT_TRUE( manager_tester.Has_Process( vp_1 ) );
 	ASSERT_TRUE( manager_tester.Has_Process( vp_2 ) );
 	ASSERT_TRUE( manager_tester.Has_Process( vp_3 ) );
@@ -464,13 +464,13 @@ TEST_F( ConcurrencyManagerTests, Interface_Get1 )
 	manager_tester.Shutdown();
 }
 
-class CSuicidalVirtualProcess : public CVirtualProcessBase
+class CSuicidalProcess : public CProcessBase
 {
 	public:
 
-		typedef CVirtualProcessBase BASECLASS;
+		typedef CProcessBase BASECLASS;
 
-		CSuicidalVirtualProcess( const SProcessProperties &properties ) :
+		CSuicidalProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
 			HasBeenServiced( false )
 		{}
@@ -478,11 +478,11 @@ class CSuicidalVirtualProcess : public CVirtualProcessBase
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CVirtualProcessExecutionContext &context )
+		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
 		{
 			if ( !HasBeenServiced )
 			{
-				Send_Manager_Message( shared_ptr< const IVirtualProcessMessage >( new CShutdownVirtualProcessMessage( Get_ID() ) ) );
+				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CShutdownProcessMessage( Get_ID() ) ) );
 				HasBeenServiced = true;
 			}
 
@@ -494,13 +494,13 @@ class CSuicidalVirtualProcess : public CVirtualProcessBase
 		bool HasBeenServiced;
 };
 
-static const SProcessProperties SUICIDAL_PROCESS_PROPERTIES( EManagerTestVirtualProcessSubject::DATABASE, 1, 1, 1 );
+static const SProcessProperties SUICIDAL_PROCESS_PROPERTIES( EManagerTestProcessSubject::DATABASE, 1, 1, 1 );
 
 TEST_F( ConcurrencyManagerTests, Run_Once_And_Shutdown_Self )
 {
 	CConcurrencyManagerTester manager_tester;
 
-	manager_tester.Setup_For_Run( shared_ptr< IManagedVirtualProcess >( new CSuicidalVirtualProcess( SUICIDAL_PROCESS_PROPERTIES ) ) );
+	manager_tester.Setup_For_Run( shared_ptr< IManagedProcess >( new CSuicidalProcess( SUICIDAL_PROCESS_PROPERTIES ) ) );
 
 	manager_tester.Wait_For_Shutdown();
 }
@@ -511,7 +511,7 @@ TEST_F( ConcurrencyManagerTests, Stress )
 	{
 		CConcurrencyManagerTester manager_tester;
 
-		manager_tester.Setup_For_Run( shared_ptr< IManagedVirtualProcess >( new CSuicidalVirtualProcess( SUICIDAL_PROCESS_PROPERTIES ) ) );
+		manager_tester.Setup_For_Run( shared_ptr< IManagedProcess >( new CSuicidalProcess( SUICIDAL_PROCESS_PROPERTIES ) ) );
 
 		manager_tester.Wait_For_Shutdown();
 	}

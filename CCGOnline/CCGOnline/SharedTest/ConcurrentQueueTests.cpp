@@ -24,7 +24,7 @@
 
 #include "Concurrency/Containers/TBBConcurrentQueue.h"
 #include "Concurrency/Messaging/LoggingMessages.h"
-#include "Concurrency/VirtualProcessConstants.h"
+#include "Concurrency/ProcessConstants.h"
 
 TEST( ConcurrentQueueTests, Add_Remove )
 {

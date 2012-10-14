@@ -198,7 +198,11 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp" />
     <ClCompile Include="LoggingTests.cpp" />
     <ClCompile Include="PriorityQueueTests.cpp" />
+    <ClCompile Include="ProcessMailboxTests.cpp" />
+    <ClCompile Include="ProcessMessageFrameTests.cpp" />
+    <ClCompile Include="ProcessMessageHandlerTests.cpp" />
     <ClCompile Include="ProcessPropertiesTests.cpp" />
+    <ClCompile Include="ProcessTests.cpp" />
     <ClCompile Include="ReflectionTests.cpp" />
     <ClCompile Include="SharedTest.cpp" />
     <ClCompile Include="SlashCommandTests.cpp" />
@@ -210,10 +214,6 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     </ClCompile>
     <ClCompile Include="TaskSchedulerTests.cpp" />
     <ClCompile Include="TimeTests.cpp" />
-    <ClCompile Include="VirtualProcessMailboxTests.cpp" />
-    <ClCompile Include="VirtualProcessMessageFrameTests.cpp" />
-    <ClCompile Include="VirtualProcessMessageHandlerTests.cpp" />
-    <ClCompile Include="VirtualProcessTests.cpp" />
     <ClCompile Include="XMLLoadableTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
