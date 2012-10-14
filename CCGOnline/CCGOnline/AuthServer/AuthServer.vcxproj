@@ -89,7 +89,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,7 +112,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Server\$(ProjectName)D3
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,7 +137,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Server\$(ProjectName)D6
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,7 +164,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Server\$(ProjectName)R3
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;X64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\ServerShared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

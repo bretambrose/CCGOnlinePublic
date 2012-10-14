@@ -152,7 +152,7 @@ class CProcessBase : public IManagedProcess
 		// Misc
 		ProcessMessageHandlerTableType MessageHandlers;
 
-		scoped_ptr< CTaskScheduler > TaskScheduler;
+		unique_ptr< CTaskScheduler > TaskScheduler;
 };
 
 #endif // PROCESS_BASE_H

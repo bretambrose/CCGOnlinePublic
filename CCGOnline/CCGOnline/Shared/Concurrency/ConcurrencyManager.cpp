@@ -205,7 +205,7 @@ class CProcessRecord
 
 		shared_ptr< IManagedProcess > Process;
 
-		scoped_ptr< CProcessMailbox > Mailbox;
+		unique_ptr< CProcessMailbox > Mailbox;
 
 		shared_ptr< CExecuteProcessScheduledTask > ExecuteTask;
 

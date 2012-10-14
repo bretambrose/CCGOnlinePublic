@@ -26,16 +26,6 @@
         </PackageLocation>
       </Mirrors>
     </InputPackage>
-    <InputPackage>
-      <Name>Boost</Name>
-      <Hash>iIhUBORBHoI/BnfB9TqV6Q==</Hash>
-      <Mirrors>
-        <PackageLocation>
-          <OS>Windows Linux</OS>
-          <URL>http://sourceforge.net/projects/boost/files/boost/1.47.0/boost_1_47_0.zip</URL>
-        </PackageLocation>
-      </Mirrors>
-    </InputPackage>
   </Inputs>
   <Outputs>
     <OutputEntry>
@@ -107,13 +97,6 @@
       <Source>loki-0.1.7</Source>
       <Destination>CCGOnline/External/loki</Destination>
       <Hash>K2yu58uIfyoG9nKTlBTelA==</Hash>
-    </OutputEntry>
-    <OutputEntry>
-      <Tag>BoostSource</Tag>
-      <PackageName>Boost</PackageName>
-      <Source>boost_1_47_0</Source>
-      <Destination>CCGOnline/External/boost/</Destination>
-      <Hash>IOF8DHdjzp9ejJdCH2gjPg==</Hash>
     </OutputEntry>
   </Outputs>
 </CConfigSettings>

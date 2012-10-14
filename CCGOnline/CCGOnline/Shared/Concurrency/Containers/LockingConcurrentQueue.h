@@ -68,7 +68,7 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 		// Private data
 		std::vector< T > Items;
 
-		scoped_ptr< ISimplePlatformMutex > Lock;
+		unique_ptr< ISimplePlatformMutex > Lock;
 
 };
 

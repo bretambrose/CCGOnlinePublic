@@ -206,7 +206,7 @@ class CConcurrencyManagerTester
 
 	private:
 
-		scoped_ptr< CConcurrencyManager > Manager;
+		unique_ptr< CConcurrencyManager > Manager;
 
 		std::set< EProcessID::Enum > RescheduledProcesses;
 };

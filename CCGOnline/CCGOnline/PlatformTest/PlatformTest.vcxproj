@@ -88,7 +88,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -108,7 +108,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)D32
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)D64
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -154,7 +154,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R32
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;X64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\External\boost;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>

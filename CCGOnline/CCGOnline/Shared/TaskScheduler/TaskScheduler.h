@@ -51,7 +51,7 @@ class CTaskScheduler
 
 	private:
 
-		scoped_ptr< TPriorityQueue< shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator > > TaskQueue;
+		unique_ptr< TPriorityQueue< shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator > > TaskQueue;
 
 		double TimeGranularity;
 };

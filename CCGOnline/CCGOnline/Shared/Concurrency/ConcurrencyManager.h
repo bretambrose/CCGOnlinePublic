@@ -160,9 +160,9 @@ class CConcurrencyManager
 		ProcessMessageHandlerTableType MessageHandlers;
 
 		stdext::hash_map< ETimeType, shared_ptr< CTaskScheduler > > TaskSchedulers;
-		scoped_ptr< CTimeKeeper > TimeKeeper;
+		unique_ptr< CTimeKeeper > TimeKeeper;
 
-		scoped_ptr< tbb::task_scheduler_init > TBBTaskSchedulerInit;
+		unique_ptr< tbb::task_scheduler_init > TBBTaskSchedulerInit;
 
 		EConcurrencyManagerState State;
 

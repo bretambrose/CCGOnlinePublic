@@ -37,9 +37,6 @@
 // Loki includes
 #include "loki/LokiTypeInfo.h"
 
-// Boost includes
-#include <boost/scoped_ptr.hpp>
-
 // Misc includes
 #pragma warning( push )
 #pragma warning( disable : 4100 )
@@ -51,8 +48,7 @@ using namespace fastdelegate;
 
 using std::tr1::shared_ptr;
 using std::tr1::static_pointer_cast;
-
-using boost::scoped_ptr;
+using std::unique_ptr;
 
 // self includes
 #include "PlatformTypes.h"
