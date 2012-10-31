@@ -172,7 +172,7 @@ void CLogInterface::Shutdown_Dynamic( void )
 		context -- execution context that the log thread should use
 		
 **********************************************************************************************************************/
-void CLogInterface::Service_Logging( double current_time, const CProcessExecutionContext &context )
+void CLogInterface::Service_Logging( const CProcessExecutionContext &context )
 {
 	CSimplePlatformMutexLocker lock( LogLock );
 
@@ -181,7 +181,7 @@ void CLogInterface::Service_Logging( double current_time, const CProcessExecutio
 		IProcess *old_process = CProcessStatics::Get_Current_Process();
 
 		CProcessStatics::Set_Current_Process( LogProcess.get() );
-		LogProcess->Service( current_time, context );
+		LogProcess->Run( context );
 		CProcessStatics::Set_Current_Process( old_process );
 		LogProcess->Flush_System_Messages();
 	}

@@ -56,9 +56,7 @@ class IManagedProcess : public IProcess
 		virtual ETimeType Get_Time_Type( void ) const = 0;
 		virtual bool Is_Root_Thread( void ) const = 0;
 
-		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context ) = 0;
-
-		virtual double Get_Elapsed_Seconds( void ) const = 0;
+		virtual void Run( const CProcessExecutionContext &context ) = 0;
 
 };
 

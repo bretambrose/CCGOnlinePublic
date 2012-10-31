@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 
-#include "Concurrency/ProcessBase.h"
+#include "Concurrency/TaskProcessBase.h"
 #include "Concurrency/ProcessSubject.h"
 #include "Concurrency/ProcessMailbox.h"
 #include "Concurrency/ProcessConstants.h"
@@ -38,7 +38,7 @@
 #include "TaskScheduler/ScheduledTask.h"
 #include "TaskScheduler/TaskScheduler.h"
 #include "Logging/LogInterface.h"
-
+#include "Helpers/ProcessHelpers.h"
 
 class ProcessTests : public testing::Test 
 {
@@ -47,11 +47,11 @@ class ProcessTests : public testing::Test
 
 };
 
-class CTestProcessTask : public CProcessBase
+class CTestProcessTask : public CTaskProcessBase
 {
 	public:
 
-		typedef CProcessBase BASECLASS;
+		typedef CTaskProcessBase BASECLASS;
 
 		CTestProcessTask( const SProcessProperties &properties ) :
 			BASECLASS( properties )
@@ -65,77 +65,7 @@ class CTestProcessTask : public CProcessBase
 	private:
 };
 
-static const EProcessID::Enum AI_PROCESS_ID = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID );
 
-class CProcessBaseTester
-{
-	public:
-
-		CProcessBaseTester( CProcessBase *process ) :
-			Process( process ),
-			ManagerProxy( new CProcessMailbox( EProcessID::CONCURRENCY_MANAGER, MANAGER_PROCESS_PROPERTIES ) ),
-			SelfProxy( new CProcessMailbox( AI_PROCESS_ID, process->Get_Properties() ) )
-		{
-			process->Set_Manager_Mailbox( ManagerProxy->Get_Writable_Mailbox() );
-			process->Set_My_Mailbox( SelfProxy->Get_Readable_Mailbox() );
-			process->Initialize( AI_PROCESS_ID );
-		}
-
-		~CProcessBaseTester()
-		{
-		}
-
-		void Service( double time_seconds )
-		{
-			CProcessStatics::Set_Current_Process( Process.get() );
-
-			CProcessExecutionContext context( nullptr );
-			Process->Service( time_seconds, context );
-
-			CProcessStatics::Set_Current_Process( nullptr );
-
-			Process->Flush_System_Messages();
-		}
-
-		void Log( const std::wstring &log_string )
-		{
-			CProcessStatics::Set_Current_Process( Process.get() );
-			CLogInterface::Log( log_string );
-			CProcessStatics::Set_Current_Process( nullptr );
-		}
-
-		shared_ptr< CProcessBase > Get_Process( void ) const { return Process; }
-
-		shared_ptr< CProcessMailbox > Get_Manager_Proxy( void ) const { return ManagerProxy; }
-		shared_ptr< CProcessMailbox > Get_Self_Proxy( void ) const { return SelfProxy; }
-
-		double Get_Reschedule_Interval( void ) const { return Process->Get_Reschedule_Interval(); }
-
-		static void Set_Has_Process_Service_Executed( void ) { HasProcessServiceExecuted = true; }
-		static bool Get_Has_Process_Service_Executed( void ) { return HasProcessServiceExecuted; }
-
-		const CProcessBase::FrameTableType &Get_Frame_Table( void ) const { return Process->PendingOutboundFrames; }
-		const CProcessBase::MailboxTableType &Get_Mailbox_Table( void ) const { return Process->Mailboxes; }
-
-		shared_ptr< CWriteOnlyMailbox > Get_Logging_Mailbox( void ) const { return Process->LoggingMailbox; }
-		void Set_Logging_Mailbox( shared_ptr< CWriteOnlyMailbox > mailbox ) { Process->LoggingMailbox = mailbox; }
-
-		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const { return Process->ManagerMailbox; }
-
-		shared_ptr< CProcessMessageFrame > Get_Log_Frame( void ) const { return Process->LogFrame; }
-		shared_ptr< CProcessMessageFrame > Get_Manager_Frame( void ) const { return Process->ManagerFrame; }
-
-	private:
-
-		static bool HasProcessServiceExecuted;
-
-		shared_ptr< CProcessBase > Process;
-
-		shared_ptr< CProcessMailbox > ManagerProxy;
-		shared_ptr< CProcessMailbox > SelfProxy;
-};
-
-bool CProcessBaseTester::HasProcessServiceExecuted = false;
 
 class CBasicServiceTestTask : public CScheduledTask
 {
@@ -149,7 +79,7 @@ class CBasicServiceTestTask : public CScheduledTask
 
 		virtual bool Execute( double /*time_seconds*/, double & /*reschedule_time_seconds*/ )
 		{
-			CProcessBaseTester::Set_Has_Process_Service_Executed();
+			CTaskProcessBaseTester::Set_Has_Process_Service_Executed();
 
 			return false;
 		}
@@ -174,15 +104,15 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 	static const double SECOND_SERVICE_TIME = 4.99;
 	static const double THIRD_SERVICE_TIME = 5.0;
 
-	CProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
+	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
 
-	ASSERT_FALSE( CProcessBaseTester::Get_Has_Process_Service_Executed() );
+	ASSERT_FALSE( CTaskProcessBaseTester::Get_Has_Process_Service_Executed() );
 
 	shared_ptr< CScheduledTask > simple_task( new CBasicServiceTestTask( 5.0 ) );
 	process_tester.Get_Process()->Get_Task_Scheduler()->Submit_Task( simple_task );
 
 	process_tester.Service( FIRST_SERVICE_TIME );
-	ASSERT_FALSE( CProcessBaseTester::Get_Has_Process_Service_Executed() );
+	ASSERT_FALSE( CTaskProcessBaseTester::Get_Has_Process_Service_Executed() );
 
 	std::vector< shared_ptr< CProcessMessageFrame > > frames;
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
@@ -203,7 +133,7 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 	frames.clear();
 
 	process_tester.Service( SECOND_SERVICE_TIME );
-	ASSERT_FALSE( CProcessBaseTester::Get_Has_Process_Service_Executed() );
+	ASSERT_FALSE( CTaskProcessBaseTester::Get_Has_Process_Service_Executed() );
 
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 	ASSERT_TRUE( frames.size() == 1 );
@@ -221,7 +151,7 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 	}
 
 	process_tester.Service( THIRD_SERVICE_TIME );
-	ASSERT_TRUE( CProcessBaseTester::Get_Has_Process_Service_Executed() );
+	ASSERT_TRUE( CTaskProcessBaseTester::Get_Has_Process_Service_Executed() );
 }
 
 static const SProcessProperties DB_PROPS( ETestProcessSubject::DATABASE );
@@ -253,7 +183,7 @@ class CSendAddMailboxMessageServiceTask : public CScheduledTask
 
 TEST_F( ProcessTests, Send_Message )
 {
-	CProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
+	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
 
 	shared_ptr< CScheduledTask > simple_task( new CSendAddMailboxMessageServiceTask( 0.0, process_tester.Get_Self_Proxy()->Get_Writable_Mailbox() ) );
 	process_tester.Get_Process()->Get_Task_Scheduler()->Submit_Task( simple_task );
@@ -317,7 +247,7 @@ TEST_F( ProcessTests, Add_Mailbox_And_Logging )
 	static const std::wstring LOG_MESSAGE_2( L"Log Test 2" );
 	static const std::wstring LOG_MESSAGE_3( L"Log Test 3" );
 
-	CProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
+	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
 
 	// vanishes because no context to route to
 	CLogInterface::Log( LOG_MESSAGE_1 );
@@ -432,7 +362,7 @@ TEST_F( ProcessTests, Shutdown_Interface )
 {
 	static const std::wstring LOG_MESSAGE( L"Log Test" );
 
-	CProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
+	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
 	EProcessID::Enum tester_id = process_tester.Get_Process()->Get_ID();
 
 	shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
@@ -537,7 +467,7 @@ TEST_F( ProcessTests, Shutdown_Soft )
 {
 	static const std::wstring LOG_MESSAGE( L"Blah blah" );
 
-	CProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
+	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
 
 	shared_ptr< CProcessMailbox > ui_conn( new CProcessMailbox( UI_PROCESS_ID, UI_PROPS ) );
 	shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
@@ -638,7 +568,7 @@ TEST_F( ProcessTests, Shutdown_Hard )
 {
 	static const std::wstring LOG_MESSAGE( L"Hard shutdown" );
 
-	CProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
+	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
 
 	shared_ptr< CProcessMailbox > ui_conn( new CProcessMailbox( UI_PROCESS_ID, UI_PROPS ) );
 	shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );

@@ -33,8 +33,10 @@
 #include "Messaging/ProcessManagementMessages.h"
 #include "PlatformProcess.h"
 #include "PlatformTime.h"
+#include "PlatformThread.h"
 #include "ProcessConstants.h"
 #include "ProcessExecutionContext.h"
+#include "ProcessExecutionMode.h"
 #include "ProcessID.h"
 #include "ProcessMailbox.h"
 #include "ProcessMessageFrame.h"
@@ -97,12 +99,12 @@ class CServiceProcessTBBTask : public tbb::task
 
 		virtual tbb::task *execute( void )
 		{
-			CProcessExecutionContext context( this );
+			CProcessExecutionContext context( this, ElapsedSeconds );
 
 			FATAL_ASSERT( CProcessStatics::Get_Current_Process() == nullptr );
 
 			CProcessStatics::Set_Current_Process( Process.get() );
-			Process->Service( ElapsedSeconds, context );
+			Process->Run( context );
 			CProcessStatics::Set_Current_Process( nullptr );
 			Process->Flush_System_Messages();
 
@@ -133,11 +135,11 @@ class CServiceLoggingProcessTBBTask : public tbb::task
 
 		virtual tbb::task *execute( void )
 		{
-			CProcessExecutionContext context( this );
+			CProcessExecutionContext context( this, ElapsedSeconds );
 
 			FATAL_ASSERT( CProcessStatics::Get_Current_Process() == nullptr );
 
-			CLogInterface::Service_Logging( ElapsedSeconds, context );
+			CLogInterface::Service_Logging( context );
 
 			return nullptr;
 		}
@@ -187,6 +189,8 @@ class CProcessRecord
 
 		CProcessMailbox *Get_Mailbox( void ) const { return Mailbox.get(); }
 
+		CPlatformThread *Get_Platform_Thread( void ) const { return PlatformThread.get(); }
+
 		// Operations
 		void Add_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler, double execution_time );
 		void Remove_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler );
@@ -209,6 +213,8 @@ class CProcessRecord
 
 		shared_ptr< CExecuteProcessScheduledTask > ExecuteTask;
 
+		unique_ptr< CPlatformThread > PlatformThread;
+
 		ExecuteProcessDelegateType ExecuteDelegate;
 
 		EInternalProcessState State;
@@ -228,10 +234,15 @@ CProcessRecord::CProcessRecord( const shared_ptr< IManagedProcess > &process, co
 	Process( process ),
 	Mailbox( new CProcessMailbox( process->Get_ID(), process->Get_Properties() ) ),
 	ExecuteTask( nullptr ),
+	PlatformThread( nullptr ),
 	ExecuteDelegate( execute_delegate ),
 	State( EIPS_INITIALIZING ),
 	PendingShutdownIDs()
 {
+	if ( process->Get_Execution_Mode() == EProcessExecutionMode::THREAD )
+	{
+		PlatformThread.reset( new CPlatformThread );
+	}
 }
 
 /**********************************************************************************************************************
@@ -1015,15 +1026,33 @@ void CConcurrencyManager::Execute_Process( EProcessID::Enum process_id, double c
 
 	shared_ptr< IManagedProcess > thread_task_base = record->Get_Process();
 
-	if ( process_id == EProcessID::LOGGING )
+	switch ( thread_task_base->Get_Execution_Mode() )
 	{
-		CServiceLoggingProcessTBBTask &tbb_task = *new( tbb::task::allocate_root() ) CServiceLoggingProcessTBBTask( current_time_seconds );
-		tbb::task::enqueue( tbb_task );
-	}
-	else
-	{
-		CServiceProcessTBBTask &tbb_task = *new( tbb::task::allocate_root() ) CServiceProcessTBBTask( thread_task_base, current_time_seconds );
-		tbb::task::enqueue( tbb_task );
+		case EProcessExecutionMode::TASK:
+			if ( process_id == EProcessID::LOGGING )
+			{
+				CServiceLoggingProcessTBBTask &tbb_task = *new( tbb::task::allocate_root() ) CServiceLoggingProcessTBBTask( current_time_seconds );
+				tbb::task::enqueue( tbb_task );
+			}
+			else
+			{
+				CServiceProcessTBBTask &tbb_task = *new( tbb::task::allocate_root() ) CServiceProcessTBBTask( thread_task_base, current_time_seconds );
+				tbb::task::enqueue( tbb_task );
+			}
+
+			break;
+
+		case EProcessExecutionMode::THREAD:
+		{
+			CProcessExecutionContext context( record->Get_Platform_Thread() );
+			thread_task_base->Run( context );
+
+			break;
+		}
+
+		default:
+			FATAL_ASSERT( false );
+			break;
 	}
 }
 

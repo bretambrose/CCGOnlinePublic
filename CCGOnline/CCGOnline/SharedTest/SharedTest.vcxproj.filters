@@ -12,6 +12,9 @@
     <Filter Include="Source Files\GeneratedCode">
       <UniqueIdentifier>{8d773894-9655-446c-82b7-ae326fde6b13}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Helpers">
+      <UniqueIdentifier>{2c657cc6-4102-4bcb-bbd5-32b619020413}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -28,6 +31,9 @@
     </ClInclude>
     <ClInclude Include="XMLLoadableTests.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\ProcessHelpers.h">
+      <Filter>Source Files\Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="ProcessTests.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\ProcessHelpers.cpp">
+      <Filter>Source Files\Helpers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

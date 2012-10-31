@@ -29,6 +29,7 @@
 #include "ProcessSubject.h"
 #include "MailboxInterfaces.h"
 #include "ProcessConstants.h"
+#include "ProcessExecutionMode.h"
 #include "ProcessMessageFrame.h"
 #include "Messaging/LoggingMessages.h"
 #include "Messaging/ProcessManagementMessages.h"
@@ -274,66 +275,28 @@ void CProcessBase::Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &mailbox
 }
 
 /**********************************************************************************************************************
-	CProcessBase::Get_Elapsed_Seconds -- gets how many seconds have elapsed since this process started executing
+	CProcessBase::Get_Next_Task_Time -- gets the next time in the future when a scheduled task should execute
 
-		Returns: time in seconds that this process has been executing
+		Returns: next scheduled task time
 					
 **********************************************************************************************************************/
-double CProcessBase::Get_Elapsed_Seconds( void ) const
+double CProcessBase::Get_Next_Task_Time( void ) const
 {
-	return CurrentTimeSeconds - FirstServiceTimeSeconds;
+	return TaskScheduler->Get_Next_Task_Time();
 }
 
 /**********************************************************************************************************************
-	CProcessBase::Get_Current_Process_Time -- gets the current execution time in seconds
+	CProcessBase::Run -- base execution logic
 
-		Returns: current execution time
-					
-**********************************************************************************************************************/
-double CProcessBase::Get_Current_Process_Time( void ) const
-{
-	return CurrentTimeSeconds;
-}
-
-/**********************************************************************************************************************
-	CProcessBase::Get_Reschedule_Interval -- gets the reschedule interval in seconds
-
-		Returns: reschedule interval
-					
-**********************************************************************************************************************/
-double CProcessBase::Get_Reschedule_Interval( void ) const
-{
-	return .1;
-}
-
-/**********************************************************************************************************************
-	CProcessBase::Get_Reschedule_Time -- gets the execution time that this process should be run again at, in seconds
-
-		Returns: next execution time
-					
-**********************************************************************************************************************/
-double CProcessBase::Get_Reschedule_Time( void ) const
-{
-	double next_task_time = TaskScheduler->Get_Next_Task_Time();
-	return std::min( CurrentTimeSeconds + Get_Reschedule_Interval(), next_task_time );
-}
-
-/**********************************************************************************************************************
-	CProcessBase::Service -- recurrent execution logic
-
-		current_time_seconds -- the current time in seconds
 		context -- the tbb context that this process is being run under
 					
 **********************************************************************************************************************/
-void CProcessBase::Service( double current_time_seconds, const CProcessExecutionContext & /*context*/ )
+void CProcessBase::Run( const CProcessExecutionContext & /*context*/ )
 {
 	if ( State == EPS_INITIALIZING )
 	{
 		State = EPS_RUNNING;
-		FirstServiceTimeSeconds = current_time_seconds;
 	}
-
-	CurrentTimeSeconds = current_time_seconds;
 
 	if ( Is_Shutting_Down() )
 	{
@@ -347,10 +310,7 @@ void CProcessBase::Service( double current_time_seconds, const CProcessExecution
 
 	FATAL_ASSERT( !( Should_Reschedule() && Is_Shutting_Down() ) );
 
-	if ( Should_Reschedule() )
-	{
-		Send_Manager_Message( shared_ptr< const IProcessMessage >( new CRescheduleProcessMessage( Get_Reschedule_Time() ) ) );
-	}
+	Service_Reschedule();
 
 	// Awkward but necessary due to shutdown sequence
 	// We need to flush before we call Handle_Shutdown_Mailboxes, but that function also needs to send messages that go out this moment too,
@@ -441,7 +401,7 @@ void CProcessBase::Handle_Shutdown_Mailboxes( void )
 **********************************************************************************************************************/
 bool CProcessBase::Should_Reschedule( void ) const
 {
-	return State == EPS_RUNNING;
+	return State == EPS_RUNNING && Get_Execution_Mode() == EProcessExecutionMode::TASK;
 }
 
 /**********************************************************************************************************************

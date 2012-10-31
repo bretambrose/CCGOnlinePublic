@@ -29,23 +29,39 @@ namespace tbb
 	class task;
 }
 
+class CPlatformThread;
+
 // Defines a virtual process's execution context; currently only contains TBB info
 class CProcessExecutionContext
 {
 	public:
 
-		CProcessExecutionContext( tbb::task *spawning_task ) :
-			SpawningTask( spawning_task )
+		CProcessExecutionContext( tbb::task *spawning_task, double elapsed_time ) :
+			SpawningTask( spawning_task ),
+			ElapsedTime( elapsed_time ),
+			PlatformThread( nullptr )
+		{
+		}
+
+		CProcessExecutionContext( CPlatformThread *thread ) :
+			SpawningTask( nullptr ),
+			ElapsedTime( 0.0 ),
+			PlatformThread( thread )
 		{
 		}
 
 		~CProcessExecutionContext() {}
 
 		tbb::task *Get_Spawning_Task( void ) const { return SpawningTask; }
+		double Get_Elapsed_Time( void ) const { return ElapsedTime; }
+		CPlatformThread *Get_Platform_Thread( void ) const { return PlatformThread; }
 
 	private:
 
 		tbb::task *SpawningTask;
+		double ElapsedTime;
+		
+		CPlatformThread *PlatformThread;
 };
 
 #endif // PROCESS_EXECUTION_CONTEXT_H

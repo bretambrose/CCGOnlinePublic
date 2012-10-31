@@ -1,9 +1,9 @@
 /**********************************************************************************************************************
 
-	stdafx.h
-		Set of includes that make up the pre-compiled header file
+	PlatformThread.h
+		A simple component that wraps OS threads
 
-	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
+	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,38 +20,27 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#ifndef PLATFORM_THREAD_H
+#define PLATFORM_THREAD_H
 
-#include "targetver.h"
+class IPlatformThread;
 
-// std includes
-#include <vector>
-#include <set>
-#include <hash_map>
-#include <map>
-#include <memory>
-#include <string>
-#include <algorithm>
-#include <assert.h>
+typedef FastDelegate1< void * > ThreadExecutionFunctionType;
 
-// Loki includes
-#include "loki/LokiTypeInfo.h"
+// A class that wraps an OS thread.  
+class CPlatformThread
+{
+	public:
 
-// Misc includes
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-#include "FastDelegate.h"
-#pragma warning( pop ) 
+		CPlatformThread( void );
+		~CPlatformThread();
 
-// Global using directives; be careful with these
-using namespace fastdelegate;
+		void Create_And_Run( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
+		void Shutdown( void );
 
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
-using std::unique_ptr;
+	private:
 
-// self includes
-#include "PlatformTypes.h"
-#include "DebugAssert.h"
-#include "WindowsWrapper.h"
+		unique_ptr< IPlatformThread > ThreadImpl;
+};
 
+#endif // PLATFORM_THREAD_H

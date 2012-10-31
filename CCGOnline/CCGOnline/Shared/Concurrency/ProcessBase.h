@@ -38,7 +38,7 @@ struct STickTime;
 
 enum EProcessState;
 
-// The shared logic level of all task-based virtual processes; not instantiable
+// The shared logic level of all virtual processes; not instantiable
 class CProcessBase : public IManagedProcess
 {
 	public:
@@ -70,18 +70,18 @@ class CProcessBase : public IManagedProcess
 
 		virtual void Cleanup( void );
 
-		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context );
-
-		virtual double Get_Elapsed_Seconds( void ) const;
+		virtual void Run( const CProcessExecutionContext &context );
 
 	protected:
 
-		double Get_Current_Process_Time( void ) const;
+		bool Is_Shutting_Down( void ) const;
 
-		// Scheduling interface, intended for derived classes
-		virtual double Get_Reschedule_Time( void ) const;
-		virtual double Get_Reschedule_Interval( void ) const;
-		virtual bool Should_Reschedule( void ) const;
+		virtual double Get_Current_Process_Time( void ) const = 0;
+		double Get_Next_Task_Time( void ) const;
+
+		virtual void Service_Reschedule( void ) {}
+
+		bool Should_Reschedule( void ) const;
 
 		// protected message handling (derived overridable/modifiable)
 		virtual void Register_Message_Handlers( void );
@@ -94,10 +94,11 @@ class CProcessBase : public IManagedProcess
 
 		friend class CProcessBaseTester;
 		friend class CProcessBaseExaminer;
+		friend class CTaskProcessBaseTester;
+		friend class CTaskProcessBaseExaminer;
 
 		// private accessors
 		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( EProcessID::Enum process_id ) const;
-		bool Is_Shutting_Down( void ) const;
 
 		// Private message handling
 		void Flush_Regular_Messages( void );

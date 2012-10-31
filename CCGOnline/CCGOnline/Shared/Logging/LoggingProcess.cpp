@@ -127,11 +127,10 @@ void CLoggingProcess::Initialize( EProcessID::Enum id )
 /**********************************************************************************************************************
 	CLoggingThreadTask::Service -- primary execution function for this process
 
-		elapsed_seconds -- how much time has elapsed, in seconds
 		context -- the thread task execution context
 		
 **********************************************************************************************************************/
-void CLoggingProcess::Service( double elapsed_seconds, const CProcessExecutionContext &context )
+void CLoggingProcess::Run( const CProcessExecutionContext &context )
 {
 	// Did we get called directly by the exception handler?
 	if ( context.Get_Spawning_Task() == nullptr )
@@ -139,7 +138,7 @@ void CLoggingProcess::Service( double elapsed_seconds, const CProcessExecutionCo
 		IsShuttingDown = true;
 	}
 
-	BASECLASS::Service( elapsed_seconds, context );
+	BASECLASS::Run( context );
 
 	if ( IsShuttingDown )
 	{

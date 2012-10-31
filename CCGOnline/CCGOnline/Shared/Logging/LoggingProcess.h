@@ -23,7 +23,7 @@
 #ifndef LOGGING_PROCESS_H
 #define LOGGING_PROCESS_H
 
-#include "Concurrency/ProcessBase.h"
+#include "Concurrency/TaskProcessBase.h"
 
 class CLogRequestMessage;
 class CLogFile;
@@ -34,11 +34,11 @@ namespace EProcessSubject
 }
 
 // A class that performs logging of information to files split by thread key
-class CLoggingProcess : public CProcessBase
+class CLoggingProcess : public CTaskProcessBase
 {
 	public:
 
-		typedef CProcessBase BASECLASS;
+		typedef CTaskProcessBase BASECLASS;
 
 		// Construction/destruction
 		CLoggingProcess( const SProcessProperties &properties );
@@ -52,11 +52,11 @@ class CLoggingProcess : public CProcessBase
 		virtual ETimeType Get_Time_Type( void ) const;
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context );
+		virtual void Run( const CProcessExecutionContext &context );
 
 	protected:
 
-		// CVirtualProcessBase protected interface
+		// CProcessBase protected interface
 		virtual void Register_Message_Handlers( void );
 
 	private:

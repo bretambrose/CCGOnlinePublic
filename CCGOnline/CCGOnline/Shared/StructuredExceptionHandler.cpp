@@ -92,7 +92,7 @@ void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredE
 
 	// Flush all logging info to disk (by using a null context); global log mutex serializes access
 	CProcessExecutionContext context( nullptr );
-	CLogInterface::Service_Logging( 0.0, context );
+	CLogInterface::Service_Logging( context );
 
 	// Write a file containing the exception details
 	Write_Exception_File( shared_exception_info );

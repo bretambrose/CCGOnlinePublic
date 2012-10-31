@@ -33,6 +33,11 @@ namespace EProcessID
 	enum Enum;
 }
 
+namespace EProcessExecutionMode
+{
+	enum Enum;
+}
+
 // Pure virtual interface for all virtual processes
 class IProcess
 {
@@ -45,6 +50,7 @@ class IProcess
 
 		virtual const SProcessProperties &Get_Properties( void ) const = 0;
 		virtual EProcessID::Enum Get_ID( void ) const = 0;
+		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const = 0;
 
 		virtual void Send_Process_Message( EProcessID::Enum destination_id, const shared_ptr< const IProcessMessage > &message ) = 0;
 		virtual void Send_Manager_Message( const shared_ptr< const IProcessMessage > &message ) = 0;

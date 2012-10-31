@@ -185,6 +185,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedCode\RegisterSharedTestEnums.h" />
+    <ClInclude Include="Helpers\ProcessHelpers.h" />
     <ClInclude Include="ReflectionTests.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -196,6 +197,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClCompile Include="EnumConversionTests.cpp" />
     <ClCompile Include="ExceptionHandlingTests.cpp" />
     <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp" />
+    <ClCompile Include="Helpers\ProcessHelpers.cpp" />
     <ClCompile Include="LoggingTests.cpp" />
     <ClCompile Include="PriorityQueueTests.cpp" />
     <ClCompile Include="ProcessMailboxTests.cpp" />

@@ -20,6 +20,9 @@
     <ClInclude Include="GeneratedCode\RegisterAuthServerEnums.h">
       <Filter>Source Files\GeneratedCode</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

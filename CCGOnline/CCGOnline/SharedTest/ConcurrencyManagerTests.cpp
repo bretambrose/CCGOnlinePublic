@@ -25,7 +25,7 @@
 #include "Concurrency/ConcurrencyManager.h"
 #include "Concurrency/MailboxInterfaces.h"
 #include "Concurrency/ProcessStatics.h"
-#include "Concurrency/ProcessBase.h"
+#include "Concurrency/TaskProcessBase.h"
 #include "Concurrency/ProcessSubject.h"
 #include "Concurrency/ProcessConstants.h"
 #include "Concurrency/ProcessMessageFrame.h"
@@ -51,16 +51,16 @@ class CProcessBaseExaminer
 			Process( virtual_process )
 		{}
 
-		const CProcessBase::FrameTableType &Get_Pending_Outbound_Frames( void ) const { return Process->PendingOutboundFrames; }
-		const CProcessBase::MailboxTableType &Get_Mailboxes( void ) const { return Process->Mailboxes; }
+		const CProcessBase::FrameTableType &Get_Frame_Table( void ) const { return Process->PendingOutboundFrames; }
+		const CProcessBase::MailboxTableType &Get_Mailbox_Table( void ) const { return Process->Mailboxes; }
 		shared_ptr< CReadOnlyMailbox > Get_My_Mailbox( void ) const { return Process->MyMailbox; }
 
-		shared_ptr< CWriteOnlyMailbox > Get_Log_Mailbox( void ) const { return Process->LoggingMailbox; }
+		shared_ptr< CWriteOnlyMailbox > Get_Logging_Mailbox( void ) const { return Process->LoggingMailbox; }
 		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const { return Process->ManagerMailbox; }
 
 		bool Has_Mailbox_With_Properties( const SProcessProperties &properties ) const
 		{
-			auto mailboxes = Get_Mailboxes();
+			auto mailboxes = Get_Mailbox_Table();
 			for ( auto iter = mailboxes.cbegin(); iter != mailboxes.cend(); ++iter )
 			{
 				if ( properties.Matches( iter->second->Get_Properties() ) )
@@ -200,7 +200,7 @@ class CConcurrencyManagerTester
 			RescheduledProcesses.clear();
 		}
 
-		const CConcurrencyManager::FrameTableType &Get_Pending_Outbound_Frames( void ) const { return Manager->PendingOutboundFrames; }
+		const CConcurrencyManager::FrameTableType &Get_Frame_Table( void ) const { return Manager->PendingOutboundFrames; }
 
 		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const { return Manager->Get_Mailbox( MANAGER_PROCESS_ID ); }
 
@@ -211,11 +211,11 @@ class CConcurrencyManagerTester
 		std::set< EProcessID::Enum > RescheduledProcesses;
 };
 
-class CDoNothingProcess : public CProcessBase
+class CDoNothingProcess : public CTaskProcessBase
 {
 	public:
 
-		typedef CProcessBase BASECLASS;
+		typedef CTaskProcessBase BASECLASS;
 
 		CDoNothingProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
@@ -225,9 +225,9 @@ class CDoNothingProcess : public CProcessBase
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
+		virtual void Run( const CProcessExecutionContext &context )
 		{
-			BASECLASS::Service( elapsed_seconds, context );
+			BASECLASS::Run( context );
 
 			ServiceCount++;
 		}
@@ -268,9 +268,9 @@ TEST_F( ConcurrencyManagerTests, Setup )
 
 	// process should have a log interface
 	CProcessBaseExaminer test_examiner( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process( AI_PROCESS_ID ) ) );
-	auto mailboxes = test_examiner.Get_Mailboxes();
+	auto mailboxes = test_examiner.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 0 );
-	ASSERT_TRUE( test_examiner.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( test_examiner.Get_Logging_Mailbox().get() != nullptr );
 
 	manager_tester.Shutdown();
 }
@@ -297,7 +297,7 @@ class CMailboxTestProcess : public CDoNothingProcess
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
+		virtual void Run( const CProcessExecutionContext &context )
 		{
 			if ( !HasBeenServiced )
 			{
@@ -328,7 +328,7 @@ class CMailboxTestProcess : public CDoNothingProcess
 				}
 			}
 
-			BASECLASS::Service( elapsed_seconds, context );
+			BASECLASS::Run( context );
 		}
 
 	private:
@@ -336,11 +336,11 @@ class CMailboxTestProcess : public CDoNothingProcess
 		bool HasBeenServiced;
 };
 
-class CSpawnMailboxGetProcess : public CProcessBase
+class CSpawnMailboxGetProcess : public CTaskProcessBase
 {
 	public:
 
-		typedef CProcessBase BASECLASS;
+		typedef CTaskProcessBase BASECLASS;
 
 		CSpawnMailboxGetProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
@@ -350,7 +350,7 @@ class CSpawnMailboxGetProcess : public CProcessBase
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
+		virtual void Run( const CProcessExecutionContext &context )
 		{
 			if ( !HasBeenServiced )
 			{
@@ -363,7 +363,7 @@ class CSpawnMailboxGetProcess : public CProcessBase
 				HasBeenServiced = true;
 			}
 
-			BASECLASS::Service( elapsed_seconds, context );
+			BASECLASS::Run( context );
 		}
 
 	private:
@@ -376,48 +376,48 @@ static const SProcessProperties SPAWN_PROCESS_PROPERTIES( EManagerTestProcessSub
 void Verify_Interfaces_Present( const CConcurrencyManagerTester &manager_tester )
 {
 	CProcessBaseExaminer spawn_process( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( SPAWN_PROCESS_PROPERTIES ) ) );
-	auto mailboxes = spawn_process.Get_Mailboxes();
+	auto mailboxes = spawn_process.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 1 );
 	ASSERT_TRUE( spawn_process.Has_Mailbox_With_Properties( VP_PROPERTY1 ) );
-	ASSERT_TRUE( spawn_process.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( spawn_process.Get_Logging_Mailbox().get() != nullptr );
 	ASSERT_TRUE( spawn_process.Get_Manager_Mailbox().get() != nullptr );
 
 	CProcessBaseExaminer test_process1( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY1 ) ) );
-	mailboxes = test_process1.Get_Mailboxes();
+	mailboxes = test_process1.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 1 );
 	ASSERT_TRUE( test_process1.Has_Mailbox_With_Properties( VP_PROPERTY2 ) );
-	ASSERT_TRUE( test_process1.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( test_process1.Get_Logging_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process1.Get_Manager_Mailbox().get() != nullptr );
 
 	CProcessBaseExaminer test_process2( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY2 ) ) );
-	mailboxes = test_process2.Get_Mailboxes();
+	mailboxes = test_process2.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 4 );
 	ASSERT_TRUE( test_process2.Has_Mailbox_With_Properties( SPAWN_PROCESS_PROPERTIES ) );
 	ASSERT_TRUE( test_process2.Has_Mailbox_With_Properties( VP_PROPERTY1 ) );
 	ASSERT_TRUE( test_process2.Has_Mailbox_With_Properties( VP_PROPERTY3 ) );
 	ASSERT_TRUE( test_process2.Has_Mailbox_With_Properties( VP_PROPERTY5 ) );
-	ASSERT_TRUE( test_process2.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( test_process2.Get_Logging_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process2.Get_Manager_Mailbox().get() != nullptr );
 
 	CProcessBaseExaminer test_process3( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY3 ) ) );
-	mailboxes = test_process3.Get_Mailboxes();
+	mailboxes = test_process3.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 2 );
 	ASSERT_TRUE( test_process3.Has_Mailbox_With_Properties( SPAWN_PROCESS_PROPERTIES ) );
 	ASSERT_TRUE( test_process3.Has_Mailbox_With_Properties( VP_PROPERTY4 ) );
-	ASSERT_TRUE( test_process3.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( test_process3.Get_Logging_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process3.Get_Manager_Mailbox().get() != nullptr );
 
 	CProcessBaseExaminer test_process4( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY4 ) ) );
-	mailboxes = test_process4.Get_Mailboxes();
+	mailboxes = test_process4.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 1 );
 	ASSERT_TRUE( test_process4.Has_Mailbox( EProcessID::FIRST_FREE_ID ) );
-	ASSERT_TRUE( test_process4.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( test_process4.Get_Logging_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process4.Get_Manager_Mailbox().get() != nullptr );
 
 	CProcessBaseExaminer test_process5( static_pointer_cast< CProcessBase >( manager_tester.Get_Virtual_Process_By_Property_Match( VP_PROPERTY5 ) ) );
-	mailboxes = test_process5.Get_Mailboxes();
+	mailboxes = test_process5.Get_Mailbox_Table();
 	ASSERT_TRUE( mailboxes.size() == 0 );
-	ASSERT_TRUE( test_process5.Get_Log_Mailbox().get() != nullptr );
+	ASSERT_TRUE( test_process5.Get_Logging_Mailbox().get() != nullptr );
 	ASSERT_TRUE( test_process5.Get_Manager_Mailbox().get() != nullptr );
 }
 
@@ -464,11 +464,11 @@ TEST_F( ConcurrencyManagerTests, Interface_Get1 )
 	manager_tester.Shutdown();
 }
 
-class CSuicidalProcess : public CProcessBase
+class CSuicidalProcess : public CTaskProcessBase
 {
 	public:
 
-		typedef CProcessBase BASECLASS;
+		typedef CTaskProcessBase BASECLASS;
 
 		CSuicidalProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
@@ -478,7 +478,7 @@ class CSuicidalProcess : public CProcessBase
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		virtual void Service( double elapsed_seconds, const CProcessExecutionContext &context )
+		virtual void Run( const CProcessExecutionContext &context )
 		{
 			if ( !HasBeenServiced )
 			{
@@ -486,7 +486,7 @@ class CSuicidalProcess : public CProcessBase
 				HasBeenServiced = true;
 			}
 
-			BASECLASS::Service( elapsed_seconds, context );
+			BASECLASS::Run( context );
 		}
 
 	private:

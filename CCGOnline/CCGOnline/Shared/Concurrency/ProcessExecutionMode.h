@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	stdafx.h
-		Set of includes that make up the pre-compiled header file
+	ProcessExecutionMode.h
+		A component definining the enumerated execution mode for processes.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,38 +20,18 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#ifndef PROCESS_EXECUTION_MODE_H
+#define PROCESS_EXECUTION_MODE_H
 
-#include "targetver.h"
+namespace EProcessExecutionMode
+{
+	enum Enum
+	{
+		INVALID = 0,
 
-// std includes
-#include <vector>
-#include <set>
-#include <hash_map>
-#include <map>
-#include <memory>
-#include <string>
-#include <algorithm>
-#include <assert.h>
+		TASK,
+		THREAD
+	};
+}
 
-// Loki includes
-#include "loki/LokiTypeInfo.h"
-
-// Misc includes
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-#include "FastDelegate.h"
-#pragma warning( pop ) 
-
-// Global using directives; be careful with these
-using namespace fastdelegate;
-
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
-using std::unique_ptr;
-
-// self includes
-#include "PlatformTypes.h"
-#include "DebugAssert.h"
-#include "WindowsWrapper.h"
-
+#endif // PROCESS_EXECUTION_MODE_H

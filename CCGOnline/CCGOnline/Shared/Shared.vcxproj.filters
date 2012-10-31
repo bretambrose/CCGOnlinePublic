@@ -248,6 +248,15 @@
     <ClInclude Include="Logging\LoggingProcess.h">
       <Filter>Source Files\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="Concurrency\ProcessExecutionMode.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\TaskProcessBase.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadProcessBase.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -348,6 +357,12 @@
     </ClCompile>
     <ClCompile Include="Logging\LoggingProcess.cpp">
       <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\TaskProcessBase.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadProcessBase.cpp">
+      <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -54,7 +54,7 @@ class CLogInterface
 		static void Shutdown_Dynamic( void );
 		
 		// Invokes the log process
-		static void Service_Logging( double current_time, const CProcessExecutionContext &context );
+		static void Service_Logging( const CProcessExecutionContext &context );
 
 		// Access the current logging level; technically not thread-safe, but doesn't matter
 		static void Set_Log_Level( ELogLevel log_level ) { LogLevel = log_level; }

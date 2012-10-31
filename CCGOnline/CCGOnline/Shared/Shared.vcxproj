@@ -176,6 +176,7 @@
     <ClInclude Include="Concurrency\ProcessBase.h" />
     <ClInclude Include="Concurrency\ProcessConstants.h" />
     <ClInclude Include="Concurrency\ProcessExecutionContext.h" />
+    <ClInclude Include="Concurrency\ProcessExecutionMode.h" />
     <ClInclude Include="Concurrency\ProcessID.h" />
     <ClInclude Include="Concurrency\ProcessInterface.h" />
     <ClInclude Include="Concurrency\ProcessMailbox.h" />
@@ -183,6 +184,8 @@
     <ClInclude Include="Concurrency\ProcessProperties.h" />
     <ClInclude Include="Concurrency\ProcessStatics.h" />
     <ClInclude Include="Concurrency\ProcessSubject.h" />
+    <ClInclude Include="Concurrency\TaskProcessBase.h" />
+    <ClInclude Include="Concurrency\ThreadProcessBase.h" />
     <ClInclude Include="CRC.h" />
     <ClInclude Include="CRCValue.h" />
     <ClInclude Include="Database\DatabaseTaskBatch.h" />
@@ -241,6 +244,8 @@
     <ClCompile Include="Concurrency\ProcessMessageFrame.cpp" />
     <ClCompile Include="Concurrency\ProcessProperties.cpp" />
     <ClCompile Include="Concurrency\ProcessStatics.cpp" />
+    <ClCompile Include="Concurrency\TaskProcessBase.cpp" />
+    <ClCompile Include="Concurrency\ThreadProcessBase.cpp" />
     <ClCompile Include="CRC.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCConnection.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCEnvironment.cpp" />

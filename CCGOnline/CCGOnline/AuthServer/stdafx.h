@@ -50,6 +50,7 @@ using namespace fastdelegate;
 
 using std::tr1::shared_ptr;
 using std::tr1::static_pointer_cast;
+using std::unique_ptr;
 
 // self includes
 #include "PlatformTypes.h"

@@ -67,8 +67,8 @@ class CLoggingVirtualProcessTester
 		void Service( void )
 		{
 			tbb::task *task = reinterpret_cast< tbb::task * >( 1 );
-			CProcessExecutionContext context( task );
-			CLogInterface::Service_Logging( 0.0, context );
+			CProcessExecutionContext context( task, 0.0 );
+			CLogInterface::Service_Logging( context );
 		}
 
 		shared_ptr< CWriteOnlyMailbox > Get_Writable_Mailbox( void ) const { return LoggingMailbox->Get_Writable_Mailbox(); }
@@ -182,11 +182,11 @@ TEST_F( LoggingTests, Direct_Logging )
 	}
 }
 
-class CDummyProcess : public CProcessBase
+class CDummyProcess : public CTaskProcessBase
 {
 	public:
 		
-		typedef CProcessBase BASECLASS;
+		typedef CTaskProcessBase BASECLASS;
 
 		CDummyProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties )
@@ -218,8 +218,8 @@ TEST_F( LoggingTests, Static_Logging )
 
 	CProcessStatics::Set_Current_Process( dummy_process.get() );
 
-	CProcessExecutionContext context( nullptr );
-	dummy_process->Service( 0.0, context );
+	CProcessExecutionContext context( nullptr, 0.0 );
+	dummy_process->Run( context );
 
 	LOG( LL_HIGH, L"This is another test, but I have to end with " << LOG_TEST_MESSAGE );
 	LOG( LL_HIGH, L"test: " << 5 << LOG_TEST_MESSAGE );

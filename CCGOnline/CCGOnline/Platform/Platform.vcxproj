@@ -155,7 +155,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\AuthServer\stdafx.h" />
     <ClInclude Include="DebugAssert.h" />
     <ClInclude Include="FastDelegate.h" />
     <ClInclude Include="FastDelegateBind.h" />
@@ -164,6 +163,7 @@
     <ClInclude Include="PlatformFileSystem.h" />
     <ClInclude Include="PlatformMisc.h" />
     <ClInclude Include="PlatformProcess.h" />
+    <ClInclude Include="PlatformThread.h" />
     <ClInclude Include="PlatformTime.h" />
     <ClInclude Include="PlatformTypes.h" />
     <ClInclude Include="stdafx.h" />
@@ -182,6 +182,7 @@
     <ClCompile Include="PlatformFileSystem.cpp" />
     <ClCompile Include="PlatformMisc.cpp" />
     <ClCompile Include="PlatformProcess.cpp" />
+    <ClCompile Include="PlatformThread.cpp" />
     <ClCompile Include="PlatformTime.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
