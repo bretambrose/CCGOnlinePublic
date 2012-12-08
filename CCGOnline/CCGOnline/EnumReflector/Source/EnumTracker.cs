@@ -94,12 +94,12 @@ namespace EnumReflector
 			}
 
 			CreationState = EEnumCreationState.Unchanged;
-			NewEnumRecord = OldEnumRecord;	// ugly but safe, avoids having to write a clone
+			NewEnumRecord = OldEnumRecord.Clone();
 		}
 
 		// Properties
 		public EEnumID ID { get; private set; }
-		public string Name { get { return OldEnumRecord != null ? OldEnumRecord.Name : NewEnumRecord.Name; } }
+		public string Name { get { return OldEnumRecord != null ? OldEnumRecord.FullName : NewEnumRecord.FullName; } }
 		public string FileNameWithPath { get { return OldEnumRecord != null ? OldEnumRecord.FileNameWithPath : NewEnumRecord.FileNameWithPath; } }
 		public EEnumCreationState CreationState { get; private set; }
 		public EEnumState State { get; set; }
@@ -131,7 +131,7 @@ namespace EnumReflector
 		public void Initialize_Parsed_Enum( CEnumRecord record )
 		{
 			EEnumID id = EEnumID.Invalid;
-			if ( m_EnumIDMap.TryGetValue( record.Name, out id ) )
+			if ( m_EnumIDMap.TryGetValue( record.FullName, out id ) )
 			{
 				CEnum enum_instance = null;
 				if ( !m_Enums.TryGetValue( id, out enum_instance ) )
@@ -186,7 +186,16 @@ namespace EnumReflector
 						en.Promote_To_Unchanged();
 					}
 				}
+			}
 
+			CLogInterface.Write_Line( "Setting base enums" );
+			Set_Base_Enums();
+
+			CLogInterface.Write_Line( "Binding derived enum entries" );
+			Bind_Derived_Enums();
+
+			foreach ( var en in m_Enums.Values )
+			{
 				if ( en.CreationState == EEnumCreationState.Unchanged && en.NewEnumRecord.Value_Equals( en.OldEnumRecord ) )
 				{
 					continue;
@@ -234,6 +243,113 @@ namespace EnumReflector
 		}
 
 		// Private interface
+		private void Set_Base_Enums()
+		{
+			foreach ( var en in m_Enums.Values )
+			{
+				CEnumRecord derived_record = en.NewEnumRecord;
+				if ( derived_record == null )
+				{
+					continue;
+				}
+
+				if ( derived_record.ExtendsEnum.Length > 0 )
+				{
+					CEnum base_enum = Get_Enum_By_Name( derived_record.ExtendsEnum );
+					if ( base_enum == null )
+					{
+						throw new Exception( "Enum " + derived_record.FullName + " is an extension of an unknown enum: " + derived_record.ExtendsEnum );
+					}
+
+					CEnumRecord base_record = base_enum.NewEnumRecord;
+					if ( base_record == null )
+					{
+						throw new Exception( "Enum " + derived_record.FullName + " is an extension of a non-existent enum: " + derived_record.ExtendsEnum );
+					}
+
+					if ( base_record == derived_record )
+					{
+						throw new Exception( "Enum " + derived_record.FullName + " is an extension of itself" );
+					}
+
+					bool is_derived_bitfield = derived_record.Is_Bitfield();
+					bool is_base_bitfield = base_record.Is_Bitfield();
+					if ( is_base_bitfield != is_derived_bitfield )
+					{
+						throw new Exception( "IsBitfield mismatch between derived enum " + derived_record.FullName + " and base enum " + base_record.FullName );
+					}
+
+					derived_record.BaseEnum = base_record;
+				}
+			}
+		}
+
+		private void Bind_Derived_Enums()
+		{
+			bool made_a_change = true;
+			while ( made_a_change )
+			{
+				made_a_change = false;
+
+				foreach ( var en in m_Enums.Values )
+				{
+					CEnumRecord new_record = en.NewEnumRecord;
+					if ( new_record == null )
+					{
+						continue;
+					}
+
+					if ( new_record.ExtensionInitialized )
+					{
+						continue;
+					}
+
+					if ( new_record.BaseEnum == null )
+					{
+						new_record.ExtensionInitialized = true;
+						made_a_change = true;
+						continue;
+					}
+
+					CEnumRecord base_record = en.NewEnumRecord.BaseEnum;
+					if ( !base_record.ExtensionInitialized )
+					{
+						continue;
+					}
+						
+					Compute_Extension_Enum_Starting_Value( new_record, base_record );
+					new_record.Bind_Unbound_Values();
+
+					made_a_change = true;
+				}
+			}
+
+			foreach ( var en in m_Enums.Values )
+			{
+				if ( en.NewEnumRecord != null && !en.NewEnumRecord.ExtensionInitialized )
+				{
+					throw new Exception( "Enum " + en.NewEnumRecord.FullName + " still has unbound extension values after processing completed." );
+				}
+			}
+		}
+
+		private void Compute_Extension_Enum_Starting_Value( CEnumRecord derived_record, CEnumRecord base_record )
+		{
+			CEnumEntry first_entry = derived_record.Get_Entries().First();
+			if ( first_entry == null || first_entry.BoundName.Length == 0 )
+			{
+				throw new Exception( "Derived enum " + derived_record.FullName + " needs a first entry that assigns a value from the base enum " + base_record.FullName );
+			}
+
+			CEnumEntry base_entry = base_record.Get_Entry_By_CPP_Name( first_entry.BoundName );
+			if ( base_entry == null )
+			{
+				throw new Exception( "Derived enum " + derived_record.FullName + " has a first entry that references " + first_entry.BoundName + " in enum " + base_record.FullName + " but that entry does not exist" );
+			}
+
+			derived_record.StartingValue = base_entry.Value;
+		}
+
 		private void Mark_Owning_Project_Dirty( EHeaderFileID header_id )
 		{
 			CHeaderFile header_file = CEnumReflector.HeaderFileTracker.Get_Header_File_By_ID( header_id );

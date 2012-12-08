@@ -20,6 +20,8 @@ tokens {
 	COMMA = ',' ;
 	SEMICOLON = ';' ;
 	BITFIELD = 'BITFIELD' ;
+	NAMESPACE = 'namespace' ;
+	EXTENDS = 'extends' ;
 }
 
 /*
@@ -33,7 +35,7 @@ shift_expression
 	: POSITIVE_INTEGER10 LEFT_SHIFT^ POSITIVE_INTEGER10 ;
 		
 integer_constant 
-	: shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 ;
+	: shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 | ID;
 
 value_assignment
 	: EQUALS! integer_constant ;
@@ -47,11 +49,11 @@ non_last_enum_entry
 enum_entry_list
 	: LBRACE^ non_last_enum_entry* last_enum_entry  RBRACE! ;
 
-enum_definition
-	: ENUM^ ID enum_entry_list SEMICOLON! ;
-
+extends_clause
+	: EXTENDS^ ID ;
+	
 enum_properties
-	: BITFIELD ;
+	: BITFIELD | extends_clause ;
 	
 enum_begin_meta
 	: META! ENUM_BEGIN^ LPAREN! enum_properties? RPAREN! ;
@@ -59,8 +61,17 @@ enum_begin_meta
 enum_end_meta
 	: META! ENUM_END^ ;
 
+enum_definition
+	: ENUM^ ID enum_entry_list SEMICOLON! ;
+	
+namespace_wrapper
+	: NAMESPACE^ ID LBRACE! enum_definition RBRACE! ;
+	
+enum_entry_point
+	: namespace_wrapper | enum_definition ;
+	 	
 public parse
-	: enum_begin_meta enum_definition enum_end_meta ;
+	: enum_begin_meta enum_entry_point enum_end_meta ;
 									
 /*
 	Lexical rules

@@ -74,6 +74,9 @@ class CProcessBase : public IManagedProcess
 
 	protected:
 
+		virtual void Per_Frame_Logic_Start( void ) {}
+		virtual void Per_Frame_Logic_End( void ) {}
+
 		bool Is_Shutting_Down( void ) const;
 
 		virtual double Get_Current_Process_Time( void ) const = 0;
@@ -88,7 +91,7 @@ class CProcessBase : public IManagedProcess
 
 		void Register_Handler( const std::type_info &message_type_info, const shared_ptr< IProcessMessageHandler > &handler );
 
-		virtual void Handle_Shutdown_Self_Request( EProcessID::Enum process_id, const shared_ptr< const CShutdownSelfRequest > &message );
+		virtual void On_Shutdown_Self_Request( void ) {}
 
 	private:
 
@@ -108,6 +111,7 @@ class CProcessBase : public IManagedProcess
 
 		void Handle_Add_Mailbox_Message( EProcessID::Enum process_id, const shared_ptr< const CAddMailboxMessage > &message );
 		void Handle_Release_Mailbox_Request( EProcessID::Enum process_id, const shared_ptr< const CReleaseMailboxRequest > &request );
+		void Handle_Shutdown_Self_Request( EProcessID::Enum process_id, const shared_ptr< const CShutdownSelfRequest > &message );
 
 		void Handle_Shutdown_Mailboxes( void );
 

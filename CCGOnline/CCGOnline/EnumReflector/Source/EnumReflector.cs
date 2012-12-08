@@ -127,6 +127,8 @@ namespace EnumReflector
 
 				CLogInterface.Write_Line( "Processing dirty header files" );
 				HeaderFileTracker.Process_Dirty_Headers();
+
+				CLogInterface.Write_Line( "Enum state post-processing" );
 				EnumTracker.Process_Final_States();
 
 				CLogInterface.Write_Line( "Writing enum registration files" );

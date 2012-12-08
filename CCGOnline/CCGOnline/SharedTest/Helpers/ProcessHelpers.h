@@ -28,6 +28,7 @@
 
 class CProcessMailbox;
 class CTaskProcessBase;
+class CThreadProcessBase;
 
 static const EProcessID::Enum AI_PROCESS_ID = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID );
 
@@ -87,6 +88,25 @@ class CTaskProcessBaseTester : public CProcessBaseTester
 	private:
 
 		shared_ptr< CTaskProcessBase > TaskProcess;
+
+};
+
+class CThreadProcessBaseTester : public CProcessBaseTester
+{
+	public:
+
+		typedef CProcessBaseTester BASECLASS;
+
+		CThreadProcessBaseTester( CThreadProcessBase *process );
+		virtual ~CThreadProcessBaseTester();
+
+		shared_ptr< CThreadProcessBase > Get_Thread_Process( void ) const;
+
+		virtual CProcessBase *Get_Process( void ) const;
+
+	private:
+
+		shared_ptr< CThreadProcessBase > ThreadProcess;
 
 };
 

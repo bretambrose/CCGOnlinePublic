@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g 2011-12-13 07:33:20
+// $ANTLR 3.4 C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g 2012-12-02 14:50:15
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -36,20 +36,22 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	public const int ENUM_END=9;
 	public const int ENUM_ENTRY=10;
 	public const int EQUALS=11;
-	public const int HEX_DIGIT=12;
-	public const int ID=13;
-	public const int LBRACE=14;
-	public const int LEFT_SHIFT=15;
-	public const int LPAREN=16;
-	public const int META=17;
-	public const int POSITIVE_INTEGER10=18;
-	public const int POSITIVE_INTEGER16=19;
-	public const int POS_DIGIT=20;
-	public const int RBRACE=21;
-	public const int RPAREN=22;
-	public const int SEMICOLON=23;
-	public const int STRING=24;
-	public const int WHITESPACE=25;
+	public const int EXTENDS=12;
+	public const int HEX_DIGIT=13;
+	public const int ID=14;
+	public const int LBRACE=15;
+	public const int LEFT_SHIFT=16;
+	public const int LPAREN=17;
+	public const int META=18;
+	public const int NAMESPACE=19;
+	public const int POSITIVE_INTEGER10=20;
+	public const int POSITIVE_INTEGER16=21;
+	public const int POS_DIGIT=22;
+	public const int RBRACE=23;
+	public const int RPAREN=24;
+	public const int SEMICOLON=25;
+	public const int STRING=26;
+	public const int WHITESPACE=27;
 
     // delegates
     // delegators
@@ -327,6 +329,42 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	}
 	// $ANTLR end "EQUALS"
 
+	partial void EnterRule_EXTENDS();
+	partial void LeaveRule_EXTENDS();
+
+	// $ANTLR start "EXTENDS"
+	[GrammarRule("EXTENDS")]
+	private void mEXTENDS()
+	{
+		EnterRule_EXTENDS();
+		EnterRule("EXTENDS", 8);
+		TraceIn("EXTENDS", 8);
+		try
+		{
+			int _type = EXTENDS;
+			int _channel = DefaultTokenChannel;
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:14:9: ( 'extends' )
+			DebugEnterAlt(1);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:14:11: 'extends'
+			{
+			DebugLocation(14, 11);
+			Match("extends"); 
+
+
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally
+		{
+			TraceOut("EXTENDS", 8);
+			LeaveRule("EXTENDS", 8);
+			LeaveRule_EXTENDS();
+		}
+	}
+	// $ANTLR end "EXTENDS"
+
 	partial void EnterRule_LBRACE();
 	partial void LeaveRule_LBRACE();
 
@@ -335,17 +373,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mLBRACE()
 	{
 		EnterRule_LBRACE();
-		EnterRule("LBRACE", 8);
-		TraceIn("LBRACE", 8);
+		EnterRule("LBRACE", 9);
+		TraceIn("LBRACE", 9);
 		try
 		{
 			int _type = LBRACE;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:14:8: ( '{' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:15:8: ( '{' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:14:10: '{'
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:15:10: '{'
 			{
-			DebugLocation(14, 10);
+			DebugLocation(15, 10);
 			Match('{'); 
 
 			}
@@ -355,8 +393,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("LBRACE", 8);
-			LeaveRule("LBRACE", 8);
+			TraceOut("LBRACE", 9);
+			LeaveRule("LBRACE", 9);
 			LeaveRule_LBRACE();
 		}
 	}
@@ -370,17 +408,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mLEFT_SHIFT()
 	{
 		EnterRule_LEFT_SHIFT();
-		EnterRule("LEFT_SHIFT", 9);
-		TraceIn("LEFT_SHIFT", 9);
+		EnterRule("LEFT_SHIFT", 10);
+		TraceIn("LEFT_SHIFT", 10);
 		try
 		{
 			int _type = LEFT_SHIFT;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:15:12: ( '<<' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:16:12: ( '<<' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:15:14: '<<'
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:16:14: '<<'
 			{
-			DebugLocation(15, 14);
+			DebugLocation(16, 14);
 			Match("<<"); 
 
 
@@ -391,8 +429,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("LEFT_SHIFT", 9);
-			LeaveRule("LEFT_SHIFT", 9);
+			TraceOut("LEFT_SHIFT", 10);
+			LeaveRule("LEFT_SHIFT", 10);
 			LeaveRule_LEFT_SHIFT();
 		}
 	}
@@ -406,17 +444,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mLPAREN()
 	{
 		EnterRule_LPAREN();
-		EnterRule("LPAREN", 10);
-		TraceIn("LPAREN", 10);
+		EnterRule("LPAREN", 11);
+		TraceIn("LPAREN", 11);
 		try
 		{
 			int _type = LPAREN;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:16:8: ( '(' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:17:8: ( '(' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:16:10: '('
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:17:10: '('
 			{
-			DebugLocation(16, 10);
+			DebugLocation(17, 10);
 			Match('('); 
 
 			}
@@ -426,8 +464,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("LPAREN", 10);
-			LeaveRule("LPAREN", 10);
+			TraceOut("LPAREN", 11);
+			LeaveRule("LPAREN", 11);
 			LeaveRule_LPAREN();
 		}
 	}
@@ -441,17 +479,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mMETA()
 	{
 		EnterRule_META();
-		EnterRule("META", 11);
-		TraceIn("META", 11);
+		EnterRule("META", 12);
+		TraceIn("META", 12);
 		try
 		{
 			int _type = META;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:17:6: ( '//:' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:18:6: ( '//:' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:17:8: '//:'
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:18:8: '//:'
 			{
-			DebugLocation(17, 8);
+			DebugLocation(18, 8);
 			Match("//:"); 
 
 
@@ -462,12 +500,48 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("META", 11);
-			LeaveRule("META", 11);
+			TraceOut("META", 12);
+			LeaveRule("META", 12);
 			LeaveRule_META();
 		}
 	}
 	// $ANTLR end "META"
+
+	partial void EnterRule_NAMESPACE();
+	partial void LeaveRule_NAMESPACE();
+
+	// $ANTLR start "NAMESPACE"
+	[GrammarRule("NAMESPACE")]
+	private void mNAMESPACE()
+	{
+		EnterRule_NAMESPACE();
+		EnterRule("NAMESPACE", 13);
+		TraceIn("NAMESPACE", 13);
+		try
+		{
+			int _type = NAMESPACE;
+			int _channel = DefaultTokenChannel;
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:19:11: ( 'namespace' )
+			DebugEnterAlt(1);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:19:13: 'namespace'
+			{
+			DebugLocation(19, 13);
+			Match("namespace"); 
+
+
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally
+		{
+			TraceOut("NAMESPACE", 13);
+			LeaveRule("NAMESPACE", 13);
+			LeaveRule_NAMESPACE();
+		}
+	}
+	// $ANTLR end "NAMESPACE"
 
 	partial void EnterRule_RBRACE();
 	partial void LeaveRule_RBRACE();
@@ -477,17 +551,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mRBRACE()
 	{
 		EnterRule_RBRACE();
-		EnterRule("RBRACE", 12);
-		TraceIn("RBRACE", 12);
+		EnterRule("RBRACE", 14);
+		TraceIn("RBRACE", 14);
 		try
 		{
 			int _type = RBRACE;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:18:8: ( '}' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:20:8: ( '}' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:18:10: '}'
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:20:10: '}'
 			{
-			DebugLocation(18, 10);
+			DebugLocation(20, 10);
 			Match('}'); 
 
 			}
@@ -497,8 +571,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("RBRACE", 12);
-			LeaveRule("RBRACE", 12);
+			TraceOut("RBRACE", 14);
+			LeaveRule("RBRACE", 14);
 			LeaveRule_RBRACE();
 		}
 	}
@@ -512,17 +586,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mRPAREN()
 	{
 		EnterRule_RPAREN();
-		EnterRule("RPAREN", 13);
-		TraceIn("RPAREN", 13);
+		EnterRule("RPAREN", 15);
+		TraceIn("RPAREN", 15);
 		try
 		{
 			int _type = RPAREN;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:19:8: ( ')' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:21:8: ( ')' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:19:10: ')'
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:21:10: ')'
 			{
-			DebugLocation(19, 10);
+			DebugLocation(21, 10);
 			Match(')'); 
 
 			}
@@ -532,8 +606,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("RPAREN", 13);
-			LeaveRule("RPAREN", 13);
+			TraceOut("RPAREN", 15);
+			LeaveRule("RPAREN", 15);
 			LeaveRule_RPAREN();
 		}
 	}
@@ -547,17 +621,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mSEMICOLON()
 	{
 		EnterRule_SEMICOLON();
-		EnterRule("SEMICOLON", 14);
-		TraceIn("SEMICOLON", 14);
+		EnterRule("SEMICOLON", 16);
+		TraceIn("SEMICOLON", 16);
 		try
 		{
 			int _type = SEMICOLON;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:20:11: ( ';' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:22:11: ( ';' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:20:13: ';'
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:22:13: ';'
 			{
-			DebugLocation(20, 13);
+			DebugLocation(22, 13);
 			Match(';'); 
 
 			}
@@ -567,8 +641,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("SEMICOLON", 14);
-			LeaveRule("SEMICOLON", 14);
+			TraceOut("SEMICOLON", 16);
+			LeaveRule("SEMICOLON", 16);
 			LeaveRule_SEMICOLON();
 		}
 	}
@@ -582,17 +656,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mID()
 	{
 		EnterRule_ID();
-		EnterRule("ID", 15);
-		TraceIn("ID", 15);
+		EnterRule("ID", 17);
+		TraceIn("ID", 17);
 		try
 		{
 			int _type = ID;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:68:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:79:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:68:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:79:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
 			{
-			DebugLocation(68, 7);
+			DebugLocation(79, 7);
 			if ((input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z'))
 			{
 				input.Consume();
@@ -605,8 +679,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 				throw mse;
 			}
 
-			DebugLocation(68, 31);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:68:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+			DebugLocation(79, 31);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:79:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
 			try { DebugEnterSubRule(1);
 			while (true)
 			{
@@ -627,7 +701,7 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 					DebugEnterAlt(1);
 					// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:
 					{
-					DebugLocation(68, 31);
+					DebugLocation(79, 31);
 					input.Consume();
 
 
@@ -652,8 +726,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("ID", 15);
-			LeaveRule("ID", 15);
+			TraceOut("ID", 17);
+			LeaveRule("ID", 17);
 			LeaveRule_ID();
 		}
 	}
@@ -667,17 +741,17 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mWHITESPACE()
 	{
 		EnterRule_WHITESPACE();
-		EnterRule("WHITESPACE", 16);
-		TraceIn("WHITESPACE", 16);
+		EnterRule("WHITESPACE", 18);
+		TraceIn("WHITESPACE", 18);
 		try
 		{
 			int _type = WHITESPACE;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:72:2: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:83:2: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:72:6: ( ' ' | '\\t' | '\\r' | '\\n' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:83:6: ( ' ' | '\\t' | '\\r' | '\\n' )
 			{
-			DebugLocation(72, 6);
+			DebugLocation(83, 6);
 			if ((input.LA(1)>='\t' && input.LA(1)<='\n')||input.LA(1)=='\r'||input.LA(1)==' ')
 			{
 				input.Consume();
@@ -690,7 +764,7 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 				throw mse;
 			}
 
-			DebugLocation(72, 35);
+			DebugLocation(83, 35);
 			_channel=Hidden;
 
 			}
@@ -700,8 +774,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("WHITESPACE", 16);
-			LeaveRule("WHITESPACE", 16);
+			TraceOut("WHITESPACE", 18);
+			LeaveRule("WHITESPACE", 18);
 			LeaveRule_WHITESPACE();
 		}
 	}
@@ -715,20 +789,20 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mSTRING()
 	{
 		EnterRule_STRING();
-		EnterRule("STRING", 17);
-		TraceIn("STRING", 17);
+		EnterRule("STRING", 19);
+		TraceIn("STRING", 19);
 		try
 		{
 			int _type = STRING;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:75:6: ( '\"' (~ ( '\\\\' | '\"' ) )* '\"' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:86:6: ( '\"' (~ ( '\\\\' | '\"' ) )* '\"' )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:75:9: '\"' (~ ( '\\\\' | '\"' ) )* '\"'
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:86:9: '\"' (~ ( '\\\\' | '\"' ) )* '\"'
 			{
-			DebugLocation(75, 9);
+			DebugLocation(86, 9);
 			Match('\"'); 
-			DebugLocation(75, 13);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:75:13: (~ ( '\\\\' | '\"' ) )*
+			DebugLocation(86, 13);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:86:13: (~ ( '\\\\' | '\"' ) )*
 			try { DebugEnterSubRule(2);
 			while (true)
 			{
@@ -749,7 +823,7 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 					DebugEnterAlt(1);
 					// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:
 					{
-					DebugLocation(75, 13);
+					DebugLocation(86, 13);
 					input.Consume();
 
 
@@ -766,7 +840,7 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 
 			} finally { DebugExitSubRule(2); }
 
-			DebugLocation(75, 30);
+			DebugLocation(86, 30);
 			Match('\"'); 
 
 			}
@@ -776,8 +850,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("STRING", 17);
-			LeaveRule("STRING", 17);
+			TraceOut("STRING", 19);
+			LeaveRule("STRING", 19);
 			LeaveRule_STRING();
 		}
 	}
@@ -791,21 +865,21 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mPOSITIVE_INTEGER16()
 	{
 		EnterRule_POSITIVE_INTEGER16();
-		EnterRule("POSITIVE_INTEGER16", 18);
-		TraceIn("POSITIVE_INTEGER16", 18);
+		EnterRule("POSITIVE_INTEGER16", 20);
+		TraceIn("POSITIVE_INTEGER16", 20);
 		try
 		{
 			int _type = POSITIVE_INTEGER16;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:78:2: ( '0x' ( HEX_DIGIT )+ )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:89:2: ( '0x' ( HEX_DIGIT )+ )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:78:4: '0x' ( HEX_DIGIT )+
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:89:4: '0x' ( HEX_DIGIT )+
 			{
-			DebugLocation(78, 4);
+			DebugLocation(89, 4);
 			Match("0x"); 
 
-			DebugLocation(78, 9);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:78:9: ( HEX_DIGIT )+
+			DebugLocation(89, 9);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:89:9: ( HEX_DIGIT )+
 			int cnt3=0;
 			try { DebugEnterSubRule(3);
 			while (true)
@@ -827,7 +901,7 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 					DebugEnterAlt(1);
 					// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:
 					{
-					DebugLocation(78, 9);
+					DebugLocation(89, 9);
 					input.Consume();
 
 
@@ -857,8 +931,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("POSITIVE_INTEGER16", 18);
-			LeaveRule("POSITIVE_INTEGER16", 18);
+			TraceOut("POSITIVE_INTEGER16", 20);
+			LeaveRule("POSITIVE_INTEGER16", 20);
 			LeaveRule_POSITIVE_INTEGER16();
 		}
 	}
@@ -872,18 +946,18 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mPOSITIVE_INTEGER10()
 	{
 		EnterRule_POSITIVE_INTEGER10();
-		EnterRule("POSITIVE_INTEGER10", 19);
-		TraceIn("POSITIVE_INTEGER10", 19);
+		EnterRule("POSITIVE_INTEGER10", 21);
+		TraceIn("POSITIVE_INTEGER10", 21);
 		try
 		{
 			int _type = POSITIVE_INTEGER10;
 			int _channel = DefaultTokenChannel;
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:2: ( ( '0' | ( POS_DIGIT ( DIGIT )* ) ) )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:2: ( ( '0' | ( POS_DIGIT ( DIGIT )* ) ) )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:4: ( '0' | ( POS_DIGIT ( DIGIT )* ) )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:4: ( '0' | ( POS_DIGIT ( DIGIT )* ) )
 			{
-			DebugLocation(81, 4);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:4: ( '0' | ( POS_DIGIT ( DIGIT )* ) )
+			DebugLocation(92, 4);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:4: ( '0' | ( POS_DIGIT ( DIGIT )* ) )
 			int alt5=2;
 			try { DebugEnterSubRule(5);
 			try { DebugEnterDecision(5, false);
@@ -908,26 +982,26 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:6: '0'
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:6: '0'
 				{
-				DebugLocation(81, 6);
+				DebugLocation(92, 6);
 				Match('0'); 
 
 				}
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:12: ( POS_DIGIT ( DIGIT )* )
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:12: ( POS_DIGIT ( DIGIT )* )
 				{
-				DebugLocation(81, 12);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:12: ( POS_DIGIT ( DIGIT )* )
+				DebugLocation(92, 12);
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:12: ( POS_DIGIT ( DIGIT )* )
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:14: POS_DIGIT ( DIGIT )*
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:14: POS_DIGIT ( DIGIT )*
 				{
-				DebugLocation(81, 14);
+				DebugLocation(92, 14);
 				mPOS_DIGIT(); 
-				DebugLocation(81, 24);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:81:24: ( DIGIT )*
+				DebugLocation(92, 24);
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:92:24: ( DIGIT )*
 				try { DebugEnterSubRule(4);
 				while (true)
 				{
@@ -948,7 +1022,7 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 						DebugEnterAlt(1);
 						// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:
 						{
-						DebugLocation(81, 24);
+						DebugLocation(92, 24);
 						input.Consume();
 
 
@@ -983,8 +1057,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("POSITIVE_INTEGER10", 19);
-			LeaveRule("POSITIVE_INTEGER10", 19);
+			TraceOut("POSITIVE_INTEGER10", 21);
+			LeaveRule("POSITIVE_INTEGER10", 21);
 			LeaveRule_POSITIVE_INTEGER10();
 		}
 	}
@@ -998,15 +1072,15 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mPOS_DIGIT()
 	{
 		EnterRule_POS_DIGIT();
-		EnterRule("POS_DIGIT", 20);
-		TraceIn("POS_DIGIT", 20);
+		EnterRule("POS_DIGIT", 22);
+		TraceIn("POS_DIGIT", 22);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:84:2: ( '1' .. '9' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:95:2: ( '1' .. '9' )
 			DebugEnterAlt(1);
 			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:
 			{
-			DebugLocation(84, 2);
+			DebugLocation(95, 2);
 			if ((input.LA(1)>='1' && input.LA(1)<='9'))
 			{
 				input.Consume();
@@ -1025,8 +1099,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("POS_DIGIT", 20);
-			LeaveRule("POS_DIGIT", 20);
+			TraceOut("POS_DIGIT", 22);
+			LeaveRule("POS_DIGIT", 22);
 			LeaveRule_POS_DIGIT();
 		}
 	}
@@ -1040,15 +1114,15 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mDIGIT()
 	{
 		EnterRule_DIGIT();
-		EnterRule("DIGIT", 21);
-		TraceIn("DIGIT", 21);
+		EnterRule("DIGIT", 23);
+		TraceIn("DIGIT", 23);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:87:2: ( '0' .. '9' )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:98:2: ( '0' .. '9' )
 			DebugEnterAlt(1);
 			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:
 			{
-			DebugLocation(87, 2);
+			DebugLocation(98, 2);
 			if ((input.LA(1)>='0' && input.LA(1)<='9'))
 			{
 				input.Consume();
@@ -1067,8 +1141,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("DIGIT", 21);
-			LeaveRule("DIGIT", 21);
+			TraceOut("DIGIT", 23);
+			LeaveRule("DIGIT", 23);
 			LeaveRule_DIGIT();
 		}
 	}
@@ -1082,15 +1156,15 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 	private void mHEX_DIGIT()
 	{
 		EnterRule_HEX_DIGIT();
-		EnterRule("HEX_DIGIT", 22);
-		TraceIn("HEX_DIGIT", 22);
+		EnterRule("HEX_DIGIT", 24);
+		TraceIn("HEX_DIGIT", 24);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:90:2: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:101:2: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
 			DebugEnterAlt(1);
 			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:
 			{
-			DebugLocation(90, 2);
+			DebugLocation(101, 2);
 			if ((input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='F')||(input.LA(1)>='a' && input.LA(1)<='f'))
 			{
 				input.Consume();
@@ -1109,8 +1183,8 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("HEX_DIGIT", 22);
-			LeaveRule("HEX_DIGIT", 22);
+			TraceOut("HEX_DIGIT", 24);
+			LeaveRule("HEX_DIGIT", 24);
 			LeaveRule_HEX_DIGIT();
 		}
 	}
@@ -1118,432 +1192,18 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 
 	public override void mTokens()
 	{
-		// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:8: ( BITFIELD | COMMA | ENUM | ENUM_BEGIN | ENUM_END | ENUM_ENTRY | EQUALS | LBRACE | LEFT_SHIFT | LPAREN | META | RBRACE | RPAREN | SEMICOLON | ID | WHITESPACE | STRING | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 )
-		int alt6=19;
+		// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:8: ( BITFIELD | COMMA | ENUM | ENUM_BEGIN | ENUM_END | ENUM_ENTRY | EQUALS | EXTENDS | LBRACE | LEFT_SHIFT | LPAREN | META | NAMESPACE | RBRACE | RPAREN | SEMICOLON | ID | WHITESPACE | STRING | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 )
+		int alt6=21;
 		try { DebugEnterDecision(6, false);
-		switch (input.LA(1))
+		try
 		{
-		case 'B':
-			{
-			int LA6_1 = input.LA(2);
-
-			if ((LA6_1=='I'))
-			{
-				int LA6_18 = input.LA(3);
-
-				if ((LA6_18=='T'))
-				{
-					int LA6_22 = input.LA(4);
-
-					if ((LA6_22=='F'))
-					{
-						int LA6_25 = input.LA(5);
-
-						if ((LA6_25=='I'))
-						{
-							int LA6_28 = input.LA(6);
-
-							if ((LA6_28=='E'))
-							{
-								int LA6_32 = input.LA(7);
-
-								if ((LA6_32=='L'))
-								{
-									int LA6_35 = input.LA(8);
-
-									if ((LA6_35=='D'))
-									{
-										int LA6_39 = input.LA(9);
-
-										if (((LA6_39>='0' && LA6_39<='9')||(LA6_39>='A' && LA6_39<='Z')||LA6_39=='_'||(LA6_39>='a' && LA6_39<='z')))
-										{
-											alt6 = 15;
-										}
-										else
-										{
-											alt6 = 1;
-										}
-									}
-									else
-									{
-										alt6 = 15;
-									}
-								}
-								else
-								{
-									alt6 = 15;
-								}
-							}
-							else
-							{
-								alt6 = 15;
-							}
-						}
-						else
-						{
-							alt6 = 15;
-						}
-					}
-					else
-					{
-						alt6 = 15;
-					}
-				}
-				else
-				{
-					alt6 = 15;
-				}
-			}
-			else
-			{
-				alt6 = 15;
-			}
-			}
-			break;
-		case ',':
-			{
-			alt6 = 2;
-			}
-			break;
-		case 'e':
-			{
-			int LA6_3 = input.LA(2);
-
-			if ((LA6_3=='n'))
-			{
-				int LA6_19 = input.LA(3);
-
-				if ((LA6_19=='u'))
-				{
-					int LA6_23 = input.LA(4);
-
-					if ((LA6_23=='m'))
-					{
-						int LA6_26 = input.LA(5);
-
-						if (((LA6_26>='0' && LA6_26<='9')||(LA6_26>='A' && LA6_26<='Z')||LA6_26=='_'||(LA6_26>='a' && LA6_26<='z')))
-						{
-							alt6 = 15;
-						}
-						else
-						{
-							alt6 = 3;
-						}
-					}
-					else
-					{
-						alt6 = 15;
-					}
-				}
-				else
-				{
-					alt6 = 15;
-				}
-			}
-			else
-			{
-				alt6 = 15;
-			}
-			}
-			break;
-		case 'E':
-			{
-			int LA6_4 = input.LA(2);
-
-			if ((LA6_4=='n'))
-			{
-				int LA6_20 = input.LA(3);
-
-				if ((LA6_20=='u'))
-				{
-					int LA6_24 = input.LA(4);
-
-					if ((LA6_24=='m'))
-					{
-						switch (input.LA(5))
-						{
-						case 'B':
-							{
-							int LA6_30 = input.LA(6);
-
-							if ((LA6_30=='e'))
-							{
-								int LA6_33 = input.LA(7);
-
-								if ((LA6_33=='g'))
-								{
-									int LA6_36 = input.LA(8);
-
-									if ((LA6_36=='i'))
-									{
-										int LA6_40 = input.LA(9);
-
-										if ((LA6_40=='n'))
-										{
-											int LA6_44 = input.LA(10);
-
-											if (((LA6_44>='0' && LA6_44<='9')||(LA6_44>='A' && LA6_44<='Z')||LA6_44=='_'||(LA6_44>='a' && LA6_44<='z')))
-											{
-												alt6 = 15;
-											}
-											else
-											{
-												alt6 = 4;
-											}
-										}
-										else
-										{
-											alt6 = 15;
-										}
-									}
-									else
-									{
-										alt6 = 15;
-									}
-								}
-								else
-								{
-									alt6 = 15;
-								}
-							}
-							else
-							{
-								alt6 = 15;
-							}
-							}
-							break;
-						case 'E':
-							{
-							int LA6_31 = input.LA(6);
-
-							if ((LA6_31=='n'))
-							{
-								switch (input.LA(7))
-								{
-								case 'd':
-									{
-									int LA6_37 = input.LA(8);
-
-									if (((LA6_37>='0' && LA6_37<='9')||(LA6_37>='A' && LA6_37<='Z')||LA6_37=='_'||(LA6_37>='a' && LA6_37<='z')))
-									{
-										alt6 = 15;
-									}
-									else
-									{
-										alt6 = 5;
-									}
-									}
-									break;
-								case 't':
-									{
-									int LA6_38 = input.LA(8);
-
-									if ((LA6_38=='r'))
-									{
-										int LA6_42 = input.LA(9);
-
-										if ((LA6_42=='y'))
-										{
-											int LA6_45 = input.LA(10);
-
-											if (((LA6_45>='0' && LA6_45<='9')||(LA6_45>='A' && LA6_45<='Z')||LA6_45=='_'||(LA6_45>='a' && LA6_45<='z')))
-											{
-												alt6 = 15;
-											}
-											else
-											{
-												alt6 = 6;
-											}
-										}
-										else
-										{
-											alt6 = 15;
-										}
-									}
-									else
-									{
-										alt6 = 15;
-									}
-									}
-									break;
-								default:
-									alt6=15;
-									break;
-
-								}
-
-							}
-							else
-							{
-								alt6 = 15;
-							}
-							}
-							break;
-						default:
-							alt6=15;
-							break;
-
-						}
-
-					}
-					else
-					{
-						alt6 = 15;
-					}
-				}
-				else
-				{
-					alt6 = 15;
-				}
-			}
-			else
-			{
-				alt6 = 15;
-			}
-			}
-			break;
-		case '=':
-			{
-			alt6 = 7;
-			}
-			break;
-		case '{':
-			{
-			alt6 = 8;
-			}
-			break;
-		case '<':
-			{
-			alt6 = 9;
-			}
-			break;
-		case '(':
-			{
-			alt6 = 10;
-			}
-			break;
-		case '/':
-			{
-			alt6 = 11;
-			}
-			break;
-		case '}':
-			{
-			alt6 = 12;
-			}
-			break;
-		case ')':
-			{
-			alt6 = 13;
-			}
-			break;
-		case ';':
-			{
-			alt6 = 14;
-			}
-			break;
-		case 'A':
-		case 'C':
-		case 'D':
-		case 'F':
-		case 'G':
-		case 'H':
-		case 'I':
-		case 'J':
-		case 'K':
-		case 'L':
-		case 'M':
-		case 'N':
-		case 'O':
-		case 'P':
-		case 'Q':
-		case 'R':
-		case 'S':
-		case 'T':
-		case 'U':
-		case 'V':
-		case 'W':
-		case 'X':
-		case 'Y':
-		case 'Z':
-		case '_':
-		case 'a':
-		case 'b':
-		case 'c':
-		case 'd':
-		case 'f':
-		case 'g':
-		case 'h':
-		case 'i':
-		case 'j':
-		case 'k':
-		case 'l':
-		case 'm':
-		case 'n':
-		case 'o':
-		case 'p':
-		case 'q':
-		case 'r':
-		case 's':
-		case 't':
-		case 'u':
-		case 'v':
-		case 'w':
-		case 'x':
-		case 'y':
-		case 'z':
-			{
-			alt6 = 15;
-			}
-			break;
-		case '\t':
-		case '\n':
-		case '\r':
-		case ' ':
-			{
-			alt6 = 16;
-			}
-			break;
-		case '\"':
-			{
-			alt6 = 17;
-			}
-			break;
-		case '0':
-			{
-			int LA6_16 = input.LA(2);
-
-			if ((LA6_16=='x'))
-			{
-				alt6 = 18;
-			}
-			else
-			{
-				alt6 = 19;
-			}
-			}
-			break;
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			{
-			alt6 = 19;
-			}
-			break;
-		default:
-			{
-				NoViableAltException nvae = new NoViableAltException("", 6, 0, input);
-				DebugRecognitionException(nvae);
-				throw nvae;
-			}
+			alt6 = dfa6.Predict(input);
 		}
-
+		catch (NoViableAltException nvae)
+		{
+			DebugRecognitionException(nvae);
+			throw;
+		}
 		} finally { DebugExitDecision(6); }
 		switch (alt6)
 		{
@@ -1612,108 +1272,126 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 			break;
 		case 8:
 			DebugEnterAlt(8);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:68: LBRACE
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:68: EXTENDS
 			{
 			DebugLocation(1, 68);
-			mLBRACE(); 
+			mEXTENDS(); 
 
 			}
 			break;
 		case 9:
 			DebugEnterAlt(9);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:75: LEFT_SHIFT
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:76: LBRACE
 			{
-			DebugLocation(1, 75);
-			mLEFT_SHIFT(); 
+			DebugLocation(1, 76);
+			mLBRACE(); 
 
 			}
 			break;
 		case 10:
 			DebugEnterAlt(10);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:86: LPAREN
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:83: LEFT_SHIFT
 			{
-			DebugLocation(1, 86);
-			mLPAREN(); 
+			DebugLocation(1, 83);
+			mLEFT_SHIFT(); 
 
 			}
 			break;
 		case 11:
 			DebugEnterAlt(11);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:93: META
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:94: LPAREN
 			{
-			DebugLocation(1, 93);
-			mMETA(); 
+			DebugLocation(1, 94);
+			mLPAREN(); 
 
 			}
 			break;
 		case 12:
 			DebugEnterAlt(12);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:98: RBRACE
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:101: META
 			{
-			DebugLocation(1, 98);
-			mRBRACE(); 
+			DebugLocation(1, 101);
+			mMETA(); 
 
 			}
 			break;
 		case 13:
 			DebugEnterAlt(13);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:105: RPAREN
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:106: NAMESPACE
 			{
-			DebugLocation(1, 105);
-			mRPAREN(); 
+			DebugLocation(1, 106);
+			mNAMESPACE(); 
 
 			}
 			break;
 		case 14:
 			DebugEnterAlt(14);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:112: SEMICOLON
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:116: RBRACE
 			{
-			DebugLocation(1, 112);
-			mSEMICOLON(); 
+			DebugLocation(1, 116);
+			mRBRACE(); 
 
 			}
 			break;
 		case 15:
 			DebugEnterAlt(15);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:122: ID
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:123: RPAREN
 			{
-			DebugLocation(1, 122);
-			mID(); 
+			DebugLocation(1, 123);
+			mRPAREN(); 
 
 			}
 			break;
 		case 16:
 			DebugEnterAlt(16);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:125: WHITESPACE
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:130: SEMICOLON
 			{
-			DebugLocation(1, 125);
-			mWHITESPACE(); 
+			DebugLocation(1, 130);
+			mSEMICOLON(); 
 
 			}
 			break;
 		case 17:
 			DebugEnterAlt(17);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:136: STRING
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:140: ID
 			{
-			DebugLocation(1, 136);
-			mSTRING(); 
+			DebugLocation(1, 140);
+			mID(); 
 
 			}
 			break;
 		case 18:
 			DebugEnterAlt(18);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:143: POSITIVE_INTEGER16
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:143: WHITESPACE
 			{
 			DebugLocation(1, 143);
-			mPOSITIVE_INTEGER16(); 
+			mWHITESPACE(); 
 
 			}
 			break;
 		case 19:
 			DebugEnterAlt(19);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:162: POSITIVE_INTEGER10
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:154: STRING
 			{
-			DebugLocation(1, 162);
+			DebugLocation(1, 154);
+			mSTRING(); 
+
+			}
+			break;
+		case 20:
+			DebugEnterAlt(20);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:161: POSITIVE_INTEGER16
+			{
+			DebugLocation(1, 161);
+			mPOSITIVE_INTEGER16(); 
+
+			}
+			break;
+		case 21:
+			DebugEnterAlt(21);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:1:180: POSITIVE_INTEGER10
+			{
+			DebugLocation(1, 180);
 			mPOSITIVE_INTEGER10(); 
 
 			}
@@ -1725,10 +1403,153 @@ public partial class EnumReflectorLexer : Antlr.Runtime.Lexer
 
 
 	#region DFA
+	DFA6 dfa6;
 
 	protected override void InitDFAs()
 	{
 		base.InitDFAs();
+		dfa6 = new DFA6(this);
+	}
+
+	private class DFA6 : DFA
+	{
+		private const string DFA6_eotS =
+			"\x1\xFFFF\x1\xE\x1\xFFFF\x2\xE\x5\xFFFF\x1\xE\x6\xFFFF\x1\x12\x1\xFFFF"+
+			"\x5\xE\x1\xFFFF\x6\xE\x1\x24\x4\xE\x1\xFFFF\xA\xE\x1\x35\x1\xE\x1\x37"+
+			"\x2\xE\x1\x3A\x1\xFFFF\x1\xE\x1\xFFFF\x2\xE\x1\xFFFF\x1\x3E\x1\x3F\x1"+
+			"\x40\x3\xFFFF";
+		private const string DFA6_eofS =
+			"\x41\xFFFF";
+		private const string DFA6_minS =
+			"\x1\x9\x1\x49\x1\xFFFF\x2\x6E\x5\xFFFF\x1\x61\x6\xFFFF\x1\x78\x1\xFFFF"+
+			"\x1\x54\x1\x75\x1\x74\x1\x75\x1\x6D\x1\xFFFF\x1\x46\x1\x6D\x1\x65\x1"+
+			"\x6D\x1\x65\x1\x49\x1\x30\x1\x6E\x1\x42\x1\x73\x1\x45\x1\xFFFF\x1\x64"+
+			"\x1\x65\x1\x6E\x1\x70\x1\x4C\x1\x73\x1\x67\x1\x64\x1\x61\x1\x44\x1\x30"+
+			"\x1\x69\x1\x30\x1\x72\x1\x63\x1\x30\x1\xFFFF\x1\x6E\x1\xFFFF\x1\x79\x1"+
+			"\x65\x1\xFFFF\x3\x30\x3\xFFFF";
+		private const string DFA6_maxS =
+			"\x1\x7D\x1\x49\x1\xFFFF\x1\x78\x1\x6E\x5\xFFFF\x1\x61\x6\xFFFF\x1\x78"+
+			"\x1\xFFFF\x1\x54\x1\x75\x1\x74\x1\x75\x1\x6D\x1\xFFFF\x1\x46\x1\x6D\x1"+
+			"\x65\x1\x6D\x1\x65\x1\x49\x1\x7A\x1\x6E\x1\x45\x1\x73\x1\x45\x1\xFFFF"+
+			"\x1\x64\x1\x65\x1\x6E\x1\x70\x1\x4C\x1\x73\x1\x67\x1\x74\x1\x61\x1\x44"+
+			"\x1\x7A\x1\x69\x1\x7A\x1\x72\x1\x63\x1\x7A\x1\xFFFF\x1\x6E\x1\xFFFF\x1"+
+			"\x79\x1\x65\x1\xFFFF\x3\x7A\x3\xFFFF";
+		private const string DFA6_acceptS =
+			"\x2\xFFFF\x1\x2\x2\xFFFF\x1\x7\x1\x9\x1\xA\x1\xB\x1\xC\x1\xFFFF\x1\xE"+
+			"\x1\xF\x1\x10\x1\x11\x1\x12\x1\x13\x1\xFFFF\x1\x15\x5\xFFFF\x1\x14\xB"+
+			"\xFFFF\x1\x3\x10\xFFFF\x1\x8\x1\xFFFF\x1\x5\x2\xFFFF\x1\x1\x3\xFFFF\x1"+
+			"\x4\x1\x6\x1\xD";
+		private const string DFA6_specialS =
+			"\x41\xFFFF}>";
+		private static readonly string[] DFA6_transitionS =
+			{
+				"\x2\xF\x2\xFFFF\x1\xF\x12\xFFFF\x1\xF\x1\xFFFF\x1\x10\x5\xFFFF\x1\x8"+
+				"\x1\xC\x2\xFFFF\x1\x2\x2\xFFFF\x1\x9\x1\x11\x9\x12\x1\xFFFF\x1\xD\x1"+
+				"\x7\x1\x5\x3\xFFFF\x1\xE\x1\x1\x2\xE\x1\x4\x15\xE\x4\xFFFF\x1\xE\x1"+
+				"\xFFFF\x4\xE\x1\x3\x8\xE\x1\xA\xC\xE\x1\x6\x1\xFFFF\x1\xB",
+				"\x1\x13",
+				"",
+				"\x1\x14\x9\xFFFF\x1\x15",
+				"\x1\x16",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"\x1\x17",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"\x1\x18",
+				"",
+				"\x1\x19",
+				"\x1\x1A",
+				"\x1\x1B",
+				"\x1\x1C",
+				"\x1\x1D",
+				"",
+				"\x1\x1E",
+				"\x1\x1F",
+				"\x1\x20",
+				"\x1\x21",
+				"\x1\x22",
+				"\x1\x23",
+				"\xA\xE\x7\xFFFF\x1A\xE\x4\xFFFF\x1\xE\x1\xFFFF\x1A\xE",
+				"\x1\x25",
+				"\x1\x26\x2\xFFFF\x1\x27",
+				"\x1\x28",
+				"\x1\x29",
+				"",
+				"\x1\x2A",
+				"\x1\x2B",
+				"\x1\x2C",
+				"\x1\x2D",
+				"\x1\x2E",
+				"\x1\x2F",
+				"\x1\x30",
+				"\x1\x31\xF\xFFFF\x1\x32",
+				"\x1\x33",
+				"\x1\x34",
+				"\xA\xE\x7\xFFFF\x1A\xE\x4\xFFFF\x1\xE\x1\xFFFF\x1A\xE",
+				"\x1\x36",
+				"\xA\xE\x7\xFFFF\x1A\xE\x4\xFFFF\x1\xE\x1\xFFFF\x1A\xE",
+				"\x1\x38",
+				"\x1\x39",
+				"\xA\xE\x7\xFFFF\x1A\xE\x4\xFFFF\x1\xE\x1\xFFFF\x1A\xE",
+				"",
+				"\x1\x3B",
+				"",
+				"\x1\x3C",
+				"\x1\x3D",
+				"",
+				"\xA\xE\x7\xFFFF\x1A\xE\x4\xFFFF\x1\xE\x1\xFFFF\x1A\xE",
+				"\xA\xE\x7\xFFFF\x1A\xE\x4\xFFFF\x1\xE\x1\xFFFF\x1A\xE",
+				"\xA\xE\x7\xFFFF\x1A\xE\x4\xFFFF\x1\xE\x1\xFFFF\x1A\xE",
+				"",
+				"",
+				""
+			};
+
+		private static readonly short[] DFA6_eot = DFA.UnpackEncodedString(DFA6_eotS);
+		private static readonly short[] DFA6_eof = DFA.UnpackEncodedString(DFA6_eofS);
+		private static readonly char[] DFA6_min = DFA.UnpackEncodedStringToUnsignedChars(DFA6_minS);
+		private static readonly char[] DFA6_max = DFA.UnpackEncodedStringToUnsignedChars(DFA6_maxS);
+		private static readonly short[] DFA6_accept = DFA.UnpackEncodedString(DFA6_acceptS);
+		private static readonly short[] DFA6_special = DFA.UnpackEncodedString(DFA6_specialS);
+		private static readonly short[][] DFA6_transition;
+
+		static DFA6()
+		{
+			int numStates = DFA6_transitionS.Length;
+			DFA6_transition = new short[numStates][];
+			for ( int i=0; i < numStates; i++ )
+			{
+				DFA6_transition[i] = DFA.UnpackEncodedString(DFA6_transitionS[i]);
+			}
+		}
+
+		public DFA6( BaseRecognizer recognizer )
+		{
+			this.recognizer = recognizer;
+			this.decisionNumber = 6;
+			this.eot = DFA6_eot;
+			this.eof = DFA6_eof;
+			this.min = DFA6_min;
+			this.max = DFA6_max;
+			this.accept = DFA6_accept;
+			this.special = DFA6_special;
+			this.transition = DFA6_transition;
+		}
+
+		public override string Description { get { return "1:1: Tokens : ( BITFIELD | COMMA | ENUM | ENUM_BEGIN | ENUM_END | ENUM_ENTRY | EQUALS | EXTENDS | LBRACE | LEFT_SHIFT | LPAREN | META | NAMESPACE | RBRACE | RPAREN | SEMICOLON | ID | WHITESPACE | STRING | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 );"; } }
+
+		public override void Error(NoViableAltException nvae)
+		{
+			DebugRecognitionException(nvae);
+		}
 	}
 
  

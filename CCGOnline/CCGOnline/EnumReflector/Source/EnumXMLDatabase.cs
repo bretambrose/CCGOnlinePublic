@@ -74,19 +74,71 @@ namespace EnumReflector
 		{
 			EntryName = string.Empty;
 			Value = 0;
+			BoundName = "";
+			CPPName = "";
+			HasValue = false;
 		}
 
-		public CEnumEntry( string entry_name, ulong value )
+		public CEnumEntry( string cpp_name, ulong value )
+		{
+			EntryName = "";
+			Value = value;
+			BoundName = "";
+			CPPName = cpp_name;
+			HasValue = true;
+		}
+
+		public CEnumEntry( string cpp_name, string entry_name, ulong value )
 		{
 			EntryName = entry_name;
 			Value = value;
+			BoundName = "";
+			CPPName = cpp_name;
+			HasValue = true;
+		}
+
+		public CEnumEntry( string cpp_name, string entry_name, string bound_name )
+		{
+			EntryName = entry_name;
+			Value = 0;
+			BoundName = bound_name;
+			CPPName = cpp_name;
+			HasValue = false;
 		}
 
 		// Methods
 		// Public interface
 		public bool Value_Equals( CEnumEntry enum_entry )
 		{
-			return EntryName == enum_entry.EntryName && Value == enum_entry.Value;
+			return EntryName == enum_entry.EntryName && Value == enum_entry.Value && BoundName == enum_entry.BoundName;
+		}
+
+		public CEnumEntry Clone()
+		{
+			CEnumEntry clone = new CEnumEntry();
+
+			clone.EntryName = EntryName;
+			clone.Value = Value;
+			clone.BoundName = BoundName;
+			clone.CPPName = CPPName;
+			clone.HasValue = HasValue;
+
+			return clone;
+		}
+
+		public void Bind_Value( ulong value )
+		{
+			if ( HasValue )
+			{
+				throw new Exception( "Attempted to bind a value to an enum entry that already has a value" );
+			}
+
+			Value = value;
+		}
+
+		public void Unbind_Value()
+		{
+			HasValue = false;
 		}
 
 		// Properties
@@ -95,6 +147,14 @@ namespace EnumReflector
 
 		[ DataMember( Name="Value", Order = 1, IsRequired=true ) ]
 		public ulong Value { get; private set; }
+
+		[ DataMember( Name="BoundName", Order = 2, IsRequired=true ) ]
+		public string BoundName { get; private set; }
+
+		[ DataMember( Name="CPPName", Order = 3, IsRequired=true ) ]
+		public string CPPName { get; private set; }
+
+		public bool HasValue { get; private set; }
 	}
 
 	[Flags]
@@ -110,27 +170,37 @@ namespace EnumReflector
 		// Construction
 		public CEnumRecord()
 		{
-			Name = String.Empty;
+			EnumName = String.Empty;
+			FullName = String.Empty;
 			FileNameWithPath = String.Empty;
+			Namespace = String.Empty;
 			Flags = EEnumFlags.None;
+			ExtendsEnum = String.Empty;
 			EnumEntries = new List< CEnumEntry >();
 			HeaderFileID = EHeaderFileID.Invalid;
+			ExtensionInitialized = false;
+			StartingValue = 0;
 		}
 
-		public CEnumRecord( string name, string file_name_with_path, EEnumFlags flags )
+		public CEnumRecord( string name, string file_name_with_path, string name_space, string extends_enum, EEnumFlags flags )
 		{
-			Name = name;
+			EnumName = name;
+			FullName = Build_Full_Enum_Name( name, name_space );
 			FileNameWithPath = file_name_with_path;
+			Namespace = name_space;
 			Flags = flags;
+			ExtendsEnum = extends_enum;
 			EnumEntries = new List< CEnumEntry >();
 			HeaderFileID = EHeaderFileID.Invalid;
+			ExtensionInitialized = false;
+			StartingValue = 0;
 		}
 
 		// Methods
 		// Public interface
 		public bool Value_Equals( CEnumRecord enum_definition )
 		{
-			if ( Name != enum_definition.Name )
+			if ( EnumName != enum_definition.EnumName )
 			{
 				return false;
 			}
@@ -141,6 +211,21 @@ namespace EnumReflector
 			}
 
 			if ( HeaderFileID != enum_definition.HeaderFileID )
+			{
+				return false;
+			}
+
+			if ( Namespace != enum_definition.Namespace )
+			{
+				return false;
+			}
+
+			if ( ExtendsEnum != enum_definition.ExtendsEnum )
+			{
+				return false;
+			}
+
+			if ( StartingValue != enum_definition.StartingValue )
 			{
 				return false;
 			}
@@ -161,16 +246,94 @@ namespace EnumReflector
 			return true;
 		}
 
-		public void Add_Entry( ulong enum_value, string value_name )
+		public CEnumRecord Clone()
+		{
+			CEnumRecord record = new CEnumRecord();
+			record.EnumName = EnumName;
+			record.FullName = FullName;
+			record.FileNameWithPath = FileNameWithPath;
+			record.Namespace = Namespace;
+			record.Flags = Flags;
+			record.ExtendsEnum = ExtendsEnum;
+			record.HeaderFileID = HeaderFileID;
+			record.EnumEntries = new List< CEnumEntry >();
+			record.StartingValue = StartingValue;
+			record.ExtensionInitialized = false;
+
+			foreach ( var entry in EnumEntries )
+			{
+				record.EnumEntries.Add( entry.Clone() );
+			}
+
+			return record;
+		}
+
+		public void Add_Bound_Entry( string cpp_name, string value_name, ulong enum_value )
+		{
+			string upper_value_name = value_name.ToUpper();
+			
+			if ( value_name.Length > 0 )
+			{
+				if ( EnumEntries.Find( e => upper_value_name == e.EntryName ) != null )
+				{
+					throw new Exception( "Duplicate enum value name ( " + upper_value_name + " ) in enum " + FullName );
+				} 
+			}
+
+			EnumEntries.Add( new CEnumEntry( cpp_name, upper_value_name, enum_value ) );
+		}
+
+		public void Add_Unbound_Entry( string cpp_name, string value_name, string bound_name )
 		{
 			string upper_value_name = value_name.ToUpper();
 
-			if ( EnumEntries.Find( e => upper_value_name == e.EntryName ) != null )
+			if ( value_name.Length > 0 )
 			{
-				throw new Exception( "Duplicate enum value name ( " + upper_value_name + " ) in enum " + Name );
-			} 
+				if ( EnumEntries.Find( e => upper_value_name == e.EntryName ) != null )
+				{
+					throw new Exception( "Duplicate enum value name ( " + upper_value_name + " ) in enum " + FullName );
+				}
+			}
 
-			EnumEntries.Add( new CEnumEntry( upper_value_name, enum_value ) );
+			EnumEntries.Add( new CEnumEntry( cpp_name, upper_value_name, bound_name ) );
+		}
+
+		public void Bind_Unbound_Values()
+		{
+			ulong current_value = StartingValue;
+
+			foreach( var entry in EnumEntries )
+			{
+				if ( !entry.HasValue )
+				{
+					entry.Bind_Value( current_value );
+
+					if ( Is_Bitfield() )
+					{
+						current_value <<= 1;
+					}
+					else
+					{
+						++current_value;
+					}
+				}
+				else
+				{
+					throw new Exception( "Extension enum " + FullName + " has an illegally bound entry " + entry.EntryName );
+				}
+			}
+
+			ExtensionInitialized = true;
+		}
+
+		public void Unbind_Values()
+		{
+			foreach( var entry in EnumEntries )
+			{
+				entry.Unbind_Value();
+			}
+
+			ExtensionInitialized = false;
 		}
 
 		public IEnumerable< CEnumEntry > Get_Entries()
@@ -178,9 +341,44 @@ namespace EnumReflector
 			return EnumEntries;
 		}
 
+		public CEnumEntry Get_Entry_By_CPP_Name( string cpp_name )
+		{
+			foreach ( var entry in EnumEntries )
+			{
+				if ( entry.CPPName == cpp_name )
+				{
+					return entry;
+				}
+			}
+
+			return null;
+		}
+
+		public bool Is_Bitfield()
+		{
+			return ( Flags & EEnumFlags.IsBitfield ) != 0;
+		}
+
+		// private interface
+		private string Build_Full_Enum_Name( string enum_name, string namespace_name )
+		{
+			if ( namespace_name.Length > 0 )
+			{
+				return namespace_name + "::" + enum_name;
+			}
+			
+			return enum_name;
+		}
+
+		[OnDeserialized]
+		private void OnDeserialized( StreamingContext context )
+		{
+			FullName = Build_Full_Enum_Name( EnumName, Namespace );
+		}
+
 		// Properties
-		[ DataMember( Name="Name", Order = 0, IsRequired=true ) ]
-		public string Name { get; private set; }
+		[ DataMember( Name="EnumName", Order = 0, IsRequired=true ) ]
+		public string EnumName { get; private set; }
 
 		[ DataMember( Name="FileNameWithPath", Order = 1, IsRequired=true ) ]
 		public string FileNameWithPath { get; private set; }
@@ -191,7 +389,17 @@ namespace EnumReflector
 		[ DataMember( Name="Entries", Order = 3, IsRequired=true ) ]
 		private List< CEnumEntry > EnumEntries { get; set; }
 
+		[ DataMember( Name="Namespace", Order = 4, IsRequired=true ) ]
+		public string Namespace { get; private set; }
+
+		[ DataMember( Name="ExtendsEnum", Order = 5, IsRequired=true ) ]
+		public string ExtendsEnum { get; private set; }
+
+		public string FullName { get; private set; }
 		public EHeaderFileID HeaderFileID { get; set; }
+		public CEnumRecord BaseEnum { get; set; }
+		public ulong StartingValue { get; set; }
+		public bool ExtensionInitialized { get; set; }
 	}
 
 	[ DataContract( Name="Project", Namespace="http://www.bretambrose.com" ) ]

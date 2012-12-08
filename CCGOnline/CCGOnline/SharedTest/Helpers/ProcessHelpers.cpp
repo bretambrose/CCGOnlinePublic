@@ -30,6 +30,7 @@
 #include "Concurrency/ProcessMailbox.h"
 #include "Concurrency/ProcessStatics.h"
 #include "Concurrency/TaskProcessBase.h"
+#include "Concurrency/ThreadProcessBase.h"
 
 bool CProcessBaseTester::HasProcessServiceExecuted = false;
 
@@ -125,5 +126,27 @@ double CTaskProcessBaseTester::Get_Reschedule_Interval( void ) const
 CProcessBase *CTaskProcessBaseTester::Get_Process( void ) const 
 { 
 	return TaskProcess.get(); 
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+CThreadProcessBaseTester::CThreadProcessBaseTester( CThreadProcessBase *process ) :
+	BASECLASS( process ),
+	ThreadProcess( process )
+{
+}
+
+CThreadProcessBaseTester::~CThreadProcessBaseTester()
+{
+}
+
+shared_ptr< CThreadProcessBase > CThreadProcessBaseTester::Get_Thread_Process( void ) const 
+{ 
+	return ThreadProcess; 
+}
+
+CProcessBase *CThreadProcessBaseTester::Get_Process( void ) const 
+{ 
+	return ThreadProcess.get(); 
 }
 

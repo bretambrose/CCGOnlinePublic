@@ -84,3 +84,63 @@ TEST( ReflectionTests, Bitfield )
 
 	ASSERT_FALSE( CEnumConverter::Convert( static_cast< EReflectionBitfieldTest >( 16 ), converted_entry ) );
 }
+
+TEST( ReflectionTests, Namespace )
+{
+	TestNameSpace::Test converted_value = TestNameSpace::NONE;
+	ASSERT_TRUE( CEnumConverter::Convert( "Test2", converted_value ) );
+	ASSERT_TRUE( converted_value == TestNameSpace::TEST2 );
+
+	ASSERT_TRUE( CEnumConverter::Convert( "TEST3", converted_value ) );
+	ASSERT_TRUE( converted_value == TestNameSpace::TEST3 );
+
+	ASSERT_FALSE( CEnumConverter::Convert( "Entryy1", converted_value ) );
+
+	std::string converted_entry;
+	ASSERT_TRUE( CEnumConverter::Convert( TestNameSpace::TEST2, converted_entry ) );
+	ASSERT_TRUE( converted_entry == "TEST2" );
+
+	ASSERT_FALSE( CEnumConverter::Convert( static_cast< TestNameSpace::Test >( 10 ), converted_entry ) );
+}
+
+TEST( ReflectionTests, Inheritance1 )
+{
+	BaseTest converted_value = BT_NONE;
+	ASSERT_TRUE( CEnumConverter::Convert( "Test2", converted_value ) );
+	ASSERT_TRUE( converted_value == BT_TEST2 );
+
+	ASSERT_TRUE( CEnumConverter::Convert( "TEST5", converted_value ) );
+	ASSERT_TRUE( converted_value == static_cast< BaseTest >( 5 ) );
+
+	ASSERT_FALSE( CEnumConverter::Convert( "Entryy1", converted_value ) );
+
+	std::string converted_entry;
+	ASSERT_TRUE( CEnumConverter::Convert( BT_TEST2, converted_entry ) );
+	ASSERT_TRUE( converted_entry == "TEST2" );
+
+	ASSERT_TRUE( CEnumConverter::Convert( static_cast< BaseTest >( DT_TEST6 ), converted_entry ) );
+	ASSERT_TRUE( converted_entry == "TEST6" );
+
+	ASSERT_FALSE( CEnumConverter::Convert( static_cast< BaseTest >( 10 ), converted_entry ) );
+}
+
+TEST( ReflectionTests, Inheritance2 )
+{
+	DerivedTest converted_value = static_cast< DerivedTest >( BT_NONE );
+	ASSERT_TRUE( CEnumConverter::Convert( "Test2", converted_value ) );
+	ASSERT_TRUE( converted_value == static_cast< DerivedTest >( BT_TEST2 ) );
+
+	ASSERT_TRUE( CEnumConverter::Convert( "TEST5", converted_value ) );
+	ASSERT_TRUE( converted_value == DT_TEST5 );
+
+	ASSERT_FALSE( CEnumConverter::Convert( "Entryy1", converted_value ) );
+
+	std::string converted_entry;
+	ASSERT_TRUE( CEnumConverter::Convert( static_cast< DerivedTest >( BT_TEST2 ), converted_entry ) );
+	ASSERT_TRUE( converted_entry == "TEST2" );
+
+	ASSERT_TRUE( CEnumConverter::Convert( DT_TEST6, converted_entry ) );
+	ASSERT_TRUE( converted_entry == "TEST6" );
+
+	ASSERT_FALSE( CEnumConverter::Convert( static_cast< DerivedTest >( 10 ), converted_entry ) );
+}

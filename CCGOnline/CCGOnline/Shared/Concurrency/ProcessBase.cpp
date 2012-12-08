@@ -303,10 +303,14 @@ void CProcessBase::Run( const CProcessExecutionContext & /*context*/ )
 		return;
 	}
 
+	Per_Frame_Logic_Start();
+
 	// message and scheduled task logic
 	Service_Message_Frames();
 
 	TaskScheduler->Service( Get_Current_Process_Time() );
+
+	Per_Frame_Logic_End();
 
 	FATAL_ASSERT( !( Should_Reschedule() && Is_Shutting_Down() ) );
 
@@ -508,6 +512,8 @@ void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process
 	{
 		State = EPS_SHUTTING_DOWN_SOFT;
 	}
+
+	On_Shutdown_Self_Request();
 
 	Send_Manager_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfResponse() ) );	
 }

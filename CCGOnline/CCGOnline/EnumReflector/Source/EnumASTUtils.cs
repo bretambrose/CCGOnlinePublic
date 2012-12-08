@@ -57,6 +57,9 @@ namespace EnumReflector
 		// Private interface
 		static private CEnumRecord Walk_Enum_AST( object root_node, ITreeAdaptor tree_adapter, string file_name_with_path )
 		{
+			string name_space = String.Empty;
+			string extension_enum_name = String.Empty;
+
 			if ( tree_adapter.GetChildCount( root_node ) != 3 )
 			{
 				throw new Exception( "Parse Error: Enum parse tree root does not have three children" );
@@ -68,13 +71,39 @@ namespace EnumReflector
 			for ( int i = 0; i < tree_adapter.GetChildCount( begin_settings_node ); i++ )
 			{
 				object setting_node = tree_adapter.GetChild( begin_settings_node, i );
-				if ( tree_adapter.GetToken( setting_node ).Type == EnumReflectorParser.BITFIELD )
-				{
-					flags |= EEnumFlags.IsBitfield;
+				switch ( tree_adapter.GetToken( setting_node ).Type )
+				{ 
+					case EnumReflectorParser.BITFIELD:
+						flags |= EEnumFlags.IsBitfield;
+						break;
+
+					case EnumReflectorParser.EXTENDS:
+					{
+						if ( tree_adapter.GetChildCount( setting_node ) != 1 )
+						{
+							throw new Exception( "Parse Error: extension clause does not have a single child identifier node" );
+						}
+
+						object extension_name_node = tree_adapter.GetChild( setting_node, 0 );
+						extension_enum_name = tree_adapter.GetText( extension_name_node );
+						break;
+					}
+
+					default:
+						break;
 				}
 			}
 
-			object enum_definition_node = tree_adapter.GetChild( root_node, 1 );
+			object enum_entry_point_node = tree_adapter.GetChild( root_node, 1 );
+			object enum_definition_node = enum_entry_point_node;
+			if ( tree_adapter.GetToken( enum_entry_point_node ).Type == EnumReflectorParser.NAMESPACE )
+			{
+				object namespace_name_node = tree_adapter.GetChild( enum_entry_point_node, 0 );
+				name_space = tree_adapter.GetText( namespace_name_node ); 
+
+				enum_definition_node = tree_adapter.GetChild( enum_entry_point_node, 1 );
+			}
+
 			if ( tree_adapter.GetChildCount( enum_definition_node ) != 2 )
 			{
 				throw new Exception( "Parse Error: Enum definition node does not have two children" );
@@ -87,9 +116,10 @@ namespace EnumReflector
 			}
 
 			string enum_name = tree_adapter.GetText( enum_name_node );
-			CLogInterface.Write_Line( "Processing Enum " + enum_name + ", Flags = " + flags.ToString() );
 
-			CEnumRecord enum_record = new CEnumRecord( enum_name, file_name_with_path, flags );
+			CLogInterface.Write_Line( "Processing Enum " + name_space + "::" + enum_name + ", Flags = " + flags.ToString() );
+
+			CEnumRecord enum_record = new CEnumRecord( enum_name, file_name_with_path, name_space, extension_enum_name, flags );
 			enum_record.HeaderFileID = CEnumReflector.HeaderFileTracker.Get_Header_ID_By_File_Path( file_name_with_path ).ID;
 
 			int current_value = 0;
@@ -99,7 +129,10 @@ namespace EnumReflector
 				object enum_entry_node = tree_adapter.GetChild( enum_entry_list_node, i );
 
 				string entry_name = tree_adapter.GetText( enum_entry_node );
-				string entry_conversion_name = null;
+				string entry_conversion_name = "";
+				bool can_bind_value = extension_enum_name.Length == 0;
+				bool bound_value = false;
+				string bound_name = "";
 
 				for ( int j = 0; j < tree_adapter.GetChildCount( enum_entry_node ); j++ )
 				{
@@ -119,10 +152,12 @@ namespace EnumReflector
 					else if ( sub_node_token_type == EnumReflectorParser.POSITIVE_INTEGER16 )
 					{
 						current_value = int.Parse( tree_adapter.GetText( enum_entry_sub_node ).Substring( 2 ), NumberStyles.AllowHexSpecifier );
+						bound_value = true;
 					}
 					else if ( sub_node_token_type == EnumReflectorParser.POSITIVE_INTEGER10 )
 					{
 						current_value = int.Parse( tree_adapter.GetText( enum_entry_sub_node ) );
+						bound_value = true;
 					}
 					else if ( sub_node_token_type == EnumReflectorParser.LEFT_SHIFT )
 					{
@@ -145,17 +180,32 @@ namespace EnumReflector
 						}
 
 						current_value = val1 << val2;
+						bound_value = true;
+					}
+					else if ( sub_node_token_type == EnumReflectorParser.ID )
+					{
+						bound_name = tree_adapter.GetText( enum_entry_sub_node );
 					}
 					else
 					{
 						throw new Exception( "Invalid node type embedded within an enum entry" );
 					}
+
+					if ( !can_bind_value && bound_value )
+					{
+						throw new Exception( "Extension enum " + enum_name + " has an illegally bound entry: " + entry_name );
+					}
 				}
 
-				if ( entry_conversion_name != null )
+				if ( can_bind_value )
 				{
-					CLogInterface.Write_Line( "Enum " + enum_name + ": Register entry " + entry_conversion_name + " with value " + current_value.ToString() );
-					enum_record.Add_Entry( (ulong)current_value, entry_conversion_name );
+					CLogInterface.Write_Line( "Enum " + enum_name + ": Register bound entry " + entry_conversion_name + " with value " + current_value.ToString() );
+					enum_record.Add_Bound_Entry( entry_name, entry_conversion_name, (ulong)current_value );
+				}
+				else
+				{
+					CLogInterface.Write_Line( "Enum " + enum_name + ": Register unbound entry " + entry_conversion_name );
+					enum_record.Add_Unbound_Entry( entry_name, entry_conversion_name, bound_name );						
 				}
 
 				current_value++;

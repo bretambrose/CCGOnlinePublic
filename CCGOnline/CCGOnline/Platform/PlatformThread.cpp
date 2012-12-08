@@ -60,6 +60,7 @@ class IPlatformThread
 		virtual void Launch_Thread( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context ) = 0;
 		virtual void Shutdown_Thread( void ) = 0;
 		virtual bool Is_Valid( void ) const = 0;
+		virtual bool Is_Running( void ) const = 0;
 		
 };
 
@@ -79,6 +80,7 @@ class CPlatformThreadImpl : public IPlatformThread
 		virtual void Launch_Thread( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
 		virtual void Shutdown_Thread( void );
 		virtual bool Is_Valid( void ) const { return ThreadHandle != NULL; }
+		virtual bool Is_Running( void ) const;
 
 	private:
 
@@ -143,6 +145,26 @@ void CPlatformThreadImpl::Shutdown_Thread( void )
 }
 
 /**********************************************************************************************************************
+	CPlatformThreadImpl::Is_Running -- checks if the thread is currently running; answer may be erroneous by the time it's
+		checked
+
+		Returns: if the thread is running or not
+
+**********************************************************************************************************************/
+bool CPlatformThreadImpl::Is_Running( void ) const
+{
+	if ( !Is_Valid() )
+	{
+		return false;
+	}
+
+	DWORD exit_code = 0;
+	::GetExitCodeThread( ThreadHandle, &exit_code );
+			
+	return ( exit_code == STILL_ACTIVE );
+}
+
+/**********************************************************************************************************************
 	CPlatformThreadImpl::Run_Thread -- Windows compatible wrapper function around the thread's actual execution invocation
 
 		thread_param -- execution context needed to reconstruct the actual function invocation
@@ -203,6 +225,18 @@ void CPlatformThread::Create_And_Run( uint64 stack_size, const ThreadExecutionFu
 void CPlatformThread::Shutdown( void )
 {
 	ThreadImpl->Shutdown_Thread();
+}
+
+/**********************************************************************************************************************
+	CPlatformThread::Is_Running -- checks if the thread is currently running; answer may be erroneous by the time it's
+		checked
+
+		Returns: if the thread is running or not
+
+**********************************************************************************************************************/
+bool CPlatformThread::Is_Running( void ) const
+{
+	return ThreadImpl->Is_Running();
 }
 
 

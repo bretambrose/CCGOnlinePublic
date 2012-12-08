@@ -289,15 +289,12 @@ std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process
 }
 
 /**********************************************************************************************************************
-	CLoggingProcess::Handle_Shutdown_Self_Request -- override of the shutdown request handler
-
-		key -- key of the virtual process that sent this shutdown request
-		message -- the shutdown request itself
+	CLoggingProcess::On_Shutdown_Self_Request -- overridable shutdown callback
 		
 **********************************************************************************************************************/
-void CLoggingProcess::Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message )
+void CLoggingProcess::On_Shutdown_Self_Request( void )
 {
-	BASECLASS::Handle_Shutdown_Self_Request( source_process_id, message );
+	BASECLASS::On_Shutdown_Self_Request();
 
 	IsShuttingDown = true;
 }

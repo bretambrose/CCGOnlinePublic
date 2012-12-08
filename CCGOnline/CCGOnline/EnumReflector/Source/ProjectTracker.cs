@@ -154,10 +154,26 @@ namespace EnumReflector
 
 			foreach ( var enum_record in project_enums )
 			{
+				if ( enum_record.Namespace.Length > 0 )
+				{
+					cpp_text.Append( "namespace " );
+					cpp_text.Append( enum_record.Namespace );
+					cpp_text.Append( END_OF_LINE );
+					cpp_text.Append( "{" );
+					cpp_text.Append( END_OF_LINE );
+					cpp_text.Append( "\t" );
+				}
+
 				cpp_text.Append( "enum " );
-				cpp_text.Append( enum_record.Name );
+				cpp_text.Append( enum_record.EnumName );
 				cpp_text.Append( ";" );
 				cpp_text.Append( END_OF_LINE );
+
+				if ( enum_record.Namespace.Length > 0 )
+				{
+					cpp_text.Append( "}" );
+					cpp_text.Append( END_OF_LINE );
+				}
 			}
 
 			cpp_text.Append( END_OF_LINE );
@@ -166,9 +182,20 @@ namespace EnumReflector
 			cpp_text.Append( "{" );
 			cpp_text.Append( END_OF_LINE );
 
+			List< CEnumRecord > base_enums = new List< CEnumRecord >();
+
 			foreach ( var enum_record in project_enums )
-			{
+			{				
 				Add_Enum_Conversions( cpp_text, enum_record );
+
+				CEnumRecord base_enum = enum_record.BaseEnum;
+				while ( base_enum != null )
+				{
+					Add_Secondary_Enum_Conversions( cpp_text, enum_record, base_enum );
+					Add_Secondary_Enum_Conversions( cpp_text, base_enum, enum_record );
+
+					base_enum = base_enum.BaseEnum;
+				}
 			}
 
 			cpp_text.Append( "}" );
@@ -180,9 +207,9 @@ namespace EnumReflector
 		private void Add_Enum_Conversions( StringBuilder cpp_text, CEnumRecord enum_record )
 		{
 			cpp_text.Append( "\tCEnumConverter::Register_Enum< " );
-			cpp_text.Append( enum_record.Name );
+			cpp_text.Append( enum_record.FullName );
 			cpp_text.Append( " >( \"" );
-			cpp_text.Append( enum_record.Name );
+			cpp_text.Append( enum_record.FullName );
 			cpp_text.Append( "\", " );
 			if ( ( enum_record.Flags & EEnumFlags.IsBitfield ) != 0 )
 			{
@@ -197,14 +224,37 @@ namespace EnumReflector
 
 			foreach ( var entry in enum_record.Get_Entries() )
 			{
-				cpp_text.Append( "\tCEnumConverter::Register_Enum_Entry( \"" );
-				cpp_text.Append( entry.EntryName );
-				cpp_text.Append( "\", static_cast< " );
-				cpp_text.Append( enum_record.Name );
-				cpp_text.Append( " >( " );
-				cpp_text.Append( entry.Value );
-				cpp_text.Append( " ) );" );
-				cpp_text.Append( END_OF_LINE );
+				if ( entry.EntryName.Length > 0 )
+				{
+					cpp_text.Append( "\tCEnumConverter::Register_Enum_Entry( \"" );
+					cpp_text.Append( entry.EntryName );
+					cpp_text.Append( "\", static_cast< " );
+					cpp_text.Append( enum_record.FullName );
+					cpp_text.Append( " >( " );
+					cpp_text.Append( entry.Value );
+					cpp_text.Append( " ) );" );
+					cpp_text.Append( END_OF_LINE );
+				}
+			}
+
+			cpp_text.Append( END_OF_LINE );
+		}
+
+		private void Add_Secondary_Enum_Conversions( StringBuilder cpp_text, CEnumRecord secondary_enum, CEnumRecord primary_enum )
+		{
+			foreach ( var entry in secondary_enum.Get_Entries() )
+			{
+				if ( entry.EntryName.Length > 0 )
+				{
+					cpp_text.Append( "\tCEnumConverter::Register_Enum_Entry( \"" );
+					cpp_text.Append( entry.EntryName );
+					cpp_text.Append( "\", static_cast< " );
+					cpp_text.Append( primary_enum.FullName );
+					cpp_text.Append( " >( " );
+					cpp_text.Append( entry.Value );
+					cpp_text.Append( " ) );" );
+					cpp_text.Append( END_OF_LINE );
+				}
 			}
 
 			cpp_text.Append( END_OF_LINE );
@@ -426,6 +476,6 @@ namespace EnumReflector
 		private Dictionary< string, EProjectID > m_ProjectIDMap = new Dictionary< string, EProjectID >();
 		private EProjectID m_NextAllocatedID = EProjectID.Invalid + 1;
 
-		private static string[] SKIPPED_PROJECTS = { "GTEST-MD", "PLATFORM", "PLATFORMTEST" };
+		private static string[] SKIPPED_PROJECTS = { "GTEST-MD", "PLATFORM", "PLATFORMTEST", "PUGIXML" };
 	}
 }

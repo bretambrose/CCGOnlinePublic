@@ -47,4 +47,40 @@ enum EReflectionBitfieldTest
 };
 //:EnumEnd
 
+//:EnumBegin()
+namespace TestNameSpace
+{
+	enum Test
+	{
+		NONE = 0,					//:EnumEntry( "None" )
+
+		TEST1,						//:EnumEntry( "Test1" )
+		TEST2,						//:EnumEntry( "Test2" )
+		TEST3							//:EnumEntry( "Test3" )
+	};
+}
+//:EnumEnd
+
+//:EnumBegin()
+enum BaseTest
+{
+	BT_NONE = 0,					//:EnumEntry( "None" )
+
+	BT_TEST1,						//:EnumEntry( "Test1" )
+	BT_TEST2,						//:EnumEntry( "Test2" )
+	BT_TEST3,						//:EnumEntry( "Test3" )
+
+	BT_END
+};
+//:EnumEnd
+
+//:EnumBegin( extends BaseTest )
+enum DerivedTest
+{
+	DT_TEST4 = BT_END,			//:EnumEntry( "Test4" )
+	DT_TEST5,						//:EnumEntry( "Test5" )
+	DT_TEST6							//:EnumEntry( "Test6" )
+};
+//:EnumEnd
+
 #endif // REFLECTION_TESTS_H

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g 2011-12-13 07:33:20
+// $ANTLR 3.4 C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g 2012-12-02 14:50:15
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -32,7 +32,7 @@ using RewriteRuleITokenStream = Antlr.Runtime.Tree.RewriteRuleTokenStream;
 public partial class EnumReflectorParser : Antlr.Runtime.Parser
 {
 	internal static readonly string[] tokenNames = new string[] {
-		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "BITFIELD", "COMMA", "DIGIT", "ENUM", "ENUM_BEGIN", "ENUM_END", "ENUM_ENTRY", "EQUALS", "HEX_DIGIT", "ID", "LBRACE", "LEFT_SHIFT", "LPAREN", "META", "POSITIVE_INTEGER10", "POSITIVE_INTEGER16", "POS_DIGIT", "RBRACE", "RPAREN", "SEMICOLON", "STRING", "WHITESPACE"
+		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "BITFIELD", "COMMA", "DIGIT", "ENUM", "ENUM_BEGIN", "ENUM_END", "ENUM_ENTRY", "EQUALS", "EXTENDS", "HEX_DIGIT", "ID", "LBRACE", "LEFT_SHIFT", "LPAREN", "META", "NAMESPACE", "POSITIVE_INTEGER10", "POSITIVE_INTEGER16", "POS_DIGIT", "RBRACE", "RPAREN", "SEMICOLON", "STRING", "WHITESPACE"
 	};
 	public const int EOF=-1;
 	public const int BITFIELD=4;
@@ -43,20 +43,22 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	public const int ENUM_END=9;
 	public const int ENUM_ENTRY=10;
 	public const int EQUALS=11;
-	public const int HEX_DIGIT=12;
-	public const int ID=13;
-	public const int LBRACE=14;
-	public const int LEFT_SHIFT=15;
-	public const int LPAREN=16;
-	public const int META=17;
-	public const int POSITIVE_INTEGER10=18;
-	public const int POSITIVE_INTEGER16=19;
-	public const int POS_DIGIT=20;
-	public const int RBRACE=21;
-	public const int RPAREN=22;
-	public const int SEMICOLON=23;
-	public const int STRING=24;
-	public const int WHITESPACE=25;
+	public const int EXTENDS=12;
+	public const int HEX_DIGIT=13;
+	public const int ID=14;
+	public const int LBRACE=15;
+	public const int LEFT_SHIFT=16;
+	public const int LPAREN=17;
+	public const int META=18;
+	public const int NAMESPACE=19;
+	public const int POSITIVE_INTEGER10=20;
+	public const int POSITIVE_INTEGER16=21;
+	public const int POS_DIGIT=22;
+	public const int RBRACE=23;
+	public const int RPAREN=24;
+	public const int SEMICOLON=25;
+	public const int STRING=26;
+	public const int WHITESPACE=27;
 
 	public EnumReflectorParser(ITokenStream input)
 		: this(input, new RecognizerSharedState())
@@ -101,7 +103,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_enum_conversion_tag();
 
 	// $ANTLR start "enum_conversion_tag"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:29:1: enum_conversion_tag : META ! ENUM_ENTRY ^ LPAREN ! STRING RPAREN !;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:31:1: enum_conversion_tag : META ! ENUM_ENTRY ^ LPAREN ! STRING RPAREN !;
 	[GrammarRule("enum_conversion_tag")]
 	private AstParserRuleReturnScope<object, IToken> enum_conversion_tag()
 	{
@@ -125,29 +127,29 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 		object STRING4_tree = default(object);
 		object RPAREN5_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "enum_conversion_tag");
-		DebugLocation(29, 44);
+		DebugLocation(31, 44);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:30:2: ( META ! ENUM_ENTRY ^ LPAREN ! STRING RPAREN !)
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:32:2: ( META ! ENUM_ENTRY ^ LPAREN ! STRING RPAREN !)
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:30:4: META ! ENUM_ENTRY ^ LPAREN ! STRING RPAREN !
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:32:4: META ! ENUM_ENTRY ^ LPAREN ! STRING RPAREN !
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(30, 8);
-			META1=(IToken)Match(input,META,Follow._META_in_enum_conversion_tag169); 
-			DebugLocation(30, 20);
-			ENUM_ENTRY2=(IToken)Match(input,ENUM_ENTRY,Follow._ENUM_ENTRY_in_enum_conversion_tag172); 
+			DebugLocation(32, 8);
+			META1=(IToken)Match(input,META,Follow._META_in_enum_conversion_tag187); 
+			DebugLocation(32, 20);
+			ENUM_ENTRY2=(IToken)Match(input,ENUM_ENTRY,Follow._ENUM_ENTRY_in_enum_conversion_tag190); 
 			ENUM_ENTRY2_tree = (object)adaptor.Create(ENUM_ENTRY2);
 			root_0 = (object)adaptor.BecomeRoot(ENUM_ENTRY2_tree, root_0);
-			DebugLocation(30, 28);
-			LPAREN3=(IToken)Match(input,LPAREN,Follow._LPAREN_in_enum_conversion_tag175); 
-			DebugLocation(30, 30);
-			STRING4=(IToken)Match(input,STRING,Follow._STRING_in_enum_conversion_tag178); 
+			DebugLocation(32, 28);
+			LPAREN3=(IToken)Match(input,LPAREN,Follow._LPAREN_in_enum_conversion_tag193); 
+			DebugLocation(32, 30);
+			STRING4=(IToken)Match(input,STRING,Follow._STRING_in_enum_conversion_tag196); 
 			STRING4_tree = (object)adaptor.Create(STRING4);
 			adaptor.AddChild(root_0, STRING4_tree);
-			DebugLocation(30, 43);
-			RPAREN5=(IToken)Match(input,RPAREN,Follow._RPAREN_in_enum_conversion_tag180); 
+			DebugLocation(32, 43);
+			RPAREN5=(IToken)Match(input,RPAREN,Follow._RPAREN_in_enum_conversion_tag198); 
 
 			}
 
@@ -170,7 +172,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("enum_conversion_tag", 1);
 			LeaveRule_enum_conversion_tag();
 		}
-		DebugLocation(30, 44);
+		DebugLocation(32, 44);
 		} finally { DebugExitRule(GrammarFileName, "enum_conversion_tag"); }
 		return retval;
 
@@ -181,7 +183,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_shift_expression();
 
 	// $ANTLR start "shift_expression"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:32:1: shift_expression : POSITIVE_INTEGER10 LEFT_SHIFT ^ POSITIVE_INTEGER10 ;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:34:1: shift_expression : POSITIVE_INTEGER10 LEFT_SHIFT ^ POSITIVE_INTEGER10 ;
 	[GrammarRule("shift_expression")]
 	private AstParserRuleReturnScope<object, IToken> shift_expression()
 	{
@@ -201,25 +203,25 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 		object LEFT_SHIFT7_tree = default(object);
 		object POSITIVE_INTEGER108_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "shift_expression");
-		DebugLocation(32, 53);
+		DebugLocation(34, 53);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:33:2: ( POSITIVE_INTEGER10 LEFT_SHIFT ^ POSITIVE_INTEGER10 )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:35:2: ( POSITIVE_INTEGER10 LEFT_SHIFT ^ POSITIVE_INTEGER10 )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:33:4: POSITIVE_INTEGER10 LEFT_SHIFT ^ POSITIVE_INTEGER10
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:35:4: POSITIVE_INTEGER10 LEFT_SHIFT ^ POSITIVE_INTEGER10
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(33, 4);
-			POSITIVE_INTEGER106=(IToken)Match(input,POSITIVE_INTEGER10,Follow._POSITIVE_INTEGER10_in_shift_expression191); 
+			DebugLocation(35, 4);
+			POSITIVE_INTEGER106=(IToken)Match(input,POSITIVE_INTEGER10,Follow._POSITIVE_INTEGER10_in_shift_expression209); 
 			POSITIVE_INTEGER106_tree = (object)adaptor.Create(POSITIVE_INTEGER106);
 			adaptor.AddChild(root_0, POSITIVE_INTEGER106_tree);
-			DebugLocation(33, 33);
-			LEFT_SHIFT7=(IToken)Match(input,LEFT_SHIFT,Follow._LEFT_SHIFT_in_shift_expression193); 
+			DebugLocation(35, 33);
+			LEFT_SHIFT7=(IToken)Match(input,LEFT_SHIFT,Follow._LEFT_SHIFT_in_shift_expression211); 
 			LEFT_SHIFT7_tree = (object)adaptor.Create(LEFT_SHIFT7);
 			root_0 = (object)adaptor.BecomeRoot(LEFT_SHIFT7_tree, root_0);
-			DebugLocation(33, 35);
-			POSITIVE_INTEGER108=(IToken)Match(input,POSITIVE_INTEGER10,Follow._POSITIVE_INTEGER10_in_shift_expression196); 
+			DebugLocation(35, 35);
+			POSITIVE_INTEGER108=(IToken)Match(input,POSITIVE_INTEGER10,Follow._POSITIVE_INTEGER10_in_shift_expression214); 
 			POSITIVE_INTEGER108_tree = (object)adaptor.Create(POSITIVE_INTEGER108);
 			adaptor.AddChild(root_0, POSITIVE_INTEGER108_tree);
 
@@ -244,7 +246,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("shift_expression", 2);
 			LeaveRule_shift_expression();
 		}
-		DebugLocation(33, 53);
+		DebugLocation(35, 53);
 		} finally { DebugExitRule(GrammarFileName, "shift_expression"); }
 		return retval;
 
@@ -255,7 +257,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_integer_constant();
 
 	// $ANTLR start "integer_constant"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:35:1: integer_constant : ( shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 );
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:37:1: integer_constant : ( shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 | ID );
 	[GrammarRule("integer_constant")]
 	private AstParserRuleReturnScope<object, IToken> integer_constant()
 	{
@@ -269,21 +271,23 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 		IToken POSITIVE_INTEGER1610 = default(IToken);
 		IToken POSITIVE_INTEGER1011 = default(IToken);
+		IToken ID12 = default(IToken);
 		AstParserRuleReturnScope<object, IToken> shift_expression9 = default(AstParserRuleReturnScope<object, IToken>);
 
 		object POSITIVE_INTEGER1610_tree = default(object);
 		object POSITIVE_INTEGER1011_tree = default(object);
+		object ID12_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "integer_constant");
-		DebugLocation(35, 62);
+		DebugLocation(37, 66);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:36:2: ( shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 )
-			int alt1=3;
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:38:2: ( shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 | ID )
+			int alt1=4;
 			try { DebugEnterDecision(1, false);
-			int LA1_0 = input.LA(1);
-
-			if ((LA1_0==POSITIVE_INTEGER10))
+			switch (input.LA(1))
 			{
+			case POSITIVE_INTEGER10:
+				{
 				int LA1_1 = input.LA(2);
 
 				if ((LA1_1==LEFT_SHIFT))
@@ -300,28 +304,37 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 					DebugRecognitionException(nvae);
 					throw nvae;
 				}
-			}
-			else if ((LA1_0==POSITIVE_INTEGER16))
-			{
+				}
+				break;
+			case POSITIVE_INTEGER16:
+				{
 				alt1 = 2;
+				}
+				break;
+			case ID:
+				{
+				alt1 = 4;
+				}
+				break;
+			default:
+				{
+					NoViableAltException nvae = new NoViableAltException("", 1, 0, input);
+					DebugRecognitionException(nvae);
+					throw nvae;
+				}
 			}
-			else
-			{
-				NoViableAltException nvae = new NoViableAltException("", 1, 0, input);
-				DebugRecognitionException(nvae);
-				throw nvae;
-			}
+
 			} finally { DebugExitDecision(1); }
 			switch (alt1)
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:36:4: shift_expression
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:38:4: shift_expression
 				{
 				root_0 = (object)adaptor.Nil();
 
-				DebugLocation(36, 4);
-				PushFollow(Follow._shift_expression_in_integer_constant209);
+				DebugLocation(38, 4);
+				PushFollow(Follow._shift_expression_in_integer_constant227);
 				shift_expression9=shift_expression();
 				PopFollow();
 
@@ -331,12 +344,12 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:36:23: POSITIVE_INTEGER16
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:38:23: POSITIVE_INTEGER16
 				{
 				root_0 = (object)adaptor.Nil();
 
-				DebugLocation(36, 23);
-				POSITIVE_INTEGER1610=(IToken)Match(input,POSITIVE_INTEGER16,Follow._POSITIVE_INTEGER16_in_integer_constant213); 
+				DebugLocation(38, 23);
+				POSITIVE_INTEGER1610=(IToken)Match(input,POSITIVE_INTEGER16,Follow._POSITIVE_INTEGER16_in_integer_constant231); 
 				POSITIVE_INTEGER1610_tree = (object)adaptor.Create(POSITIVE_INTEGER1610);
 				adaptor.AddChild(root_0, POSITIVE_INTEGER1610_tree);
 
@@ -344,14 +357,27 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 				break;
 			case 3:
 				DebugEnterAlt(3);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:36:44: POSITIVE_INTEGER10
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:38:44: POSITIVE_INTEGER10
 				{
 				root_0 = (object)adaptor.Nil();
 
-				DebugLocation(36, 44);
-				POSITIVE_INTEGER1011=(IToken)Match(input,POSITIVE_INTEGER10,Follow._POSITIVE_INTEGER10_in_integer_constant217); 
+				DebugLocation(38, 44);
+				POSITIVE_INTEGER1011=(IToken)Match(input,POSITIVE_INTEGER10,Follow._POSITIVE_INTEGER10_in_integer_constant235); 
 				POSITIVE_INTEGER1011_tree = (object)adaptor.Create(POSITIVE_INTEGER1011);
 				adaptor.AddChild(root_0, POSITIVE_INTEGER1011_tree);
+
+				}
+				break;
+			case 4:
+				DebugEnterAlt(4);
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:38:65: ID
+				{
+				root_0 = (object)adaptor.Nil();
+
+				DebugLocation(38, 65);
+				ID12=(IToken)Match(input,ID,Follow._ID_in_integer_constant239); 
+				ID12_tree = (object)adaptor.Create(ID12);
+				adaptor.AddChild(root_0, ID12_tree);
 
 				}
 				break;
@@ -376,7 +402,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("integer_constant", 3);
 			LeaveRule_integer_constant();
 		}
-		DebugLocation(36, 62);
+		DebugLocation(38, 66);
 		} finally { DebugExitRule(GrammarFileName, "integer_constant"); }
 		return retval;
 
@@ -387,7 +413,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_value_assignment();
 
 	// $ANTLR start "value_assignment"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:38:1: value_assignment : EQUALS ! integer_constant ;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:40:1: value_assignment : EQUALS ! integer_constant ;
 	[GrammarRule("value_assignment")]
 	private AstParserRuleReturnScope<object, IToken> value_assignment()
 	{
@@ -399,28 +425,28 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 		object root_0 = default(object);
 
-		IToken EQUALS12 = default(IToken);
-		AstParserRuleReturnScope<object, IToken> integer_constant13 = default(AstParserRuleReturnScope<object, IToken>);
+		IToken EQUALS13 = default(IToken);
+		AstParserRuleReturnScope<object, IToken> integer_constant14 = default(AstParserRuleReturnScope<object, IToken>);
 
-		object EQUALS12_tree = default(object);
+		object EQUALS13_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "value_assignment");
-		DebugLocation(38, 28);
+		DebugLocation(40, 28);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:39:2: ( EQUALS ! integer_constant )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:41:2: ( EQUALS ! integer_constant )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:39:4: EQUALS ! integer_constant
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:41:4: EQUALS ! integer_constant
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(39, 10);
-			EQUALS12=(IToken)Match(input,EQUALS,Follow._EQUALS_in_value_assignment227); 
-			DebugLocation(39, 12);
-			PushFollow(Follow._integer_constant_in_value_assignment230);
-			integer_constant13=integer_constant();
+			DebugLocation(41, 10);
+			EQUALS13=(IToken)Match(input,EQUALS,Follow._EQUALS_in_value_assignment248); 
+			DebugLocation(41, 12);
+			PushFollow(Follow._integer_constant_in_value_assignment251);
+			integer_constant14=integer_constant();
 			PopFollow();
 
-			adaptor.AddChild(root_0, integer_constant13.Tree);
+			adaptor.AddChild(root_0, integer_constant14.Tree);
 
 			}
 
@@ -443,7 +469,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("value_assignment", 4);
 			LeaveRule_value_assignment();
 		}
-		DebugLocation(39, 28);
+		DebugLocation(41, 28);
 		} finally { DebugExitRule(GrammarFileName, "value_assignment"); }
 		return retval;
 
@@ -454,7 +480,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_last_enum_entry();
 
 	// $ANTLR start "last_enum_entry"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:41:1: last_enum_entry : ID ^ ( value_assignment )? ( enum_conversion_tag )? ;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:43:1: last_enum_entry : ID ^ ( value_assignment )? ( enum_conversion_tag )? ;
 	[GrammarRule("last_enum_entry")]
 	private AstParserRuleReturnScope<object, IToken> last_enum_entry()
 	{
@@ -466,27 +492,27 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 		object root_0 = default(object);
 
-		IToken ID14 = default(IToken);
-		AstParserRuleReturnScope<object, IToken> value_assignment15 = default(AstParserRuleReturnScope<object, IToken>);
-		AstParserRuleReturnScope<object, IToken> enum_conversion_tag16 = default(AstParserRuleReturnScope<object, IToken>);
+		IToken ID15 = default(IToken);
+		AstParserRuleReturnScope<object, IToken> value_assignment16 = default(AstParserRuleReturnScope<object, IToken>);
+		AstParserRuleReturnScope<object, IToken> enum_conversion_tag17 = default(AstParserRuleReturnScope<object, IToken>);
 
-		object ID14_tree = default(object);
+		object ID15_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "last_enum_entry");
-		DebugLocation(41, 46);
+		DebugLocation(43, 46);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:42:2: ( ID ^ ( value_assignment )? ( enum_conversion_tag )? )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:44:2: ( ID ^ ( value_assignment )? ( enum_conversion_tag )? )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:42:4: ID ^ ( value_assignment )? ( enum_conversion_tag )?
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:44:4: ID ^ ( value_assignment )? ( enum_conversion_tag )?
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(42, 6);
-			ID14=(IToken)Match(input,ID,Follow._ID_in_last_enum_entry240); 
-			ID14_tree = (object)adaptor.Create(ID14);
-			root_0 = (object)adaptor.BecomeRoot(ID14_tree, root_0);
-			DebugLocation(42, 8);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:42:8: ( value_assignment )?
+			DebugLocation(44, 6);
+			ID15=(IToken)Match(input,ID,Follow._ID_in_last_enum_entry261); 
+			ID15_tree = (object)adaptor.Create(ID15);
+			root_0 = (object)adaptor.BecomeRoot(ID15_tree, root_0);
+			DebugLocation(44, 8);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:44:8: ( value_assignment )?
 			int alt2=2;
 			try { DebugEnterSubRule(2);
 			try { DebugEnterDecision(2, false);
@@ -501,14 +527,14 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:42:8: value_assignment
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:44:8: value_assignment
 				{
-				DebugLocation(42, 8);
-				PushFollow(Follow._value_assignment_in_last_enum_entry243);
-				value_assignment15=value_assignment();
+				DebugLocation(44, 8);
+				PushFollow(Follow._value_assignment_in_last_enum_entry264);
+				value_assignment16=value_assignment();
 				PopFollow();
 
-				adaptor.AddChild(root_0, value_assignment15.Tree);
+				adaptor.AddChild(root_0, value_assignment16.Tree);
 
 				}
 				break;
@@ -516,8 +542,8 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			}
 			} finally { DebugExitSubRule(2); }
 
-			DebugLocation(42, 26);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:42:26: ( enum_conversion_tag )?
+			DebugLocation(44, 26);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:44:26: ( enum_conversion_tag )?
 			int alt3=2;
 			try { DebugEnterSubRule(3);
 			try { DebugEnterDecision(3, false);
@@ -532,14 +558,14 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:42:26: enum_conversion_tag
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:44:26: enum_conversion_tag
 				{
-				DebugLocation(42, 26);
-				PushFollow(Follow._enum_conversion_tag_in_last_enum_entry246);
-				enum_conversion_tag16=enum_conversion_tag();
+				DebugLocation(44, 26);
+				PushFollow(Follow._enum_conversion_tag_in_last_enum_entry267);
+				enum_conversion_tag17=enum_conversion_tag();
 				PopFollow();
 
-				adaptor.AddChild(root_0, enum_conversion_tag16.Tree);
+				adaptor.AddChild(root_0, enum_conversion_tag17.Tree);
 
 				}
 				break;
@@ -569,7 +595,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("last_enum_entry", 5);
 			LeaveRule_last_enum_entry();
 		}
-		DebugLocation(42, 46);
+		DebugLocation(44, 46);
 		} finally { DebugExitRule(GrammarFileName, "last_enum_entry"); }
 		return retval;
 
@@ -580,7 +606,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_non_last_enum_entry();
 
 	// $ANTLR start "non_last_enum_entry"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:44:1: non_last_enum_entry : ID ^ ( value_assignment )? COMMA ! ( enum_conversion_tag )? ;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:46:1: non_last_enum_entry : ID ^ ( value_assignment )? COMMA ! ( enum_conversion_tag )? ;
 	[GrammarRule("non_last_enum_entry")]
 	private AstParserRuleReturnScope<object, IToken> non_last_enum_entry()
 	{
@@ -592,29 +618,29 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 		object root_0 = default(object);
 
-		IToken ID17 = default(IToken);
-		IToken COMMA19 = default(IToken);
-		AstParserRuleReturnScope<object, IToken> value_assignment18 = default(AstParserRuleReturnScope<object, IToken>);
-		AstParserRuleReturnScope<object, IToken> enum_conversion_tag20 = default(AstParserRuleReturnScope<object, IToken>);
+		IToken ID18 = default(IToken);
+		IToken COMMA20 = default(IToken);
+		AstParserRuleReturnScope<object, IToken> value_assignment19 = default(AstParserRuleReturnScope<object, IToken>);
+		AstParserRuleReturnScope<object, IToken> enum_conversion_tag21 = default(AstParserRuleReturnScope<object, IToken>);
 
-		object ID17_tree = default(object);
-		object COMMA19_tree = default(object);
+		object ID18_tree = default(object);
+		object COMMA20_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "non_last_enum_entry");
-		DebugLocation(44, 53);
+		DebugLocation(46, 53);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:45:2: ( ID ^ ( value_assignment )? COMMA ! ( enum_conversion_tag )? )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:47:2: ( ID ^ ( value_assignment )? COMMA ! ( enum_conversion_tag )? )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:45:4: ID ^ ( value_assignment )? COMMA ! ( enum_conversion_tag )?
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:47:4: ID ^ ( value_assignment )? COMMA ! ( enum_conversion_tag )?
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(45, 6);
-			ID17=(IToken)Match(input,ID,Follow._ID_in_non_last_enum_entry257); 
-			ID17_tree = (object)adaptor.Create(ID17);
-			root_0 = (object)adaptor.BecomeRoot(ID17_tree, root_0);
-			DebugLocation(45, 8);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:45:8: ( value_assignment )?
+			DebugLocation(47, 6);
+			ID18=(IToken)Match(input,ID,Follow._ID_in_non_last_enum_entry278); 
+			ID18_tree = (object)adaptor.Create(ID18);
+			root_0 = (object)adaptor.BecomeRoot(ID18_tree, root_0);
+			DebugLocation(47, 8);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:47:8: ( value_assignment )?
 			int alt4=2;
 			try { DebugEnterSubRule(4);
 			try { DebugEnterDecision(4, false);
@@ -629,14 +655,14 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:45:8: value_assignment
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:47:8: value_assignment
 				{
-				DebugLocation(45, 8);
-				PushFollow(Follow._value_assignment_in_non_last_enum_entry260);
-				value_assignment18=value_assignment();
+				DebugLocation(47, 8);
+				PushFollow(Follow._value_assignment_in_non_last_enum_entry281);
+				value_assignment19=value_assignment();
 				PopFollow();
 
-				adaptor.AddChild(root_0, value_assignment18.Tree);
+				adaptor.AddChild(root_0, value_assignment19.Tree);
 
 				}
 				break;
@@ -644,10 +670,10 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			}
 			} finally { DebugExitSubRule(4); }
 
-			DebugLocation(45, 31);
-			COMMA19=(IToken)Match(input,COMMA,Follow._COMMA_in_non_last_enum_entry263); 
-			DebugLocation(45, 33);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:45:33: ( enum_conversion_tag )?
+			DebugLocation(47, 31);
+			COMMA20=(IToken)Match(input,COMMA,Follow._COMMA_in_non_last_enum_entry284); 
+			DebugLocation(47, 33);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:47:33: ( enum_conversion_tag )?
 			int alt5=2;
 			try { DebugEnterSubRule(5);
 			try { DebugEnterDecision(5, false);
@@ -662,14 +688,14 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:45:33: enum_conversion_tag
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:47:33: enum_conversion_tag
 				{
-				DebugLocation(45, 33);
-				PushFollow(Follow._enum_conversion_tag_in_non_last_enum_entry266);
-				enum_conversion_tag20=enum_conversion_tag();
+				DebugLocation(47, 33);
+				PushFollow(Follow._enum_conversion_tag_in_non_last_enum_entry287);
+				enum_conversion_tag21=enum_conversion_tag();
 				PopFollow();
 
-				adaptor.AddChild(root_0, enum_conversion_tag20.Tree);
+				adaptor.AddChild(root_0, enum_conversion_tag21.Tree);
 
 				}
 				break;
@@ -699,7 +725,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("non_last_enum_entry", 6);
 			LeaveRule_non_last_enum_entry();
 		}
-		DebugLocation(45, 53);
+		DebugLocation(47, 53);
 		} finally { DebugExitRule(GrammarFileName, "non_last_enum_entry"); }
 		return retval;
 
@@ -710,7 +736,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_enum_entry_list();
 
 	// $ANTLR start "enum_entry_list"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:47:1: enum_entry_list : LBRACE ^ ( non_last_enum_entry )* last_enum_entry RBRACE !;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:49:1: enum_entry_list : LBRACE ^ ( non_last_enum_entry )* last_enum_entry RBRACE !;
 	[GrammarRule("enum_entry_list")]
 	private AstParserRuleReturnScope<object, IToken> enum_entry_list()
 	{
@@ -722,29 +748,29 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 		object root_0 = default(object);
 
-		IToken LBRACE21 = default(IToken);
-		IToken RBRACE24 = default(IToken);
-		AstParserRuleReturnScope<object, IToken> non_last_enum_entry22 = default(AstParserRuleReturnScope<object, IToken>);
-		AstParserRuleReturnScope<object, IToken> last_enum_entry23 = default(AstParserRuleReturnScope<object, IToken>);
+		IToken LBRACE22 = default(IToken);
+		IToken RBRACE25 = default(IToken);
+		AstParserRuleReturnScope<object, IToken> non_last_enum_entry23 = default(AstParserRuleReturnScope<object, IToken>);
+		AstParserRuleReturnScope<object, IToken> last_enum_entry24 = default(AstParserRuleReturnScope<object, IToken>);
 
-		object LBRACE21_tree = default(object);
-		object RBRACE24_tree = default(object);
+		object LBRACE22_tree = default(object);
+		object RBRACE25_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "enum_entry_list");
-		DebugLocation(47, 57);
+		DebugLocation(49, 57);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:48:2: ( LBRACE ^ ( non_last_enum_entry )* last_enum_entry RBRACE !)
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:50:2: ( LBRACE ^ ( non_last_enum_entry )* last_enum_entry RBRACE !)
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:48:4: LBRACE ^ ( non_last_enum_entry )* last_enum_entry RBRACE !
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:50:4: LBRACE ^ ( non_last_enum_entry )* last_enum_entry RBRACE !
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(48, 10);
-			LBRACE21=(IToken)Match(input,LBRACE,Follow._LBRACE_in_enum_entry_list278); 
-			LBRACE21_tree = (object)adaptor.Create(LBRACE21);
-			root_0 = (object)adaptor.BecomeRoot(LBRACE21_tree, root_0);
-			DebugLocation(48, 12);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:48:12: ( non_last_enum_entry )*
+			DebugLocation(50, 10);
+			LBRACE22=(IToken)Match(input,LBRACE,Follow._LBRACE_in_enum_entry_list299); 
+			LBRACE22_tree = (object)adaptor.Create(LBRACE22);
+			root_0 = (object)adaptor.BecomeRoot(LBRACE22_tree, root_0);
+			DebugLocation(50, 12);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:50:12: ( non_last_enum_entry )*
 			try { DebugEnterSubRule(6);
 			while (true)
 			{
@@ -758,21 +784,21 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 					if ((LA6_1==EQUALS))
 					{
-						int LA6_2 = input.LA(3);
-
-						if ((LA6_2==POSITIVE_INTEGER10))
+						switch (input.LA(3))
 						{
+						case POSITIVE_INTEGER10:
+							{
 							int LA6_5 = input.LA(4);
 
 							if ((LA6_5==LEFT_SHIFT))
 							{
-								int LA6_7 = input.LA(5);
+								int LA6_8 = input.LA(5);
 
-								if ((LA6_7==POSITIVE_INTEGER10))
+								if ((LA6_8==POSITIVE_INTEGER10))
 								{
-									int LA6_8 = input.LA(6);
+									int LA6_9 = input.LA(6);
 
-									if ((LA6_8==COMMA))
+									if ((LA6_9==COMMA))
 									{
 										alt6 = 1;
 									}
@@ -788,9 +814,10 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 							}
 
 
-						}
-						else if ((LA6_2==POSITIVE_INTEGER16))
-						{
+							}
+							break;
+						case POSITIVE_INTEGER16:
+							{
 							int LA6_6 = input.LA(4);
 
 							if ((LA6_6==COMMA))
@@ -799,8 +826,21 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 							}
 
 
-						}
+							}
+							break;
+						case ID:
+							{
+							int LA6_7 = input.LA(4);
 
+							if ((LA6_7==COMMA))
+							{
+								alt6 = 1;
+							}
+
+
+							}
+							break;
+						}
 
 					}
 					else if ((LA6_1==COMMA))
@@ -817,14 +857,14 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:48:12: non_last_enum_entry
+					// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:50:12: non_last_enum_entry
 					{
-					DebugLocation(48, 12);
-					PushFollow(Follow._non_last_enum_entry_in_enum_entry_list281);
-					non_last_enum_entry22=non_last_enum_entry();
+					DebugLocation(50, 12);
+					PushFollow(Follow._non_last_enum_entry_in_enum_entry_list302);
+					non_last_enum_entry23=non_last_enum_entry();
 					PopFollow();
 
-					adaptor.AddChild(root_0, non_last_enum_entry22.Tree);
+					adaptor.AddChild(root_0, non_last_enum_entry23.Tree);
 
 					}
 					break;
@@ -839,14 +879,14 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 			} finally { DebugExitSubRule(6); }
 
-			DebugLocation(48, 33);
-			PushFollow(Follow._last_enum_entry_in_enum_entry_list284);
-			last_enum_entry23=last_enum_entry();
+			DebugLocation(50, 33);
+			PushFollow(Follow._last_enum_entry_in_enum_entry_list305);
+			last_enum_entry24=last_enum_entry();
 			PopFollow();
 
-			adaptor.AddChild(root_0, last_enum_entry23.Tree);
-			DebugLocation(48, 56);
-			RBRACE24=(IToken)Match(input,RBRACE,Follow._RBRACE_in_enum_entry_list287); 
+			adaptor.AddChild(root_0, last_enum_entry24.Tree);
+			DebugLocation(50, 56);
+			RBRACE25=(IToken)Match(input,RBRACE,Follow._RBRACE_in_enum_entry_list308); 
 
 			}
 
@@ -869,63 +909,52 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("enum_entry_list", 7);
 			LeaveRule_enum_entry_list();
 		}
-		DebugLocation(48, 57);
+		DebugLocation(50, 57);
 		} finally { DebugExitRule(GrammarFileName, "enum_entry_list"); }
 		return retval;
 
 	}
 	// $ANTLR end "enum_entry_list"
 
-	partial void EnterRule_enum_definition();
-	partial void LeaveRule_enum_definition();
+	partial void EnterRule_extends_clause();
+	partial void LeaveRule_extends_clause();
 
-	// $ANTLR start "enum_definition"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:50:1: enum_definition : ENUM ^ ID enum_entry_list SEMICOLON !;
-	[GrammarRule("enum_definition")]
-	private AstParserRuleReturnScope<object, IToken> enum_definition()
+	// $ANTLR start "extends_clause"
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:52:1: extends_clause : EXTENDS ^ ID ;
+	[GrammarRule("extends_clause")]
+	private AstParserRuleReturnScope<object, IToken> extends_clause()
 	{
-		EnterRule_enum_definition();
-		EnterRule("enum_definition", 8);
-		TraceIn("enum_definition", 8);
+		EnterRule_extends_clause();
+		EnterRule("extends_clause", 8);
+		TraceIn("extends_clause", 8);
 		AstParserRuleReturnScope<object, IToken> retval = new AstParserRuleReturnScope<object, IToken>();
 		retval.Start = (IToken)input.LT(1);
 
 		object root_0 = default(object);
 
-		IToken ENUM25 = default(IToken);
-		IToken ID26 = default(IToken);
-		IToken SEMICOLON28 = default(IToken);
-		AstParserRuleReturnScope<object, IToken> enum_entry_list27 = default(AstParserRuleReturnScope<object, IToken>);
+		IToken EXTENDS26 = default(IToken);
+		IToken ID27 = default(IToken);
 
-		object ENUM25_tree = default(object);
-		object ID26_tree = default(object);
-		object SEMICOLON28_tree = default(object);
-		try { DebugEnterRule(GrammarFileName, "enum_definition");
-		DebugLocation(50, 39);
+		object EXTENDS26_tree = default(object);
+		object ID27_tree = default(object);
+		try { DebugEnterRule(GrammarFileName, "extends_clause");
+		DebugLocation(52, 15);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:51:2: ( ENUM ^ ID enum_entry_list SEMICOLON !)
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:53:2: ( EXTENDS ^ ID )
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:51:4: ENUM ^ ID enum_entry_list SEMICOLON !
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:53:4: EXTENDS ^ ID
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(51, 8);
-			ENUM25=(IToken)Match(input,ENUM,Follow._ENUM_in_enum_definition298); 
-			ENUM25_tree = (object)adaptor.Create(ENUM25);
-			root_0 = (object)adaptor.BecomeRoot(ENUM25_tree, root_0);
-			DebugLocation(51, 10);
-			ID26=(IToken)Match(input,ID,Follow._ID_in_enum_definition301); 
-			ID26_tree = (object)adaptor.Create(ID26);
-			adaptor.AddChild(root_0, ID26_tree);
-			DebugLocation(51, 13);
-			PushFollow(Follow._enum_entry_list_in_enum_definition303);
-			enum_entry_list27=enum_entry_list();
-			PopFollow();
-
-			adaptor.AddChild(root_0, enum_entry_list27.Tree);
-			DebugLocation(51, 38);
-			SEMICOLON28=(IToken)Match(input,SEMICOLON,Follow._SEMICOLON_in_enum_definition305); 
+			DebugLocation(53, 11);
+			EXTENDS26=(IToken)Match(input,EXTENDS,Follow._EXTENDS_in_extends_clause319); 
+			EXTENDS26_tree = (object)adaptor.Create(EXTENDS26);
+			root_0 = (object)adaptor.BecomeRoot(EXTENDS26_tree, root_0);
+			DebugLocation(53, 13);
+			ID27=(IToken)Match(input,ID,Follow._ID_in_extends_clause322); 
+			ID27_tree = (object)adaptor.Create(ID27);
+			adaptor.AddChild(root_0, ID27_tree);
 
 			}
 
@@ -944,22 +973,22 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 		}
 		finally
 		{
-			TraceOut("enum_definition", 8);
-			LeaveRule("enum_definition", 8);
-			LeaveRule_enum_definition();
+			TraceOut("extends_clause", 8);
+			LeaveRule("extends_clause", 8);
+			LeaveRule_extends_clause();
 		}
-		DebugLocation(51, 39);
-		} finally { DebugExitRule(GrammarFileName, "enum_definition"); }
+		DebugLocation(53, 15);
+		} finally { DebugExitRule(GrammarFileName, "extends_clause"); }
 		return retval;
 
 	}
-	// $ANTLR end "enum_definition"
+	// $ANTLR end "extends_clause"
 
 	partial void EnterRule_enum_properties();
 	partial void LeaveRule_enum_properties();
 
 	// $ANTLR start "enum_properties"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:53:1: enum_properties : BITFIELD ;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:55:1: enum_properties : ( BITFIELD | extends_clause );
 	[GrammarRule("enum_properties")]
 	private AstParserRuleReturnScope<object, IToken> enum_properties()
 	{
@@ -971,26 +1000,66 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 
 		object root_0 = default(object);
 
-		IToken BITFIELD29 = default(IToken);
+		IToken BITFIELD28 = default(IToken);
+		AstParserRuleReturnScope<object, IToken> extends_clause29 = default(AstParserRuleReturnScope<object, IToken>);
 
-		object BITFIELD29_tree = default(object);
+		object BITFIELD28_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "enum_properties");
-		DebugLocation(53, 12);
+		DebugLocation(55, 29);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:54:2: ( BITFIELD )
-			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:54:4: BITFIELD
-			{
-			root_0 = (object)adaptor.Nil();
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:56:2: ( BITFIELD | extends_clause )
+			int alt7=2;
+			try { DebugEnterDecision(7, false);
+			int LA7_0 = input.LA(1);
 
-			DebugLocation(54, 4);
-			BITFIELD29=(IToken)Match(input,BITFIELD,Follow._BITFIELD_in_enum_properties316); 
-			BITFIELD29_tree = (object)adaptor.Create(BITFIELD29);
-			adaptor.AddChild(root_0, BITFIELD29_tree);
+			if ((LA7_0==BITFIELD))
+			{
+				alt7 = 1;
+			}
+			else if ((LA7_0==EXTENDS))
+			{
+				alt7 = 2;
+			}
+			else
+			{
+				NoViableAltException nvae = new NoViableAltException("", 7, 0, input);
+				DebugRecognitionException(nvae);
+				throw nvae;
+			}
+			} finally { DebugExitDecision(7); }
+			switch (alt7)
+			{
+			case 1:
+				DebugEnterAlt(1);
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:56:4: BITFIELD
+				{
+				root_0 = (object)adaptor.Nil();
+
+				DebugLocation(56, 4);
+				BITFIELD28=(IToken)Match(input,BITFIELD,Follow._BITFIELD_in_enum_properties333); 
+				BITFIELD28_tree = (object)adaptor.Create(BITFIELD28);
+				adaptor.AddChild(root_0, BITFIELD28_tree);
+
+				}
+				break;
+			case 2:
+				DebugEnterAlt(2);
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:56:15: extends_clause
+				{
+				root_0 = (object)adaptor.Nil();
+
+				DebugLocation(56, 15);
+				PushFollow(Follow._extends_clause_in_enum_properties337);
+				extends_clause29=extends_clause();
+				PopFollow();
+
+				adaptor.AddChild(root_0, extends_clause29.Tree);
+
+				}
+				break;
 
 			}
-
 			retval.Stop = (IToken)input.LT(-1);
 
 			retval.Tree = (object)adaptor.RulePostProcessing(root_0);
@@ -1010,7 +1079,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("enum_properties", 9);
 			LeaveRule_enum_properties();
 		}
-		DebugLocation(54, 12);
+		DebugLocation(56, 29);
 		} finally { DebugExitRule(GrammarFileName, "enum_properties"); }
 		return retval;
 
@@ -1021,7 +1090,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_enum_begin_meta();
 
 	// $ANTLR start "enum_begin_meta"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:56:1: enum_begin_meta : META ! ENUM_BEGIN ^ LPAREN ! ( enum_properties )? RPAREN !;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:58:1: enum_begin_meta : META ! ENUM_BEGIN ^ LPAREN ! ( enum_properties )? RPAREN !;
 	[GrammarRule("enum_begin_meta")]
 	private AstParserRuleReturnScope<object, IToken> enum_begin_meta()
 	{
@@ -1044,43 +1113,43 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 		object LPAREN32_tree = default(object);
 		object RPAREN34_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "enum_begin_meta");
-		DebugLocation(56, 54);
+		DebugLocation(58, 54);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:57:2: ( META ! ENUM_BEGIN ^ LPAREN ! ( enum_properties )? RPAREN !)
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:59:2: ( META ! ENUM_BEGIN ^ LPAREN ! ( enum_properties )? RPAREN !)
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:57:4: META ! ENUM_BEGIN ^ LPAREN ! ( enum_properties )? RPAREN !
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:59:4: META ! ENUM_BEGIN ^ LPAREN ! ( enum_properties )? RPAREN !
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(57, 8);
-			META30=(IToken)Match(input,META,Follow._META_in_enum_begin_meta327); 
-			DebugLocation(57, 20);
-			ENUM_BEGIN31=(IToken)Match(input,ENUM_BEGIN,Follow._ENUM_BEGIN_in_enum_begin_meta330); 
+			DebugLocation(59, 8);
+			META30=(IToken)Match(input,META,Follow._META_in_enum_begin_meta348); 
+			DebugLocation(59, 20);
+			ENUM_BEGIN31=(IToken)Match(input,ENUM_BEGIN,Follow._ENUM_BEGIN_in_enum_begin_meta351); 
 			ENUM_BEGIN31_tree = (object)adaptor.Create(ENUM_BEGIN31);
 			root_0 = (object)adaptor.BecomeRoot(ENUM_BEGIN31_tree, root_0);
-			DebugLocation(57, 28);
-			LPAREN32=(IToken)Match(input,LPAREN,Follow._LPAREN_in_enum_begin_meta333); 
-			DebugLocation(57, 30);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:57:30: ( enum_properties )?
-			int alt7=2;
-			try { DebugEnterSubRule(7);
-			try { DebugEnterDecision(7, false);
-			int LA7_0 = input.LA(1);
+			DebugLocation(59, 28);
+			LPAREN32=(IToken)Match(input,LPAREN,Follow._LPAREN_in_enum_begin_meta354); 
+			DebugLocation(59, 30);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:59:30: ( enum_properties )?
+			int alt8=2;
+			try { DebugEnterSubRule(8);
+			try { DebugEnterDecision(8, false);
+			int LA8_0 = input.LA(1);
 
-			if ((LA7_0==BITFIELD))
+			if ((LA8_0==BITFIELD||LA8_0==EXTENDS))
 			{
-				alt7 = 1;
+				alt8 = 1;
 			}
-			} finally { DebugExitDecision(7); }
-			switch (alt7)
+			} finally { DebugExitDecision(8); }
+			switch (alt8)
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:57:30: enum_properties
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:59:30: enum_properties
 				{
-				DebugLocation(57, 30);
-				PushFollow(Follow._enum_properties_in_enum_begin_meta336);
+				DebugLocation(59, 30);
+				PushFollow(Follow._enum_properties_in_enum_begin_meta357);
 				enum_properties33=enum_properties();
 				PopFollow();
 
@@ -1090,10 +1159,10 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 				break;
 
 			}
-			} finally { DebugExitSubRule(7); }
+			} finally { DebugExitSubRule(8); }
 
-			DebugLocation(57, 53);
-			RPAREN34=(IToken)Match(input,RPAREN,Follow._RPAREN_in_enum_begin_meta339); 
+			DebugLocation(59, 53);
+			RPAREN34=(IToken)Match(input,RPAREN,Follow._RPAREN_in_enum_begin_meta360); 
 
 			}
 
@@ -1116,7 +1185,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("enum_begin_meta", 10);
 			LeaveRule_enum_begin_meta();
 		}
-		DebugLocation(57, 54);
+		DebugLocation(59, 54);
 		} finally { DebugExitRule(GrammarFileName, "enum_begin_meta"); }
 		return retval;
 
@@ -1127,7 +1196,7 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	partial void LeaveRule_enum_end_meta();
 
 	// $ANTLR start "enum_end_meta"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:59:1: enum_end_meta : META ! ENUM_END ^;
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:61:1: enum_end_meta : META ! ENUM_END ^;
 	[GrammarRule("enum_end_meta")]
 	private AstParserRuleReturnScope<object, IToken> enum_end_meta()
 	{
@@ -1145,19 +1214,19 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 		object META35_tree = default(object);
 		object ENUM_END36_tree = default(object);
 		try { DebugEnterRule(GrammarFileName, "enum_end_meta");
-		DebugLocation(59, 19);
+		DebugLocation(61, 19);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:60:2: ( META ! ENUM_END ^)
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:62:2: ( META ! ENUM_END ^)
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:60:4: META ! ENUM_END ^
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:62:4: META ! ENUM_END ^
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(60, 8);
-			META35=(IToken)Match(input,META,Follow._META_in_enum_end_meta351); 
-			DebugLocation(60, 18);
-			ENUM_END36=(IToken)Match(input,ENUM_END,Follow._ENUM_END_in_enum_end_meta354); 
+			DebugLocation(62, 8);
+			META35=(IToken)Match(input,META,Follow._META_in_enum_end_meta372); 
+			DebugLocation(62, 18);
+			ENUM_END36=(IToken)Match(input,ENUM_END,Follow._ENUM_END_in_enum_end_meta375); 
 			ENUM_END36_tree = (object)adaptor.Create(ENUM_END36);
 			root_0 = (object)adaptor.BecomeRoot(ENUM_END36_tree, root_0);
 
@@ -1182,61 +1251,63 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 			LeaveRule("enum_end_meta", 11);
 			LeaveRule_enum_end_meta();
 		}
-		DebugLocation(60, 19);
+		DebugLocation(62, 19);
 		} finally { DebugExitRule(GrammarFileName, "enum_end_meta"); }
 		return retval;
 
 	}
 	// $ANTLR end "enum_end_meta"
 
-	partial void EnterRule_parse();
-	partial void LeaveRule_parse();
+	partial void EnterRule_enum_definition();
+	partial void LeaveRule_enum_definition();
 
-	// $ANTLR start "parse"
-	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:62:8: public parse : enum_begin_meta enum_definition enum_end_meta ;
-	[GrammarRule("parse")]
-	public AstParserRuleReturnScope<object, IToken> parse()
+	// $ANTLR start "enum_definition"
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:64:1: enum_definition : ENUM ^ ID enum_entry_list SEMICOLON !;
+	[GrammarRule("enum_definition")]
+	private AstParserRuleReturnScope<object, IToken> enum_definition()
 	{
-		EnterRule_parse();
-		EnterRule("parse", 12);
-		TraceIn("parse", 12);
+		EnterRule_enum_definition();
+		EnterRule("enum_definition", 12);
+		TraceIn("enum_definition", 12);
 		AstParserRuleReturnScope<object, IToken> retval = new AstParserRuleReturnScope<object, IToken>();
 		retval.Start = (IToken)input.LT(1);
 
 		object root_0 = default(object);
 
-		AstParserRuleReturnScope<object, IToken> enum_begin_meta37 = default(AstParserRuleReturnScope<object, IToken>);
-		AstParserRuleReturnScope<object, IToken> enum_definition38 = default(AstParserRuleReturnScope<object, IToken>);
-		AstParserRuleReturnScope<object, IToken> enum_end_meta39 = default(AstParserRuleReturnScope<object, IToken>);
+		IToken ENUM37 = default(IToken);
+		IToken ID38 = default(IToken);
+		IToken SEMICOLON40 = default(IToken);
+		AstParserRuleReturnScope<object, IToken> enum_entry_list39 = default(AstParserRuleReturnScope<object, IToken>);
 
-		try { DebugEnterRule(GrammarFileName, "parse");
-		DebugLocation(62, 49);
+		object ENUM37_tree = default(object);
+		object ID38_tree = default(object);
+		object SEMICOLON40_tree = default(object);
+		try { DebugEnterRule(GrammarFileName, "enum_definition");
+		DebugLocation(64, 39);
 		try
 		{
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:63:2: ( enum_begin_meta enum_definition enum_end_meta )
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:65:2: ( ENUM ^ ID enum_entry_list SEMICOLON !)
 			DebugEnterAlt(1);
-			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:63:4: enum_begin_meta enum_definition enum_end_meta
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:65:4: ENUM ^ ID enum_entry_list SEMICOLON !
 			{
 			root_0 = (object)adaptor.Nil();
 
-			DebugLocation(63, 4);
-			PushFollow(Follow._enum_begin_meta_in_parse367);
-			enum_begin_meta37=enum_begin_meta();
+			DebugLocation(65, 8);
+			ENUM37=(IToken)Match(input,ENUM,Follow._ENUM_in_enum_definition386); 
+			ENUM37_tree = (object)adaptor.Create(ENUM37);
+			root_0 = (object)adaptor.BecomeRoot(ENUM37_tree, root_0);
+			DebugLocation(65, 10);
+			ID38=(IToken)Match(input,ID,Follow._ID_in_enum_definition389); 
+			ID38_tree = (object)adaptor.Create(ID38);
+			adaptor.AddChild(root_0, ID38_tree);
+			DebugLocation(65, 13);
+			PushFollow(Follow._enum_entry_list_in_enum_definition391);
+			enum_entry_list39=enum_entry_list();
 			PopFollow();
 
-			adaptor.AddChild(root_0, enum_begin_meta37.Tree);
-			DebugLocation(63, 20);
-			PushFollow(Follow._enum_definition_in_parse369);
-			enum_definition38=enum_definition();
-			PopFollow();
-
-			adaptor.AddChild(root_0, enum_definition38.Tree);
-			DebugLocation(63, 36);
-			PushFollow(Follow._enum_end_meta_in_parse371);
-			enum_end_meta39=enum_end_meta();
-			PopFollow();
-
-			adaptor.AddChild(root_0, enum_end_meta39.Tree);
+			adaptor.AddChild(root_0, enum_entry_list39.Tree);
+			DebugLocation(65, 38);
+			SEMICOLON40=(IToken)Match(input,SEMICOLON,Follow._SEMICOLON_in_enum_definition393); 
 
 			}
 
@@ -1255,11 +1326,274 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 		}
 		finally
 		{
-			TraceOut("parse", 12);
-			LeaveRule("parse", 12);
+			TraceOut("enum_definition", 12);
+			LeaveRule("enum_definition", 12);
+			LeaveRule_enum_definition();
+		}
+		DebugLocation(65, 39);
+		} finally { DebugExitRule(GrammarFileName, "enum_definition"); }
+		return retval;
+
+	}
+	// $ANTLR end "enum_definition"
+
+	partial void EnterRule_namespace_wrapper();
+	partial void LeaveRule_namespace_wrapper();
+
+	// $ANTLR start "namespace_wrapper"
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:67:1: namespace_wrapper : NAMESPACE ^ ID LBRACE ! enum_definition RBRACE !;
+	[GrammarRule("namespace_wrapper")]
+	private AstParserRuleReturnScope<object, IToken> namespace_wrapper()
+	{
+		EnterRule_namespace_wrapper();
+		EnterRule("namespace_wrapper", 13);
+		TraceIn("namespace_wrapper", 13);
+		AstParserRuleReturnScope<object, IToken> retval = new AstParserRuleReturnScope<object, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		object root_0 = default(object);
+
+		IToken NAMESPACE41 = default(IToken);
+		IToken ID42 = default(IToken);
+		IToken LBRACE43 = default(IToken);
+		IToken RBRACE45 = default(IToken);
+		AstParserRuleReturnScope<object, IToken> enum_definition44 = default(AstParserRuleReturnScope<object, IToken>);
+
+		object NAMESPACE41_tree = default(object);
+		object ID42_tree = default(object);
+		object LBRACE43_tree = default(object);
+		object RBRACE45_tree = default(object);
+		try { DebugEnterRule(GrammarFileName, "namespace_wrapper");
+		DebugLocation(67, 49);
+		try
+		{
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:68:2: ( NAMESPACE ^ ID LBRACE ! enum_definition RBRACE !)
+			DebugEnterAlt(1);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:68:4: NAMESPACE ^ ID LBRACE ! enum_definition RBRACE !
+			{
+			root_0 = (object)adaptor.Nil();
+
+			DebugLocation(68, 13);
+			NAMESPACE41=(IToken)Match(input,NAMESPACE,Follow._NAMESPACE_in_namespace_wrapper405); 
+			NAMESPACE41_tree = (object)adaptor.Create(NAMESPACE41);
+			root_0 = (object)adaptor.BecomeRoot(NAMESPACE41_tree, root_0);
+			DebugLocation(68, 15);
+			ID42=(IToken)Match(input,ID,Follow._ID_in_namespace_wrapper408); 
+			ID42_tree = (object)adaptor.Create(ID42);
+			adaptor.AddChild(root_0, ID42_tree);
+			DebugLocation(68, 24);
+			LBRACE43=(IToken)Match(input,LBRACE,Follow._LBRACE_in_namespace_wrapper410); 
+			DebugLocation(68, 26);
+			PushFollow(Follow._enum_definition_in_namespace_wrapper413);
+			enum_definition44=enum_definition();
+			PopFollow();
+
+			adaptor.AddChild(root_0, enum_definition44.Tree);
+			DebugLocation(68, 48);
+			RBRACE45=(IToken)Match(input,RBRACE,Follow._RBRACE_in_namespace_wrapper415); 
+
+			}
+
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
+		}
+		catch (RecognitionException re)
+		{
+			ReportError(re);
+			Recover(input,re);
+		retval.Tree = (object)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
+		}
+		finally
+		{
+			TraceOut("namespace_wrapper", 13);
+			LeaveRule("namespace_wrapper", 13);
+			LeaveRule_namespace_wrapper();
+		}
+		DebugLocation(68, 49);
+		} finally { DebugExitRule(GrammarFileName, "namespace_wrapper"); }
+		return retval;
+
+	}
+	// $ANTLR end "namespace_wrapper"
+
+	partial void EnterRule_enum_entry_point();
+	partial void LeaveRule_enum_entry_point();
+
+	// $ANTLR start "enum_entry_point"
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:70:1: enum_entry_point : ( namespace_wrapper | enum_definition );
+	[GrammarRule("enum_entry_point")]
+	private AstParserRuleReturnScope<object, IToken> enum_entry_point()
+	{
+		EnterRule_enum_entry_point();
+		EnterRule("enum_entry_point", 14);
+		TraceIn("enum_entry_point", 14);
+		AstParserRuleReturnScope<object, IToken> retval = new AstParserRuleReturnScope<object, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		object root_0 = default(object);
+
+		AstParserRuleReturnScope<object, IToken> namespace_wrapper46 = default(AstParserRuleReturnScope<object, IToken>);
+		AstParserRuleReturnScope<object, IToken> enum_definition47 = default(AstParserRuleReturnScope<object, IToken>);
+
+		try { DebugEnterRule(GrammarFileName, "enum_entry_point");
+		DebugLocation(70, 39);
+		try
+		{
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:71:2: ( namespace_wrapper | enum_definition )
+			int alt9=2;
+			try { DebugEnterDecision(9, false);
+			int LA9_0 = input.LA(1);
+
+			if ((LA9_0==NAMESPACE))
+			{
+				alt9 = 1;
+			}
+			else if ((LA9_0==ENUM))
+			{
+				alt9 = 2;
+			}
+			else
+			{
+				NoViableAltException nvae = new NoViableAltException("", 9, 0, input);
+				DebugRecognitionException(nvae);
+				throw nvae;
+			}
+			} finally { DebugExitDecision(9); }
+			switch (alt9)
+			{
+			case 1:
+				DebugEnterAlt(1);
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:71:4: namespace_wrapper
+				{
+				root_0 = (object)adaptor.Nil();
+
+				DebugLocation(71, 4);
+				PushFollow(Follow._namespace_wrapper_in_enum_entry_point427);
+				namespace_wrapper46=namespace_wrapper();
+				PopFollow();
+
+				adaptor.AddChild(root_0, namespace_wrapper46.Tree);
+
+				}
+				break;
+			case 2:
+				DebugEnterAlt(2);
+				// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:71:24: enum_definition
+				{
+				root_0 = (object)adaptor.Nil();
+
+				DebugLocation(71, 24);
+				PushFollow(Follow._enum_definition_in_enum_entry_point431);
+				enum_definition47=enum_definition();
+				PopFollow();
+
+				adaptor.AddChild(root_0, enum_definition47.Tree);
+
+				}
+				break;
+
+			}
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
+		}
+		catch (RecognitionException re)
+		{
+			ReportError(re);
+			Recover(input,re);
+		retval.Tree = (object)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
+		}
+		finally
+		{
+			TraceOut("enum_entry_point", 14);
+			LeaveRule("enum_entry_point", 14);
+			LeaveRule_enum_entry_point();
+		}
+		DebugLocation(71, 39);
+		} finally { DebugExitRule(GrammarFileName, "enum_entry_point"); }
+		return retval;
+
+	}
+	// $ANTLR end "enum_entry_point"
+
+	partial void EnterRule_parse();
+	partial void LeaveRule_parse();
+
+	// $ANTLR start "parse"
+	// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:73:8: public parse : enum_begin_meta enum_entry_point enum_end_meta ;
+	[GrammarRule("parse")]
+	public AstParserRuleReturnScope<object, IToken> parse()
+	{
+		EnterRule_parse();
+		EnterRule("parse", 15);
+		TraceIn("parse", 15);
+		AstParserRuleReturnScope<object, IToken> retval = new AstParserRuleReturnScope<object, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		object root_0 = default(object);
+
+		AstParserRuleReturnScope<object, IToken> enum_begin_meta48 = default(AstParserRuleReturnScope<object, IToken>);
+		AstParserRuleReturnScope<object, IToken> enum_entry_point49 = default(AstParserRuleReturnScope<object, IToken>);
+		AstParserRuleReturnScope<object, IToken> enum_end_meta50 = default(AstParserRuleReturnScope<object, IToken>);
+
+		try { DebugEnterRule(GrammarFileName, "parse");
+		DebugLocation(73, 50);
+		try
+		{
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:74:2: ( enum_begin_meta enum_entry_point enum_end_meta )
+			DebugEnterAlt(1);
+			// C:\\GitProjects\\CCGOnlinePublic\\CCGOnline\\CCGOnline\\Grammars\\EnumReflector.g:74:4: enum_begin_meta enum_entry_point enum_end_meta
+			{
+			root_0 = (object)adaptor.Nil();
+
+			DebugLocation(74, 4);
+			PushFollow(Follow._enum_begin_meta_in_parse446);
+			enum_begin_meta48=enum_begin_meta();
+			PopFollow();
+
+			adaptor.AddChild(root_0, enum_begin_meta48.Tree);
+			DebugLocation(74, 20);
+			PushFollow(Follow._enum_entry_point_in_parse448);
+			enum_entry_point49=enum_entry_point();
+			PopFollow();
+
+			adaptor.AddChild(root_0, enum_entry_point49.Tree);
+			DebugLocation(74, 37);
+			PushFollow(Follow._enum_end_meta_in_parse450);
+			enum_end_meta50=enum_end_meta();
+			PopFollow();
+
+			adaptor.AddChild(root_0, enum_end_meta50.Tree);
+
+			}
+
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
+		}
+		catch (RecognitionException re)
+		{
+			ReportError(re);
+			Recover(input,re);
+		retval.Tree = (object)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
+		}
+		finally
+		{
+			TraceOut("parse", 15);
+			LeaveRule("parse", 15);
 			LeaveRule_parse();
 		}
-		DebugLocation(63, 49);
+		DebugLocation(74, 50);
 		} finally { DebugExitRule(GrammarFileName, "parse"); }
 		return retval;
 
@@ -1271,45 +1605,56 @@ public partial class EnumReflectorParser : Antlr.Runtime.Parser
 	#region Follow sets
 	private static class Follow
 	{
-		public static readonly BitSet _META_in_enum_conversion_tag169 = new BitSet(new ulong[]{0x400UL});
-		public static readonly BitSet _ENUM_ENTRY_in_enum_conversion_tag172 = new BitSet(new ulong[]{0x10000UL});
-		public static readonly BitSet _LPAREN_in_enum_conversion_tag175 = new BitSet(new ulong[]{0x1000000UL});
-		public static readonly BitSet _STRING_in_enum_conversion_tag178 = new BitSet(new ulong[]{0x400000UL});
-		public static readonly BitSet _RPAREN_in_enum_conversion_tag180 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _POSITIVE_INTEGER10_in_shift_expression191 = new BitSet(new ulong[]{0x8000UL});
-		public static readonly BitSet _LEFT_SHIFT_in_shift_expression193 = new BitSet(new ulong[]{0x40000UL});
-		public static readonly BitSet _POSITIVE_INTEGER10_in_shift_expression196 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _shift_expression_in_integer_constant209 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _POSITIVE_INTEGER16_in_integer_constant213 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _POSITIVE_INTEGER10_in_integer_constant217 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _EQUALS_in_value_assignment227 = new BitSet(new ulong[]{0xC0000UL});
-		public static readonly BitSet _integer_constant_in_value_assignment230 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _ID_in_last_enum_entry240 = new BitSet(new ulong[]{0x20802UL});
-		public static readonly BitSet _value_assignment_in_last_enum_entry243 = new BitSet(new ulong[]{0x20002UL});
-		public static readonly BitSet _enum_conversion_tag_in_last_enum_entry246 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _ID_in_non_last_enum_entry257 = new BitSet(new ulong[]{0x820UL});
-		public static readonly BitSet _value_assignment_in_non_last_enum_entry260 = new BitSet(new ulong[]{0x20UL});
-		public static readonly BitSet _COMMA_in_non_last_enum_entry263 = new BitSet(new ulong[]{0x20002UL});
-		public static readonly BitSet _enum_conversion_tag_in_non_last_enum_entry266 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _LBRACE_in_enum_entry_list278 = new BitSet(new ulong[]{0x2000UL});
-		public static readonly BitSet _non_last_enum_entry_in_enum_entry_list281 = new BitSet(new ulong[]{0x2000UL});
-		public static readonly BitSet _last_enum_entry_in_enum_entry_list284 = new BitSet(new ulong[]{0x200000UL});
-		public static readonly BitSet _RBRACE_in_enum_entry_list287 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _ENUM_in_enum_definition298 = new BitSet(new ulong[]{0x2000UL});
-		public static readonly BitSet _ID_in_enum_definition301 = new BitSet(new ulong[]{0x4000UL});
-		public static readonly BitSet _enum_entry_list_in_enum_definition303 = new BitSet(new ulong[]{0x800000UL});
-		public static readonly BitSet _SEMICOLON_in_enum_definition305 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _BITFIELD_in_enum_properties316 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _META_in_enum_begin_meta327 = new BitSet(new ulong[]{0x100UL});
-		public static readonly BitSet _ENUM_BEGIN_in_enum_begin_meta330 = new BitSet(new ulong[]{0x10000UL});
-		public static readonly BitSet _LPAREN_in_enum_begin_meta333 = new BitSet(new ulong[]{0x400010UL});
-		public static readonly BitSet _enum_properties_in_enum_begin_meta336 = new BitSet(new ulong[]{0x400000UL});
-		public static readonly BitSet _RPAREN_in_enum_begin_meta339 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _META_in_enum_end_meta351 = new BitSet(new ulong[]{0x200UL});
-		public static readonly BitSet _ENUM_END_in_enum_end_meta354 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _enum_begin_meta_in_parse367 = new BitSet(new ulong[]{0x80UL});
-		public static readonly BitSet _enum_definition_in_parse369 = new BitSet(new ulong[]{0x20000UL});
-		public static readonly BitSet _enum_end_meta_in_parse371 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _META_in_enum_conversion_tag187 = new BitSet(new ulong[]{0x400UL});
+		public static readonly BitSet _ENUM_ENTRY_in_enum_conversion_tag190 = new BitSet(new ulong[]{0x20000UL});
+		public static readonly BitSet _LPAREN_in_enum_conversion_tag193 = new BitSet(new ulong[]{0x4000000UL});
+		public static readonly BitSet _STRING_in_enum_conversion_tag196 = new BitSet(new ulong[]{0x1000000UL});
+		public static readonly BitSet _RPAREN_in_enum_conversion_tag198 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _POSITIVE_INTEGER10_in_shift_expression209 = new BitSet(new ulong[]{0x10000UL});
+		public static readonly BitSet _LEFT_SHIFT_in_shift_expression211 = new BitSet(new ulong[]{0x100000UL});
+		public static readonly BitSet _POSITIVE_INTEGER10_in_shift_expression214 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _shift_expression_in_integer_constant227 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _POSITIVE_INTEGER16_in_integer_constant231 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _POSITIVE_INTEGER10_in_integer_constant235 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _ID_in_integer_constant239 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _EQUALS_in_value_assignment248 = new BitSet(new ulong[]{0x304000UL});
+		public static readonly BitSet _integer_constant_in_value_assignment251 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _ID_in_last_enum_entry261 = new BitSet(new ulong[]{0x40802UL});
+		public static readonly BitSet _value_assignment_in_last_enum_entry264 = new BitSet(new ulong[]{0x40002UL});
+		public static readonly BitSet _enum_conversion_tag_in_last_enum_entry267 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _ID_in_non_last_enum_entry278 = new BitSet(new ulong[]{0x820UL});
+		public static readonly BitSet _value_assignment_in_non_last_enum_entry281 = new BitSet(new ulong[]{0x20UL});
+		public static readonly BitSet _COMMA_in_non_last_enum_entry284 = new BitSet(new ulong[]{0x40002UL});
+		public static readonly BitSet _enum_conversion_tag_in_non_last_enum_entry287 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _LBRACE_in_enum_entry_list299 = new BitSet(new ulong[]{0x4000UL});
+		public static readonly BitSet _non_last_enum_entry_in_enum_entry_list302 = new BitSet(new ulong[]{0x4000UL});
+		public static readonly BitSet _last_enum_entry_in_enum_entry_list305 = new BitSet(new ulong[]{0x800000UL});
+		public static readonly BitSet _RBRACE_in_enum_entry_list308 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _EXTENDS_in_extends_clause319 = new BitSet(new ulong[]{0x4000UL});
+		public static readonly BitSet _ID_in_extends_clause322 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _BITFIELD_in_enum_properties333 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _extends_clause_in_enum_properties337 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _META_in_enum_begin_meta348 = new BitSet(new ulong[]{0x100UL});
+		public static readonly BitSet _ENUM_BEGIN_in_enum_begin_meta351 = new BitSet(new ulong[]{0x20000UL});
+		public static readonly BitSet _LPAREN_in_enum_begin_meta354 = new BitSet(new ulong[]{0x1001010UL});
+		public static readonly BitSet _enum_properties_in_enum_begin_meta357 = new BitSet(new ulong[]{0x1000000UL});
+		public static readonly BitSet _RPAREN_in_enum_begin_meta360 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _META_in_enum_end_meta372 = new BitSet(new ulong[]{0x200UL});
+		public static readonly BitSet _ENUM_END_in_enum_end_meta375 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _ENUM_in_enum_definition386 = new BitSet(new ulong[]{0x4000UL});
+		public static readonly BitSet _ID_in_enum_definition389 = new BitSet(new ulong[]{0x8000UL});
+		public static readonly BitSet _enum_entry_list_in_enum_definition391 = new BitSet(new ulong[]{0x2000000UL});
+		public static readonly BitSet _SEMICOLON_in_enum_definition393 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _NAMESPACE_in_namespace_wrapper405 = new BitSet(new ulong[]{0x4000UL});
+		public static readonly BitSet _ID_in_namespace_wrapper408 = new BitSet(new ulong[]{0x8000UL});
+		public static readonly BitSet _LBRACE_in_namespace_wrapper410 = new BitSet(new ulong[]{0x80UL});
+		public static readonly BitSet _enum_definition_in_namespace_wrapper413 = new BitSet(new ulong[]{0x800000UL});
+		public static readonly BitSet _RBRACE_in_namespace_wrapper415 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _namespace_wrapper_in_enum_entry_point427 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _enum_definition_in_enum_entry_point431 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _enum_begin_meta_in_parse446 = new BitSet(new ulong[]{0x80080UL});
+		public static readonly BitSet _enum_entry_point_in_parse448 = new BitSet(new ulong[]{0x40000UL});
+		public static readonly BitSet _enum_end_meta_in_parse450 = new BitSet(new ulong[]{0x2UL});
 	}
 	#endregion Follow sets
 }

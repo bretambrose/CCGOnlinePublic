@@ -23,6 +23,7 @@
 #include "stdafx.h"
 
 #include "Concurrency/TaskProcessBase.h"
+#include "Concurrency/ThreadProcessBase.h"
 #include "Concurrency/ProcessSubject.h"
 #include "Concurrency/ProcessMailbox.h"
 #include "Concurrency/ProcessConstants.h"
@@ -39,6 +40,8 @@
 #include "TaskScheduler/TaskScheduler.h"
 #include "Logging/LogInterface.h"
 #include "Helpers/ProcessHelpers.h"
+#include "PlatformProcess.h"
+#include "PlatformThread.h"
 
 class ProcessTests : public testing::Test 
 {
@@ -65,6 +68,32 @@ class CTestProcessTask : public CTaskProcessBase
 	private:
 };
 
+class CTestThreadProcess : public CThreadProcessBase
+{
+	public:
+
+		typedef CThreadProcessBase BASECLASS;
+
+		CTestThreadProcess( const SProcessProperties &properties ) :
+			BASECLASS( properties ),
+			FramesCompleted( 0 )
+		{}
+
+		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
+		virtual bool Is_Root_Thread( void ) const { return true; }
+
+		uint64 Get_Frames_Completed( void ) const { return FramesCompleted; }
+
+	protected:
+
+		virtual void Per_Frame_Logic_End( void ) { ++FramesCompleted; }
+
+		virtual uint32 Get_Sleep_Interval_In_Milliseconds( void ) const { return 10; }
+
+	private:
+
+		uint64 FramesCompleted;
+};
 
 
 class CBasicServiceTestTask : public CScheduledTask
@@ -651,4 +680,35 @@ TEST_F( ProcessTests, Shutdown_Hard )
 		}
 	}
 
+}
+
+TEST_F( ProcessTests, Thread_Shutdown )
+{
+	CTestThreadProcess *test_thread_process = new CTestThreadProcess( AI_PROPS );
+	CThreadProcessBaseTester process_tester( test_thread_process );
+
+	shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
+	process_tester.Set_Logging_Mailbox( log_conn->Get_Writable_Mailbox() );
+
+	shared_ptr< CPlatformThread > platform_thread( new CPlatformThread() );
+
+	CProcessExecutionContext thread_context( platform_thread.get() );
+	process_tester.Get_Thread_Process()->Run( thread_context );
+
+	while( test_thread_process->Get_Frames_Completed() < 10 )
+	{
+		NPlatform::Sleep( 1 );
+	}
+
+	ASSERT_TRUE( platform_thread->Is_Running() );
+
+	shared_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
+	shutdown_frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
+
+	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
+
+	while ( platform_thread->Is_Running() )
+	{
+		NPlatform::Sleep( 1 );
+	}
 }

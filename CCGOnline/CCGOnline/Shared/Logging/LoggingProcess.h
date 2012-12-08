@@ -59,6 +59,8 @@ class CLoggingProcess : public CTaskProcessBase
 		// CProcessBase protected interface
 		virtual void Register_Message_Handlers( void );
 
+		virtual void On_Shutdown_Self_Request( void );
+
 	private:
 
 		void Shutdown( void );
@@ -68,7 +70,6 @@ class CLoggingProcess : public CTaskProcessBase
 		std::wstring Build_File_Name( EProcessSubject::Enum subject ) const;
 		std::wstring Build_Log_Message( EProcessID::Enum process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64 system_time ) const;
 
-		virtual void Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message );
 		void Handle_Log_Request_Message( EProcessID::Enum source_process_id, const shared_ptr< const CLogRequestMessage > &message );
 
 		void Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64 system_time );
