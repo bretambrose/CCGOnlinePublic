@@ -451,6 +451,32 @@ bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, uint6
 }
 
 /**********************************************************************************************************************
+	CEnumConverter::Convert_Internal -- converts from an integer to a wstring for the supplied enum
+
+		enum_name -- name of the enum this is a conversion operation for
+		value -- integer value to convert from
+		entry_name -- output parameter for the corresponding string value
+
+**********************************************************************************************************************/	
+bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::wstring &entry_name )
+{
+	CConvertibleEnum *enum_object = Find_Enum( enum_type_id );
+	if ( enum_object == nullptr )
+	{
+		return false;
+	}
+
+	std::string narrow_entry_name;
+	bool success = enum_object->Convert( value, narrow_entry_name );
+	if ( success )
+	{
+		NStringUtils::String_To_WideString( narrow_entry_name, entry_name );
+	}
+
+	return success;
+}
+
+/**********************************************************************************************************************
 	CEnumConverter::Convert -- converts from a string to an integer for the supplied enum
 
 		enum_name -- name of the enum this is a conversion operation for

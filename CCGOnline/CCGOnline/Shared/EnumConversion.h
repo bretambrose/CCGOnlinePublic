@@ -84,6 +84,13 @@ class CEnumConverter
 			return Convert_Internal( typeid( T ), converted_value, entry_name );
 		}
 
+		template < typename T >
+		static bool Convert( T output_value, std::wstring &entry_name )
+		{
+			uint64 converted_value = static_cast< uint64 >( output_value );
+			return Convert_Internal( typeid( T ), converted_value, entry_name );
+		}
+
 		static bool Convert( const std::string &enum_name, const std::wstring &entry_name, uint64 &output_value );
 
 	private:
@@ -96,6 +103,7 @@ class CEnumConverter
 
 		static bool Convert_Internal( const std::type_info &enum_type_id, const std::string &entry_name, uint64 &output_value );
 		static bool Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::string &entry_name );
+		static bool Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::wstring &entry_name );
 
 		static stdext::hash_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > Enums;
 		static stdext::hash_map< std::string, CConvertibleEnum * > EnumsByName;

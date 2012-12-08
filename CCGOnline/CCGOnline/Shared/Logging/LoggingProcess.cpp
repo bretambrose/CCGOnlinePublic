@@ -28,6 +28,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "EnumConversion.h"
 #include "Concurrency/ProcessSubject.h"
 #include "Concurrency/ProcessConstants.h"
 #include "Concurrency/Messaging/LoggingMessages.h"
@@ -226,23 +227,11 @@ void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_pr
 **********************************************************************************************************************/
 std::wstring CLoggingProcess::Build_File_Name( EProcessSubject::Enum subject ) const
 {
-#ifdef TOFIX
-	static std::wstring _subject_file_names[ TS_COUNT ] = 
-	{
-		L"",
-		L"ConcurrencyManager",
-		L"Logic",
-		L"NetworkConnectionManager",
-		L"NetworkConnectionSet",
-		L"AI",
-		L"UI",
-		L"Database",
-		L"Logging"
-	};
-#endif // TOFIX
+	std::wstring subject_string;
+	CEnumConverter::Convert( subject, subject_string );
 
 	std::basic_ostringstream< wchar_t > file_name_string;
-	file_name_string << L"Logs\\" << CLogInterface::Get_Service_Name() << L"_" << PID << L"_" << static_cast< uint32 >( subject ) << L".txt";
+	file_name_string << L"Logs\\" << CLogInterface::Get_Service_Name() << L"_" << PID << L"_" << subject_string.c_str() << L".txt";
 
 	return file_name_string.rdbuf()->str();
 }
@@ -282,8 +271,11 @@ std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process
 	uint16 minor_part = source_properties.Get_Minor_Part();
 	uint16 mode_part = source_properties.Get_Mode_Part();
 
+	std::wstring subject_string;
+	CEnumConverter::Convert( subject_part, subject_string );
+
 	std::basic_ostringstream< wchar_t > output_string;
-	output_string << L"[ " << CPlatformTime::Format_Raw_Time( system_time ) << L" ]( " << source_process_id << L": " << subject_part << L", " << major_part << L", " << minor_part << L", " << mode_part << L" ) : " << message << L"\n";
+	output_string << L"[ " << CPlatformTime::Format_Raw_Time( system_time ) << L" ]( " << source_process_id << L": " << subject_string.c_str() << L", " << major_part << L", " << minor_part << L", " << mode_part << L" ) : " << message << L"\n";
 
 	return output_string.rdbuf()->str();
 }
