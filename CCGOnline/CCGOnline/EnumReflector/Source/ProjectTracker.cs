@@ -152,7 +152,10 @@ namespace EnumReflector
 			List< CEnumRecord > project_enums = new List< CEnumRecord >();
 			CEnumReflector.EnumTracker.Build_Project_Enum_List( ID, project_enums );
 
-			foreach ( var enum_record in project_enums )
+			HashSet< CEnumRecord > referenced_enums = new HashSet< CEnumRecord >();
+			CEnumReflector.EnumTracker.Build_Referenced_Enum_Set( project_enums, referenced_enums );
+
+			foreach ( var enum_record in referenced_enums )
 			{
 				if ( enum_record.Namespace.Length > 0 )
 				{

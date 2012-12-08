@@ -22,12 +22,19 @@ tokens {
 	BITFIELD = 'BITFIELD' ;
 	NAMESPACE = 'namespace' ;
 	EXTENDS = 'extends' ;
+	IDQUALIFIER = '::' ;
 }
 
 /*
 	Parser rules
 */
 
+qualifier_list
+	: ( IDQUALIFIER ID )* ;
+	
+qualified_id
+	: ID^ qualifier_list ;
+	
 enum_conversion_tag 
 	: META! ENUM_ENTRY^ LPAREN! STRING RPAREN! ;
 
@@ -35,7 +42,7 @@ shift_expression
 	: POSITIVE_INTEGER10 LEFT_SHIFT^ POSITIVE_INTEGER10 ;
 		
 integer_constant 
-	: shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 | ID;
+	: shift_expression | POSITIVE_INTEGER16 | POSITIVE_INTEGER10 | qualified_id;
 
 value_assignment
 	: EQUALS! integer_constant ;
@@ -50,7 +57,7 @@ enum_entry_list
 	: LBRACE^ non_last_enum_entry* last_enum_entry  RBRACE! ;
 
 extends_clause
-	: EXTENDS^ ID ;
+	: EXTENDS^ qualified_id ;
 	
 enum_properties
 	: BITFIELD | extends_clause ;
@@ -65,7 +72,7 @@ enum_definition
 	: ENUM^ ID enum_entry_list SEMICOLON! ;
 	
 namespace_wrapper
-	: NAMESPACE^ ID LBRACE! enum_definition RBRACE! ;
+	: NAMESPACE^ qualified_id LBRACE! enum_definition RBRACE! ;
 	
 enum_entry_point
 	: namespace_wrapper | enum_definition ;
@@ -78,7 +85,7 @@ public parse
 */
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
-
+	
 WHITESPACE  
 	:   ( ' ' | '\t' | '\r' | '\n' ) {$channel=Hidden;} ;
 

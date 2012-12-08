@@ -123,7 +123,7 @@ namespace EnumReflector
 			{
 				EEnumID id = Allocate_Enum_ID();
 				CEnum enum_instance = new CEnum( id, enum_record );
-				m_EnumIDMap.Add( enum_instance.Name, id );
+				m_EnumIDMap.Add( enum_record.FullName, id );
 				m_Enums.Add( id, enum_instance );
 			}
 		}
@@ -145,7 +145,7 @@ namespace EnumReflector
 			{
 				id = Allocate_Enum_ID();
 				CEnum enum_instance = new CEnum( id, record.HeaderFileID, record );
-				m_EnumIDMap.Add( enum_instance.Name, id );
+				m_EnumIDMap.Add( record.FullName, id );
 				m_Enums.Add( id, enum_instance );
 			}
 		}
@@ -237,6 +237,21 @@ namespace EnumReflector
 			}
 		}
 
+		public void Build_Referenced_Enum_Set( List< CEnumRecord > project_enums, HashSet< CEnumRecord > referenced_enums )
+		{
+			foreach( var enum_record in project_enums )
+			{
+				referenced_enums.Add( enum_record );
+
+				CEnumRecord base_record = enum_record.BaseEnum;
+				while ( base_record != null )
+				{
+					referenced_enums.Add( base_record );
+					base_record = base_record.BaseEnum;
+				}
+			}
+		}
+
 		public CEnum Get_Enum_By_ID( EEnumID id )
 		{
 			return m_Enums[ id ];
@@ -255,7 +270,7 @@ namespace EnumReflector
 
 				if ( derived_record.ExtendsEnum.Length > 0 )
 				{
-					CEnum base_enum = Get_Enum_By_Name( derived_record.ExtendsEnum );
+					CEnum base_enum = Get_Enum_By_Full_Name( derived_record.ExtendsEnum );
 					if ( base_enum == null )
 					{
 						throw new Exception( "Enum " + derived_record.FullName + " is an extension of an unknown enum: " + derived_record.ExtendsEnum );
@@ -365,10 +380,10 @@ namespace EnumReflector
 			return m_NextAllocatedID++;
 		}
 
-		private CEnum Get_Enum_By_Name( string enum_name )
+		private CEnum Get_Enum_By_Full_Name( string enum_full_name )
 		{
 			EEnumID id = EEnumID.Invalid;
-			if ( !m_EnumIDMap.TryGetValue( enum_name, out id ) )
+			if ( !m_EnumIDMap.TryGetValue( enum_full_name, out id ) )
 			{
 				return null;
 			}

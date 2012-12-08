@@ -225,11 +225,6 @@ namespace EnumReflector
 				return false;
 			}
 
-			if ( StartingValue != enum_definition.StartingValue )
-			{
-				return false;
-			}
-
 			if ( EnumEntries.Count != enum_definition.EnumEntries.Count )
 			{
 				return false;

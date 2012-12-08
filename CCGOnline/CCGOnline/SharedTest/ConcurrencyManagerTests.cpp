@@ -26,7 +26,6 @@
 #include "Concurrency/MailboxInterfaces.h"
 #include "Concurrency/ProcessStatics.h"
 #include "Concurrency/TaskProcessBase.h"
-#include "Concurrency/ProcessSubject.h"
 #include "Concurrency/ProcessConstants.h"
 #include "Concurrency/ProcessMessageFrame.h"
 #include "Concurrency/Messaging/ProcessManagementMessages.h"
@@ -36,6 +35,7 @@
 #include "TaskScheduler/ScheduledTask.h"
 #include "TaskScheduler/TaskScheduler.h"
 #include "PlatformProcess.h"
+#include "SharedTestProcessSubject.h"
 
 class ConcurrencyManagerTests : public testing::Test 
 {
@@ -239,18 +239,8 @@ class CDoNothingProcess : public CTaskProcessBase
 		uint32 ServiceCount;
 };
 
-namespace EManagerTestProcessSubject
-{
-	enum Enum
-	{
-		AI = EProcessSubject::NEXT_FREE_VALUE,
-		DATABASE,
-		UI
-	};
-}
-
 static const EProcessID::Enum AI_PROCESS_ID( EProcessID::FIRST_FREE_ID );
-static const SProcessProperties AI_PROPS( EManagerTestProcessSubject::AI );
+static const SProcessProperties AI_PROPS( ETestExtendedProcessSubject::AI );
 
 TEST_F( ConcurrencyManagerTests, Setup )
 {
@@ -277,11 +267,11 @@ TEST_F( ConcurrencyManagerTests, Setup )
 
 
 
-static const SProcessProperties VP_PROPERTY1( EManagerTestProcessSubject::AI, 1, 1, 1 );
-static const SProcessProperties VP_PROPERTY2( EManagerTestProcessSubject::AI, 1, 2, 1 );
-static const SProcessProperties VP_PROPERTY3( EManagerTestProcessSubject::AI, 1, 3, 4 );
-static const SProcessProperties VP_PROPERTY4( EManagerTestProcessSubject::AI, 2, 1, 2 );
-static const SProcessProperties VP_PROPERTY5( EManagerTestProcessSubject::AI, 1, 1, 3 );
+static const SProcessProperties VP_PROPERTY1( ETestExtendedProcessSubject::AI, 1, 1, 1 );
+static const SProcessProperties VP_PROPERTY2( ETestExtendedProcessSubject::AI, 1, 2, 1 );
+static const SProcessProperties VP_PROPERTY3( ETestExtendedProcessSubject::AI, 1, 3, 4 );
+static const SProcessProperties VP_PROPERTY4( ETestExtendedProcessSubject::AI, 2, 1, 2 );
+static const SProcessProperties VP_PROPERTY5( ETestExtendedProcessSubject::AI, 1, 1, 3 );
 
 class CMailboxTestProcess : public CDoNothingProcess
 {
@@ -310,12 +300,12 @@ class CMailboxTestProcess : public CDoNothingProcess
 				}
 				else if ( properties == VP_PROPERTY2 )
 				{
-					SProcessProperties multimatch( EManagerTestProcessSubject::AI, 1, 0, 0 );
+					SProcessProperties multimatch( ETestExtendedProcessSubject::AI, 1, 0, 0 );
 					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
 				}
 				else if ( properties == VP_PROPERTY3 )
 				{
-					SProcessProperties multimatch( EManagerTestProcessSubject::AI, 2, 0, 0 );
+					SProcessProperties multimatch( ETestExtendedProcessSubject::AI, 2, 0, 0 );
 					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
 				}
 				else if ( properties == VP_PROPERTY4 )
@@ -371,7 +361,7 @@ class CSpawnMailboxGetProcess : public CTaskProcessBase
 		bool HasBeenServiced;
 };
 
-static const SProcessProperties SPAWN_PROCESS_PROPERTIES( EManagerTestProcessSubject::DATABASE, 1, 1, 1 );
+static const SProcessProperties SPAWN_PROCESS_PROPERTIES( ETestExtendedProcessSubject::DATABASE, 1, 1, 1 );
 
 void Verify_Interfaces_Present( const CConcurrencyManagerTester &manager_tester )
 {
@@ -494,7 +484,7 @@ class CSuicidalProcess : public CTaskProcessBase
 		bool HasBeenServiced;
 };
 
-static const SProcessProperties SUICIDAL_PROCESS_PROPERTIES( EManagerTestProcessSubject::DATABASE, 1, 1, 1 );
+static const SProcessProperties SUICIDAL_PROCESS_PROPERTIES( ETestExtendedProcessSubject::DATABASE, 1, 1, 1 );
 
 TEST_F( ConcurrencyManagerTests, Run_Once_And_Shutdown_Self )
 {

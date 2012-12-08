@@ -24,7 +24,6 @@
 
 #include "Concurrency/TaskProcessBase.h"
 #include "Concurrency/ThreadProcessBase.h"
-#include "Concurrency/ProcessSubject.h"
 #include "Concurrency/ProcessMailbox.h"
 #include "Concurrency/ProcessConstants.h"
 #include "Concurrency/ProcessStatics.h"
@@ -42,6 +41,7 @@
 #include "Helpers/ProcessHelpers.h"
 #include "PlatformProcess.h"
 #include "PlatformThread.h"
+#include "SharedTestProcessSubject.h"
 
 class ProcessTests : public testing::Test 
 {
@@ -114,17 +114,7 @@ class CBasicServiceTestTask : public CScheduledTask
 		}
 };
 
-namespace ETestProcessSubject
-{
-	enum Enum
-	{
-		AI = EProcessSubject::NEXT_FREE_VALUE,
-		DATABASE,
-		UI
-	};
-}
-
-SProcessProperties AI_PROPS( ETestProcessSubject::AI  );
+SProcessProperties AI_PROPS( ETestExtendedProcessSubject::AI  );
 
 
 TEST_F( ProcessTests, Basic_Service_And_Reschedule )
@@ -183,7 +173,7 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 	ASSERT_TRUE( CTaskProcessBaseTester::Get_Has_Process_Service_Executed() );
 }
 
-static const SProcessProperties DB_PROPS( ETestProcessSubject::DATABASE );
+static const SProcessProperties DB_PROPS( ETestExtendedProcessSubject::DATABASE );
 static const EProcessID::Enum DB_PROCESS_ID = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 1 );
 
 class CSendAddMailboxMessageServiceTask : public CScheduledTask
@@ -360,7 +350,7 @@ TEST_F( ProcessTests, Add_Mailbox_And_Logging )
 
 }
 
-static const SProcessProperties UI_PROPS( ETestProcessSubject::UI );
+static const SProcessProperties UI_PROPS( ETestExtendedProcessSubject::UI );
 static const EProcessID::Enum UI_PROCESS_ID = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 2 );
 
 class CSendMailboxMessageTask : public CScheduledTask

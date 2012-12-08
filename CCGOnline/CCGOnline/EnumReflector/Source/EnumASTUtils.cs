@@ -23,6 +23,7 @@
 
 using System;
 using System.Globalization;
+using System.Text;
 
 using Antlr.Runtime;
 using Antlr.Runtime.Misc;
@@ -55,6 +56,21 @@ namespace EnumReflector
 		}
 
 		// Private interface
+		static private string Concatenate_Depth2_Subtree_Name( ITreeAdaptor tree_adapter, object node )
+		{
+			StringBuilder builder = new StringBuilder();
+
+			builder.Append( tree_adapter.GetText( node ) );
+
+			for ( int i = 0; i < tree_adapter.GetChildCount( node ); i++ )
+			{
+				object child_node = tree_adapter.GetChild( node, i );
+				builder.Append( tree_adapter.GetText( child_node ) );
+			}
+
+			return builder.ToString();
+		}
+
 		static private CEnumRecord Walk_Enum_AST( object root_node, ITreeAdaptor tree_adapter, string file_name_with_path )
 		{
 			string name_space = String.Empty;
@@ -81,11 +97,11 @@ namespace EnumReflector
 					{
 						if ( tree_adapter.GetChildCount( setting_node ) != 1 )
 						{
-							throw new Exception( "Parse Error: extension clause does not have a single child identifier node" );
+							throw new Exception( "Parse Error: extension clause does not have a single child qualified identifier node" );
 						}
 
 						object extension_name_node = tree_adapter.GetChild( setting_node, 0 );
-						extension_enum_name = tree_adapter.GetText( extension_name_node );
+						extension_enum_name = Concatenate_Depth2_Subtree_Name( tree_adapter, extension_name_node );
 						break;
 					}
 
@@ -99,7 +115,7 @@ namespace EnumReflector
 			if ( tree_adapter.GetToken( enum_entry_point_node ).Type == EnumReflectorParser.NAMESPACE )
 			{
 				object namespace_name_node = tree_adapter.GetChild( enum_entry_point_node, 0 );
-				name_space = tree_adapter.GetText( namespace_name_node ); 
+				name_space = Concatenate_Depth2_Subtree_Name( tree_adapter, namespace_name_node ); 
 
 				enum_definition_node = tree_adapter.GetChild( enum_entry_point_node, 1 );
 			}
@@ -128,7 +144,12 @@ namespace EnumReflector
 			{
 				object enum_entry_node = tree_adapter.GetChild( enum_entry_list_node, i );
 
-				string entry_name = tree_adapter.GetText( enum_entry_node );
+				string qualified_entry_name = tree_adapter.GetText( enum_entry_node );
+				if ( name_space.Length > 0 )
+				{
+					qualified_entry_name = name_space + "::" + qualified_entry_name;
+				}
+
 				string entry_conversion_name = "";
 				bool can_bind_value = extension_enum_name.Length == 0;
 				bool bound_value = false;
@@ -184,7 +205,7 @@ namespace EnumReflector
 					}
 					else if ( sub_node_token_type == EnumReflectorParser.ID )
 					{
-						bound_name = tree_adapter.GetText( enum_entry_sub_node );
+						bound_name = Concatenate_Depth2_Subtree_Name( tree_adapter, enum_entry_sub_node );
 					}
 					else
 					{
@@ -193,19 +214,19 @@ namespace EnumReflector
 
 					if ( !can_bind_value && bound_value )
 					{
-						throw new Exception( "Extension enum " + enum_name + " has an illegally bound entry: " + entry_name );
+						throw new Exception( "Extension enum " + enum_record.FullName + " has an illegally bound entry: " + qualified_entry_name );
 					}
 				}
 
 				if ( can_bind_value )
 				{
-					CLogInterface.Write_Line( "Enum " + enum_name + ": Register bound entry " + entry_conversion_name + " with value " + current_value.ToString() );
-					enum_record.Add_Bound_Entry( entry_name, entry_conversion_name, (ulong)current_value );
+					CLogInterface.Write_Line( "Enum " + enum_record.FullName + ": Register bound entry " + entry_conversion_name + " with value " + current_value.ToString() );
+					enum_record.Add_Bound_Entry( qualified_entry_name, entry_conversion_name, (ulong)current_value );
 				}
 				else
 				{
-					CLogInterface.Write_Line( "Enum " + enum_name + ": Register unbound entry " + entry_conversion_name );
-					enum_record.Add_Unbound_Entry( entry_name, entry_conversion_name, bound_name );						
+					CLogInterface.Write_Line( "Enum " + enum_record.FullName + ": Register unbound entry " + entry_conversion_name );
+					enum_record.Add_Unbound_Entry( qualified_entry_name, entry_conversion_name, bound_name );						
 				}
 
 				current_value++;

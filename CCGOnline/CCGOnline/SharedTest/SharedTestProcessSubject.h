@@ -1,8 +1,7 @@
 /**********************************************************************************************************************
 
-	ProcessSubject.h
-		A component containing the type enumerating different process subjects.  The subject is the high-level
-		logical role of the process.
+	SharedTestProcessSubject.h
+		defines an extension of the ProcessSubject enum for use in Shared unit testing
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -21,22 +20,25 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_SUBJECT_H
-#define PROCESS_SUBJECT_H
+#ifndef SHARED_TEST_PROCESS_SUBJECT_H
+#define SHARED_TEST_PROCESS_SUBJECT_H
 
-//:EnumBegin()
-namespace EProcessSubject
+#include "Concurrency/ProcessSubject.h"
+
+//:EnumBegin( extends EProcessSubject::Enum )
+namespace ETestExtendedProcessSubject
 {
 	enum Enum
 	{
-		INVALID = 0,
+		LOGIC = EProcessSubject::NEXT_FREE_VALUE,		//:EnumEntry( "Logic" )
+		NETWORK_CONNECTION_MANAGER,						//:EnumEntry( "NetworkConnectionManager" )
+		NETWORK_CONNECTION_SET,								//:EnumEntry( "NetworkConnectionSet" )
+		AI,														//:EnumEntry( "AI" )
+		UI,														//:EnumEntry( "UI" )
+		DATABASE													//:EnumEntry( "Database" )
 
-		CONCURRENCY_MANAGER,			//:EnumEntry( "ConcurrencyManager" )
-		LOGGING,							//:EnumEntry( "Logging" )
-
-		NEXT_FREE_VALUE
 	};
 }
 //:EnumEnd
 
-#endif // PROCESS_SUBJECT_H
+#endif // SHARED_TEST_PROCESS_SUBJECT_H
