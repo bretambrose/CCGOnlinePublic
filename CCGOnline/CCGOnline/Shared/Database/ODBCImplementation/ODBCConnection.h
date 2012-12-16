@@ -47,7 +47,7 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 		virtual IDatabaseStatement *Allocate_Statement( const std::wstring &statement_text );
 		virtual void Release_Statement( IDatabaseStatement *statement );
 
-		virtual DBErrorStateType Get_Error_State( void ) const { return ErrorState; }
+		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 
 	private:
 
@@ -55,12 +55,11 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 		
 		bool Was_Last_ODBC_Operation_Successful( void ) const;
 
-		void Update_Error_State( ODBCConnectionOperationType operation_type, SQLRETURN error_code );
+		void Update_Error_Status( ODBCConnectionOperationType operation_type, SQLRETURN error_code );
 				
 		DBConnectionIDType ID;
 
 		ODBCConnectionStateType State;
-		DBErrorStateType ErrorState;
 
 		stdext::hash_map< DBStatementIDType, IDatabaseStatement * > Statements;
 		stdext::hash_map< std::wstring, DBStatementIDType > CachedStatements;

@@ -49,7 +49,6 @@ CODBCConnection::CODBCConnection( DBConnectionIDType id, SQLHENV environment_han
 	BASECLASS( environment_handle, connection_handle, 0 ),
 	ID( id ),
 	State( ODBCCST_UNINITIALIZED ),
-	ErrorState( DBEST_SUCCESS ),
 	Statements(),
 	CachedStatements(),
 	NextStatementID( static_cast< DBStatementIDType >( 1 ) ),
@@ -78,7 +77,7 @@ void CODBCConnection::Initialize( const std::wstring &connection_string )
 														  &output_size, 
 														  SQL_DRIVER_COMPLETE );
 
-	Update_Error_State( ODBCCOT_CONNECT_TO_DB, error_code );
+	Update_Error_Status( ODBCCOT_CONNECT_TO_DB, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		State = ODBCCST_FATAL_ERROR;
@@ -86,7 +85,7 @@ void CODBCConnection::Initialize( const std::wstring &connection_string )
 	}
 
 	error_code = SQLSetConnectAttr( ConnectionHandle, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) SQL_AUTOCOMMIT_OFF, 0 );
-	Update_Error_State( ODBCCOT_TOGGLE_AUTO_COMMIT, error_code );
+	Update_Error_Status( ODBCCOT_TOGGLE_AUTO_COMMIT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		State = ODBCCST_FATAL_ERROR;
@@ -140,7 +139,7 @@ IDatabaseStatement *CODBCConnection::Allocate_Statement( const std::wstring &sta
 
 	SQLHSTMT statement_handle = 0;
 	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_STMT, ConnectionHandle, &statement_handle );
-	Update_Error_State( ODBCCOT_ALLOCATE_STATEMENT_HANDLE, error_code );
+	Update_Error_Status( ODBCCOT_ALLOCATE_STATEMENT_HANDLE, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		return nullptr;
@@ -197,32 +196,28 @@ void CODBCConnection::Release_Statement( IDatabaseStatement *statement )
 
 bool CODBCConnection::Was_Last_ODBC_Operation_Successful( void ) const
 {
-	return Was_Database_Operation_Successful( ErrorState );
+	return Was_Database_Operation_Successful( Get_Error_State_Base() );
 }
 
-void CODBCConnection::Update_Error_State( ODBCConnectionOperationType operation_type, SQLRETURN error_code )
+void CODBCConnection::Update_Error_Status( ODBCConnectionOperationType operation_type, SQLRETURN error_code )
 {
-	if ( error_code == SQL_SUCCESS )
+	if ( Refresh_Error_Status( error_code ) )
 	{
-		Clear_Error_List();
-		ErrorState = DBEST_SUCCESS;
 		return;
 	}
-
-	BASECLASS::Rebuild_Error_List();
 
 	switch ( operation_type )
 	{
 		case ODBCCOT_CONNECT_TO_DB:
-			ErrorState = ( error_code == SQL_SUCCESS_WITH_INFO ) ? DBEST_WARNING : DBEST_FATAL_ERROR;
+			Set_Error_State_Base( ( error_code == SQL_SUCCESS_WITH_INFO ) ? DBEST_WARNING : DBEST_FATAL_ERROR );
 			break;
 
 		case ODBCCOT_TOGGLE_AUTO_COMMIT:
-			ErrorState = DBEST_FATAL_ERROR;
+			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;
 
 		case ODBCCOT_ALLOCATE_STATEMENT_HANDLE:
-			ErrorState = DBEST_NON_FATAL_ERROR;
+			Set_Error_State_Base( DBEST_NON_FATAL_ERROR );
 			break;
 
 		default:

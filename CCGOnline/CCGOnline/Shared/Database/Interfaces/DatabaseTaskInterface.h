@@ -41,6 +41,7 @@ class IDatabaseTask
 		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) = 0;			
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) = 0;	
 
+		virtual void On_Rollback( void ) = 0;
 		virtual void On_Task_Success( void ) = 0;					
 		virtual void On_Task_Failure( void ) = 0;					// error information needs to be copied into a base class 
 

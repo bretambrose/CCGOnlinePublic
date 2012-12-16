@@ -52,18 +52,18 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 
 		virtual bool Is_Ready_For_Use( void ) const;
 
-		virtual DBErrorStateType Get_Error_State( void ) const { return ErrorState; }
+		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
+		virtual int32 Get_Bad_Row_Number( void ) const { return Get_Bad_Row_Number_Base(); }
 
 	private:
 
 		bool Was_Last_ODBC_Operation_Successful( void ) const;
 
-		void Update_Error_State( ODBCStatementOperationType operation_type, SQLRETURN error_code );
+		void Update_Error_Status( ODBCStatementOperationType operation_type, SQLRETURN error_code );
 		
 		DBStatementIDType ID;
 
 		ODBCStatementStateType State;
-		DBErrorStateType ErrorState;
 
 		std::wstring StatementText;
 

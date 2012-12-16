@@ -154,7 +154,6 @@ CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle
 	BASECLASS( environment_handle, connection_handle, statement_handle ),
 	ID( id ),
 	State( ODBCCST_UNINITIALIZED ),
-	ErrorState( DBEST_SUCCESS ),
 	StatementText( L"" ),
 	RowStatuses( nullptr ),
 	RowsFetched( 0 ),
@@ -208,7 +207,7 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 	if ( parameters.size() > 0 )
 	{
 		SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) param_set_size, 0 );
-		Update_Error_State( ODBCSOT_SET_PARAM_SET_ROW_SIZE, error_code );
+		Update_Error_Status( ODBCSOT_SET_PARAM_SET_ROW_SIZE, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
 			State = ODBCEST_FATAL_ERROR;
@@ -230,7 +229,7 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 			SQLUSMALLINT parameter_index = static_cast< SQLUSMALLINT >( i + 1 );
 
 			error_code = SQLBindParameter( StatementHandle, parameter_index, param_type, c_value_type, sql_value_type, value_size, decimals, value_address, value_buffer_size, indicator_address );
-			Update_Error_State( ODBCSOT_BIND_PARAMETER, error_code );
+			Update_Error_Status( ODBCSOT_BIND_PARAMETER, error_code );
 			if ( !Was_Last_ODBC_Operation_Successful() )
 			{
 				State = ODBCEST_FATAL_ERROR;
@@ -256,7 +255,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		ProcessResults = true;
 
 		SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_BIND_TYPE, (SQLPOINTER) result_set_size, 0 );
-		Update_Error_State( ODBCSOT_SET_RESULT_SET_ROW_SIZE, error_code );
+		Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_SIZE, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
 			State = ODBCEST_FATAL_ERROR;
@@ -264,7 +263,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		}
 
 		error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) result_set_count, 0 );
-		Update_Error_State( ODBCSOT_SET_RESULT_SET_ROW_COUNT, error_code );
+		Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_COUNT, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
 			State = ODBCEST_FATAL_ERROR;
@@ -274,7 +273,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		FATAL_ASSERT( result_set_count > 0 );
 		RowStatuses = new SQLSMALLINT[ result_set_count ];
 		error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_STATUS_PTR, RowStatuses, 0 );
-		Update_Error_State( ODBCSOT_SET_ROW_STATUS_ARRAY, error_code );
+		Update_Error_Status( ODBCSOT_SET_ROW_STATUS_ARRAY, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
 			State = ODBCEST_FATAL_ERROR;
@@ -282,7 +281,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		}
 
 		error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROWS_FETCHED_PTR, (SQLPOINTER) &RowsFetched, 0 );
-		Update_Error_State( ODBCSOT_SET_ROWS_FETCHED_PTR, error_code );
+		Update_Error_Status( ODBCSOT_SET_ROWS_FETCHED_PTR, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
 			State = ODBCEST_FATAL_ERROR;
@@ -299,7 +298,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 			SQLUSMALLINT column_index = static_cast< SQLUSMALLINT >( i + 1 );
 
 			error_code = SQLBindCol( StatementHandle, column_index, c_value_type, value_address, value_buffer_size, value_indicator );
-			Update_Error_State( ODBCSOT_BIND_COLUMN, error_code );
+			Update_Error_Status( ODBCSOT_BIND_COLUMN, error_code );
 			if ( !Was_Last_ODBC_Operation_Successful() )
 			{
 				State = ODBCEST_FATAL_ERROR;
@@ -318,7 +317,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 void CODBCStatement::Execute( uint32 batch_size )
 {
 	SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) batch_size, 0 );
-	Update_Error_State( ODBCSOT_SET_PARAM_SET_COUNT, error_code );
+	Update_Error_Status( ODBCSOT_SET_PARAM_SET_COUNT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		State = ODBCEST_FATAL_ERROR;
@@ -326,7 +325,7 @@ void CODBCStatement::Execute( uint32 batch_size )
 	}
 
 	error_code = SQLExecDirect( StatementHandle, (SQLWCHAR *)StatementText.c_str(), SQL_NTS );
-	Update_Error_State( ODBCSOT_EXECUTE_STATEMENT, error_code );
+	Update_Error_Status( ODBCSOT_EXECUTE_STATEMENT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		State = ODBCEST_FATAL_ERROR;
@@ -368,7 +367,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 		}
 		else if ( ec2 != SQL_SUCCESS )
 		{
-			Update_Error_State( ODBCSOT_FETCH_RESULTS, error_code );
+			Update_Error_Status( ODBCSOT_FETCH_RESULTS, error_code );
 			State = ODBCEST_FATAL_ERROR;
 			return FRST_ERROR;
 		}
@@ -379,7 +378,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 	}
 	else if ( error_code != SQL_SUCCESS )
 	{
-		Update_Error_State( ODBCSOT_FETCH_RESULTS, error_code );
+		Update_Error_Status( ODBCSOT_FETCH_RESULTS, error_code );
 		State = ODBCEST_FATAL_ERROR;
 		return FRST_ERROR;
 	}
@@ -392,7 +391,7 @@ void CODBCStatement::End_Transaction( bool commit )
 	FATAL_ASSERT( State == ODBCCST_END_TRANSACTION || ( !commit && State == ODBCEST_FATAL_ERROR ) );	
 
 	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
-	Update_Error_State( ODBCSOT_COMMIT_ROLLBACK_STATEMENT, error_code );
+	Update_Error_Status( ODBCSOT_COMMIT_ROLLBACK_STATEMENT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		State = ODBCEST_FATAL_ERROR;
@@ -404,24 +403,20 @@ void CODBCStatement::End_Transaction( bool commit )
 
 bool CODBCStatement::Is_Ready_For_Use( void ) const
 {
-	return State == ODBCCST_READY && ErrorState == DBEST_SUCCESS;
+	return State == ODBCCST_READY && Get_Error_State_Base() == DBEST_SUCCESS;
 }
 
 bool CODBCStatement::Was_Last_ODBC_Operation_Successful( void ) const
 {
-	return Was_Database_Operation_Successful( ErrorState );
+	return Was_Database_Operation_Successful( Get_Error_State_Base() );
 }
 
-void CODBCStatement::Update_Error_State( ODBCStatementOperationType operation_type, SQLRETURN error_code )
+void CODBCStatement::Update_Error_Status( ODBCStatementOperationType operation_type, SQLRETURN error_code )
 {
-	if ( error_code == SQL_SUCCESS )
+	if ( Refresh_Error_Status( error_code ) )
 	{
-		Clear_Error_List();
-		ErrorState = DBEST_SUCCESS;
 		return;
 	}
-
-	BASECLASS::Rebuild_Error_List();
 
 	switch ( operation_type )
 	{
@@ -436,7 +431,7 @@ void CODBCStatement::Update_Error_State( ODBCStatementOperationType operation_ty
 		case ODBCSOT_EXECUTE_STATEMENT:
 		case ODBCSOT_COMMIT_ROLLBACK_STATEMENT:
 		case ODBCSOT_FETCH_RESULTS:
-			ErrorState = DBEST_FATAL_ERROR;
+			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			 
 		default:
 			FATAL_ASSERT( false );

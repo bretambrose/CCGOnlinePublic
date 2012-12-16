@@ -1,9 +1,9 @@
 /**********************************************************************************************************************
 
-	stdafx.h
-		Set of includes that make up the pre-compiled header file
+	DatabaseTask.h
+		A component defining 
 
-	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
+	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,39 +20,26 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#ifndef DATABASE_TASK_H
+#define DATABASE_TASK_H
 
-#include "targetver.h"
+#include "Interfaces/DatabaseTaskInterface.h"
 
-// std includes
-#include <list>
-#include <vector>
-#include <set>
-#include <hash_map>
-#include <map>
-#include <memory>
-#include <string>
-#include <algorithm>
-#include <assert.h>
+template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
+class TDatabaseTask : public IDatabaseTask
+{
+	public:
 
-// Loki includes
-#include "loki/LokiTypeInfo.h"
+		typedef IDatabaseTask BASECLASS;
 
-// Misc includes
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-#include "FastDelegate.h"
-#pragma warning( pop ) 
+		TDatabaseTask( void ) {}
+		virtual ~TDatabaseTask() {}
 
-// Global using directives; be careful with these
-using namespace fastdelegate;
+		typedef I InputParametersType;
+		typedef O ResultSetType;
 
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
-using std::unique_ptr;
+		static const uint32 InputParameterBatchSize = ISIZE;
+		static const uint32 ResultSetBatchSize = OSIZE;
+};
 
-// self includes
-#include "PlatformTypes.h"
-#include "DebugAssert.h"
-#include "WindowsWrapper.h"
-
+#endif // DATABASE_TASK_H

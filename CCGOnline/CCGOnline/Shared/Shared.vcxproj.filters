@@ -257,6 +257,9 @@
     <ClInclude Include="Concurrency\ThreadProcessBase.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
+    <ClInclude Include="Database\DatabaseTask.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

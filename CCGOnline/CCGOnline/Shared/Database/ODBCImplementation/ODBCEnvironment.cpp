@@ -46,7 +46,6 @@ enum ODBCEnvironmentOperationType
 CODBCEnvironment::CODBCEnvironment( SQLHENV environment_handle ) :
 	BASECLASS( environment_handle, 0, 0 ),
 	State( ODBCEST_UNINITIALIZED ),
-	ErrorState( DBEST_SUCCESS ),
 	Connections(),
 	NextConnectionID( static_cast< DBConnectionIDType >( 1 ) )
 {
@@ -62,7 +61,7 @@ void CODBCEnvironment::Initialize( void )
 	FATAL_ASSERT( State == ODBCEST_UNINITIALIZED );
 
 	SQLRETURN error_code = SQLSetEnvAttr( EnvironmentHandle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
-	Update_Error_State( ODBCEOT_SET_VERSION, error_code );
+	Update_Error_Status( ODBCEOT_SET_VERSION, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		State = ODBCEST_FATAL_ERROR;
@@ -110,7 +109,7 @@ IDatabaseConnection *CODBCEnvironment::Add_Connection( const std::wstring &conne
 
 	SQLHDBC dbc_handle = 0;
 	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_DBC, EnvironmentHandle, &dbc_handle );
-	Update_Error_State( ODBCEOT_ALLOCATE_CONNECTION_HANDLE, error_code );
+	Update_Error_Status( ODBCEOT_ALLOCATE_CONNECTION_HANDLE, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		return nullptr;
@@ -126,25 +125,21 @@ IDatabaseConnection *CODBCEnvironment::Add_Connection( const std::wstring &conne
 	return connection;
 }
 
-void CODBCEnvironment::Update_Error_State( ODBCEnvironmentOperationType operation_type, SQLRETURN error_code )
+void CODBCEnvironment::Update_Error_Status( ODBCEnvironmentOperationType operation_type, SQLRETURN error_code )
 {
-	if ( error_code == SQL_SUCCESS )
+	if ( Refresh_Error_Status( error_code ) )
 	{
-		Clear_Error_List();
-		ErrorState = DBEST_SUCCESS;
 		return;
 	}
-
-	BASECLASS::Rebuild_Error_List();
 
 	switch ( operation_type )
 	{
 		case ODBCEOT_SET_VERSION:
-			ErrorState = DBEST_FATAL_ERROR;
+			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;
 
 		case ODBCEOT_ALLOCATE_CONNECTION_HANDLE:
-			ErrorState = DBEST_NON_FATAL_ERROR;
+			Set_Error_State_Base( DBEST_NON_FATAL_ERROR );
 			break;
 
 		default:
@@ -155,5 +150,5 @@ void CODBCEnvironment::Update_Error_State( ODBCEnvironmentOperationType operatio
 
 bool CODBCEnvironment::Was_Last_ODBC_Operation_Successful( void ) const
 {
-	return Was_Database_Operation_Successful( ErrorState );
+	return Was_Database_Operation_Successful( Get_Error_State_Base() );
 }

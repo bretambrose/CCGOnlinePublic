@@ -23,12 +23,17 @@
 #ifndef DATABASE_TASK_BATCH_H
 #define DATABASE_TASK_BATCH_H
 
-class IDatabaseTask;
+#include "Interfaces/DatabaseConnectionInterface.h"
+#include "Interfaces/DatabaseStatementInterface.h"
+#include "Interfaces/DatabaseTaskInterface.h"
+#include "DatabaseTypes.h"
 
 template < typename T >
 class TDatabaseTaskBatch
 {
 	public:
+
+		typedef std::list< IDatabaseTask * > DBTaskListType;
 
 		TDatabaseTaskBatch( void ) :
 			PendingTasks(),
@@ -38,8 +43,8 @@ class TDatabaseTaskBatch
 		{
 			FATAL_ASSERT( T::InputParameterBatchSize > 0 && T::ResultSetBatchSize > 0 );
 
-			InputParameterBlock = new BatchInputParametersType[ T::InputParameterBatchSize ];
-			ResultSetBlock = new BatchResultSetType[ T::ResultSetBatchSize ];
+			InputParameterBlock = new T::InputParametersType[ T::InputParameterBatchSize ];
+			ResultSetBlock = new T::ResultSetType[ T::ResultSetBatchSize ];
 		}
 
 		~TDatabaseTaskBatch()
@@ -48,7 +53,7 @@ class TDatabaseTaskBatch
 			delete []ResultSetBlock;
 		}
 
-		void Add_Task( const shared_ptr< IDatabaseTask > &task ) { PendingTasks.push_back( task ); }
+		void Add_Task( IDatabaseTask *task ) { PendingTasks.push_back( task ); }
 
 		void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
@@ -66,8 +71,8 @@ class TDatabaseTaskBatch
 			IDatabaseStatement *statement = connection->Allocate_Statement( StatementText );
 			FATAL_ASSERT( statement != nullptr );
 
-			statement->Bind_Input( InputParameterBlock, sizeof( BatchInputParametersType ) );
-			statement->Bind_Output( ResultSetBlock, sizeof( BatchResultSetType ), T::ResultSetBatchSize );
+			statement->Bind_Input( InputParameterBlock, T::InputParameterBatchSize );
+			statement->Bind_Output( ResultSetBlock, sizeof( T::ResultSetType ), T::ResultSetBatchSize );
 			FATAL_ASSERT( statement->Get_Error_State() == DBEST_SUCCESS );
 
 			while ( PendingTasks.size() > 0 )
@@ -84,8 +89,6 @@ class TDatabaseTaskBatch
 				Process_Task_List( statement, sub_list, successful_tasks, failed_tasks );
 			}
 
-			PendingTasks.clear();
-
 			connection->Release_Statement( statement );
 		}
 
@@ -93,22 +96,74 @@ class TDatabaseTaskBatch
 
 		void Process_Task_List( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
+			for ( DBTaskListType::iterator iter = sub_list.begin(), uint32 i = 0; iter != sub_list.end(); ++iter, ++i )
+			{
+				( *iter )->Initialize_Parameters( InputParameterBlock[ i ] );
+			}
+
 			while ( sub_list.size() > 0 )
 			{
 				bool success = true;
 
-				for ( DBTaskListType::iterator iter = sub_list.begin(), uint32 i = 0; iter != sub_list.end(); ++iter, ++i )
+				if ( !Was_Database_Operation_Successful( statement->Get_Error_State() ) )
 				{
-					iter->Initialize_Parameters( InputParameterBlock[ i ] );
+					FATAL_ASSERT( false );
 				}
 
 				statement->Execute( sub_list.size() );
 				if ( !Was_Database_Operation_Successful( statement->Get_Error_State() ) )
 				{
-					FATAL_ASSERT( false );	// TODO: FIX
+					success = false;
+					if ( Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks ) )
+					{
+						return;
+					}
 				}
+				else
+				{
+					DBTaskListType::iterator iter = sub_list.begin();
 
-				??;
+					int64 rows_fetched = 0;
+					uint32 input_row = 0;
+					EFetchResultsStatusType fetch_status = FRST_ONGOING;
+					while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
+					{
+						while ( fetch_status == FRST_ONGOING )
+						{
+							fetch_status = statement->Fetch_Results( rows_fetched );
+							if ( fetch_status != FRST_ERROR )
+							{
+								( *iter )->On_Fetch_Results( ResultSetBlock, rows_fetched );
+							}
+						}
+
+						if ( fetch_status != FRST_ERROR )
+						{
+							( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
+						}
+
+						++iter;
+						++input_row;
+					}
+
+					if ( fetch_status == FRST_FINISHED_ALL )
+					{
+						for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
+						{
+							successful_tasks.push_back( *iter );
+						}
+
+						sub_list.clear();
+					}
+					else
+					{
+						success = false;
+						if ( Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks ) )
+						{
+							return;
+						}
+					}
+				}
 
 				statement->End_Transaction( success );
 				if ( success )
@@ -117,9 +172,57 @@ class TDatabaseTaskBatch
 				}
 			}
 		}
-		 
-		typedef std::list< shared_ptr< IDatabaseTask > > DBTaskListType;
 
+		void Handle_Batch_Error( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		{
+			int32 bad_row_number = statement->Get_Bad_Row_Number();
+			if ( bad_row_number < 0 )
+			{
+				statement->End_Transaction( false );
+				Process_Task_List_One_By_One( statement, sub_list, successful_tasks, failed_tasks );
+				return true;
+			}
+			else
+			{						
+				for( DBTaskListType::iterator iter = sub_list.begin(), int32 row = 0; iter != sub_list.end(); ++row, ++iter )
+				{
+					( *iter )->On_Rollback();
+
+					if ( row >= bad_row_number )
+					{
+						if ( row == bad_row_number )
+						{
+							failed_tasks.push_back( *iter );
+							iter = sub_list.erase( iter );
+						}
+
+						( *iter )->Initialize_Parameters( InputParameterBlock[ row ] );
+					} 
+				}
+
+				return false;
+			}
+		}
+
+		void Process_Task_List_One_By_One( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		{
+			for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
+			{
+				( *iter )->On_Rollback();
+			}
+
+			DBTaskListType individual_list;
+			for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
+			{
+				individual_list.clear();
+				individual_list.push_back( *iter );
+
+				Process_Task_List( statement, individual_list, successful_tasks, failed_tasks );
+			}
+
+			sub_list.clear();
+		}
+		 
 		typedef typename T::InputParametersType BatchInputParametersType;
 		typedef typename T::ResultSetType BatchResultSetType; 
 

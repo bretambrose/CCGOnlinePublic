@@ -25,6 +25,7 @@
 #include "targetver.h"
 
 // std includes
+#include <list>
 #include <vector>
 #include <set>
 #include <hash_map>

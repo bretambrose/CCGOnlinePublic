@@ -27,6 +27,8 @@
 #include <Windows.h>
 #include <sql.h>
 
+enum DBErrorStateType;
+
 struct SODBCError
 {
 	SODBCError( void );
@@ -50,8 +52,12 @@ class CODBCObjectBase
 
 		void Invalidate_Handles( void );
 
-		void Clear_Error_List( void );
-		void Rebuild_Error_List( void );	
+		bool Refresh_Error_Status( SQLRETURN error_code );	
+
+		DBErrorStateType Get_Error_State_Base( void ) const { return ErrorState; }
+		void Set_Error_State_Base( DBErrorStateType error_state ) { ErrorState = error_state; }
+
+		int32 Get_Bad_Row_Number_Base( void ) const { return BadRowNumber; }
 
 		const std::vector< SODBCError > &Get_Errors( void ) const { return Errors; }
 		
@@ -60,6 +66,9 @@ class CODBCObjectBase
 		SQLHSTMT StatementHandle;
 
 	private:
+
+		DBErrorStateType ErrorState;
+		int32 BadRowNumber;
 
 		std::vector< SODBCError > Errors;
 };

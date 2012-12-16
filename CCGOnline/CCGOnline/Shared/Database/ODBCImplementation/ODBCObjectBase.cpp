@@ -54,6 +54,8 @@ CODBCObjectBase::CODBCObjectBase( SQLHENV environment_handle, SQLHDBC connection
 	EnvironmentHandle( environment_handle ),
 	ConnectionHandle( connection_handle ),
 	StatementHandle( statement_handle ),
+	ErrorState( DBEST_SUCCESS ),
+	BadRowNumber( -1 ),
 	Errors()
 {
 }
@@ -62,45 +64,65 @@ CODBCObjectBase::~CODBCObjectBase()
 {
 }
 
-void CODBCObjectBase::Clear_Error_List( void )
-{
-	Errors.clear();
-}
-
-void CODBCObjectBase::Rebuild_Error_List( void )
+bool CODBCObjectBase::Refresh_Error_Status( SQLRETURN error_code )
 {
 	FATAL_ASSERT( EnvironmentHandle != 0 );
+
 	Errors.clear();
+	BadRowNumber = -1;
 
-	SQLSMALLINT text_length = 0;
-	SQLINTEGER sql_error_code = 0;
-	SQLWCHAR error_buffer[ 1024 ] = { 0 };
-	SQLWCHAR sql_state[ 6 ] = { 0 };
-
-	SQLRETURN error_code = SQLError( EnvironmentHandle, 
-												( ConnectionHandle != 0 ) ? ConnectionHandle : SQL_NULL_HDBC, 
-												( StatementHandle != 0 ) ? StatementHandle : SQL_NULL_HSTMT, 
-												sql_state, 
-												&sql_error_code, 
-												error_buffer, 
-												sizeof( error_buffer ), 
-												&text_length );
-
-	Errors.push_back( SODBCError( sql_error_code, sql_state, std::wstring( error_buffer, error_buffer + text_length ) ) );
-
-	while ( error_code == SQL_SUCCESS )
+	if ( error_code == SQL_SUCCESS )
 	{
-		error_code = SQLError( EnvironmentHandle, 
-									  ( ConnectionHandle != 0 ) ? ConnectionHandle : SQL_NULL_HDBC, 
-									  ( StatementHandle != 0 ) ? StatementHandle : SQL_NULL_HSTMT, 
-									  sql_state, 
-									  &sql_error_code, 
-									  error_buffer, 
-									  sizeof( error_buffer ), 
-									  &text_length );
-
-		Errors.push_back( SODBCError( sql_error_code, sql_state, std::wstring( error_buffer, error_buffer + text_length ) ) );
+		ErrorState = DBEST_SUCCESS;
+		return true;
 	}
+	else if ( error_code == SQL_INVALID_HANDLE )
+	{
+		ErrorState = DBEST_FATAL_ERROR;
+		return true;
+	}
+
+	SQLSMALLINT handle_type = SQL_HANDLE_ENV;
+	SQLHANDLE handle = EnvironmentHandle;
+	if ( StatementHandle != 0 )
+	{
+		handle_type = SQL_HANDLE_STMT;
+		handle = StatementHandle;
+	}
+	else if ( ConnectionHandle != 0 )
+	{
+		handle_type = SQL_HANDLE_DBC;
+		handle = ConnectionHandle;
+	}
+
+	SQLINTEGER record_count = 0;
+	SQLRETURN ec = SQLGetDiagField( handle_type, handle, 0, SQL_DIAG_NUMBER, &record_count, SQL_IS_INTEGER, NULL );
+	FATAL_ASSERT( ec == SQL_SUCCESS );
+
+	SQLWCHAR sql_state[ 6 ] = { 0 };
+	SQLINTEGER sql_error_code = 0;
+	SQLSMALLINT text_length = 0;
+	SQLWCHAR error_buffer[ 1024 ] = { 0 };
+
+	for ( SQLSMALLINT i = 1; i <= record_count; ++i )
+	{
+		ec = SQLGetDiagRec( handle_type, handle, i, sql_state, &sql_error_code, error_buffer, sizeof( error_buffer ), &text_length );
+		FATAL_ASSERT( ec == SQL_SUCCESS );
+
+		if ( handle_type == SQL_HANDLE_STMT && BadRowNumber == -1 )
+		{
+			SQLINTEGER bad_row = 0;
+			ec = SQLGetDiagField( handle_type, handle, i, SQL_DIAG_ROW_NUMBER, &bad_row, SQL_IS_INTEGER, NULL );
+			FATAL_ASSERT( ec == SQL_SUCCESS );
+
+			if ( bad_row >= 1 )
+			{
+				BadRowNumber = bad_row - 1;
+			}
+		}
+	}
+
+	return false;
 }
 
 void CODBCObjectBase::Invalidate_Handles( void )

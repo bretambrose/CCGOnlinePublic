@@ -44,16 +44,15 @@ class CODBCEnvironment : public CODBCObjectBase, public IDatabaseEnvironment
 
 		virtual IDatabaseConnection *Add_Connection( const std::wstring &connection_string, bool cache_statements );
 		
-		virtual DBErrorStateType Get_Error_State( void ) const { return ErrorState; }
+		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 
 	private:
 		
 		bool Was_Last_ODBC_Operation_Successful( void ) const;
 
-		void Update_Error_State( ODBCEnvironmentOperationType operation_type, SQLRETURN error_code );
+		void Update_Error_Status( ODBCEnvironmentOperationType operation_type, SQLRETURN error_code );
 
 		ODBCEnvironmentStateType State;
-		DBErrorStateType ErrorState;
 
 		stdext::hash_map< DBConnectionIDType, IDatabaseConnection * > Connections;
 	
