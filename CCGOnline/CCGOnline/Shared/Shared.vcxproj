@@ -202,6 +202,7 @@
     <ClInclude Include="Database\ODBCImplementation\ODBCEnvironment.h" />
     <ClInclude Include="Database\ODBCImplementation\ODBCFactory.h" />
     <ClInclude Include="Database\ODBCImplementation\ODBCObjectBase.h" />
+    <ClInclude Include="Database\ODBCImplementation\ODBCParameterInsulation.h" />
     <ClInclude Include="Database\ODBCImplementation\ODBCParameters.h" />
     <ClInclude Include="Database\ODBCImplementation\ODBCStatement.h" />
     <ClInclude Include="EnumConversion.h" />

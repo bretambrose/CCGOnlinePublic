@@ -103,5 +103,8 @@
     <ClCompile Include="ODBCTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ODBCDatabaseTaskTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

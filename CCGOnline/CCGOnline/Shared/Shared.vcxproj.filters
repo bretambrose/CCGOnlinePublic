@@ -260,6 +260,9 @@
     <ClInclude Include="Database\DatabaseCalls.h">
       <Filter>Source Files\Database</Filter>
     </ClInclude>
+    <ClInclude Include="Database\ODBCImplementation\ODBCParameterInsulation.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

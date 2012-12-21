@@ -25,10 +25,7 @@
 
 #include "Database/Interfaces/DatabaseVariableInterface.h"
 #include "Database/DatabaseTypes.h"
-#include <Windows.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
+#include "ODBCParameterInsulation.h"
 
 template < typename T >
 EDatabaseVariableValueType Get_ODBC_Value_Type( const T & /*dummy*/ )
@@ -36,12 +33,12 @@ EDatabaseVariableValueType Get_ODBC_Value_Type( const T & /*dummy*/ )
 	return DVVT_INVALID;
 }
 
-EDatabaseVariableValueType Get_ODBC_Value_Type( const int32 & /*dummy*/ ) { return DVVT_INT32; }
-EDatabaseVariableValueType Get_ODBC_Value_Type( const uint32 & /*dummy*/ ) { return DVVT_UINT32; }
-EDatabaseVariableValueType Get_ODBC_Value_Type( const int64 & /*dummy*/ ) { return DVVT_INT64; }
-EDatabaseVariableValueType Get_ODBC_Value_Type( const uint64 & /*dummy*/ ) { return DVVT_UINT64; }
-EDatabaseVariableValueType Get_ODBC_Value_Type( const float & /*dummy*/ ) { return DVVT_FLOAT; }
-EDatabaseVariableValueType Get_ODBC_Value_Type( const double & /*dummy*/ ) { return DVVT_DOUBLE; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const int32 & /*dummy*/ ) { return DVVT_INT32; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const uint32 & /*dummy*/ ) { return DVVT_UINT32; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const int64 & /*dummy*/ ) { return DVVT_INT64; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const uint64 & /*dummy*/ ) { return DVVT_UINT64; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const float & /*dummy*/ ) { return DVVT_FLOAT; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const double & /*dummy*/ ) { return DVVT_DOUBLE; }
 
 template < typename T, EDatabaseVariableType PT >
 class TODBCScalarVariable : public IDatabaseVariable
@@ -52,7 +49,7 @@ class TODBCScalarVariable : public IDatabaseVariable
 
 		TODBCScalarVariable( void ) :
 			Value( static_cast< T >( 0 ) ),
-			Indicator( SQL_NULL_DATA )
+			Indicator( IP_SQL_NULL_DATA )
 		{}
 
 		TODBCScalarVariable( const TODBCScalarVariable< T, PT > &rhs ) :
@@ -80,13 +77,13 @@ class TODBCScalarVariable : public IDatabaseVariable
 		const T &Get_Value( void ) const { return Value; }
 		void Set_Value( const T &value ) { Value = value; Indicator = 0; }
 
-		bool Is_Null( void ) const { return Indicator == SQL_NULL_DATA; }
-		void Set_Null( void ) { Indicator = SQL_NULL_DATA; }
+		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
+		void Set_Null( void ) { Indicator = IP_SQL_NULL_DATA; }
 
 	private:
 
 		T Value;
-		SQLLEN Indicator;
+		IP_SQLLEN Indicator;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +114,7 @@ class DBString : public IDatabaseVariable
 		typedef IDatabaseVariable BASECLASS;
 
 		DBString( void ) :
-			Indicator( SQL_NULL_DATA )
+			Indicator( IP_SQL_NULL_DATA )
 		{
 		}
 
@@ -174,15 +171,15 @@ class DBString : public IDatabaseVariable
 				Buffer[ length ] = 0;
 			}
 
-			Indicator = ( buffer == nullptr ) ? SQL_NULL_DATA : SQL_NTS;
+			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : SQL_NTS;
 		}
 
-		bool Is_Null( void ) const { return Indicator == SQL_NULL_DATA; }
+		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
 	private:
 
 		char Buffer[ BUFFER_LENGTH + 1 ];
-		SQLLEN Indicator;
+		IP_SQLLEN Indicator;
 
 };
 
@@ -194,7 +191,7 @@ class DBWString : public IDatabaseVariable
 		typedef IDatabaseVariable BASECLASS;
 
 		DBWString( void ) :
-			Indicator( SQL_NULL_DATA )
+			Indicator( IP_SQL_NULL_DATA )
 		{
 		}
 
@@ -251,15 +248,15 @@ class DBWString : public IDatabaseVariable
 				Buffer[ length ] = 0;
 			}
 
-			Indicator = ( buffer == nullptr ) ? SQL_NULL_DATA : SQL_NTS;
+			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : SQL_NTS;
 		}
 
-		bool Is_Null( void ) const { return Indicator == SQL_NULL_DATA; }
+		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
 	private:
 
 		wchar_t Buffer[ BUFFER_LENGTH + 1 ];
-		SQLLEN Indicator;
+		IP_SQLLEN Indicator;
 
 };
 

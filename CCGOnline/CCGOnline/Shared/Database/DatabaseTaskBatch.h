@@ -135,7 +135,7 @@ class TDatabaseTaskBatch
 						while ( fetch_status == FRST_ONGOING )
 						{
 							fetch_status = statement->Fetch_Results( rows_fetched );
-							if ( fetch_status != FRST_ERROR )
+							if ( fetch_status != FRST_ERROR && rows_fetched > 0 )
 							{
 								( *iter )->On_Fetch_Results( ResultSetBlock, rows_fetched );
 							}
