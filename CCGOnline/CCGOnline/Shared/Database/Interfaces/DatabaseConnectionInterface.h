@@ -24,6 +24,8 @@
 #define DATABASE_CONNECTION_INTERFACE_H
 
 class IDatabaseStatement;
+class IDatabaseTask;
+class IDatabaseVariableSet;
 
 enum DBConnectionIDType;
 enum DBErrorStateType;
@@ -43,6 +45,10 @@ class IDatabaseConnection
 		virtual void Release_Statement( IDatabaseStatement *statement ) = 0;
 
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;
+
+		virtual void Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const = 0;
+		virtual bool Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const = 0;
+
 };
 
 #endif // DATABASE_CONNECTION_INTERFACE_H

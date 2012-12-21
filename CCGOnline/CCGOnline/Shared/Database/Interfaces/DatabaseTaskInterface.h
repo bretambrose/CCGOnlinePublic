@@ -25,16 +25,21 @@
 
 class IDatabaseVariableSet;
 
+enum EDatabaseTaskType;
+
 class IDatabaseTask
 {
 	public:
 		
-		IDatabaseTask( void );
+		IDatabaseTask( void ) {}
 		virtual ~IDatabaseTask() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const = 0;
+		virtual EDatabaseTaskType Get_Task_Type( void ) const = 0;
 
 	protected:
 
-		friend template < typename T > class TDatabaseTaskBatch;
+		template < typename T > friend class TDatabaseTaskBatch;
 
 		// WIP: signatures in flux
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) = 0;		
@@ -43,11 +48,7 @@ class IDatabaseTask
 
 		virtual void On_Rollback( void ) = 0;
 		virtual void On_Task_Success( void ) = 0;					
-		virtual void On_Task_Failure( void ) = 0;					// error information needs to be copied into a base class 
-
-		virtual const wchar_t *Get_Statement_Text( IDatabaseVariableSet *input_parameters ) = 0;	// implemented in DBProcedureCall, FunctionCall
-
-		virtual bool Validate_Input_Signature( IDatabaseVariableSet *input_parameters ) = 0;		// called only once ever per TaskBatch, implemented in DBProcedureCall, FunctionCall
+		virtual void On_Task_Failure( void ) = 0;					
 
 };
 

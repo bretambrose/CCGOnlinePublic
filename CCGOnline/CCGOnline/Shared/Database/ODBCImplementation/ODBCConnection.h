@@ -49,6 +49,9 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 
+		virtual void Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const;
+		virtual bool Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const;
+
 	private:
 
 		IDatabaseStatement *Get_Statement( DBStatementIDType id ) const;

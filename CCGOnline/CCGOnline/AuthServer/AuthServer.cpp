@@ -40,6 +40,8 @@
 #include "Database/Interfaces/DatabaseStatementInterface.h"
 #include "Database/Interfaces/DatabaseEnvironmentInterface.h"
 #include "Database/DatabaseVariableSet.h"
+#include "Database/DatabaseCalls.h"
+#include "Database/DatabaseTaskBatch.h"
 
 #include <iostream>
 
@@ -1201,7 +1203,7 @@ void Test_SQL_Server_Output_Params_Multi_Result_Set( void )
 
 	error_code = SQLDriverConnect( dbc_handle, 
 											 0, 
-											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", 
+											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=sa;PWD=CCG0nl1ne;", 
 											 SQL_NTS, 
 											 output_connection_buffer, 
 											 1024, 
@@ -1229,13 +1231,6 @@ void Test_SQL_Server_Output_Params_Multi_Result_Set( void )
 	error_code = SQLBindParameter( statement_handle, 1, SQL_PARAM_INPUT_OUTPUT, SQL_C_UBIGINT, SQL_BIGINT, 0, 0, &test_input[ 0 ].AccountCount, 0, &test_input[ 0 ].AccountCountLengthIndicator );
 	FATAL_ASSERT( error_code == SQL_SUCCESS );
 
-	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) 2, 0 );
-	FATAL_ASSERT( error_code == SQL_SUCCESS );
-
-	std::wstring statement_text( L"{call dynamic.get_all_accounts_with_in_out(?)}" );
-	error_code = SQLExecDirect( statement_handle, (SQLWCHAR *)statement_text.c_str(), SQL_NTS );
-	FATAL_ASSERT( error_code == SQL_SUCCESS );
-
 	STestInOutOutput test_output[ 2 ];
 	SQLSMALLINT row_statuses[ 2 ];
 
@@ -1259,6 +1254,151 @@ void Test_SQL_Server_Output_Params_Multi_Result_Set( void )
 	FATAL_ASSERT( error_code == SQL_SUCCESS );
 
 	error_code = SQLBindCol( statement_handle, 3, SQL_C_ULONG, &test_output[ 0 ].NicknameSequenceID, 0, &test_output[ 0 ].NicknameSequenceIDLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) 2, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	std::wstring statement_text( L"{call dynamic.get_all_accounts_with_in_out(?)}" );
+	error_code = SQLExecDirect( statement_handle, (SQLWCHAR *)statement_text.c_str(), SQL_NTS );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLRETURN ec2 = SQL_SUCCESS;
+	while ( ec2 == SQL_SUCCESS )
+	{
+		while ( error_code == SQL_SUCCESS )
+		{
+			error_code = SQLFetchScroll( statement_handle, SQL_FETCH_NEXT, 0 );
+		}
+
+		if ( error_code == SQL_NO_DATA )
+		{
+			ec2 = SQLMoreResults( statement_handle );
+			error_code = SQL_SUCCESS;
+		}
+		else
+		{
+			SQLSMALLINT text_length = 0;
+			SQLINTEGER sql_error_code = 0;
+			SQLWCHAR error_buffer[ 1024 ] = { 0 };
+			SQLWCHAR sql_state[ 6 ] = { 0 };
+
+			error_code = SQLError( env_handle, dbc_handle, statement_handle, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+			while ( error_code == SQL_SUCCESS )
+			{
+				error_code = SQLError( env_handle, dbc_handle, statement_handle, sql_state, &sql_error_code, error_buffer, 1024, &text_length );
+			}
+
+			ec2 = SQL_ERROR;
+		}
+	}
+
+	if ( ec2 == SQL_NO_DATA_FOUND )
+	{
+		error_code = SQLEndTran( SQL_HANDLE_DBC, dbc_handle, SQL_COMMIT );
+		FATAL_ASSERT( error_code == SQL_SUCCESS );
+	}
+
+	SQLFreeHandle( SQL_HANDLE_STMT, statement_handle );
+	SQLDisconnect( dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_DBC, dbc_handle );
+	SQLFreeHandle( SQL_HANDLE_ENV, env_handle );
+}
+
+struct STestAccountGetOutput
+{
+	SQLUBIGINT AccountID;
+	SQLLEN AccountIDLengthIndicator;
+
+	SQLCHAR AccountEmail[ 256 ];
+	SQLLEN AccountEmailLengthIndicator;
+
+	SQLCHAR Nickname[ 33 ];
+	SQLLEN NicknameLengthIndicator;
+
+	SQLUINTEGER NicknameSequenceID;
+	SQLLEN NicknameSequenceIDLengthIndicator;
+};
+
+void Test_SQL_Server_Multirow_Result_Set( void )
+{
+	SQLHENV env_handle = 0;
+	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetEnvAttr( env_handle, SQL_ATTR_ODBC_VERSION, (void*) SQL_OV_ODBC3, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHDBC dbc_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_DBC, env_handle, &dbc_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
+	SQLSMALLINT output_size = 0;
+
+	error_code = SQLDriverConnect( dbc_handle, 
+											 0, 
+											 (SQLWCHAR *)L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=sa;PWD=CCG0nl1ne;", 
+											 SQL_NTS, 
+											 output_connection_buffer, 
+											 1024, 
+											 &output_size, 
+											 SQL_DRIVER_COMPLETE );
+	FATAL_ASSERT( error_code == SQL_SUCCESS ||error_code == SQL_SUCCESS_WITH_INFO );
+
+	error_code = SQLSetConnectAttr( dbc_handle, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) SQL_AUTOCOMMIT_OFF, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	SQLHSTMT statement_handle = 0;
+	error_code = SQLAllocHandle( SQL_HANDLE_STMT, dbc_handle, &statement_handle );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	STestInOutInput test_input[ 2 ];
+	test_input[ 0 ].AccountCount = 0;
+	test_input[ 0 ].AccountCountLengthIndicator = 0;
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAM_BIND_TYPE, (SQLPOINTER) sizeof( STestInOutInput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindParameter( statement_handle, 1, SQL_PARAM_INPUT, SQL_C_UBIGINT, SQL_BIGINT, 0, 0, &test_input[ 0 ].AccountCount, 0, &test_input[ 0 ].AccountCountLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	STestAccountGetOutput test_output[ 2 ];
+	SQLSMALLINT row_statuses[ 2 ];
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_BIND_TYPE, (SQLPOINTER) sizeof( STestAccountGetOutput ), 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) 1, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_STATUS_PTR, row_statuses, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	int64 rows_fetched = 0;
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROWS_FETCHED_PTR, (SQLPOINTER) &rows_fetched, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 1, SQL_C_UBIGINT, &test_output[ 0 ].AccountID, 0, &test_output[ 0 ].AccountIDLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 2, SQL_C_CHAR, test_output[ 0 ].AccountEmail, 256, &test_output[ 0 ].AccountEmailLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 3, SQL_C_CHAR, test_output[ 0 ].Nickname, 33, &test_output[ 0 ].NicknameLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLBindCol( statement_handle, 4, SQL_C_ULONG, &test_output[ 0 ].NicknameSequenceID, 0, &test_output[ 0 ].NicknameSequenceIDLengthIndicator );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) 1, 0 );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	std::wstring statement_text( L"{call dynamic.get_all_accounts(?)}" );
+	error_code = SQLExecDirect( statement_handle, (SQLWCHAR *)statement_text.c_str(), SQL_NTS );
+	FATAL_ASSERT( error_code == SQL_SUCCESS );
+
+	error_code = SQLSetStmtAttr( statement_handle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) 2, 0 );
 	FATAL_ASSERT( error_code == SQL_SUCCESS );
 
 	SQLRETURN ec2 = SQL_SUCCESS;
@@ -1518,14 +1658,99 @@ bool Handle_Fetch_Account( const CSlashCommandInstance &instance, std::wstring &
 	return true;
 }
 
+class CAddAccountDatabaseTask : public TDatabaseProcedureCall< CAddAccountInputParams, 3, CEmptyVariableSet, 1 >
+{
+	public:
+
+		CAddAccountDatabaseTask( const std::string &account_email, const std::string &nickname, const std::string &password_hash ) :
+			AccountEmail( account_email ),
+			Nickname( nickname ),
+			PasswordHash( password_hash )
+		{}
+
+		virtual ~CAddAccountDatabaseTask() {}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters )
+		{
+			CAddAccountInputParams *input_params = static_cast< CAddAccountInputParams * >( input_parameters );
+			*input_params = CAddAccountInputParams( AccountEmail, Nickname, PasswordHash );
+		}
+
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 /*rows_fetched*/ ) {}		
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) {}
+
+		virtual void On_Rollback( void ) {}
+		virtual void On_Task_Success( void ) {}				
+		virtual void On_Task_Failure( void ) {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.add_account"; }
+
+	private:
+
+		std::string AccountEmail;
+		std::string Nickname;
+		std::string PasswordHash;
+};
+
+bool Handle_Add_Account_Batch( const CSlashCommandInstance &instance, std::wstring & /*error_msg*/ )
+{
+	std::string email;
+	instance.Get_Param( 0, email );
+
+	std::string nickname;
+	instance.Get_Param( 1, nickname );
+
+	uint32 add_count = 0;
+	instance.Get_Param( 2, add_count );
+	FATAL_ASSERT( add_count > 0 );
+
+	std::vector< IDatabaseTask * > tasks;
+	TDatabaseTaskBatch< CAddAccountDatabaseTask > add_account_batch;
+
+	for ( uint32 i = 0; i < add_count; ++i )
+	{
+		char buffer[ 10 ];
+		_itoa_s( i, buffer, 10 );
+		IDatabaseTask *task = new CAddAccountDatabaseTask( email + std::string( buffer ), nickname, "00001111222233334444555566667777" );
+		add_account_batch.Add_Task( task );
+		tasks.push_back( task ); 
+	}
+
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	FATAL_ASSERT( connection != nullptr );
+
+	DBTaskListType successful_tasks, failed_tasks;
+	add_account_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	
+	for ( uint32 i = 0; i < add_count; ++i )
+	{
+		delete tasks[ i ];
+	}
+
+	return true;
+}
+
+bool Handle_Fetch_Account_Batch( const CSlashCommandInstance & /*instance*/, std::wstring & /*error_msg*/ )
+{
+	return true;
+}
+
 int main( int /*argc*/, wchar_t* /*argv*/[] )
 {
 	NAuthServer::Initialize();
+
+	Test_SQL_Server_Multirow_Result_Set();
 
 	CSlashCommandManager::Initialize();
 	CSlashCommandManager::Load_Command_File( "Data/XML/SlashCommandODBCTests.xml" );
 	CSlashCommandManager::Register_Command_Handler( L"AddAccount", Handle_Add_Account );
 	CSlashCommandManager::Register_Command_Handler( L"FetchAccount", Handle_Fetch_Account );
+	CSlashCommandManager::Register_Command_Handler( L"BatchAddAccount", Handle_Add_Account_Batch );
+	CSlashCommandManager::Register_Command_Handler( L"BatchFetchAccount", Handle_Fetch_Account_Batch );
 
 	CODBCFactory::Create_Environment();
 

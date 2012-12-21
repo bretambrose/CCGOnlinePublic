@@ -25,6 +25,10 @@
 
 #include "Database/Interfaces/DatabaseVariableInterface.h"
 #include "Database/DatabaseTypes.h"
+#include <Windows.h>
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
 
 template < typename T >
 EDatabaseVariableValueType Get_ODBC_Value_Type( const T & /*dummy*/ )

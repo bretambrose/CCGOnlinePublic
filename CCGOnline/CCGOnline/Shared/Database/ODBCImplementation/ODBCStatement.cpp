@@ -155,6 +155,7 @@ CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle
 	ID( id ),
 	State( ODBCCST_UNINITIALIZED ),
 	StatementText( L"" ),
+	ResultSetRowCount( 1 ),
 	RowStatuses( nullptr ),
 	RowsFetched( 0 ),
 	ProcessResults( true )
@@ -243,6 +244,9 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 
 void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count )
 {
+	FATAL_ASSERT( result_set_count > 0 );
+	ResultSetRowCount = result_set_count;
+
 	if ( State != ODBCCST_BOUND_INPUT )
 	{
 		return;
@@ -256,14 +260,6 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 
 		SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_BIND_TYPE, (SQLPOINTER) result_set_size, 0 );
 		Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_SIZE, error_code );
-		if ( !Was_Last_ODBC_Operation_Successful() )
-		{
-			State = ODBCEST_FATAL_ERROR;
-			return;
-		}
-
-		error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) result_set_count, 0 );
-		Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_COUNT, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
 			State = ODBCEST_FATAL_ERROR;
@@ -316,7 +312,22 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 
 void CODBCStatement::Execute( uint32 batch_size )
 {
-	SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) batch_size, 0 );
+	if ( State != ODBCCST_READY )
+	{
+		return;
+	}
+
+	// Good freaking lord I hate ODBC; this needs to be 1 at the time execute is called or it uses a server-side cursor that's
+	// all kinds of fucked up.  We set it to the real value right before results processing.
+	SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) 1, 0 );
+	Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_COUNT, error_code );
+	if ( !Was_Last_ODBC_Operation_Successful() )
+	{
+		State = ODBCEST_FATAL_ERROR;
+		return;
+	}
+
+	error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) batch_size, 0 );
 	Update_Error_Status( ODBCSOT_SET_PARAM_SET_COUNT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
@@ -326,6 +337,15 @@ void CODBCStatement::Execute( uint32 batch_size )
 
 	error_code = SQLExecDirect( StatementHandle, (SQLWCHAR *)StatementText.c_str(), SQL_NTS );
 	Update_Error_Status( ODBCSOT_EXECUTE_STATEMENT, error_code );
+	if ( !Was_Last_ODBC_Operation_Successful() )
+	{
+		State = ODBCEST_FATAL_ERROR;
+		return;
+	}
+
+	// Set result set row count to the real value in anticipation of result set processing
+	error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) ResultSetRowCount, 0 );
+	Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_COUNT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		State = ODBCEST_FATAL_ERROR;
@@ -401,6 +421,11 @@ void CODBCStatement::End_Transaction( bool commit )
 	State = ODBCCST_READY;
 }
 
+bool CODBCStatement::Needs_Binding( void ) const
+{
+	return State == ODBCCST_INITIALIZED;
+}
+
 bool CODBCStatement::Is_Ready_For_Use( void ) const
 {
 	return State == ODBCCST_READY && Get_Error_State_Base() == DBEST_SUCCESS;
@@ -432,6 +457,7 @@ void CODBCStatement::Update_Error_Status( ODBCStatementOperationType operation_t
 		case ODBCSOT_COMMIT_ROLLBACK_STATEMENT:
 		case ODBCSOT_FETCH_RESULTS:
 			Set_Error_State_Base( DBEST_FATAL_ERROR );
+			break;
 			 
 		default:
 			FATAL_ASSERT( false );

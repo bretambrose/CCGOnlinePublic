@@ -106,18 +106,20 @@ bool CODBCObjectBase::Refresh_Error_Status( SQLRETURN error_code )
 
 	for ( SQLSMALLINT i = 1; i <= record_count; ++i )
 	{
-		ec = SQLGetDiagRec( handle_type, handle, i, sql_state, &sql_error_code, error_buffer, sizeof( error_buffer ), &text_length );
+		ec = SQLGetDiagRec( handle_type, handle, i, sql_state, &sql_error_code, error_buffer, sizeof( error_buffer ) / sizeof( SQLWCHAR ), &text_length );
 		FATAL_ASSERT( ec == SQL_SUCCESS );
+
+		Errors.push_back( SODBCError( sql_error_code, sql_state, std::wstring( error_buffer ) ) );
 
 		if ( handle_type == SQL_HANDLE_STMT && BadRowNumber == -1 )
 		{
-			SQLINTEGER bad_row = 0;
+			SQLLEN bad_row = 0;
 			ec = SQLGetDiagField( handle_type, handle, i, SQL_DIAG_ROW_NUMBER, &bad_row, SQL_IS_INTEGER, NULL );
 			FATAL_ASSERT( ec == SQL_SUCCESS );
 
 			if ( bad_row >= 1 )
 			{
-				BadRowNumber = bad_row - 1;
+				BadRowNumber = static_cast< int32 >( bad_row - 1 );
 			}
 		}
 	}

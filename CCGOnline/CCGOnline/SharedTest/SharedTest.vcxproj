@@ -118,7 +118,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)D32
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\intel64\vc10</AdditionalLibraryDirectories>
-      <AdditionalDependencies>shared.lib;platform.lib;DbgHelp.lib;shlwapi.lib;gtest-md.lib;pugixml.lib;tbbmalloc_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shared.lib;platform.lib;DbgHelp.lib;shlwapi.lib;gtest-md.lib;pugixml.lib;tbbmalloc_debug.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>
       </EntryPointSymbol>
       <IgnoreSpecificDefaultLibraries>
@@ -200,6 +200,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp" />
     <ClCompile Include="Helpers\ProcessHelpers.cpp" />
     <ClCompile Include="LoggingTests.cpp" />
+    <ClCompile Include="ODBCTests.cpp" />
     <ClCompile Include="PriorityQueueTests.cpp" />
     <ClCompile Include="ProcessMailboxTests.cpp" />
     <ClCompile Include="ProcessMessageFrameTests.cpp" />

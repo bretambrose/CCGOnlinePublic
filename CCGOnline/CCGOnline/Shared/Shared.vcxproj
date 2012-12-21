@@ -188,7 +188,7 @@
     <ClInclude Include="Concurrency\ThreadProcessBase.h" />
     <ClInclude Include="CRC.h" />
     <ClInclude Include="CRCValue.h" />
-    <ClInclude Include="Database\DatabaseTask.h" />
+    <ClInclude Include="Database\DatabaseCalls.h" />
     <ClInclude Include="Database\DatabaseTaskBatch.h" />
     <ClInclude Include="Database\DatabaseTypes.h" />
     <ClInclude Include="Database\DatabaseVariableSet.h" />

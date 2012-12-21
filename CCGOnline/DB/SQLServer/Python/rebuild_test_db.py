@@ -6,6 +6,6 @@ def main():
                                                       "BuildDB/Test/CreateTestTables.sql",
                                                       "BuildDB/Test/CreateTestForeignKeys.sql", 
                                                       "BuildDB/Test/Procedures", 
-                                                      "BuildDB/Test/PopulateTestTables.sql" ], "RebuildTestDB", "TestServer" )
+                                                      "BuildDB/Test/PopulateTestTables.sql" ], "RebuildTestDB", "TestServer", True )
 
 main()

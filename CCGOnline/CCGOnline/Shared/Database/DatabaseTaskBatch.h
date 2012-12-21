@@ -33,8 +33,6 @@ class TDatabaseTaskBatch
 {
 	public:
 
-		typedef std::list< IDatabaseTask * > DBTaskListType;
-
 		TDatabaseTaskBatch( void ) :
 			PendingTasks(),
 			InputParameterBlock( nullptr ),
@@ -64,21 +62,26 @@ class TDatabaseTaskBatch
 
 			if ( StatementText.size() == 0 )
 			{
-				FATAL_ASSERT( PendingTasks[ 0 ]->Validate_Input_Signature( InputParameterBlock ) );
-				StatementText = PendingTasks[ 0 ]->Get_Statement_Text( InputParameterBlock );
+				IDatabaseTask *first_task = *PendingTasks.begin();
+				FATAL_ASSERT( connection->Validate_Input_Signature( first_task, InputParameterBlock ) );
+				connection->Construct_Statement_Text( first_task, InputParameterBlock, StatementText );
 			}
 
 			IDatabaseStatement *statement = connection->Allocate_Statement( StatementText );
 			FATAL_ASSERT( statement != nullptr );
 
-			statement->Bind_Input( InputParameterBlock, T::InputParameterBatchSize );
-			statement->Bind_Output( ResultSetBlock, sizeof( T::ResultSetType ), T::ResultSetBatchSize );
-			FATAL_ASSERT( statement->Get_Error_State() == DBEST_SUCCESS );
+			if ( statement->Needs_Binding() )
+			{
+				statement->Bind_Input( InputParameterBlock, T::InputParameterBatchSize );
+				statement->Bind_Output( ResultSetBlock, sizeof( T::ResultSetType ), T::ResultSetBatchSize );
+				FATAL_ASSERT( statement->Get_Error_State() == DBEST_SUCCESS );
+			}
+
+			FATAL_ASSERT( statement->Is_Ready_For_Use() );
 
 			while ( PendingTasks.size() > 0 )
 			{
 				DBTaskListType sub_list;
-				uint32 range_count = 0;
 
 				while ( PendingTasks.size() > 0 && sub_list.size() < T::InputParameterBatchSize )
 				{
@@ -96,9 +99,10 @@ class TDatabaseTaskBatch
 
 		void Process_Task_List( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
-			for ( DBTaskListType::iterator iter = sub_list.begin(), uint32 i = 0; iter != sub_list.end(); ++iter, ++i )
+			uint32 i = 0;
+			for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter, ++i )
 			{
-				( *iter )->Initialize_Parameters( InputParameterBlock[ i ] );
+				( *iter )->Initialize_Parameters( &InputParameterBlock[ i ] );
 			}
 
 			while ( sub_list.size() > 0 )
@@ -110,7 +114,7 @@ class TDatabaseTaskBatch
 					FATAL_ASSERT( false );
 				}
 
-				statement->Execute( sub_list.size() );
+				statement->Execute( static_cast< uint32 >( sub_list.size() ) );
 				if ( !Was_Database_Operation_Successful( statement->Get_Error_State() ) )
 				{
 					success = false;
@@ -173,7 +177,7 @@ class TDatabaseTaskBatch
 			}
 		}
 
-		void Handle_Batch_Error( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		bool Handle_Batch_Error( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
 			int32 bad_row_number = statement->Get_Bad_Row_Number();
 			if ( bad_row_number < 0 )
@@ -184,7 +188,8 @@ class TDatabaseTaskBatch
 			}
 			else
 			{						
-				for( DBTaskListType::iterator iter = sub_list.begin(), int32 row = 0; iter != sub_list.end(); ++row, ++iter )
+				int32 row = 0;
+				for( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++row, ++iter )
 				{
 					( *iter )->On_Rollback();
 
@@ -196,7 +201,7 @@ class TDatabaseTaskBatch
 							iter = sub_list.erase( iter );
 						}
 
-						( *iter )->Initialize_Parameters( InputParameterBlock[ row ] );
+						( *iter )->Initialize_Parameters( &InputParameterBlock[ row ] );
 					} 
 				}
 

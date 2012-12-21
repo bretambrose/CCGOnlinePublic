@@ -24,10 +24,14 @@
 
 #include "ODBCConnection.h"
 
+#include <sqlext.h>
+#include <sstream>
+#include "StringUtils.h"
 #include "ODBCStatement.h"
 #include "Database/DatabaseTypes.h"
-#include <sqlext.h>
-#include "StringUtils.h"
+#include "Database/Interfaces/DatabaseTaskInterface.h"
+#include "Database/Interfaces/DatabaseVariableInterface.h"
+#include "Database/Interfaces/DatabaseVariableSetInterface.h"
 
 enum ODBCConnectionStateType
 {
@@ -184,10 +188,11 @@ void CODBCConnection::Release_Statement( IDatabaseStatement *statement )
 
 			const std::wstring &upper_statement_text = statement->Get_Statement_Text();
 			auto iter = CachedStatements.find( upper_statement_text );
-			FATAL_ASSERT( iter != CachedStatements.end() );
-
-			CachedStatements.erase( iter );
-			Statements.erase( statement_id );
+			if ( iter != CachedStatements.end() )
+			{
+				CachedStatements.erase( iter );
+				Statements.erase( statement_id );
+			}
 
 			delete statement;
 		}
@@ -235,4 +240,64 @@ IDatabaseStatement *CODBCConnection::Get_Statement( DBStatementIDType id ) const
 	}
 
 	return nullptr;
+}
+
+
+void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const
+{
+	std::basic_ostringstream< wchar_t > statement_stream;
+
+	statement_stream << L"{";
+	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
+	{
+		statement_stream << L"? = ";
+	}
+
+	statement_stream << L"call " << task->Get_Procedure_Name() << L"(";
+
+	std::vector< IDatabaseVariable * > params;
+	input_parameters->Get_Variables( params );
+
+	uint32 start_param = 0;
+	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
+	{
+		start_param = 1;
+	}
+
+	for ( uint32 i = start_param; i < params.size(); ++i )
+	{
+		if ( i + 1 < params.size() )
+		{
+			statement_stream << L"?,";
+		}
+		else
+		{
+			statement_stream << L"?";
+		}
+	}
+
+	statement_stream << L")}";
+
+	statement_text = std::wstring( statement_stream.rdbuf()->str() );
+}
+
+bool CODBCConnection::Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const
+{
+	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
+	{
+		std::vector< IDatabaseVariable * > params;
+		input_parameters->Get_Variables( params );
+
+		if ( params.size() == 0 )
+		{
+			return false;
+		}
+
+		if ( params[ 0 ]->Get_Parameter_Type() != DVT_OUTPUT )
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

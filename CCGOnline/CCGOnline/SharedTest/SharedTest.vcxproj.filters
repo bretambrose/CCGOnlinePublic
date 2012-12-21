@@ -100,5 +100,8 @@
     <ClCompile Include="Helpers\ProcessHelpers.cpp">
       <Filter>Source Files\Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="ODBCTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

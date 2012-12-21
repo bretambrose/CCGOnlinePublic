@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	DatabaseTask.h
+	DatabaseCalls.h
 		A component defining 
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -20,20 +20,26 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_H
-#define DATABASE_TASK_H
+#ifndef DATABASE_CALLS_H
+#define DATABASE_CALLS_H
 
 #include "Interfaces/DatabaseTaskInterface.h"
+#include "DatabaseTypes.h"
 
 template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
-class TDatabaseTask : public IDatabaseTask
+class TDatabaseFunctionCall : public IDatabaseTask
 {
 	public:
 
 		typedef IDatabaseTask BASECLASS;
 
-		TDatabaseTask( void ) {}
-		virtual ~TDatabaseTask() {}
+		TDatabaseFunctionCall( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~TDatabaseFunctionCall() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_FUNCTION_CALL; }
 
 		typedef I InputParametersType;
 		typedef O ResultSetType;
@@ -42,4 +48,26 @@ class TDatabaseTask : public IDatabaseTask
 		static const uint32 ResultSetBatchSize = OSIZE;
 };
 
-#endif // DATABASE_TASK_H
+template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
+class TDatabaseProcedureCall : public IDatabaseTask
+{
+	public:
+
+		typedef IDatabaseTask BASECLASS;
+
+		TDatabaseProcedureCall( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~TDatabaseProcedureCall() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_PROCEDURE_CALL; }
+
+		typedef I InputParametersType;
+		typedef O ResultSetType;
+
+		static const uint32 InputParameterBatchSize = ISIZE;
+		static const uint32 ResultSetBatchSize = OSIZE;
+};
+
+#endif // DATABASE_CALLS_H

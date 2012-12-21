@@ -50,6 +50,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		virtual void End_Transaction( bool commit );
 		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched );
 
+		virtual bool Needs_Binding( void ) const;
 		virtual bool Is_Ready_For_Use( void ) const;
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
@@ -66,6 +67,8 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		ODBCStatementStateType State;
 
 		std::wstring StatementText;
+
+		uint32 ResultSetRowCount;
 
 		SQLSMALLINT *RowStatuses;
 		int64 RowsFetched;

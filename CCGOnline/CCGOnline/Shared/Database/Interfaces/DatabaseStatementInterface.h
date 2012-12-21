@@ -47,6 +47,7 @@ class IDatabaseStatement
 		virtual void End_Transaction( bool commit ) = 0;
 		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched ) = 0;
 
+		virtual bool Needs_Binding( void ) const = 0;
 		virtual bool Is_Ready_For_Use( void ) const = 0;
 
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;

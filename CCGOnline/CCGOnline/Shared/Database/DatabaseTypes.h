@@ -77,4 +77,14 @@ enum EFetchResultsStatusType
 	FRST_ERROR
 };
 
+enum EDatabaseTaskType
+{
+	DTT_PROCEDURE_CALL,
+	DTT_FUNCTION_CALL
+};
+
+class IDatabaseTask;
+
+typedef std::list< IDatabaseTask * > DBTaskListType;
+
 #endif // DATABASE_TYPES_H

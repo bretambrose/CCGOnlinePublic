@@ -9,6 +9,16 @@
 		</Params>
 	</SlashCommand>
 
+  <SlashCommand>
+    <Command>BatchAddAccount</Command>
+
+    <Params>
+      <Param type="string"/>
+      <Param type="string"/>
+      <Param type="uint32" optional="true" default="1"/>
+    </Params>
+  </SlashCommand>
+  
 	<SlashCommand>
 		<Command>FetchAccount</Command>
 
@@ -17,4 +27,14 @@
 			<Param type="uint32" optional="true" default="1"/>
 		</Params>
 	</SlashCommand>
+
+  <SlashCommand>
+    <Command>BatchFetchAccount</Command>
+
+    <Params>
+      <Param type="string"/>
+      <Param type="uint32" optional="true" default="1"/>
+    </Params>
+  </SlashCommand>
+  
 </Commands>

@@ -171,7 +171,7 @@ def CCGRunDBScript( user, sql_script_path, script_type, log_file_name, granted_p
     CCGRunDBScripts( user, [ ( sql_script_path, script_type ) ], log_file_name, granted_procedure_user )
 
 
-def CCGRunDBScripts( user, sql_script_path_list, log_file_name, granted_procedure_user = "" ):
+def CCGRunDBScripts( user, sql_script_path_list, log_file_name, granted_procedure_user = "", exit_immediately = False ):
 
     try:
         CCGRunDBScriptsAux( user, sql_script_path_list, log_file_name, granted_procedure_user )
@@ -181,7 +181,8 @@ def CCGRunDBScripts( user, sql_script_path_list, log_file_name, granted_procedur
         print( "There were errors =(" )
         
     finally:
-        input( "Press Enter to exit" )
+        if exit_immediately == False:
+            input( "Press Enter to exit" )
     
 
 

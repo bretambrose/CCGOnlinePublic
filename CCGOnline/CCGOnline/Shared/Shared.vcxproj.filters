@@ -257,7 +257,7 @@
     <ClInclude Include="Concurrency\ThreadProcessBase.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="Database\DatabaseTask.h">
+    <ClInclude Include="Database\DatabaseCalls.h">
       <Filter>Source Files\Database</Filter>
     </ClInclude>
   </ItemGroup>
