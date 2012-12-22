@@ -48,6 +48,7 @@ class IDatabaseConnection
 
 		virtual void Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const = 0;
 		virtual bool Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const = 0;
+		virtual bool Validate_Output_Signature( IDatabaseTask *task, IDatabaseVariableSet *output_parameters ) const = 0;
 
 };
 

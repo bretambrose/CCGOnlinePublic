@@ -39,6 +39,7 @@ inline EDatabaseVariableValueType Get_ODBC_Value_Type( const int64 & /*dummy*/ )
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const uint64 & /*dummy*/ ) { return DVVT_UINT64; }
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const float & /*dummy*/ ) { return DVVT_FLOAT; }
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const double & /*dummy*/ ) { return DVVT_DOUBLE; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const bool & /*dummy*/ ) { return DVVT_BOOLEAN; }
 
 template < typename T, EDatabaseVariableType PT >
 class TODBCScalarVariable : public IDatabaseVariable
@@ -104,6 +105,18 @@ typedef TODBCScalarVariable< uint64, DVT_INPUT >				DBUInt64In;
 typedef TODBCScalarVariable< uint64, DVT_INPUT_OUTPUT >		DBUInt64InOut;
 typedef TODBCScalarVariable< uint64, DVT_OUTPUT >				DBUInt64Out;
 
+typedef TODBCScalarVariable< float, DVT_INPUT >					DBFloatIn;
+typedef TODBCScalarVariable< float, DVT_INPUT_OUTPUT >		DBFloatInOut;
+typedef TODBCScalarVariable< float, DVT_OUTPUT >				DBFloatOut;
+
+typedef TODBCScalarVariable< double, DVT_INPUT >				DBDoubleIn;
+typedef TODBCScalarVariable< double, DVT_INPUT_OUTPUT >		DBDoubleInOut;
+typedef TODBCScalarVariable< double, DVT_OUTPUT >				DBDoubleOut;
+
+typedef TODBCScalarVariable< bool, DVT_INPUT >					DBBoolIn;
+typedef TODBCScalarVariable< bool, DVT_INPUT_OUTPUT >			DBBoolInOut;
+typedef TODBCScalarVariable< bool, DVT_OUTPUT >					DBBoolOut;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template < uint32 BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
@@ -118,6 +131,7 @@ class DBString : public IDatabaseVariable
 		{
 		}
 
+		// We could loosen this up with a templated constructor, but I don't see a compelling use case yet
 		DBString( const DBString< BUFFER_LENGTH, PT > &rhs ) :
 			Indicator( rhs.Indicator )
 		{
@@ -171,7 +185,7 @@ class DBString : public IDatabaseVariable
 				Buffer[ length ] = 0;
 			}
 
-			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : SQL_NTS;
+			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : IP_SQL_NTS;
 		}
 
 		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
@@ -182,6 +196,90 @@ class DBString : public IDatabaseVariable
 		IP_SQLLEN Indicator;
 
 };
+
+template < uint32 BUFFER_LENGTH >
+class DBStringIn : public DBString< BUFFER_LENGTH, DVT_INPUT >
+{
+	public:
+
+		typedef DBString< BUFFER_LENGTH, DVT_INPUT > BASECLASS;
+
+		DBStringIn( void ) :
+			BASECLASS()
+		{
+		}
+
+		DBStringIn( const DBStringIn< BUFFER_LENGTH > &rhs ) :
+			BASECLASS( rhs )
+		{
+		}
+
+		explicit DBStringIn( const std::string &buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		explicit DBStringIn( const char *buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		virtual ~DBStringIn() {}
+};
+
+template < uint32 BUFFER_LENGTH >
+class DBStringInOut : public DBString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
+{
+	public:
+
+		typedef DBString< BUFFER_LENGTH, DVT_INPUT_OUTPUT > BASECLASS;
+
+		DBStringInOut( void ) :
+			BASECLASS()
+		{
+		}
+
+		DBStringInOut( const DBStringInOut< BUFFER_LENGTH > &rhs ) :
+			BASECLASS( rhs )
+		{
+		}
+
+		explicit DBStringInOut( const std::string &buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		explicit DBStringInOut( const char *buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		virtual ~DBStringInOut() {}
+};
+
+template < uint32 BUFFER_LENGTH >
+class DBStringOut : public DBString< BUFFER_LENGTH, DVT_OUTPUT >
+{
+	public:
+
+		typedef DBString< BUFFER_LENGTH, DVT_OUTPUT > BASECLASS;
+
+		DBStringOut( void ) :
+			BASECLASS()
+		{
+		}
+
+		DBStringOut( const DBStringOut< BUFFER_LENGTH > &rhs ) :
+			BASECLASS( rhs )
+		{
+		}
+
+		// Output params have no need for data-based constructors
+
+		virtual ~DBStringOut() {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template < uint32 BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
 class DBWString : public IDatabaseVariable
@@ -195,6 +293,7 @@ class DBWString : public IDatabaseVariable
 		{
 		}
 
+		// We could loosen this up with a templated constructor, but I don't see a compelling use case yet
 		DBWString( const DBString< BUFFER_LENGTH, PT > &rhs ) :
 			Indicator( rhs.Indicator )
 		{
@@ -238,7 +337,7 @@ class DBWString : public IDatabaseVariable
 		{ 
 			if ( buffer != nullptr )
 			{
-				int32 length = wcslen( buffer );
+				size_t length = wcslen( buffer );
 				if ( length > BUFFER_LENGTH )
 				{
 					length = BUFFER_LENGTH;
@@ -248,7 +347,7 @@ class DBWString : public IDatabaseVariable
 				Buffer[ length ] = 0;
 			}
 
-			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : SQL_NTS;
+			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : IP_SQL_NTS;
 		}
 
 		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
@@ -258,6 +357,88 @@ class DBWString : public IDatabaseVariable
 		wchar_t Buffer[ BUFFER_LENGTH + 1 ];
 		IP_SQLLEN Indicator;
 
+};
+
+template < uint32 BUFFER_LENGTH >
+class DBWStringIn : public DBWString< BUFFER_LENGTH, DVT_INPUT >
+{
+	public:
+
+		typedef DBWString< BUFFER_LENGTH, DVT_INPUT > BASECLASS;
+
+		DBWStringIn( void ) :
+			BASECLASS()
+		{
+		}
+
+		DBWStringIn( const DBWStringIn< BUFFER_LENGTH > &rhs ) :
+			BASECLASS( rhs )
+		{
+		}
+
+		explicit DBWStringIn( const std::wstring &buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		explicit DBWStringIn( const wchar_t *buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		virtual ~DBWStringIn() {}
+};
+
+template < uint32 BUFFER_LENGTH >
+class DBWStringInOut : public DBWString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
+{
+	public:
+
+		typedef DBWString< BUFFER_LENGTH, DVT_INPUT_OUTPUT > BASECLASS;
+
+		DBWStringInOut( void ) :
+			BASECLASS()
+		{
+		}
+
+		DBWStringInOut( const DBWStringInOut< BUFFER_LENGTH > &rhs ) :
+			BASECLASS( rhs )
+		{
+		}
+
+		explicit DBWStringInOut( const std::wstring &buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		explicit DBWStringInOut( const wchar_t *buffer ) :
+			BASECLASS( buffer )
+		{
+		}
+
+		virtual ~DBWStringInOut() {}
+};
+
+template < uint32 BUFFER_LENGTH >
+class DBWStringOut : public DBWString< BUFFER_LENGTH, DVT_OUTPUT >
+{
+	public:
+
+		typedef DBWString< BUFFER_LENGTH, DVT_OUTPUT > BASECLASS;
+
+		DBWStringOut( void ) :
+			BASECLASS()
+		{
+		}
+
+		DBWStringOut( const DBWStringOut< BUFFER_LENGTH > &rhs ) :
+			BASECLASS( rhs )
+		{
+		}
+
+		// Output params have no need for data-based constructors
+
+		virtual ~DBWStringOut() {}
 };
 
 #endif // ODBC_PARAMETERS_H

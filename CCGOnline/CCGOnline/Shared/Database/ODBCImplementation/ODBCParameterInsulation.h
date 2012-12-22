@@ -23,11 +23,12 @@
 #ifndef ODBC_PARAMETER_INSULATION_H
 #define ODBC_PARAMETER_INSULATION_H
 
-#define INSULATE_FROM_WINDOWS_HEADERS
+//#define INSULATE_FROM_WINDOWS_HEADERS
 
 #ifdef INSULATE_FROM_WINDOWS_HEADERS
 
 static const int32 IP_SQL_NULL_DATA = -1;
+static const int32 IP_SQL_NTS = -3;
 
 #ifdef X64
 #define IP_SQLLEN long long
@@ -44,6 +45,7 @@ static const int32 IP_SQL_NULL_DATA = -1;
 
 static const int32 IP_SQL_NULL_DATA = SQL_NULL_DATA;
 #define IP_SQLLEN SQLLEN
+#define IP_SQL_NTS SQL_NTS
 
 #endif // INSULATE_FROM_WINDOWS_HEADERS
 

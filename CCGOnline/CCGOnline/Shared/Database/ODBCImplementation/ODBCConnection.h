@@ -51,6 +51,7 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 
 		virtual void Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const;
 		virtual bool Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const;
+		virtual bool Validate_Output_Signature( IDatabaseTask *task, IDatabaseVariableSet *output_parameters ) const;
 
 	private:
 

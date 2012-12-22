@@ -41,8 +41,8 @@ class TDatabaseTaskBatch
 		{
 			FATAL_ASSERT( T::InputParameterBatchSize > 0 && T::ResultSetBatchSize > 0 );
 
-			InputParameterBlock = new T::InputParametersType[ T::InputParameterBatchSize ];
-			ResultSetBlock = new T::ResultSetType[ T::ResultSetBatchSize ];
+			InputParameterBlock = new BatchInputParametersType[ T::InputParameterBatchSize ];
+			ResultSetBlock = new BatchResultSetType[ T::ResultSetBatchSize ];
 		}
 
 		~TDatabaseTaskBatch()
@@ -64,6 +64,7 @@ class TDatabaseTaskBatch
 			{
 				IDatabaseTask *first_task = *PendingTasks.begin();
 				FATAL_ASSERT( connection->Validate_Input_Signature( first_task, InputParameterBlock ) );
+				FATAL_ASSERT( connection->Validate_Output_Signature( first_task, ResultSetBlock ) );
 				connection->Construct_Statement_Text( first_task, InputParameterBlock, StatementText );
 			}
 
@@ -72,8 +73,8 @@ class TDatabaseTaskBatch
 
 			if ( statement->Needs_Binding() )
 			{
-				statement->Bind_Input( InputParameterBlock, T::InputParameterBatchSize );
-				statement->Bind_Output( ResultSetBlock, sizeof( T::ResultSetType ), T::ResultSetBatchSize );
+				statement->Bind_Input( InputParameterBlock, sizeof( BatchInputParametersType ) );
+				statement->Bind_Output( ResultSetBlock, sizeof( BatchResultSetType ), T::ResultSetBatchSize );
 				FATAL_ASSERT( statement->Get_Error_State() == DBEST_SUCCESS );
 			}
 
@@ -132,6 +133,7 @@ class TDatabaseTaskBatch
 					EFetchResultsStatusType fetch_status = FRST_ONGOING;
 					while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
 					{
+						fetch_status = FRST_ONGOING;
 						while ( fetch_status == FRST_ONGOING )
 						{
 							fetch_status = statement->Fetch_Results( rows_fetched );
@@ -141,13 +143,19 @@ class TDatabaseTaskBatch
 							}
 						}
 
-						if ( fetch_status != FRST_ERROR )
+						if ( fetch_status == FRST_FINISHED_SET )
 						{
 							( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
+							++iter;
+							++input_row;
 						}
-
-						++iter;
-						++input_row;
+						else if ( fetch_status == FRST_FINISHED_ALL )
+						{
+							for ( ; iter != sub_list.end(); ++iter, ++input_row )
+							{
+								( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
+							}
+						}
 					}
 
 					if ( fetch_status == FRST_FINISHED_ALL )

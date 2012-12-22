@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	ODBCTests.cpp
-		defines unit tests for ODBC wrapper functionality
+	ODBCMiscTests.cpp
+		defines some miscellaneous unit tests for ODBC wrapper functionality
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -30,7 +30,7 @@
 #include "Database/ODBCImplementation/ODBCParameters.h"
 #include "Database/DatabaseVariableSet.h"
 
-class ODBCTests : public testing::Test 
+class ODBCMiscTests : public testing::Test 
 {
 	public:
 	
@@ -48,7 +48,7 @@ class ODBCTests : public testing::Test
 
 };
 
-TEST_F( ODBCTests, AllocateAndCleanup )
+TEST_F( ODBCMiscTests, AllocateAndCleanup )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
@@ -89,7 +89,7 @@ class CGetAccountResultSet : public IDatabaseVariableSet
 };
 
 
-TEST_F( ODBCTests, ReadSeededData_GetAllAccounts1_OK )
+TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts1_OK )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
@@ -168,7 +168,7 @@ TEST_F( ODBCTests, ReadSeededData_GetAllAccounts1_OK )
 	delete []params_array;
 }
 
-TEST_F( ODBCTests, ReadSeededData_GetAllAccounts2_OK )
+TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );

@@ -78,7 +78,7 @@ SQLSMALLINT Get_ODBC_C_Value_Type( EDatabaseVariableValueType variable_value_typ
 			return SQL_C_DOUBLE;
 
 		case DVVT_BOOLEAN:
-			return SQL_C_BIT;
+			return SQL_C_BIT;		// or SQL_C_TINYINT?
 
 		default:
 			FATAL_ASSERT( false ); 
@@ -112,7 +112,7 @@ SQLSMALLINT Get_ODBC_SQL_Value_Type( EDatabaseVariableValueType variable_value_t
 			return SQL_DOUBLE;
 
 		case DVVT_BOOLEAN:
-			return SQL_BIT;
+			return SQL_BIT;		// or SQL_TINYINT?
 
 		default:
 			FATAL_ASSERT( false ); 
@@ -357,6 +357,8 @@ void CODBCStatement::Execute( uint32 batch_size )
 
 EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 {
+	rows_fetched = 0;
+
 	if ( !ProcessResults )
 	{
 		State = ODBCCST_END_TRANSACTION;

@@ -283,11 +283,13 @@ void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVa
 
 bool CODBCConnection::Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const
 {
+	uint32 starting_input_param = 0;
+
+	std::vector< IDatabaseVariable * > params;
+	input_parameters->Get_Variables( params );
+
 	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
 	{
-		std::vector< IDatabaseVariable * > params;
-		input_parameters->Get_Variables( params );
-
 		if ( params.size() == 0 )
 		{
 			return false;
@@ -296,6 +298,44 @@ bool CODBCConnection::Validate_Input_Signature( IDatabaseTask *task, IDatabaseVa
 		if ( params[ 0 ]->Get_Parameter_Type() != DVT_OUTPUT )
 		{
 			return false;
+		}
+
+		starting_input_param = 1;
+	}
+
+	for ( uint32 i = starting_input_param; i < params.size(); ++i )
+	{
+		EDatabaseVariableType variable_type = params[ i ]->Get_Parameter_Type();
+		if ( variable_type != DVT_INPUT && variable_type != DVT_INPUT_OUTPUT )
+		{
+			return false;
+		} 
+	}
+
+	return true;
+}
+
+bool CODBCConnection::Validate_Output_Signature( IDatabaseTask *task, IDatabaseVariableSet *output_parameters ) const
+{
+	std::vector< IDatabaseVariable * > params;
+	output_parameters->Get_Variables( params );
+
+	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
+	{
+		if ( params.size() != 0 )
+		{
+			return false;
+		}
+	}
+	else
+	{
+		for ( uint32 i = 0; i < params.size(); ++i )
+		{
+			EDatabaseVariableType variable_type = params[ i ]->Get_Parameter_Type();
+			if ( variable_type != DVT_INPUT )
+			{
+				return false;
+			} 
 		}
 	}
 
