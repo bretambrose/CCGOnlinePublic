@@ -25,7 +25,7 @@
 #include "ODBCFactory.h"
 #include "ODBCEnvironment.h"
 
-IDatabaseEnvironment *CODBCFactory::Environment( NULL );
+IDatabaseEnvironment *CODBCFactory::Environment( nullptr );
 
 void CODBCFactory::Create_Environment( void )
 {

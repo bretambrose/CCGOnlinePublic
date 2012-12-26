@@ -27,6 +27,8 @@
 #include "Interfaces/DatabaseStatementInterface.h"
 #include "Interfaces/DatabaseTaskInterface.h"
 #include "DatabaseTypes.h"
+#include "Logging/LogInterface.h"
+#include "EnumConversion.h"
 
 template < typename T >
 class TDatabaseTaskBatch
@@ -37,7 +39,8 @@ class TDatabaseTaskBatch
 			PendingTasks(),
 			InputParameterBlock( nullptr ),
 			ResultSetBlock( nullptr ),
-			StatementText( L"" )
+			StatementText( L"" ),
+			TaskName( typeid( T ).name() )
 		{
 			FATAL_ASSERT( T::InputParameterBatchSize > 0 && T::ResultSetBatchSize > 0 );
 
@@ -63,8 +66,8 @@ class TDatabaseTaskBatch
 			if ( StatementText.size() == 0 )
 			{
 				IDatabaseTask *first_task = *PendingTasks.begin();
-				FATAL_ASSERT( connection->Validate_Input_Signature( first_task, InputParameterBlock ) );
-				FATAL_ASSERT( connection->Validate_Output_Signature( first_task, ResultSetBlock ) );
+				FATAL_ASSERT( connection->Validate_Input_Signature( first_task->Get_Task_Type(), InputParameterBlock ) );
+				FATAL_ASSERT( connection->Validate_Output_Signature( first_task->Get_Task_Type(), ResultSetBlock ) );
 				connection->Construct_Statement_Text( first_task, InputParameterBlock, StatementText );
 			}
 
@@ -80,6 +83,8 @@ class TDatabaseTaskBatch
 
 			FATAL_ASSERT( statement->Is_Ready_For_Use() );
 
+			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
+
 			while ( PendingTasks.size() > 0 )
 			{
 				DBTaskListType sub_list;
@@ -92,6 +97,8 @@ class TDatabaseTaskBatch
 
 				Process_Task_List( statement, sub_list, successful_tasks, failed_tasks );
 			}
+
+			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << " Failures: " << failed_tasks.size() );
 
 			connection->Release_Statement( statement );
 		}
@@ -187,9 +194,22 @@ class TDatabaseTaskBatch
 
 		bool Handle_Batch_Error( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
+			if ( sub_list.size() == 1 )
+			{
+				IDatabaseTask *task = *( sub_list.begin() );
+				Log_Error( statement, &InputParameterBlock[ 0 ] );
+
+				statement->End_Transaction( false );
+				failed_tasks.push_back( task );
+				sub_list.clear();
+				return true;
+			}
+
 			int32 bad_row_number = statement->Get_Bad_Row_Number();
 			if ( bad_row_number < 0 )
 			{
+				Log_Error( statement, nullptr );
+
 				statement->End_Transaction( false );
 				Process_Task_List_One_By_One( statement, sub_list, successful_tasks, failed_tasks );
 				return true;
@@ -205,6 +225,8 @@ class TDatabaseTaskBatch
 					{
 						if ( row == bad_row_number )
 						{
+							Log_Error( statement, &InputParameterBlock[ row ] );
+
 							failed_tasks.push_back( *iter );
 							iter = sub_list.erase( iter );
 						}
@@ -235,6 +257,40 @@ class TDatabaseTaskBatch
 
 			sub_list.clear();
 		}
+
+		void Log_Error( IDatabaseStatement *statement, IDatabaseVariableSet *input_params )
+		{
+			FATAL_ASSERT( statement != nullptr );
+
+			statement->Log_Error_State();
+
+			if ( input_params != nullptr )
+			{
+				std::vector< IDatabaseVariable * > params;
+				input_params->Get_Variables( params );
+				if ( params.size() > 0 )
+				{
+					LOG( LL_LOW, "\tDumping Parameters:" );
+					for ( uint32 i = 0; i < params.size(); ++i )
+					{
+						std::string value_string;
+						Convert_Database_Variable_To_String( params[ i ], value_string );
+
+						std::string type_string;
+						CEnumConverter::Convert< EDatabaseVariableValueType >( params[ i ]->Get_Value_Type(), type_string );
+
+						std::string param_type_string;
+						CEnumConverter::Convert< EDatabaseVariableType >( params[ i ]->Get_Parameter_Type(), param_type_string );
+
+						LOG( LL_LOW, "\t\t" << i << ": " << value_string.c_str() << "(" << type_string.c_str() << ", " << param_type_string.c_str() << ")" );
+					}
+				}
+			}
+			else
+			{
+				LOG( LL_LOW, "\tUnable to determine which task invocation created this error." );
+			}
+		}
 		 
 		typedef typename T::InputParametersType BatchInputParametersType;
 		typedef typename T::ResultSetType BatchResultSetType; 
@@ -245,6 +301,7 @@ class TDatabaseTaskBatch
 		BatchResultSetType *ResultSetBlock;
 
 		std::wstring StatementText;
+		std::string TaskName;
 };
 
 #endif // DATABASE_TASK_BATCH_H

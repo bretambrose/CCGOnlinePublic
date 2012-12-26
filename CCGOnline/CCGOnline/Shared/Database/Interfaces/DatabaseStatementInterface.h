@@ -52,6 +52,7 @@ class IDatabaseStatement
 
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;
 		virtual int32 Get_Bad_Row_Number( void ) const = 0;
+		virtual void Log_Error_State( void ) const = 0;
 };
 
 #endif // DATABASE_STATEMENT_INTERFACE_H

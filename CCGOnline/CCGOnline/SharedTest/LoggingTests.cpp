@@ -221,8 +221,8 @@ TEST_F( LoggingTests, Static_Logging )
 	CProcessExecutionContext context( nullptr, 0.0 );
 	dummy_process->Run( context );
 
-	LOG( LL_HIGH, L"This is another test, but I have to end with " << LOG_TEST_MESSAGE );
-	LOG( LL_HIGH, L"test: " << 5 << LOG_TEST_MESSAGE );
+	WLOG( LL_HIGH, L"This is another test, but I have to end with " << LOG_TEST_MESSAGE );
+	WLOG( LL_HIGH, L"test: " << 5 << LOG_TEST_MESSAGE );
 
 	CProcessStatics::Set_Current_Process( nullptr );
 

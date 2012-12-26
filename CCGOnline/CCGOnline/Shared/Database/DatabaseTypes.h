@@ -23,14 +23,16 @@
 #ifndef DATABASE_TYPES_H
 #define DATABASE_TYPES_H
 
+//:EnumBegin()
 enum DBErrorStateType
 {
-	DBEST_SUCCESS,
+	DBEST_SUCCESS,					//:EnumEntry( "Success" )
 
-	DBEST_FATAL_ERROR,
-	DBEST_NON_FATAL_ERROR,
-	DBEST_WARNING
+	DBEST_FATAL_ERROR,			//:EnumEntry( "Fatal Error" )
+	DBEST_NON_FATAL_ERROR,		//:EnumEntry( "Non Fatal Error" )
+	DBEST_WARNING					//:EnumEntry( "Warning" )
 };
+//:EnumEnd
 
 inline bool Is_Fatal_DB_Error( DBErrorStateType error ) { return error == DBEST_FATAL_ERROR; }
 inline bool Was_Database_Operation_Successful( DBErrorStateType error ) { return error == DBEST_SUCCESS || error == DBEST_WARNING; }
@@ -45,28 +47,31 @@ enum DBStatementIDType
 	DBSIDT_INVALID
 };
 
+//:EnumBegin()
 enum EDatabaseVariableType
 {
-	DVT_INPUT,
-	DVT_INPUT_OUTPUT,
-	DVT_OUTPUT
+	DVT_INPUT,					//:EnumEntry( "In" )
+	DVT_INPUT_OUTPUT,			//:EnumEntry( "InOut" )
+	DVT_OUTPUT					//:EnumEntry( "Out" )
 };
+//:EnumEnd
 
+//:EnumBegin()
 enum EDatabaseVariableValueType
 {
 	DVVT_INVALID,
 
-	DVVT_INT32,
-	DVVT_UINT32,
-	DVVT_INT64,
-	DVVT_UINT64,
-	DVVT_STRING,
-	DVVT_WSTRING,
-
-	DVVT_FLOAT,
-	DVVT_DOUBLE,
-	DVVT_BOOLEAN
+	DVVT_INT32,					//:EnumEntry( "Int32" )
+	DVVT_UINT32,				//:EnumEntry( "UInt32" )
+	DVVT_INT64,					//:EnumEntry( "Int64" )
+	DVVT_UINT64,				//:EnumEntry( "UInt64" )
+	DVVT_STRING,				//:EnumEntry( "String" )
+	DVVT_WSTRING,				//:EnumEntry( "WString" )
+	DVVT_FLOAT,					//:EnumEntry( "Float" )
+	DVVT_DOUBLE,				//:EnumEntry( "Double" )
+	DVVT_BOOLEAN				//:EnumEntry( "Boolean" )
 };
+//:EnumEnd
 
 enum EFetchResultsStatusType
 {

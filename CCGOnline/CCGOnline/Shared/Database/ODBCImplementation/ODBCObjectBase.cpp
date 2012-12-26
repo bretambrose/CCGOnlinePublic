@@ -26,6 +26,8 @@
 #include "ODBCObjectBase.h"
 #include <sqlucode.h>
 #include "Database/DatabaseTypes.h"
+#include "Logging/LogInterface.h"
+#include "EnumConversion.h"
 
 SODBCError::SODBCError( void ) :
 	SQLErrorCode( SQL_SUCCESS ),
@@ -134,4 +136,23 @@ void CODBCObjectBase::Invalidate_Handles( void )
 	StatementHandle = 0;
 }
 
+void CODBCObjectBase::Log_Error_State_Base( void ) const
+{
+	std::string state_string;
+	CEnumConverter::Convert< DBErrorStateType >( ErrorState, state_string );
+	LOG( LL_LOW, "\tState: " << state_string.c_str() );
+	if ( Errors.size() > 0 )
+	{
+		LOG( LL_LOW, "\tODBC Error Records:" );
+		for ( uint32 i = 0; i < Errors.size(); ++i )
+		{
+			const SODBCError &error_record = Errors[ i ]; 
+			WLOG( LL_LOW, L"\t\t" << i << L" - EC: " << error_record.SQLErrorCode << L", SQLState: " << error_record.SQLState << L", Desc: " << error_record.ErrorDescription );
+		}
+	}
+	else
+	{
+		LOG( LL_LOW, "\tNo ODBC Error records found." );
+	}
+}
 

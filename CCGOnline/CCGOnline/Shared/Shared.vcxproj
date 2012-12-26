@@ -253,6 +253,7 @@
     <ClCompile Include="Database\ODBCImplementation\ODBCEnvironment.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCFactory.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCObjectBase.cpp" />
+    <ClCompile Include="Database\ODBCImplementation\ODBCParameters.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCStatement.cpp" />
     <ClCompile Include="EnumConversion.cpp" />
     <ClCompile Include="GeneratedCode\RegisterSharedEnums.cpp" />

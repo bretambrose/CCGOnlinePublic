@@ -70,6 +70,10 @@ class CLogInterface
 		static void Log( const std::wstring &message );
 		static void Log( const wchar_t *message );
 
+		static void Log( const std::basic_ostringstream< char > &message_stream );
+		static void Log( const std::string &message );
+		static void Log( const char *message );
+
 		static shared_ptr< IManagedProcess > Get_Logging_Process( void ) { return LogProcess; }
 
 	private:
@@ -95,10 +99,14 @@ class CLogInterface
 // Conditional macros for logging
 #ifdef ENABLE_LOGGING
 
-#define LOG( log_level, stream_expression ) if ( CLogInterface::Get_Log_Level() >= log_level ) { std::basic_ostringstream< wchar_t > log_stream; log_stream << stream_expression; CLogInterface::Log( log_stream ); }
+#include <sstream>
+
+#define WLOG( log_level, stream_expression ) if ( CLogInterface::Get_Log_Level() >= log_level ) { std::basic_ostringstream< wchar_t > log_stream; log_stream << stream_expression; CLogInterface::Log( log_stream ); }
+#define LOG( log_level, stream_expression ) if ( CLogInterface::Get_Log_Level() >= log_level ) { std::basic_ostringstream< char > log_stream; log_stream << stream_expression; CLogInterface::Log( log_stream ); }
 
 #else
 
+#define WLOG( log_level, stream_expression )
 #define LOG( log_level, stream_expression ) 
 
 #endif // ENABLE_LOGGING

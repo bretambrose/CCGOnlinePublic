@@ -281,14 +281,14 @@ void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVa
 	statement_text = std::wstring( statement_stream.rdbuf()->str() );
 }
 
-bool CODBCConnection::Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const
+bool CODBCConnection::Validate_Input_Signature( EDatabaseTaskType task_type, IDatabaseVariableSet *input_parameters ) const
 {
 	uint32 starting_input_param = 0;
 
 	std::vector< IDatabaseVariable * > params;
 	input_parameters->Get_Variables( params );
 
-	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
+	if ( task_type == DTT_FUNCTION_CALL )
 	{
 		if ( params.size() == 0 )
 		{
@@ -315,12 +315,12 @@ bool CODBCConnection::Validate_Input_Signature( IDatabaseTask *task, IDatabaseVa
 	return true;
 }
 
-bool CODBCConnection::Validate_Output_Signature( IDatabaseTask *task, IDatabaseVariableSet *output_parameters ) const
+bool CODBCConnection::Validate_Output_Signature( EDatabaseTaskType task_type, IDatabaseVariableSet *output_parameters ) const
 {
 	std::vector< IDatabaseVariable * > params;
 	output_parameters->Get_Variables( params );
 
-	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
+	if ( task_type == DTT_FUNCTION_CALL )
 	{
 		if ( params.size() != 0 )
 		{

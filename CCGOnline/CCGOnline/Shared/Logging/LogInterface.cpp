@@ -36,6 +36,7 @@
 #include "PlatformTime.h"
 #include "PlatformFileSystem.h"
 #include "SynchronizationPrimitives/PlatformMutex.h"
+#include "StringUtils.h"
 
 // Static class data member definitions
 ISimplePlatformMutex *CLogInterface::LogLock( nullptr );
@@ -231,4 +232,42 @@ void CLogInterface::Log( const std::basic_ostringstream< wchar_t > &message_stre
 	Log( message_stream.rdbuf()->str() );
 }
 
+/**********************************************************************************************************************
+	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
+	
+		message -- string to be logged
+		
+**********************************************************************************************************************/
+void CLogInterface::Log( const std::string &message )
+{
+	std::wstring w_message;
+	NStringUtils::String_To_WideString( message, w_message );
+
+	Log( w_message );
+}
+
+/**********************************************************************************************************************
+	CLogInterface::Log -- logging function; forwards text to the log thread to be logged
+	
+		message -- string to be logged
+		
+**********************************************************************************************************************/
+void CLogInterface::Log( const char *message )
+{
+	std::wstring w_message;
+	NStringUtils::String_To_WideString( message, w_message );
+
+	Log( w_message );
+}
+
+/**********************************************************************************************************************
+	CLogInterface::Log -- logging function; forwards text to the log thread to be logged
+	
+		message_stream -- stream containing the string to be logged
+		
+**********************************************************************************************************************/
+void CLogInterface::Log( const std::basic_ostringstream< char > &message_stream )
+{
+	Log( message_stream.rdbuf()->str() );
+}
 

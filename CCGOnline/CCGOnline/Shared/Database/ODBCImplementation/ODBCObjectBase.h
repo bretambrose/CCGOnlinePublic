@@ -60,6 +60,8 @@ class CODBCObjectBase
 		int32 Get_Bad_Row_Number_Base( void ) const { return BadRowNumber; }
 
 		const std::vector< SODBCError > &Get_Errors( void ) const { return Errors; }
+
+		void Log_Error_State_Base( void ) const;
 		
 		SQLHENV EnvironmentHandle;
 		SQLHDBC ConnectionHandle;

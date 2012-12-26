@@ -370,5 +370,8 @@
     <ClCompile Include="Concurrency\ThreadProcessBase.cpp">
       <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
+    <ClCompile Include="Database\ODBCImplementation\ODBCParameters.cpp">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

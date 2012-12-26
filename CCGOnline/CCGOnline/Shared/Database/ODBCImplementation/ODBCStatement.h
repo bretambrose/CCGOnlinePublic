@@ -55,6 +55,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 		virtual int32 Get_Bad_Row_Number( void ) const { return Get_Bad_Row_Number_Base(); }
+		virtual void Log_Error_State( void ) const;
 
 	private:
 

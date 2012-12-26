@@ -29,6 +29,7 @@
 #include <sqlucode.h>
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
 #include "Database/Interfaces/DatabaseVariableInterface.h"
+#include "Logging/LogInterface.h"
 
 SQLSMALLINT Get_ODBC_Variable_Type( EDatabaseVariableType variable_type )
 {
@@ -465,5 +466,12 @@ void CODBCStatement::Update_Error_Status( ODBCStatementOperationType operation_t
 			FATAL_ASSERT( false );
 			break;
 	}
+}
+
+void CODBCStatement::Log_Error_State( void ) const
+{
+	WLOG( LL_LOW, L"\tStatement Text: " << StatementText.c_str() );
+
+	BASECLASS::Log_Error_State_Base();
 }
 

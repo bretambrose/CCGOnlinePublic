@@ -104,7 +104,7 @@ IDatabaseConnection *CODBCEnvironment::Add_Connection( const std::wstring &conne
 {
 	if ( State != ODBCEST_INITIALIZED )
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	SQLHDBC dbc_handle = 0;

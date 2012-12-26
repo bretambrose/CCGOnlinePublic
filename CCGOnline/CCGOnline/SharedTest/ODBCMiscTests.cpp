@@ -252,3 +252,153 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
 }
+
+class CTestInputValidation1 : public IDatabaseVariableSet
+{
+	public:
+
+		CTestInputValidation1( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		CTestInputValidation1( const CTestInputValidation1 &rhs ) :
+			AccountID( rhs.AccountID ),
+			AccountEmail( rhs.AccountEmail ),
+			Nickname( rhs.Nickname ),
+			NicknameSequenceID( rhs.NicknameSequenceID )
+		{}
+
+		virtual ~CTestInputValidation1() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64Out AccountID;
+		DBString< 255 > AccountEmail;
+		DBString< 32 > Nickname;
+		DBUInt32In NicknameSequenceID;
+};
+
+TEST_F( ODBCMiscTests, TestInputValidation1 )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	CTestInputValidation1 params;
+	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &params ) );
+	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &params ) );
+	ASSERT_TRUE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &params ) );
+	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &params ) );
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+class CTestInputValidation2 : public IDatabaseVariableSet
+{
+	public:
+
+		CTestInputValidation2( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		CTestInputValidation2( const CTestInputValidation2 &rhs ) :
+			AccountID( rhs.AccountID ),
+			AccountEmail( rhs.AccountEmail ),
+			Nickname( rhs.Nickname ),
+			NicknameSequenceID( rhs.NicknameSequenceID )
+		{}
+
+		virtual ~CTestInputValidation2() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBString< 255 > AccountEmail;
+		DBString< 32 > Nickname;
+		DBUInt32In NicknameSequenceID;
+};
+
+TEST_F( ODBCMiscTests, TestInputValidation2 )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	CTestInputValidation2 params;
+	ASSERT_TRUE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &params ) );
+	ASSERT_TRUE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &params ) );
+	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &params ) );
+	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &params ) );
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+class CTestInputValidation3 : public IDatabaseVariableSet
+{
+	public:
+
+		CTestInputValidation3( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		CTestInputValidation3( const CTestInputValidation3 &rhs ) :
+			AccountID( rhs.AccountID ),
+			AccountEmail( rhs.AccountEmail ),
+			Nickname( rhs.Nickname ),
+			NicknameSequenceID( rhs.NicknameSequenceID )
+		{}
+
+		virtual ~CTestInputValidation3() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBString< 255 > AccountEmail;
+		DBString< 32 > Nickname;
+		DBUInt32Out NicknameSequenceID;
+};
+
+TEST_F( ODBCMiscTests, TestInputValidation3 )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	CTestInputValidation3 params;
+	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &params ) );
+	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &params ) );
+	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &params ) );
+	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &params ) );
+
+	CEmptyVariableSet empty_params;
+	ASSERT_TRUE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &empty_params ) );
+	ASSERT_TRUE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &empty_params ) );
+	ASSERT_TRUE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &empty_params ) );
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}

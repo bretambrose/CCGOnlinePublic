@@ -29,6 +29,7 @@ class IDatabaseVariableSet;
 
 enum DBConnectionIDType;
 enum DBErrorStateType;
+enum EDatabaseTaskType;
 
 class IDatabaseConnection
 {
@@ -47,8 +48,8 @@ class IDatabaseConnection
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;
 
 		virtual void Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const = 0;
-		virtual bool Validate_Input_Signature( IDatabaseTask *task, IDatabaseVariableSet *input_parameters ) const = 0;
-		virtual bool Validate_Output_Signature( IDatabaseTask *task, IDatabaseVariableSet *output_parameters ) const = 0;
+		virtual bool Validate_Input_Signature( EDatabaseTaskType task_type, IDatabaseVariableSet *input_parameters ) const = 0;
+		virtual bool Validate_Output_Signature( EDatabaseTaskType task_type, IDatabaseVariableSet *output_parameters ) const = 0;
 
 };
 

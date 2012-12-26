@@ -26,6 +26,9 @@
 #include "Database/Interfaces/DatabaseVariableInterface.h"
 #include "Database/DatabaseTypes.h"
 #include "ODBCParameterInsulation.h"
+#include "StringUtils.h"
+
+void Convert_Database_Variable_To_String( IDatabaseVariable *variable, std::string &value );
 
 template < typename T >
 EDatabaseVariableValueType Get_ODBC_Value_Type( const T & /*dummy*/ )
@@ -41,33 +44,32 @@ inline EDatabaseVariableValueType Get_ODBC_Value_Type( const float & /*dummy*/ )
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const double & /*dummy*/ ) { return DVVT_DOUBLE; }
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const bool & /*dummy*/ ) { return DVVT_BOOLEAN; }
 
-template < typename T, EDatabaseVariableType PT >
-class TODBCScalarVariable : public IDatabaseVariable
+template < typename T >
+class TODBCScalarVariableBase : public IDatabaseVariable
 {
 	public:
 
 		typedef IDatabaseVariable BASECLASS;
 
-		TODBCScalarVariable( void ) :
+		TODBCScalarVariableBase( void ) :
 			Value( static_cast< T >( 0 ) ),
 			Indicator( IP_SQL_NULL_DATA )
 		{}
 
-		TODBCScalarVariable( const TODBCScalarVariable< T, PT > &rhs ) :
+		TODBCScalarVariableBase( const TODBCScalarVariableBase< T > &rhs ) :
 			Value( rhs.Value ),
 			Indicator( rhs.Indicator )
 		{}
 
-		explicit TODBCScalarVariable( const T &value ) :
+		explicit TODBCScalarVariableBase( const T &value ) :
 			Value( value ),
 			Indicator( 0 )
 		{}
 
-		virtual ~TODBCScalarVariable() {}
+		virtual ~TODBCScalarVariableBase() {}
 
 		// Baseclass interface
 		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return Get_ODBC_Value_Type( Value ); }
-		virtual EDatabaseVariableType Get_Parameter_Type( void ) const { return PT; }
 		virtual uint32 Get_Decimals( void ) const { return 0; }
 		virtual void *Get_Value_Address( void ) { return &Value; }
 		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
@@ -85,6 +87,32 @@ class TODBCScalarVariable : public IDatabaseVariable
 
 		T Value;
 		IP_SQLLEN Indicator;
+};
+
+
+template < typename T, EDatabaseVariableType PT >
+class TODBCScalarVariable : public TODBCScalarVariableBase< T >
+{
+	public:
+
+		typedef TODBCScalarVariableBase< T > BASECLASS;
+
+		TODBCScalarVariable( void ) :
+			BASECLASS()
+		{}
+
+		TODBCScalarVariable( const TODBCScalarVariable< T, PT > &rhs ) :
+			BASECLASS( rhs )
+		{}
+
+		explicit TODBCScalarVariable( const T &value ) :
+			BASECLASS( value )
+		{}
+
+		virtual ~TODBCScalarVariable() {}
+
+		// Baseclass interface
+		virtual EDatabaseVariableType Get_Parameter_Type( void ) const { return PT; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,42 +147,46 @@ typedef TODBCScalarVariable< bool, DVT_OUTPUT >					DBBoolOut;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template < uint32 BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
-class DBString : public IDatabaseVariable
+class IDatabaseString : public IDatabaseVariable
 {
 	public:
 
 		typedef IDatabaseVariable BASECLASS;
 
-		DBString( void ) :
+		IDatabaseString( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~IDatabaseString() {}
+
+		virtual void To_String( std::string &value ) const = 0;
+		virtual void To_WString( std::wstring &value ) const = 0;
+
+};
+
+template < typename C, uint32 BUFFER_LENGTH >
+class DBStringBase : public IDatabaseString
+{
+	public:
+
+		typedef IDatabaseString BASECLASS;
+
+		DBStringBase( void ) :
+			BASECLASS(),
 			Indicator( IP_SQL_NULL_DATA )
 		{
 		}
 
-		// We could loosen this up with a templated constructor, but I don't see a compelling use case yet
-		DBString( const DBString< BUFFER_LENGTH, PT > &rhs ) :
+		DBStringBase( const DBStringBase< C, BUFFER_LENGTH > &rhs ) :
+			BASECLASS(),
 			Indicator( rhs.Indicator )
 		{
-			memcpy( Buffer, rhs.Buffer, ( BUFFER_LENGTH + 1 ) * sizeof( char ) );
+			memcpy( Buffer, rhs.Buffer, ( BUFFER_LENGTH + 1 ) * sizeof( C ) );
 		}
 
-		explicit DBString( const std::string &buffer ) :
-			Indicator( 0 )
-		{
-			Set_Value( buffer.c_str() );
-		}
-
-		explicit DBString( const char *buffer ) :
-			Indicator( 0 )
-		{
-			Set_Value( buffer );
-		}
-
-		virtual ~DBString() {}
+		virtual ~DBStringBase() {}
 
 		// Baseclass interface
-		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return DVVT_STRING; }
-		virtual EDatabaseVariableType Get_Parameter_Type( void ) const { return PT; }
 		virtual uint32 Get_Decimals( void ) const { return 0; }
 		virtual void *Get_Value_Address( void ) { return static_cast< char * >( Buffer ); }
 		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
@@ -162,39 +194,97 @@ class DBString : public IDatabaseVariable
 		virtual uint32 Get_Value_Buffer_Size( void ) const { return BUFFER_LENGTH + 1; }
 
 		// Additional interface
-		const char *Get_Buffer( void ) const { return Buffer; }
+		const C *Get_Buffer( void ) const { return Buffer; }
 
-		void Copy_Into( std::string &dest )
-		{
-			FATAL_ASSERT( !Is_Null() );
+		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
-			dest.assign( Buffer );
-		}
+	protected:
 
-		void Set_Value( const char *buffer ) 
+		void Set_Value_With_Length( const C *buffer, size_t length ) 
 		{ 
 			if ( buffer != nullptr )
 			{
-				size_t length = strlen( buffer );
 				if ( length > BUFFER_LENGTH )
 				{
 					length = BUFFER_LENGTH;
 				}
 
-				memcpy( Buffer, buffer, length * sizeof( char ) );
+				memcpy( Buffer, buffer, length * sizeof( C ) );
 				Buffer[ length ] = 0;
 			}
 
 			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : IP_SQL_NTS;
 		}
 
-		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
-
 	private:
 
-		char Buffer[ BUFFER_LENGTH + 1 ];
+		C Buffer[ BUFFER_LENGTH + 1 ];
 		IP_SQLLEN Indicator;
 
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template < uint32 BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
+class DBString : public DBStringBase< char, BUFFER_LENGTH >
+{
+	public:
+
+		typedef DBStringBase< char, BUFFER_LENGTH > BASECLASS;
+
+		DBString( void ) :
+			BASECLASS()
+		{
+		}
+
+		// We could loosen this up with a templated constructor, but I don't see a compelling use case yet
+		DBString( const DBString< BUFFER_LENGTH, PT > &rhs ) :
+			BASECLASS( rhs )
+		{
+		}
+
+		explicit DBString( const std::string &buffer ) :
+			BASECLASS()
+		{
+			Set_Value_With_Length( buffer.c_str(), buffer.size() );
+		}
+
+		explicit DBString( const char *buffer ) :
+			BASECLASS()
+		{
+			Set_Value_With_Length( buffer, strlen( buffer ) );
+		}
+
+		virtual ~DBString() {}
+
+		// Baseclass interface
+		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return DVVT_STRING; }
+		virtual EDatabaseVariableType Get_Parameter_Type( void ) const { return PT; }
+		virtual void To_String( std::string &value ) const
+		{
+			if ( Is_Null() )
+			{
+				value = "<NULL>";
+			}
+			else
+			{
+				value.assign( Get_Buffer() );
+			}
+		}
+
+		virtual void To_WString( std::wstring &value ) const
+		{
+			std::string base_value;
+			To_String( base_value );
+			NStringUtils::String_To_WideString( base_value, value );
+		}
+
+		void Copy_Into( std::string &dest )
+		{
+			FATAL_ASSERT( !Is_Null() );
+
+			dest.assign( Get_Buffer() );
+		}
 };
 
 template < uint32 BUFFER_LENGTH >
@@ -282,34 +372,33 @@ class DBStringOut : public DBString< BUFFER_LENGTH, DVT_OUTPUT >
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template < uint32 BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
-class DBWString : public IDatabaseVariable
+class DBWString : public DBStringBase< wchar_t, BUFFER_LENGTH >
 {
 	public:
 
-		typedef IDatabaseVariable BASECLASS;
+		typedef DBStringBase< wchar_t, BUFFER_LENGTH > BASECLASS;
 
 		DBWString( void ) :
-			Indicator( IP_SQL_NULL_DATA )
+			BASECLASS()
 		{
 		}
 
 		// We could loosen this up with a templated constructor, but I don't see a compelling use case yet
 		DBWString( const DBString< BUFFER_LENGTH, PT > &rhs ) :
-			Indicator( rhs.Indicator )
+			BASECLASS( rhs )
 		{
-			memcpy( Buffer, rhs.Buffer, ( BUFFER_LENGTH + 1 ) * sizeof( wchar_t ) );
 		}
 
 		explicit DBWString( const std::wstring &buffer ) :
-			Indicator( 0 )
+			BASECLASS()
 		{
-			Set_Value( buffer.c_str() );
+			Set_Value_With_Length( buffer.c_str(), buffer.size() );
 		}
 
 		explicit DBWString( const wchar_t *buffer ) :
-			Indicator( 0 )
+			BASECLASS
 		{
-			Set_Value( buffer );
+			Set_Value_With_Length( buffer, wcslen( buffer ) );
 		}
 
 		virtual ~DBWString() {}
@@ -317,46 +406,32 @@ class DBWString : public IDatabaseVariable
 		// Baseclass interface
 		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return DVVT_WSTRING; }
 		virtual EDatabaseVariableType Get_Parameter_Type( void ) const { return PT; }
-		virtual uint32 Get_Decimals( void ) const { return 0; }
-		virtual void *Get_Value_Address( void ) { return static_cast< wchar_t * >( Buffer ); }
-		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
-		virtual uint32 Get_Value_Size( void ) const { return BUFFER_LENGTH + 1; }
-		virtual uint32 Get_Value_Buffer_Size( void ) const { return BUFFER_LENGTH + 1; }
 
-		// Additional interface
-		const wchar_t *Get_Buffer( void ) const { return Buffer; }
+		virtual void To_String( std::string &value ) const
+		{
+			std::wstring base_value;
+			To_WString( base_value );
+			NStringUtils::WideString_To_String( base_value, value );
+		}
+
+		virtual void To_WString( std::wstring &value ) const
+		{
+			if ( Is_Null() )
+			{
+				value = L"<NULL>";
+			}
+			else
+			{
+				value.assign( Get_Buffer() );
+			}
+		}
 
 		void Copy_Into( std::wstring &dest )
 		{
 			FATAL_ASSERT( !Is_Null() );
 
-			dest.assign( Buffer );
+			dest.assign( Get_Buffer() );
 		}
-
-		void Set_Value( const wchar_t *buffer ) 
-		{ 
-			if ( buffer != nullptr )
-			{
-				size_t length = wcslen( buffer );
-				if ( length > BUFFER_LENGTH )
-				{
-					length = BUFFER_LENGTH;
-				}
-
-				memcpy( Buffer, buffer, length * sizeof( wchar_t ) );
-				Buffer[ length ] = 0;
-			}
-
-			Indicator = ( buffer == nullptr ) ? IP_SQL_NULL_DATA : IP_SQL_NTS;
-		}
-
-		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
-
-	private:
-
-		wchar_t Buffer[ BUFFER_LENGTH + 1 ];
-		IP_SQLLEN Indicator;
-
 };
 
 template < uint32 BUFFER_LENGTH >

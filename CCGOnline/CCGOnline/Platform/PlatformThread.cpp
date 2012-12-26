@@ -79,7 +79,7 @@ class CPlatformThreadImpl : public IPlatformThread
 
 		virtual void Launch_Thread( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
 		virtual void Shutdown_Thread( void );
-		virtual bool Is_Valid( void ) const { return ThreadHandle != NULL; }
+		virtual bool Is_Valid( void ) const { return ThreadHandle != nullptr; }
 		virtual bool Is_Running( void ) const;
 
 	private:
@@ -96,7 +96,7 @@ class CPlatformThreadImpl : public IPlatformThread
 
 **********************************************************************************************************************/
 CPlatformThreadImpl::CPlatformThreadImpl( void ) :
-	ThreadHandle( NULL ),
+	ThreadHandle( nullptr ),
 	TranslationContext()
 {
 }
@@ -111,14 +111,14 @@ CPlatformThreadImpl::CPlatformThreadImpl( void ) :
 **********************************************************************************************************************/
 void CPlatformThreadImpl::Launch_Thread( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context )
 {
-	FATAL_ASSERT( ThreadHandle == NULL );
+	FATAL_ASSERT( ThreadHandle == nullptr );
 
 	TranslationContext.Initialize( execution_function, run_context );
 
 	ThreadHandle = reinterpret_cast< HANDLE >( 
 		::_beginthreadex( NULL, static_cast< uint32 >( stack_size ), CPlatformThreadImpl::Run_Thread, &TranslationContext, 0, NULL ) );
 
-	FATAL_ASSERT( ThreadHandle != NULL );
+	FATAL_ASSERT( ThreadHandle != nullptr );
 }
 
 /**********************************************************************************************************************
@@ -141,7 +141,7 @@ void CPlatformThreadImpl::Shutdown_Thread( void )
 	}
 
 	::CloseHandle( ThreadHandle );
-	ThreadHandle = NULL;
+	ThreadHandle = nullptr;
 }
 
 /**********************************************************************************************************************
