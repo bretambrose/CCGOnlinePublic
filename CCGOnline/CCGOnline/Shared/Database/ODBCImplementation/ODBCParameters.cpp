@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	ODBCParameters.h
+	ODBCParameters.cpp
 		A component defining various ODBC specific parameter types to be used as inputs to stored procedures
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).

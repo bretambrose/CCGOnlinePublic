@@ -52,6 +52,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 
 		virtual bool Needs_Binding( void ) const;
 		virtual bool Is_Ready_For_Use( void ) const;
+		virtual bool Is_In_Error_State( void ) const;
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 		virtual int32 Get_Bad_Row_Number( void ) const { return Get_Bad_Row_Number_Base(); }
@@ -62,7 +63,8 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		bool Was_Last_ODBC_Operation_Successful( void ) const;
 
 		void Update_Error_Status( ODBCStatementOperationType operation_type, SQLRETURN error_code );
-		
+		void Reflect_ODBC_Error_State_Into_Statement_State( void );
+
 		DBStatementIDType ID;
 
 		ODBCStatementStateType State;

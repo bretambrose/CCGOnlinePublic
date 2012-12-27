@@ -139,7 +139,7 @@ void CODBCEnvironment::Update_Error_Status( ODBCEnvironmentOperationType operati
 			break;
 
 		case ODBCEOT_ALLOCATE_CONNECTION_HANDLE:
-			Set_Error_State_Base( DBEST_NON_FATAL_ERROR );
+			Set_Error_State_Base( DBEST_RECOVERABLE_ERROR );
 			break;
 
 		default:

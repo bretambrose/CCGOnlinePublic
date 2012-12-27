@@ -29,7 +29,7 @@ enum DBErrorStateType
 	DBEST_SUCCESS,					//:EnumEntry( "Success" )
 
 	DBEST_FATAL_ERROR,			//:EnumEntry( "Fatal Error" )
-	DBEST_NON_FATAL_ERROR,		//:EnumEntry( "Non Fatal Error" )
+	DBEST_RECOVERABLE_ERROR,	//:EnumEntry( "Recoverable Error" )
 	DBEST_WARNING					//:EnumEntry( "Warning" )
 };
 //:EnumEnd

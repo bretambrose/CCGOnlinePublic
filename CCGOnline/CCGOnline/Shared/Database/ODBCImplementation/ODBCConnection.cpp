@@ -222,7 +222,7 @@ void CODBCConnection::Update_Error_Status( ODBCConnectionOperationType operation
 			break;
 
 		case ODBCCOT_ALLOCATE_STATEMENT_HANDLE:
-			Set_Error_State_Base( DBEST_NON_FATAL_ERROR );
+			Set_Error_State_Base( DBEST_RECOVERABLE_ERROR );
 			break;
 
 		default:

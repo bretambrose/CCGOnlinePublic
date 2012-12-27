@@ -200,6 +200,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
     <ClCompile Include="GeneratedCode\RegisterSharedTestEnums.cpp" />
     <ClCompile Include="Helpers\ProcessHelpers.cpp" />
     <ClCompile Include="LoggingTests.cpp" />
+    <ClCompile Include="ODBCFailureTests.cpp" />
     <ClCompile Include="ODBCMiscTests.cpp" />
     <ClCompile Include="ODBCSuccessTests.cpp" />
     <ClCompile Include="PriorityQueueTests.cpp" />

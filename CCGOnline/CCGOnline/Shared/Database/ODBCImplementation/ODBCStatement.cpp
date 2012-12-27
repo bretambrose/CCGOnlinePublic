@@ -123,15 +123,16 @@ SQLSMALLINT Get_ODBC_SQL_Value_Type( EDatabaseVariableValueType variable_value_t
 
 enum ODBCStatementStateType
 {
-	ODBCCST_UNINITIALIZED,
-	ODBCCST_INITIALIZED,
-	ODBCCST_BOUND_INPUT,
-	ODBCCST_READY,
-	ODBCCST_PROCESS_RESULTS,
-	ODBCCST_END_TRANSACTION,
+	ODBCSST_UNINITIALIZED,
+	ODBCSST_INITIALIZED,
+	ODBCSST_BOUND_INPUT,
+	ODBCSST_READY,
+	ODBCSST_PROCESS_RESULTS,
+	ODBCSST_END_TRANSACTION,
 
-	ODBCCST_SHUTDOWN,
-	ODBCEST_FATAL_ERROR
+	ODBCSST_SHUTDOWN,
+	ODBCSST_RECOVERABLE_ERROR,
+	ODBCSST_FATAL_ERROR
 };
 
 enum ODBCStatementOperationType
@@ -154,7 +155,7 @@ enum ODBCStatementOperationType
 CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle ) :
 	BASECLASS( environment_handle, connection_handle, statement_handle ),
 	ID( id ),
-	State( ODBCCST_UNINITIALIZED ),
+	State( ODBCSST_UNINITIALIZED ),
 	StatementText( L"" ),
 	ResultSetRowCount( 1 ),
 	RowStatuses( nullptr ),
@@ -168,18 +169,31 @@ CODBCStatement::~CODBCStatement()
 	Shutdown();
 }
 
+void CODBCStatement::Reflect_ODBC_Error_State_Into_Statement_State( void )
+{
+	DBErrorStateType error_state = Get_Error_State_Base();
+	if ( error_state == DBEST_RECOVERABLE_ERROR )
+	{
+		State = ODBCSST_RECOVERABLE_ERROR;
+	}
+	else if ( error_state == DBEST_FATAL_ERROR )
+	{
+		State = ODBCSST_FATAL_ERROR;
+	}
+}
+
 void CODBCStatement::Initialize( const std::wstring &statement_text )
 {
-	FATAL_ASSERT( State == ODBCCST_UNINITIALIZED );
+	FATAL_ASSERT( State == ODBCSST_UNINITIALIZED );
 
 	StatementText = statement_text;
 
-	State = ODBCCST_INITIALIZED;
+	State = ODBCSST_INITIALIZED;
 }
 
 void CODBCStatement::Shutdown( void )
 {
-	if ( State != ODBCCST_UNINITIALIZED && State != ODBCCST_SHUTDOWN )
+	if ( State != ODBCSST_UNINITIALIZED && State != ODBCSST_SHUTDOWN )
 	{
 		if ( RowStatuses != nullptr )
 		{
@@ -192,17 +206,12 @@ void CODBCStatement::Shutdown( void )
 		Invalidate_Handles();
 	}
 
-	State = ODBCCST_SHUTDOWN;
+	State = ODBCSST_SHUTDOWN;
 }
 
 void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size )
 {
-	FATAL_ASSERT( State != ODBCCST_SHUTDOWN && State != ODBCEST_FATAL_ERROR );
-
-	if ( State != ODBCCST_INITIALIZED )
-	{
-		return;
-	}
+	FATAL_ASSERT( State == ODBCSST_INITIALIZED );
 
 	std::vector< IDatabaseVariable * > parameters;
 	param_set->Get_Variables( parameters );
@@ -212,7 +221,7 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 		Update_Error_Status( ODBCSOT_SET_PARAM_SET_ROW_SIZE, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
-			State = ODBCEST_FATAL_ERROR;
+			Reflect_ODBC_Error_State_Into_Statement_State();
 			return;
 		}
 
@@ -234,13 +243,13 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 			Update_Error_Status( ODBCSOT_BIND_PARAMETER, error_code );
 			if ( !Was_Last_ODBC_Operation_Successful() )
 			{
-				State = ODBCEST_FATAL_ERROR;
+				Reflect_ODBC_Error_State_Into_Statement_State();
 				return;
 			}
 		}
 	}
 
-	State = ODBCCST_BOUND_INPUT;
+	State = ODBCSST_BOUND_INPUT;
 }
 
 void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count )
@@ -248,10 +257,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 	FATAL_ASSERT( result_set_count > 0 );
 	ResultSetRowCount = result_set_count;
 
-	if ( State != ODBCCST_BOUND_INPUT )
-	{
-		return;
-	}
+	FATAL_ASSERT( State == ODBCSST_BOUND_INPUT );
 
 	std::vector< IDatabaseVariable * > result_columns;
 	result_set->Get_Variables( result_columns );
@@ -263,7 +269,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_SIZE, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
-			State = ODBCEST_FATAL_ERROR;
+			Reflect_ODBC_Error_State_Into_Statement_State();
 			return;
 		}
 
@@ -273,7 +279,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		Update_Error_Status( ODBCSOT_SET_ROW_STATUS_ARRAY, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
-			State = ODBCEST_FATAL_ERROR;
+			Reflect_ODBC_Error_State_Into_Statement_State();
 			return;
 		}
 
@@ -281,7 +287,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		Update_Error_Status( ODBCSOT_SET_ROWS_FETCHED_PTR, error_code );
 		if ( !Was_Last_ODBC_Operation_Successful() )
 		{
-			State = ODBCEST_FATAL_ERROR;
+			Reflect_ODBC_Error_State_Into_Statement_State();
 			return;
 		}
 
@@ -298,7 +304,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 			Update_Error_Status( ODBCSOT_BIND_COLUMN, error_code );
 			if ( !Was_Last_ODBC_Operation_Successful() )
 			{
-				State = ODBCEST_FATAL_ERROR;
+				Reflect_ODBC_Error_State_Into_Statement_State();
 				return;
 			}
 		}
@@ -308,12 +314,12 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 		ProcessResults = false;
 	}
 
-	State = ODBCCST_READY;
+	State = ODBCSST_READY;
 }
 
 void CODBCStatement::Execute( uint32 batch_size )
 {
-	if ( State != ODBCCST_READY )
+	if ( State != ODBCSST_READY )
 	{
 		return;
 	}
@@ -324,7 +330,7 @@ void CODBCStatement::Execute( uint32 batch_size )
 	Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_COUNT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCEST_FATAL_ERROR;
+		Reflect_ODBC_Error_State_Into_Statement_State();
 		return;
 	}
 
@@ -332,7 +338,7 @@ void CODBCStatement::Execute( uint32 batch_size )
 	Update_Error_Status( ODBCSOT_SET_PARAM_SET_COUNT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCEST_FATAL_ERROR;
+		Reflect_ODBC_Error_State_Into_Statement_State();
 		return;
 	}
 
@@ -340,7 +346,7 @@ void CODBCStatement::Execute( uint32 batch_size )
 	Update_Error_Status( ODBCSOT_EXECUTE_STATEMENT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCEST_FATAL_ERROR;
+		Reflect_ODBC_Error_State_Into_Statement_State();
 		return;
 	}
 
@@ -349,11 +355,11 @@ void CODBCStatement::Execute( uint32 batch_size )
 	Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_COUNT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCEST_FATAL_ERROR;
+		Reflect_ODBC_Error_State_Into_Statement_State();
 		return;
 	}
 
-	State = ODBCCST_PROCESS_RESULTS;
+	State = ODBCSST_PROCESS_RESULTS;
 }
 
 EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
@@ -362,20 +368,20 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 
 	if ( !ProcessResults )
 	{
-		State = ODBCCST_END_TRANSACTION;
+		State = ODBCSST_END_TRANSACTION;
 	}
 
-	if ( State == ODBCCST_END_TRANSACTION )
+	if ( State == ODBCSST_END_TRANSACTION )
 	{
 		return FRST_FINISHED_ALL;
 	}
 
-	if ( State == ODBCEST_FATAL_ERROR )
+	if ( State == ODBCSST_FATAL_ERROR || State == ODBCSST_RECOVERABLE_ERROR )
 	{
 		return FRST_ERROR;
 	}
 
-	FATAL_ASSERT( State == ODBCCST_PROCESS_RESULTS );
+	FATAL_ASSERT( State == ODBCSST_PROCESS_RESULTS );
 
 	SQLRETURN error_code = SQLFetchScroll( StatementHandle, SQL_FETCH_NEXT, 0 );
 	rows_fetched = RowsFetched;
@@ -385,13 +391,13 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 		SQLRETURN ec2 = SQLMoreResults( StatementHandle );
 		if ( ec2 == SQL_NO_DATA_FOUND )
 		{
-			State = ODBCCST_END_TRANSACTION;
+			State = ODBCSST_END_TRANSACTION;
 			return FRST_FINISHED_ALL;
 		}
 		else if ( ec2 != SQL_SUCCESS )
 		{
 			Update_Error_Status( ODBCSOT_FETCH_RESULTS, error_code );
-			State = ODBCEST_FATAL_ERROR;
+			Reflect_ODBC_Error_State_Into_Statement_State();
 			return FRST_ERROR;
 		}
 		else
@@ -402,7 +408,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 	else if ( error_code != SQL_SUCCESS )
 	{
 		Update_Error_Status( ODBCSOT_FETCH_RESULTS, error_code );
-		State = ODBCEST_FATAL_ERROR;
+		Reflect_ODBC_Error_State_Into_Statement_State();
 		return FRST_ERROR;
 	}
 
@@ -411,27 +417,32 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 
 void CODBCStatement::End_Transaction( bool commit )
 {
-	FATAL_ASSERT( State == ODBCCST_END_TRANSACTION || ( !commit && State == ODBCEST_FATAL_ERROR ) );	
+	FATAL_ASSERT( State == ODBCSST_END_TRANSACTION || ( !commit && State == ODBCSST_RECOVERABLE_ERROR ) );	
 
 	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
 	Update_Error_Status( ODBCSOT_COMMIT_ROLLBACK_STATEMENT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCEST_FATAL_ERROR;
+		Reflect_ODBC_Error_State_Into_Statement_State();
 		return;
 	}
 
-	State = ODBCCST_READY;
+	State = ODBCSST_READY;
 }
 
 bool CODBCStatement::Needs_Binding( void ) const
 {
-	return State == ODBCCST_INITIALIZED;
+	return State == ODBCSST_INITIALIZED;
 }
 
 bool CODBCStatement::Is_Ready_For_Use( void ) const
 {
-	return State == ODBCCST_READY && Get_Error_State_Base() == DBEST_SUCCESS;
+	return State == ODBCSST_READY && Get_Error_State_Base() == DBEST_SUCCESS;
+}
+
+bool CODBCStatement::Is_In_Error_State( void ) const
+{
+	return State == ODBCSST_FATAL_ERROR || State == ODBCSST_RECOVERABLE_ERROR;
 }
 
 bool CODBCStatement::Was_Last_ODBC_Operation_Successful( void ) const
@@ -456,12 +467,15 @@ void CODBCStatement::Update_Error_Status( ODBCStatementOperationType operation_t
 		case ODBCSOT_SET_ROW_STATUS_ARRAY:
 		case ODBCSOT_SET_ROWS_FETCHED_PTR:
 		case ODBCSOT_BIND_COLUMN:
-		case ODBCSOT_EXECUTE_STATEMENT:
 		case ODBCSOT_COMMIT_ROLLBACK_STATEMENT:
-		case ODBCSOT_FETCH_RESULTS:
 			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;
-			 
+
+		case ODBCSOT_EXECUTE_STATEMENT:
+		case ODBCSOT_FETCH_RESULTS:
+			Set_Error_State_Base( DBEST_RECOVERABLE_ERROR );
+			break;
+						 
 		default:
 			FATAL_ASSERT( false );
 			break;

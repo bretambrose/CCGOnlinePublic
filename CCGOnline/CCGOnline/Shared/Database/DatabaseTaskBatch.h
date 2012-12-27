@@ -78,7 +78,6 @@ class TDatabaseTaskBatch
 			{
 				statement->Bind_Input( InputParameterBlock, sizeof( BatchInputParametersType ) );
 				statement->Bind_Output( ResultSetBlock, sizeof( BatchResultSetType ), T::ResultSetBatchSize );
-				FATAL_ASSERT( statement->Get_Error_State() == DBEST_SUCCESS );
 			}
 
 			FATAL_ASSERT( statement->Is_Ready_For_Use() );
@@ -100,6 +99,8 @@ class TDatabaseTaskBatch
 
 			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << " Failures: " << failed_tasks.size() );
 
+			FATAL_ASSERT( statement->Is_Ready_For_Use() );
+
 			connection->Release_Statement( statement );
 		}
 
@@ -115,85 +116,71 @@ class TDatabaseTaskBatch
 
 			while ( sub_list.size() > 0 )
 			{
-				bool success = true;
-
-				if ( !Was_Database_Operation_Successful( statement->Get_Error_State() ) )
-				{
-					FATAL_ASSERT( false );
-				}
+				FATAL_ASSERT( !statement->Is_In_Error_State() );
+				size_t list_size = sub_list.size();
 
 				statement->Execute( static_cast< uint32 >( sub_list.size() ) );
-				if ( !Was_Database_Operation_Successful( statement->Get_Error_State() ) )
+				if ( statement->Is_In_Error_State() )
 				{
-					success = false;
-					if ( Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks ) )
-					{
-						return;
-					}
+					Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks );
+					FATAL_ASSERT( sub_list.size() != list_size );
+					continue;
 				}
-				else
+
+				DBTaskListType::iterator iter = sub_list.begin();
+
+				int64 rows_fetched = 0;
+				uint32 input_row = 0;
+				EFetchResultsStatusType fetch_status = FRST_ONGOING;
+				while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
 				{
-					DBTaskListType::iterator iter = sub_list.begin();
-
-					int64 rows_fetched = 0;
-					uint32 input_row = 0;
-					EFetchResultsStatusType fetch_status = FRST_ONGOING;
-					while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
+					fetch_status = FRST_ONGOING;
+					while ( fetch_status == FRST_ONGOING )
 					{
-						fetch_status = FRST_ONGOING;
-						while ( fetch_status == FRST_ONGOING )
+						fetch_status = statement->Fetch_Results( rows_fetched );
+						if ( fetch_status != FRST_ERROR && rows_fetched > 0 )
 						{
-							fetch_status = statement->Fetch_Results( rows_fetched );
-							if ( fetch_status != FRST_ERROR && rows_fetched > 0 )
-							{
-								( *iter )->On_Fetch_Results( ResultSetBlock, rows_fetched );
-							}
+							( *iter )->On_Fetch_Results( ResultSetBlock, rows_fetched );
 						}
+					}
 
-						if ( fetch_status == FRST_FINISHED_SET )
+					if ( fetch_status == FRST_FINISHED_SET )
+					{
+						( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
+						++iter;
+						++input_row;
+					}
+					else if ( fetch_status == FRST_FINISHED_ALL )
+					{
+						for ( ; iter != sub_list.end(); ++iter, ++input_row )
 						{
 							( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
-							++iter;
-							++input_row;
-						}
-						else if ( fetch_status == FRST_FINISHED_ALL )
-						{
-							for ( ; iter != sub_list.end(); ++iter, ++input_row )
-							{
-								( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
-							}
-						}
-					}
-
-					if ( fetch_status == FRST_FINISHED_ALL )
-					{
-						for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
-						{
-							successful_tasks.push_back( *iter );
-						}
-
-						sub_list.clear();
-					}
-					else
-					{
-						success = false;
-						if ( Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks ) )
-						{
-							return;
 						}
 					}
 				}
 
-				statement->End_Transaction( success );
-				if ( success )
+				if ( fetch_status != FRST_FINISHED_ALL )
 				{
-					return;
+					Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks );
+					FATAL_ASSERT( sub_list.size() != list_size );
+					continue;
 				}
+
+				statement->End_Transaction( true );
+
+				for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
+				{
+					successful_tasks.push_back( *iter );
+				}
+
+				sub_list.clear();
 			}
 		}
 
-		bool Handle_Batch_Error( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		void Handle_Batch_Error( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
+			FATAL_ASSERT( sub_list.size() > 0 );
+
 			if ( sub_list.size() == 1 )
 			{
 				IDatabaseTask *task = *( sub_list.begin() );
@@ -202,7 +189,7 @@ class TDatabaseTaskBatch
 				statement->End_Transaction( false );
 				failed_tasks.push_back( task );
 				sub_list.clear();
-				return true;
+				return;
 			}
 
 			int32 bad_row_number = statement->Get_Bad_Row_Number();
@@ -212,31 +199,29 @@ class TDatabaseTaskBatch
 
 				statement->End_Transaction( false );
 				Process_Task_List_One_By_One( statement, sub_list, successful_tasks, failed_tasks );
-				return true;
+				return;
 			}
-			else
-			{						
-				int32 row = 0;
-				for( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++row, ++iter )
+					
+			int32 row = 0;
+			for( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++row, ++iter )
+			{
+				( *iter )->On_Rollback();
+
+				if ( row >= bad_row_number )
 				{
-					( *iter )->On_Rollback();
-
-					if ( row >= bad_row_number )
+					if ( row == bad_row_number )
 					{
-						if ( row == bad_row_number )
-						{
-							Log_Error( statement, &InputParameterBlock[ row ] );
+						Log_Error( statement, &InputParameterBlock[ row ] );
 
-							failed_tasks.push_back( *iter );
-							iter = sub_list.erase( iter );
-						}
+						failed_tasks.push_back( *iter );
+						iter = sub_list.erase( iter );
+					}
 
-						( *iter )->Initialize_Parameters( &InputParameterBlock[ row ] );
-					} 
-				}
-
-				return false;
+					( *iter )->Initialize_Parameters( &InputParameterBlock[ row ] );
+				} 
 			}
+
+			statement->End_Transaction( false );
 		}
 
 		void Process_Task_List_One_By_One( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
@@ -284,6 +269,10 @@ class TDatabaseTaskBatch
 
 						LOG( LL_LOW, "\t\t" << i << ": " << value_string.c_str() << "(" << type_string.c_str() << ", " << param_type_string.c_str() << ")" );
 					}
+				}
+				else
+				{
+					LOG( LL_LOW, "\tNo Input Parameters." );
 				}
 			}
 			else
