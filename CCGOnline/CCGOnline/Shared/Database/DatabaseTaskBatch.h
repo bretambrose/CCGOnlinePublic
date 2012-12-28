@@ -201,22 +201,29 @@ class TDatabaseTaskBatch
 				Process_Task_List_One_By_One( statement, sub_list, successful_tasks, failed_tasks );
 				return;
 			}
-					
+			
+			// Log and remove the bad call		
 			int32 row = 0;
+			for( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++row, ++iter )
+			{
+				if ( row == bad_row_number )
+				{
+					Log_Error( statement, &InputParameterBlock[ row ] );
+
+					failed_tasks.push_back( *iter );
+					sub_list.erase( iter );
+					break;
+				}
+			}
+
+			row = 0;
 			for( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++row, ++iter )
 			{
 				( *iter )->On_Rollback();
 
+				// everything beyond this point was shifted down by one in the batch; reinitialize
 				if ( row >= bad_row_number )
 				{
-					if ( row == bad_row_number )
-					{
-						Log_Error( statement, &InputParameterBlock[ row ] );
-
-						failed_tasks.push_back( *iter );
-						iter = sub_list.erase( iter );
-					}
-
 					( *iter )->Initialize_Parameters( &InputParameterBlock[ row ] );
 				} 
 			}

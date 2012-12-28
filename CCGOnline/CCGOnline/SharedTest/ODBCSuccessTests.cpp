@@ -80,8 +80,8 @@ class CGetAccountProcedureResultSet : public IDatabaseVariableSet
 		}
 
 		DBUInt64In AccountID;
-		DBString< 255 > AccountEmail;
-		DBString< 32 > Nickname;
+		DBStringIn< 255 > AccountEmail;
+		DBStringIn< 32 > Nickname;
 		DBUInt32In NicknameSequenceID;
 };
 
@@ -320,7 +320,7 @@ class CGetAllAccountsInOutParams : public IDatabaseVariableSet
 			variables.push_back( &OutTest );
 		}
 
-		DBString< 32 > FilteredNickname;
+		DBStringIn< 32 > FilteredNickname;
 		DBUInt64InOut InTest;
 		DBUInt64InOut Count;
 		DBUInt64InOut OutTest;
@@ -514,7 +514,7 @@ class CGetAccountCountParams : public IDatabaseVariableSet
 		}
 
 		DBUInt64Out AccountCount;
-		DBString< 32 > FilteredNickname;
+		DBStringIn< 32 > FilteredNickname;
 };
 
 template< uint32 ISIZE >
@@ -663,7 +663,7 @@ class CGetAccountEmailFunctionParams : public IDatabaseVariableSet
 			variables.push_back( &AccountID );
 		}
 
-		DBString< 255, DVT_OUTPUT > AccountEmail;
+		DBStringOut< 255 > AccountEmail;
 		DBUInt64In AccountID;
 };
 
