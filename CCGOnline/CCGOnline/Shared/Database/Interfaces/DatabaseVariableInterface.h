@@ -39,6 +39,7 @@ class IDatabaseVariable
 		virtual void *Get_Value_Address( void ) = 0;
 		virtual uint32 Get_Value_Buffer_Size( void ) const = 0;
 		virtual void *Get_Auxiliary_Address( void ) = 0;
+		virtual bool Is_Null( void ) const = 0;
 
 };
 

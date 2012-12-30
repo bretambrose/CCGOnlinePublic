@@ -56,6 +56,7 @@ class CODBCObjectBase
 
 		DBErrorStateType Get_Error_State_Base( void ) const { return ErrorState; }
 		void Set_Error_State_Base( DBErrorStateType error_state ) { ErrorState = error_state; }
+		void Push_User_Error( DBErrorStateType error_state, const std::wstring &error_description );
 
 		int32 Get_Bad_Row_Number_Base( void ) const { return BadRowNumber; }
 

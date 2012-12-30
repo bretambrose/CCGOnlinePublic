@@ -253,25 +253,19 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
 }
 
-class CTestInputValidation1 : public IDatabaseVariableSet
+// valid as function input, invalid all other times
+class CTestSignatureValidation1 : public IDatabaseVariableSet
 {
 	public:
 
-		CTestInputValidation1( void ) :
+		CTestSignatureValidation1( void ) :
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
 			NicknameSequenceID()
 		{}
 
-		CTestInputValidation1( const CTestInputValidation1 &rhs ) :
-			AccountID( rhs.AccountID ),
-			AccountEmail( rhs.AccountEmail ),
-			Nickname( rhs.Nickname ),
-			NicknameSequenceID( rhs.NicknameSequenceID )
-		{}
-
-		virtual ~CTestInputValidation1() {}
+		virtual ~CTestSignatureValidation1() {}
 
 		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
 		{
@@ -287,39 +281,19 @@ class CTestInputValidation1 : public IDatabaseVariableSet
 		DBUInt32In NicknameSequenceID;
 };
 
-TEST_F( ODBCMiscTests, TestInputValidation1 )
-{
-	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
-	ASSERT_TRUE( connection != nullptr );
-
-	CTestInputValidation1 params;
-	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &params ) );
-	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &params ) );
-	ASSERT_TRUE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &params ) );
-	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &params ) );
-
-	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
-}
-
-class CTestInputValidation2 : public IDatabaseVariableSet
+// valid as procedure input or output, invalid all other times
+class CTestSignatureValidation2 : public IDatabaseVariableSet
 {
 	public:
 
-		CTestInputValidation2( void ) :
+		CTestSignatureValidation2( void ) :
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
 			NicknameSequenceID()
 		{}
 
-		CTestInputValidation2( const CTestInputValidation2 &rhs ) :
-			AccountID( rhs.AccountID ),
-			AccountEmail( rhs.AccountEmail ),
-			Nickname( rhs.Nickname ),
-			NicknameSequenceID( rhs.NicknameSequenceID )
-		{}
-
-		virtual ~CTestInputValidation2() {}
+		virtual ~CTestSignatureValidation2() {}
 
 		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
 		{
@@ -335,39 +309,19 @@ class CTestInputValidation2 : public IDatabaseVariableSet
 		DBUInt32In NicknameSequenceID;
 };
 
-TEST_F( ODBCMiscTests, TestInputValidation2 )
-{
-	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
-	ASSERT_TRUE( connection != nullptr );
-
-	CTestInputValidation2 params;
-	ASSERT_TRUE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &params ) );
-	ASSERT_TRUE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &params ) );
-	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &params ) );
-	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &params ) );
-
-	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
-}
-
-class CTestInputValidation3 : public IDatabaseVariableSet
+// never valid as input or output
+class CTestSignatureValidation3 : public IDatabaseVariableSet
 {
 	public:
 
-		CTestInputValidation3( void ) :
+		CTestSignatureValidation3( void ) :
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
 			NicknameSequenceID()
 		{}
 
-		CTestInputValidation3( const CTestInputValidation3 &rhs ) :
-			AccountID( rhs.AccountID ),
-			AccountEmail( rhs.AccountEmail ),
-			Nickname( rhs.Nickname ),
-			NicknameSequenceID( rhs.NicknameSequenceID )
-		{}
-
-		virtual ~CTestInputValidation3() {}
+		virtual ~CTestSignatureValidation3() {}
 
 		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
 		{
@@ -383,22 +337,79 @@ class CTestInputValidation3 : public IDatabaseVariableSet
 		DBUInt32Out NicknameSequenceID;
 };
 
-TEST_F( ODBCMiscTests, TestInputValidation3 )
+// valid as procedure input if there is non-empty result set
+class CTestSignatureValidation4 : public IDatabaseVariableSet
+{
+	public:
+
+		CTestSignatureValidation4( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		virtual ~CTestSignatureValidation4() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBString< 255 > AccountEmail;
+		DBString< 32 > Nickname;
+		DBUInt32InOut NicknameSequenceID;
+};
+
+TEST_F( ODBCMiscTests, TestSignatureValidation )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
-	CTestInputValidation3 params;
-	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &params ) );
-	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &params ) );
-	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &params ) );
-	ASSERT_FALSE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &params ) );
-
+	CTestSignatureValidation1 params1;
+	CTestSignatureValidation2 params2;
+	CTestSignatureValidation3 params3;
+	CTestSignatureValidation4 params4;
 	CEmptyVariableSet empty_params;
-	ASSERT_TRUE( connection->Validate_Input_Signature( DTT_PROCEDURE_CALL, &empty_params ) );
-	ASSERT_FALSE( connection->Validate_Input_Signature( DTT_FUNCTION_CALL, &empty_params ) );
-	ASSERT_TRUE( connection->Validate_Output_Signature( DTT_PROCEDURE_CALL, &empty_params ) );
-	ASSERT_TRUE( connection->Validate_Output_Signature( DTT_FUNCTION_CALL, &empty_params ) );
+
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params1, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &params3 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params3, &params2 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params4, &params2 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params4, &empty_params ) );
+
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &empty_params ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params2 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &empty_params ) );
+
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params1, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params3 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params3, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params4 ) );
+
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params1, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params2, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params1, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params2, &empty_params ) );
+
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params3, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params3, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params3, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params4, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params4, &params1 ) );
+
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params3 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params4 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &empty_params ) );
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
 }

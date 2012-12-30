@@ -12,6 +12,8 @@ CREATE PROCEDURE dynamic.exception_thrower
 )
 AS
 BEGIN
+
+	SET NOCOUNT ON;
     
 	IF @p_throw_exception = 1
 	BEGIN

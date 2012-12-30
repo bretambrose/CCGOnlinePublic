@@ -11,14 +11,16 @@ CREATE PROCEDURE dynamic.get_account_by_email (
 AS
 BEGIN
 
-  SELECT
-    account_id,
-    nickname,
-    nickname_sequence_id
-  FROM
-    dynamic.accounts
-  WHERE
-    upper_account_email = UPPER( @p_email ) AND closed_on IS NULL;
+	SET NOCOUNT ON;
+
+	SELECT
+		account_id,
+		nickname,
+		nickname_sequence_id
+	FROM
+		dynamic.accounts
+	WHERE
+		upper_account_email = UPPER( @p_email ) AND closed_on IS NULL;
     
 END
 GO

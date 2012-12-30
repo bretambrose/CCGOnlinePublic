@@ -8,12 +8,15 @@ GO
 CREATE PROCEDURE dynamic.no_execute_permission 
 AS
 BEGIN
+
+	SET NOCOUNT ON;
     
 	SELECT 0;
 
 END
 GO
 
+-- doesn't seem to work
 REVOKE EXECUTE ON OBJECT::dynamic.no_execute_permission FROM testserver;
 
 GO

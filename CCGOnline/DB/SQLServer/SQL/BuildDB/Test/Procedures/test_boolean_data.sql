@@ -13,6 +13,8 @@ CREATE PROCEDURE dynamic.test_boolean_data
 AS
 BEGIN
 
+	SET NOCOUNT ON;
+
 	SET @p_in_out = @p_in ^ @p_in_out;
 
 	SELECT

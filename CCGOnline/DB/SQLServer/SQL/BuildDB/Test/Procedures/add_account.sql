@@ -12,6 +12,8 @@ CREATE PROCEDURE dynamic.add_account (
 )
 AS
 BEGIN
+
+	SET NOCOUNT ON;
  
 	DECLARE @upper_nickname VARCHAR(32) = UPPER( @p_nickname );
 	DECLARE @nickname_seq_id BIGINT;

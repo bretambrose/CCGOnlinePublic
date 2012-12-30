@@ -12,7 +12,7 @@ CREATE PROCEDURE dynamic.function_input_procedure
 )
 AS
 BEGIN
-    
+  
 	RETURN
 
 END

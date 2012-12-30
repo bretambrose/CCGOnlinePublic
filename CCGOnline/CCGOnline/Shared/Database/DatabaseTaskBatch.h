@@ -66,8 +66,7 @@ class TDatabaseTaskBatch
 			if ( StatementText.size() == 0 )
 			{
 				IDatabaseTask *first_task = *PendingTasks.begin();
-				FATAL_ASSERT( connection->Validate_Input_Signature( first_task->Get_Task_Type(), InputParameterBlock ) );
-				FATAL_ASSERT( connection->Validate_Output_Signature( first_task->Get_Task_Type(), ResultSetBlock ) );
+				FATAL_ASSERT( connection->Validate_Input_Output_Signatures( first_task->Get_Task_Type(), InputParameterBlock, ResultSetBlock ) );
 				connection->Construct_Statement_Text( first_task, InputParameterBlock, StatementText );
 			}
 
@@ -122,7 +121,7 @@ class TDatabaseTaskBatch
 				statement->Execute( static_cast< uint32 >( sub_list.size() ) );
 				if ( statement->Is_In_Error_State() )
 				{
-					Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks );
+					Handle_Batch_Error( statement, NULL, sub_list, successful_tasks, failed_tasks );
 					FATAL_ASSERT( sub_list.size() != list_size );
 					continue;
 				}
@@ -132,8 +131,17 @@ class TDatabaseTaskBatch
 				int64 rows_fetched = 0;
 				uint32 input_row = 0;
 				EFetchResultsStatusType fetch_status = FRST_ONGOING;
+				const wchar_t *additional_error_context = NULL;		// error logging is somewhat removed from error recognition, so use this awkward way of forwarding user-level information
 				while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
 				{
+					if ( iter == sub_list.end() )
+					{
+						// Uh oh, there are more result sets than batched calls, we need to fail out
+						fetch_status = FRST_ERROR;
+						additional_error_context = L"\tThere were more result sets than batched calls.";
+						break;
+					}
+
 					fetch_status = FRST_ONGOING;
 					while ( fetch_status == FRST_ONGOING )
 					{
@@ -152,16 +160,31 @@ class TDatabaseTaskBatch
 					}
 					else if ( fetch_status == FRST_FINISHED_ALL )
 					{
-						for ( ; iter != sub_list.end(); ++iter, ++input_row )
+						if ( !statement->Should_Have_Results() || input_row + 1 == list_size )
 						{
-							( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
+							for ( ; iter != sub_list.end(); ++iter, ++input_row )
+							{
+								( *iter )->On_Fetch_Results_Finished( &InputParameterBlock[ input_row ] );
+							}
+						}
+						else
+						{
+							/*
+								This is the case when we have a batch of N, we expect N result sets, but we get back fewer than that.
+								We have no way of knowing which row in the batch failed to return a result set (ODBC doesn't consider this an error), 
+								so we fail the whole thing and are forced to execute them one by one in order to find the offender.
+								It's true that stored procedures that return results should unconditionally select a result set, even if it's empty, but this allows
+								us to detect and flag bad procedures rather than giving incorrect results.
+							*/
+							fetch_status = FRST_ERROR;
+							additional_error_context = L"\tThere were fewer result sets than batched calls.";
 						}
 					}
 				}
 
 				if ( fetch_status != FRST_FINISHED_ALL )
 				{
-					Handle_Batch_Error( statement, sub_list, successful_tasks, failed_tasks );
+					Handle_Batch_Error( statement, additional_error_context, sub_list, successful_tasks, failed_tasks );
 					FATAL_ASSERT( sub_list.size() != list_size );
 					continue;
 				}
@@ -177,14 +200,14 @@ class TDatabaseTaskBatch
 			}
 		}
 
-		void Handle_Batch_Error( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		void Handle_Batch_Error( IDatabaseStatement *statement, const wchar_t *additional_error_context, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
 			FATAL_ASSERT( sub_list.size() > 0 );
 
 			if ( sub_list.size() == 1 )
 			{
 				IDatabaseTask *task = *( sub_list.begin() );
-				Log_Error( statement, &InputParameterBlock[ 0 ] );
+				Log_Error( statement, &InputParameterBlock[ 0 ], additional_error_context );
 
 				statement->End_Transaction( false );
 				failed_tasks.push_back( task );
@@ -195,7 +218,7 @@ class TDatabaseTaskBatch
 			int32 bad_row_number = statement->Get_Bad_Row_Number();
 			if ( bad_row_number < 0 )
 			{
-				Log_Error( statement, nullptr );
+				Log_Error( statement, nullptr, additional_error_context );
 
 				statement->End_Transaction( false );
 				Process_Task_List_One_By_One( statement, sub_list, successful_tasks, failed_tasks );
@@ -208,7 +231,7 @@ class TDatabaseTaskBatch
 			{
 				if ( row == bad_row_number )
 				{
-					Log_Error( statement, &InputParameterBlock[ row ] );
+					Log_Error( statement, &InputParameterBlock[ row ], additional_error_context );
 
 					failed_tasks.push_back( *iter );
 					sub_list.erase( iter );
@@ -250,10 +273,16 @@ class TDatabaseTaskBatch
 			sub_list.clear();
 		}
 
-		void Log_Error( IDatabaseStatement *statement, IDatabaseVariableSet *input_params )
+		void Log_Error( IDatabaseStatement *statement, IDatabaseVariableSet *input_params, const wchar_t *additional_error_context )
 		{
 			FATAL_ASSERT( statement != nullptr );
 
+			LOG( LL_LOW, "\tBATCH PROCESSING ERROR" );
+			if ( additional_error_context != nullptr )
+			{
+				WLOG( LL_LOW, additional_error_context );
+			}
+			 
 			statement->Log_Error_State();
 
 			if ( input_params != nullptr )

@@ -53,6 +53,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		virtual bool Needs_Binding( void ) const;
 		virtual bool Is_Ready_For_Use( void ) const;
 		virtual bool Is_In_Error_State( void ) const;
+		virtual bool Should_Have_Results( void ) const { return ExpectedResultSetWidth > 0; }
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 		virtual int32 Get_Bad_Row_Number( void ) const { return Get_Bad_Row_Number_Base(); }
@@ -76,7 +77,9 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		SQLSMALLINT *RowStatuses;
 		int64 RowsFetched;
 
-		bool ProcessResults;
+		int32 ExpectedResultSetWidth;
+		int32 CurrentResultSetWidth;
+
 };
 
 #endif // ODBC_STATEMENT_H

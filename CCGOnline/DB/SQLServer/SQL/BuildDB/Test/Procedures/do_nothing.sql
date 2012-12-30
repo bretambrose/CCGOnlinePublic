@@ -9,6 +9,8 @@ CREATE PROCEDURE dynamic.do_nothing
 AS
 BEGIN
 
+	SET NOCOUNT ON;
+
 	DECLARE @test BIGINT = 0;
 	SELECT
 		@test = COUNT( account_id )

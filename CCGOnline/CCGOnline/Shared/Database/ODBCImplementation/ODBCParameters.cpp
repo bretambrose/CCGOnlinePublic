@@ -31,63 +31,70 @@ void Convert_Database_Variable_To_String( IDatabaseVariable *variable, std::stri
 {
 	std::basic_ostringstream< char > varstream;
 
-	switch ( variable->Get_Value_Type() )
+	if ( variable->Is_Null() )
 	{
-		case DVVT_INT32:
+		varstream << "<NULL>";
+	}
+	else
+	{
+		switch ( variable->Get_Value_Type() )
 		{
-			TODBCScalarVariableBase< int32 > *scalar_variable = static_cast< TODBCScalarVariableBase< int32 > * >( variable );
-			varstream << scalar_variable->Get_Value();
-			break;
-		}
+			case DVVT_INT32:
+			{
+				TODBCScalarVariableBase< int32 > *scalar_variable = static_cast< TODBCScalarVariableBase< int32 > * >( variable );
+				varstream << scalar_variable->Get_Value();
+				break;
+			}
 
-		case DVVT_UINT32:
-		{
-			TODBCScalarVariableBase< uint32 > *scalar_variable = static_cast< TODBCScalarVariableBase< uint32 > * >( variable );
-			varstream << scalar_variable->Get_Value();
-			break;
-		}
+			case DVVT_UINT32:
+			{
+				TODBCScalarVariableBase< uint32 > *scalar_variable = static_cast< TODBCScalarVariableBase< uint32 > * >( variable );
+				varstream << scalar_variable->Get_Value();
+				break;
+			}
 
-		case DVVT_INT64:
-		{
-			TODBCScalarVariableBase< int64 > *scalar_variable = static_cast< TODBCScalarVariableBase< int64 > * >( variable );
-			varstream << scalar_variable->Get_Value();
-			break;
-		}
+			case DVVT_INT64:
+			{
+				TODBCScalarVariableBase< int64 > *scalar_variable = static_cast< TODBCScalarVariableBase< int64 > * >( variable );
+				varstream << scalar_variable->Get_Value();
+				break;
+			}
 
-		case DVVT_UINT64:
-		{
-			TODBCScalarVariableBase< uint64 > *scalar_variable = static_cast< TODBCScalarVariableBase< uint64 > * >( variable );
-			varstream << scalar_variable->Get_Value();
-			break;
-		}
+			case DVVT_UINT64:
+			{
+				TODBCScalarVariableBase< uint64 > *scalar_variable = static_cast< TODBCScalarVariableBase< uint64 > * >( variable );
+				varstream << scalar_variable->Get_Value();
+				break;
+			}
 
-		case DVVT_STRING:
-		case DVVT_WSTRING:
-		{
-			IDatabaseString *db_string = static_cast< IDatabaseString * >( variable );
-			db_string->To_String( value );
-			return;
-		}
+			case DVVT_STRING:
+			case DVVT_WSTRING:
+			{
+				IDatabaseString *db_string = static_cast< IDatabaseString * >( variable );
+				db_string->To_String( value );
+				return;
+			}
 
-		case DVVT_FLOAT:
-		{
-			TODBCScalarVariableBase< float > *scalar_variable = static_cast< TODBCScalarVariableBase< float > * >( variable );
-			varstream << scalar_variable->Get_Value();
-			break;
-		}
+			case DVVT_FLOAT:
+			{
+				TODBCScalarVariableBase< float > *scalar_variable = static_cast< TODBCScalarVariableBase< float > * >( variable );
+				varstream << scalar_variable->Get_Value();
+				break;
+			}
 
-		case DVVT_DOUBLE:
-		{
-			TODBCScalarVariableBase< double > *scalar_variable = static_cast< TODBCScalarVariableBase< double > * >( variable );
-			varstream << scalar_variable->Get_Value();
-			break;
-		}
+			case DVVT_DOUBLE:
+			{
+				TODBCScalarVariableBase< double > *scalar_variable = static_cast< TODBCScalarVariableBase< double > * >( variable );
+				varstream << scalar_variable->Get_Value();
+				break;
+			}
 
-		case DVVT_BOOLEAN:
-		{
-			TODBCScalarVariableBase< bool > *scalar_variable = static_cast< TODBCScalarVariableBase< bool > * >( variable );
-			varstream << ( scalar_variable->Get_Value() ? "true" : "false" );
-			break;
+			case DVVT_BOOLEAN:
+			{
+				TODBCScalarVariableBase< bool > *scalar_variable = static_cast< TODBCScalarVariableBase< bool > * >( variable );
+				varstream << ( scalar_variable->Get_Value() ? "true" : "false" );
+				break;
+			}
 		}
 	}
 

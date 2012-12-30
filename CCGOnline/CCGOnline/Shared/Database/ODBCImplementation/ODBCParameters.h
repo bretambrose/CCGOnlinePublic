@@ -75,12 +75,12 @@ class TODBCScalarVariableBase : public IDatabaseVariable
 		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
 		virtual uint32 Get_Value_Size( void ) const { return 0; }
 		virtual uint32 Get_Value_Buffer_Size( void ) const { return 0; }
+		virtual bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
 		// Additional interface
-		const T &Get_Value( void ) const { return Value; }
+		const T &Get_Value( void ) const { FATAL_ASSERT( !Is_Null() ); return Value; }
 		void Set_Value( const T &value ) { Value = value; Indicator = 0; }
 
-		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 		void Set_Null( void ) { Indicator = IP_SQL_NULL_DATA; }
 
 	private:
@@ -192,11 +192,10 @@ class DBStringBase : public IDatabaseString
 		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
 		virtual uint32 Get_Value_Size( void ) const { return BUFFER_LENGTH + 1; }
 		virtual uint32 Get_Value_Buffer_Size( void ) const { return BUFFER_LENGTH + 1; }
+		virtual bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
 		// Additional interface
 		const C *Get_Buffer( void ) const { return Buffer; }
-
-		bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
 	protected:
 

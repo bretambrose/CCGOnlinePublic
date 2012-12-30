@@ -1365,3 +1365,413 @@ TEST_F( ODBCFailureTests, UniquenessViolationProcedureCall_3_2_6_4_5 )
 	Run_ThrowExceptionProcedureCall_Test< 3, 2 >( L"dynamic.unique_constraint_violator", 6, 4, 5 );
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CMissingSelectParams : public IDatabaseVariableSet
+{
+	public:
+
+		CMissingSelectParams( void ) :
+			SkipSelect(),
+			AccountCount()
+		{}
+
+		CMissingSelectParams( bool skip_select ) :
+			SkipSelect( skip_select ),
+			AccountCount()
+		{}
+
+		CMissingSelectParams( const CMissingSelectParams &rhs ) :
+			SkipSelect( rhs.SkipSelect ),
+			AccountCount( rhs.AccountCount )
+		{}
+
+		virtual ~CMissingSelectParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &SkipSelect );
+			variables.push_back( &AccountCount );
+		}
+
+		DBBoolIn SkipSelect;
+		DBUInt64InOut AccountCount;
+};
+
+class CMissingSelectResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CMissingSelectResultSet( void ) :
+			ID()
+		{}
+
+		CMissingSelectResultSet( const CMissingSelectResultSet &rhs ) :
+			ID( rhs.ID )
+		{}
+
+		virtual ~CMissingSelectResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ID );
+		}
+
+		DBUInt64In ID;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CMissingSelectProcedureCall : public TDatabaseProcedureCall< CMissingSelectParams, ISIZE, CMissingSelectResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CMissingSelectParams, ISIZE, CMissingSelectResultSet, OSIZE > BASECLASS;
+
+		CMissingSelectProcedureCall( bool skip_select ) : 
+			BASECLASS(),
+			SkipSelect( skip_select ),
+			Results(),
+			AccountCount( 0 ),
+			FinishedCalls( 0 ),
+			Success( false ),
+			InitializeCalls( 0 ),
+			Rollbacks( 0 )
+		{}
+
+		virtual ~CMissingSelectProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.skip_select_procedure"; }
+
+		void Verify_Results( uint32 self_index, uint32 exception_index1, uint32 exception_index2 ) 
+		{
+			if ( self_index == exception_index1 || self_index == exception_index2 )
+			{
+				ASSERT_TRUE( !Success );
+			}
+			else
+			{
+				ASSERT_TRUE( Success );
+				ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+				ASSERT_TRUE( Results.size() == 3 );
+				ASSERT_TRUE( AccountCount == 3 );
+				for ( uint32 i = 0; i < Results.size(); ++i )
+				{
+					ASSERT_TRUE( Results[ i ].ID.Get_Value() == i + 1 );
+				}
+			}
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
+			CMissingSelectParams *input_params = static_cast< CMissingSelectParams * >( input_parameters );
+			*input_params = CMissingSelectParams( SkipSelect );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CMissingSelectResultSet *result_rows = static_cast< CMissingSelectResultSet * >( result_set );
+			for ( int64 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( result_rows[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CMissingSelectParams *input_params = static_cast< CMissingSelectParams * >( input_parameters );
+			AccountCount = input_params->AccountCount.Get_Value();
+
+			FinishedCalls++;
+			Success = true;
+		}	
+
+		virtual void On_Rollback( void ) { 
+			Results.clear();
+			AccountCount = 0;
+
+			Rollbacks++; 
+			Success = false;
+		}
+
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		bool SkipSelect;
+
+		std::vector< CMissingSelectResultSet > Results;
+		uint64 AccountCount;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+		uint32 Rollbacks;
+		bool Success;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_MissingSelectProcedureCall_Test( uint32 task_count, uint32 skip_index1, uint32 skip_index2 )
+{
+	FATAL_ASSERT( skip_index1 < task_count && skip_index1 < skip_index2 );
+
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CMissingSelectProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CMissingSelectProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CMissingSelectProcedureCall< ISIZE, OSIZE > *db_task = new CMissingSelectProcedureCall< ISIZE, OSIZE >( i == skip_index1 || i == skip_index2 );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	uint32 exception_count = ( skip_index2 < task_count ) ? 2 : 1;
+
+	ASSERT_TRUE( failed_tasks.size() == exception_count );
+	ASSERT_TRUE( successful_tasks.size() == task_count - exception_count );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results( i, skip_index1, skip_index2 );
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_1_1_1_0_NULL )
+{
+	Run_MissingSelectProcedureCall_Test< 1, 1 >( 1, 0, 666 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_2_1_2_0_NULL )
+{
+	Run_MissingSelectProcedureCall_Test< 2, 1 >( 2, 0, 666 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_2_1_2_1_NULL )
+{
+	Run_MissingSelectProcedureCall_Test< 2, 1 >( 2, 1, 666 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_3_0_NULL )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 3, 0, 666 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_3_1_NULL )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 3, 1, 666 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_3_2_NULL )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 3, 2, 666 );
+}
+
+///
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_0_1 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 0, 1 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_1_2 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 1, 2 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_0_2 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 0, 2 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_0_3 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 0, 3 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_1_3 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 1, 3 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_2_4 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 2, 4 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_3_4 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 3, 4 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_3_5 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 3, 5 );
+}
+
+TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_4_5 )
+{
+	Run_MissingSelectProcedureCall_Test< 3, 1 >( 6, 4, 5 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef ON_HOLD
+
+class CExtraSelectParams : public IDatabaseVariableSet
+{
+	public:
+
+		CExtraSelectParams( void ) :
+			ExtraSelect(),
+			AccountCount()
+		{}
+
+		CExtraSelectParams( bool extra_select ) :
+			ExtraSelect( extra_select ),
+			AccountCount()
+		{}
+
+		CExtraSelectParams( const CExtraSelectParams &rhs ) :
+			ExtraSelect( rhs.ExtraSelect ),
+			AccountCount( rhs.AccountCount )
+		{}
+
+		virtual ~CExtraSelectParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ExtraSelect );
+			variables.push_back( &AccountCount );
+		}
+
+		DBBoolIn ExtraSelect;
+		DBUInt64InOut AccountCount;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CExtraSelectProcedureCall : public TDatabaseProcedureCall< CExtraSelectParams, ISIZE, CEmptyVariableSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CExtraSelectParams, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+
+		CExtraSelectProcedureCall( bool extra_select ) : 
+			BASECLASS(),
+			ExtraSelect( extra_select ),
+			AccountCount( 0 ),
+			FinishedCalls( 0 ),
+			Success( false ),
+			InitializeCalls( 0 ),
+			Rollbacks( 0 )
+		{}
+
+		virtual ~CExtraSelectProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.extra_select_procedure"; }
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( Success );
+			ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+			ASSERT_TRUE( AccountCount == 3 );
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
+			CExtraSelectParams *input_params = static_cast< CExtraSelectParams * >( input_parameters );
+			*input_params = CExtraSelectParams( ExtraSelect );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 /*rows_fetched*/ ) 
+		{
+			ASSERT_TRUE( false );
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CExtraSelectParams *input_params = static_cast< CExtraSelectParams * >( input_parameters );
+			AccountCount = input_params->AccountCount.Get_Value();
+
+			FinishedCalls++;
+			Success = true;
+		}	
+
+		virtual void On_Rollback( void ) { 
+			AccountCount = 0;
+
+			Rollbacks++; 
+			Success = false;
+		}
+
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		bool ExtraSelect;
+
+		uint64 AccountCount;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+		uint32 Rollbacks;
+		bool Success;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_ExtraSelectProcedureCall_Test( uint32 task_count, uint32 non_extra_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CExtraSelectProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CExtraSelectProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CExtraSelectProcedureCall< ISIZE, OSIZE > *db_task = new CExtraSelectProcedureCall< ISIZE, OSIZE >( i != non_extra_index );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == 0 );
+	ASSERT_TRUE( successful_tasks.size() == task_count );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_1_1_1_1 )
+{
+	Run_ExtraSelectProcedureCall_Test< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_1_1_1_0 )
+{
+	Run_ExtraSelectProcedureCall_Test< 1, 1 >( 1, 0 );
+}
+
+#endif // ON_HOLD

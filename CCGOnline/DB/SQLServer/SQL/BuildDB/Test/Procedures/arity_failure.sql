@@ -13,6 +13,8 @@ CREATE PROCEDURE dynamic.arity_failure
 )
 AS
 BEGIN
+
+	SET NOCOUNT ON;
     
 	RETURN
 

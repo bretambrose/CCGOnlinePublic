@@ -12,6 +12,8 @@ CREATE PROCEDURE dynamic.unique_constraint_violator
 )
 AS
 BEGIN
+
+	SET NOCOUNT ON;
     
 	IF @p_violate_constraint = 1
 	BEGIN

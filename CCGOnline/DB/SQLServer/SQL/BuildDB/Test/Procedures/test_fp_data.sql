@@ -15,6 +15,8 @@ CREATE PROCEDURE dynamic.test_fp_data
 AS
 BEGIN
 
+	SET NOCOUNT ON;
+
 	SET @p_float_in_out = @p_float_in + @p_float_in_out;
 	SET @p_double_in_out = @p_double_in + @p_double_in_out;
 

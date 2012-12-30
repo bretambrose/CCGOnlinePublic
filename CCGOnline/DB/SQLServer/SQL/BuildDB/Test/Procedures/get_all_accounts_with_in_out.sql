@@ -15,6 +15,8 @@ CREATE PROCEDURE dynamic.get_all_accounts_with_in_out
 AS
 BEGIN
 
+	SET NOCOUNT ON;
+
 	DECLARE @temp BIGINT = @p_in_test;
 	SET @p_in_test = @p_out_test;
 	SET @p_out_test = @temp;

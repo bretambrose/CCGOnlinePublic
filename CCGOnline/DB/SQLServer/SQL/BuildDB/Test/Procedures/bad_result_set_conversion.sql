@@ -8,6 +8,8 @@ GO
 CREATE PROCEDURE dynamic.bad_result_set_conversion 
 AS
 BEGIN
+
+	SET NOCOUNT ON;
     
 	SELECT 'Bret';
 

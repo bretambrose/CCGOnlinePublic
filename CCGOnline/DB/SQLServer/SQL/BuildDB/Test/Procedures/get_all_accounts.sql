@@ -9,6 +9,8 @@ CREATE PROCEDURE dynamic.get_all_accounts
 AS
 BEGIN
 
+	SET NOCOUNT ON;
+
 	SELECT
 		account_id,
 		account_email,

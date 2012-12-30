@@ -160,7 +160,8 @@ CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle
 	ResultSetRowCount( 1 ),
 	RowStatuses( nullptr ),
 	RowsFetched( 0 ),
-	ProcessResults( true )
+	ExpectedResultSetWidth( 0 ),
+	CurrentResultSetWidth( -1 )
 {
 }
 
@@ -263,7 +264,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 	result_set->Get_Variables( result_columns );
 	if ( result_columns.size() > 0 )
 	{
-		ProcessResults = true;
+		ExpectedResultSetWidth = static_cast< int32 >( result_columns.size() );
 
 		SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_BIND_TYPE, (SQLPOINTER) result_set_size, 0 );
 		Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_SIZE, error_code );
@@ -308,10 +309,6 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 				return;
 			}
 		}
-	}
-	else
-	{
-		ProcessResults = false;
 	}
 
 	State = ODBCSST_READY;
@@ -359,17 +356,13 @@ void CODBCStatement::Execute( uint32 batch_size )
 		return;
 	}
 
+	CurrentResultSetWidth = -1;
 	State = ODBCSST_PROCESS_RESULTS;
 }
 
 EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 {
 	rows_fetched = 0;
-
-	if ( !ProcessResults )
-	{
-		State = ODBCSST_END_TRANSACTION;
-	}
 
 	if ( State == ODBCSST_END_TRANSACTION )
 	{
@@ -383,11 +376,37 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 
 	FATAL_ASSERT( State == ODBCSST_PROCESS_RESULTS );
 
-	SQLRETURN error_code = SQLFetchScroll( StatementHandle, SQL_FETCH_NEXT, 0 );
-	rows_fetched = RowsFetched;
+	// If this is our first encounter with this result set, get its width; make sure it matches what we're expecting
+	if ( CurrentResultSetWidth == -1 )
+	{
+		SQLSMALLINT column_count = 0;
+		SQLRETURN ec = SQLNumResultCols( StatementHandle, &column_count );
+		if ( ec == SQL_SUCCESS )
+		{
+			CurrentResultSetWidth = column_count;
+		}
+
+		if ( ec != SQL_SUCCESS || CurrentResultSetWidth != ExpectedResultSetWidth )
+		{
+			std::basic_ostringstream< wchar_t > message_stream;
+			message_stream << L"\tGot a result set of width " << CurrentResultSetWidth << L" while expecting a result set of width " << ExpectedResultSetWidth;
+			Push_User_Error( DBEST_RECOVERABLE_ERROR, message_stream.rdbuf()->str() );
+			State = ODBCSST_RECOVERABLE_ERROR;
+			return FRST_ERROR;
+		}
+	}
+
+	// SQLMoreResults is the trigger that allows us to read final values from our in/out parameters, so we must call it even if there's no result set
+	SQLRETURN error_code = SQL_NO_DATA;	
+	if ( CurrentResultSetWidth > 0 && ExpectedResultSetWidth > 0 )
+	{
+		error_code = SQLFetchScroll( StatementHandle, SQL_FETCH_NEXT, 0 );
+		rows_fetched = RowsFetched;
+	}
 
 	if ( error_code == SQL_NO_DATA )
 	{
+		CurrentResultSetWidth = -1;
 		SQLRETURN ec2 = SQLMoreResults( StatementHandle );
 		if ( ec2 == SQL_NO_DATA_FOUND )
 		{

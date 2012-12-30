@@ -11,6 +11,8 @@ CREATE PROCEDURE dynamic.bad_input_params
 )
 AS
 BEGIN
+
+	SET NOCOUNT ON;
     
 	RETURN
 

@@ -136,6 +136,16 @@ void CODBCObjectBase::Invalidate_Handles( void )
 	StatementHandle = 0;
 }
 
+void CODBCObjectBase::Push_User_Error( DBErrorStateType error_state, const std::wstring &error_description )
+{
+	FATAL_ASSERT( error_state != DBEST_SUCCESS );
+
+	ErrorState = error_state;
+
+	Errors.clear();
+	Errors.push_back( SODBCError( -1, L"*USER*", error_description ) );
+}
+
 void CODBCObjectBase::Log_Error_State_Base( void ) const
 {
 	std::string state_string;
