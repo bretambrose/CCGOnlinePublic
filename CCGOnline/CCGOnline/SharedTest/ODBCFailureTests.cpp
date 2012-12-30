@@ -1626,8 +1626,6 @@ TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_4_5 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef ON_HOLD
-
 class CExtraSelectParams : public IDatabaseVariableSet
 {
 	public:
@@ -1682,9 +1680,16 @@ class CExtraSelectProcedureCall : public TDatabaseProcedureCall< CExtraSelectPar
 
 		void Verify_Results( void ) 
 		{
-			ASSERT_TRUE( Success );
-			ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
-			ASSERT_TRUE( AccountCount == 3 );
+			if ( ExtraSelect )
+			{
+				ASSERT_FALSE( Success );
+			}
+			else
+			{
+				ASSERT_TRUE( Success );
+				ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+				ASSERT_TRUE( AccountCount == 3 );
+			}
 		}
 
 	protected:
@@ -1751,8 +1756,10 @@ void Run_ExtraSelectProcedureCall_Test( uint32 task_count, uint32 non_extra_inde
 	DBTaskListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
-	ASSERT_TRUE( failed_tasks.size() == 0 );
-	ASSERT_TRUE( successful_tasks.size() == task_count );
+	uint32 bad_task_count = ( non_extra_index < task_count ) ? task_count - 1 : task_count;
+
+	ASSERT_TRUE( failed_tasks.size() == bad_task_count );
+	ASSERT_TRUE( successful_tasks.size() == task_count - bad_task_count );
 	
 	for ( uint32 i = 0; i < tasks.size(); ++i )
 	{
@@ -1774,4 +1781,711 @@ TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_1_1_1_0 )
 	Run_ExtraSelectProcedureCall_Test< 1, 1 >( 1, 0 );
 }
 
-#endif // ON_HOLD
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_2_1_2_0 )
+{
+	Run_ExtraSelectProcedureCall_Test< 2, 1 >( 2, 0 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_2_1_2_1 )
+{
+	Run_ExtraSelectProcedureCall_Test< 2, 1 >( 2, 1 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_2_1_2_2 )
+{
+	Run_ExtraSelectProcedureCall_Test< 2, 1 >( 2, 2 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_3_1_3_0 )
+{
+	Run_ExtraSelectProcedureCall_Test< 3, 1 >( 3, 0 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_3_1_3_1 )
+{
+	Run_ExtraSelectProcedureCall_Test< 3, 1 >( 3, 1 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_3_1_3_2 )
+{
+	Run_ExtraSelectProcedureCall_Test< 3, 1 >( 3, 2 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_3_1_6_1 )
+{
+	Run_ExtraSelectProcedureCall_Test< 3, 1 >( 6, 1 );
+}
+
+TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_3_1_6_4 )
+{
+	Run_ExtraSelectProcedureCall_Test< 3, 1 >( 6, 4 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CTooManyResultsParams : public IDatabaseVariableSet
+{
+	public:
+
+		CTooManyResultsParams( void ) :
+			ExtraSelect()
+		{}
+
+		CTooManyResultsParams( bool extra_select ) :
+			ExtraSelect( extra_select )
+		{}
+
+		CTooManyResultsParams( const CTooManyResultsParams &rhs ) :
+			ExtraSelect( rhs.ExtraSelect )
+		{}
+
+		virtual ~CTooManyResultsParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ExtraSelect );
+		}
+
+		DBBoolIn ExtraSelect;
+};
+
+class CTooManyResultsResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CTooManyResultsResultSet( void ) :
+			ID()
+		{}
+
+		CTooManyResultsResultSet( const CTooManyResultsResultSet &rhs ) :
+			ID( rhs.ID )
+		{}
+
+		virtual ~CTooManyResultsResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ID );
+		}
+
+		DBUInt64In ID;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CTooManyResultsProcedureCall : public TDatabaseProcedureCall< CTooManyResultsParams, ISIZE, CTooManyResultsResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CTooManyResultsParams, ISIZE, CTooManyResultsResultSet, OSIZE > BASECLASS;
+
+		CTooManyResultsProcedureCall( bool extra_select ) : 
+			BASECLASS(),
+			ExtraSelect( extra_select ),
+			Results(),
+			FinishedCalls( 0 ),
+			Success( false ),
+			InitializeCalls( 0 ),
+			Rollbacks( 0 )
+		{}
+
+		virtual ~CTooManyResultsProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.too_many_results_procedure"; }
+
+		void Verify_Results( void ) 
+		{
+			if ( !ExtraSelect )
+			{
+				ASSERT_TRUE( Success );
+				ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+				ASSERT_TRUE( Results.size() == 3 );
+				for ( uint32 i = 0; i < Results.size(); ++i )
+				{
+					ASSERT_TRUE( Results[ i ].ID.Get_Value() == i + 1 );
+				}
+			}
+		}
+
+		bool Has_Extra_Select( void ) const { return ExtraSelect; }
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
+			CTooManyResultsParams *input_params = static_cast< CTooManyResultsParams * >( input_parameters );
+			*input_params = CTooManyResultsParams( ExtraSelect );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CTooManyResultsResultSet *results = static_cast< CTooManyResultsResultSet * >( result_set );
+
+			for ( int64 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+			Success = true;
+		}	
+
+		virtual void On_Rollback( void ) { 
+			Results.clear();
+			Rollbacks++; 
+			Success = false;
+		}
+
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		bool ExtraSelect;
+
+		std::vector< CTooManyResultsResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+		uint32 Rollbacks;
+		bool Success;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_TooManyResultsProcedureCall_Test( uint32 task_count, uint32 extra_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CTooManyResultsProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CTooManyResultsProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CTooManyResultsProcedureCall< ISIZE, OSIZE > *db_task = new CTooManyResultsProcedureCall< ISIZE, OSIZE >( i == extra_index );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	uint32 good_task_count = ( extra_index < task_count ) ? task_count - 1 : task_count;
+
+	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
+	ASSERT_TRUE( successful_tasks.size() == good_task_count );
+	
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CTooManyResultsProcedureCall< ISIZE, OSIZE > *task = static_cast< CTooManyResultsProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Has_Extra_Select() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CTooManyResultsProcedureCall< ISIZE, OSIZE > *task = static_cast< CTooManyResultsProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Has_Extra_Select() );
+	}
+
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_1_1_1_1 )
+{
+	Run_TooManyResultsProcedureCall_Test< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_1_1_1_0 )
+{
+	Run_TooManyResultsProcedureCall_Test< 1, 1 >( 1, 0 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_2_1_2_0 )
+{
+	Run_TooManyResultsProcedureCall_Test< 2, 1 >( 2, 0 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_2_1_2_1 )
+{
+	Run_TooManyResultsProcedureCall_Test< 2, 1 >( 2, 1 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_2_1_2_2 )
+{
+	Run_TooManyResultsProcedureCall_Test< 2, 1 >( 2, 2 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_3_1_3_0 )
+{
+	Run_TooManyResultsProcedureCall_Test< 3, 1 >( 3, 0 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_3_1_3_1 )
+{
+	Run_TooManyResultsProcedureCall_Test< 3, 1 >( 3, 1 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_3_1_3_2 )
+{
+	Run_TooManyResultsProcedureCall_Test< 3, 1 >( 3, 2 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_3_1_6_1 )
+{
+	Run_TooManyResultsProcedureCall_Test< 3, 1 >( 6, 1 );
+}
+
+TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_3_1_6_4 )
+{
+	Run_TooManyResultsProcedureCall_Test< 3, 1 >( 6, 4 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CExtraColumnParams : public IDatabaseVariableSet
+{
+	public:
+
+		CExtraColumnParams( void ) :
+			ExtraColumn()
+		{}
+
+		CExtraColumnParams( bool extra_column ) :
+			ExtraColumn( extra_column )
+		{}
+
+		CExtraColumnParams( const CExtraColumnParams &rhs ) :
+			ExtraColumn( rhs.ExtraColumn )
+		{}
+
+		virtual ~CExtraColumnParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ExtraColumn );
+		}
+
+		DBBoolIn ExtraColumn;
+};
+
+class CExtraColumnResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CExtraColumnResultSet( void ) :
+			ID()
+		{}
+
+		CExtraColumnResultSet( const CExtraColumnResultSet &rhs ) :
+			ID( rhs.ID )
+		{}
+
+		virtual ~CExtraColumnResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ID );
+		}
+
+		DBUInt64In ID;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CExtraColumnProcedureCall : public TDatabaseProcedureCall< CExtraColumnParams, ISIZE, CExtraColumnResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CExtraColumnParams, ISIZE, CExtraColumnResultSet, OSIZE > BASECLASS;
+
+		CExtraColumnProcedureCall( bool extra_column ) : 
+			BASECLASS(),
+			ExtraColumn( extra_column ),
+			Results(),
+			FinishedCalls( 0 ),
+			Success( false ),
+			InitializeCalls( 0 ),
+			Rollbacks( 0 )
+		{}
+
+		virtual ~CExtraColumnProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.extra_column_procedure"; }
+
+		void Verify_Results( void ) 
+		{
+			if ( !ExtraColumn )
+			{
+				ASSERT_TRUE( Success );
+				ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+				ASSERT_TRUE( Results.size() == 3 );
+				for ( uint32 i = 0; i < Results.size(); ++i )
+				{
+					ASSERT_TRUE( Results[ i ].ID.Get_Value() == i + 1 );
+				}
+			}
+		}
+
+		bool Has_Extra_Column( void ) const { return ExtraColumn; }
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
+			CExtraColumnParams *input_params = static_cast< CExtraColumnParams * >( input_parameters );
+			*input_params = CExtraColumnParams( ExtraColumn );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CExtraColumnResultSet *results = static_cast< CExtraColumnResultSet * >( result_set );
+
+			for ( int64 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+			Success = true;
+		}	
+
+		virtual void On_Rollback( void ) { 
+			Results.clear();
+			Rollbacks++; 
+			Success = false;
+		}
+
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		bool ExtraColumn;
+
+		std::vector< CExtraColumnResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+		uint32 Rollbacks;
+		bool Success;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_ExtraColumnProcedureCall_Test( uint32 task_count, uint32 extra_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CExtraColumnProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CExtraColumnProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CExtraColumnProcedureCall< ISIZE, OSIZE > *db_task = new CExtraColumnProcedureCall< ISIZE, OSIZE >( i == extra_index );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	uint32 good_task_count = ( extra_index < task_count ) ? task_count - 1 : task_count;
+
+	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
+	ASSERT_TRUE( successful_tasks.size() == good_task_count );
+	
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CExtraColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CExtraColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Has_Extra_Column() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CExtraColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CExtraColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Has_Extra_Column() );
+	}
+
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_1_1_1_1 )
+{
+	Run_ExtraColumnProcedureCall_Test< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_1_1_1_0 )
+{
+	Run_ExtraColumnProcedureCall_Test< 1, 1 >( 1, 0 );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_2_1_2_0 )
+{
+	Run_ExtraColumnProcedureCall_Test< 2, 1 >( 2, 0 );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_2_1_2_1 )
+{
+	Run_ExtraColumnProcedureCall_Test< 2, 1 >( 2, 1 );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_3_2_7_0 )
+{
+	Run_ExtraColumnProcedureCall_Test< 3, 2 >( 7, 0 );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_3_2_7_2 )
+{
+	Run_ExtraColumnProcedureCall_Test< 3, 2 >( 7, 2 );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_3_2_7_4 )
+{
+	Run_ExtraColumnProcedureCall_Test< 3, 2 >( 7, 4 );
+}
+
+TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_3_2_7_6 )
+{
+	Run_ExtraColumnProcedureCall_Test< 3, 2 >( 7, 6 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CMissingColumnParams : public IDatabaseVariableSet
+{
+	public:
+
+		CMissingColumnParams( void ) :
+			MissingColumn()
+		{}
+
+		CMissingColumnParams( bool missing_column ) :
+			MissingColumn( missing_column )
+		{}
+
+		CMissingColumnParams( const CMissingColumnParams &rhs ) :
+			MissingColumn( rhs.MissingColumn )
+		{}
+
+		virtual ~CMissingColumnParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &MissingColumn );
+		}
+
+		DBBoolIn MissingColumn;
+};
+
+class CMissingColumnResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CMissingColumnResultSet( void ) :
+			ID1(),
+			ID2()
+		{}
+
+		CMissingColumnResultSet( const CMissingColumnResultSet &rhs ) :
+			ID1( rhs.ID1 ),
+			ID2( rhs.ID2 )
+		{}
+
+		virtual ~CMissingColumnResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ID1 );
+			variables.push_back( &ID2 );
+		}
+
+		DBUInt64In ID1;
+		DBUInt64In ID2;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CMissingColumnProcedureCall : public TDatabaseProcedureCall< CMissingColumnParams, ISIZE, CMissingColumnResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CMissingColumnParams, ISIZE, CMissingColumnResultSet, OSIZE > BASECLASS;
+
+		CMissingColumnProcedureCall( bool missing_column ) : 
+			BASECLASS(),
+			MissingColumn( missing_column ),
+			Results(),
+			FinishedCalls( 0 ),
+			Success( false ),
+			InitializeCalls( 0 ),
+			Rollbacks( 0 )
+		{}
+
+		virtual ~CMissingColumnProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.missing_column_procedure"; }
+
+		void Verify_Results( void ) 
+		{
+			if ( !MissingColumn )
+			{
+				ASSERT_TRUE( Success );
+				ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+				ASSERT_TRUE( Results.size() == 3 );
+				for ( uint32 i = 0; i < Results.size(); ++i )
+				{
+					ASSERT_TRUE( Results[ i ].ID1.Get_Value() == i + 1 );
+					ASSERT_TRUE( Results[ i ].ID2.Get_Value() == 1 );
+				}
+			}
+		}
+
+		bool Has_Missing_Column( void ) const { return MissingColumn; }
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
+			CMissingColumnParams *input_params = static_cast< CMissingColumnParams * >( input_parameters );
+			*input_params = CMissingColumnParams( MissingColumn );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CMissingColumnResultSet *results = static_cast< CMissingColumnResultSet * >( result_set );
+
+			for ( int64 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+			Success = true;
+		}	
+
+		virtual void On_Rollback( void ) { 
+			Results.clear();
+			Rollbacks++; 
+			Success = false;
+		}
+
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		bool MissingColumn;
+
+		std::vector< CMissingColumnResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+		uint32 Rollbacks;
+		bool Success;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_MissingColumnProcedureCall_Test( uint32 task_count, uint32 missing_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CMissingColumnProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CMissingColumnProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CMissingColumnProcedureCall< ISIZE, OSIZE > *db_task = new CMissingColumnProcedureCall< ISIZE, OSIZE >( i == missing_index );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	uint32 good_task_count = ( missing_index < task_count ) ? task_count - 1 : task_count;
+
+	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
+	ASSERT_TRUE( successful_tasks.size() == good_task_count );
+	
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CMissingColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Has_Missing_Column() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CMissingColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Has_Missing_Column() );
+	}
+
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_1_1_1_1 )
+{
+	Run_MissingColumnProcedureCall_Test< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_1_1_1_0 )
+{
+	Run_MissingColumnProcedureCall_Test< 1, 1 >( 1, 0 );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_2_1_2_0 )
+{
+	Run_MissingColumnProcedureCall_Test< 2, 1 >( 2, 0 );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_2_1_2_1 )
+{
+	Run_MissingColumnProcedureCall_Test< 2, 1 >( 2, 1 );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_3_2_7_0 )
+{
+	Run_MissingColumnProcedureCall_Test< 3, 2 >( 7, 0 );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_3_2_7_2 )
+{
+	Run_MissingColumnProcedureCall_Test< 3, 2 >( 7, 2 );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_3_2_7_4 )
+{
+	Run_MissingColumnProcedureCall_Test< 3, 2 >( 7, 4 );
+}
+
+TEST_F( ODBCFailureTests, MissingColumnProcedureCall_3_2_7_6 )
+{
+	Run_MissingColumnProcedureCall_Test< 3, 2 >( 7, 6 );
+}

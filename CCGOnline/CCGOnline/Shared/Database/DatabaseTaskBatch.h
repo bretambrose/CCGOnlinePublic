@@ -175,6 +175,9 @@ class TDatabaseTaskBatch
 								so we fail the whole thing and are forced to execute them one by one in order to find the offender.
 								It's true that stored procedures that return results should unconditionally select a result set, even if it's empty, but this allows
 								us to detect and flag bad procedures rather than giving incorrect results.
+
+								Note that there is no known way of recognizing (and flagging as an error) the case when there are N calls and N result sets,
+								but the result sets are not associated 1-1 with the calls.
 							*/
 							fetch_status = FRST_ERROR;
 							additional_error_context = L"\tThere were fewer result sets than batched calls.";

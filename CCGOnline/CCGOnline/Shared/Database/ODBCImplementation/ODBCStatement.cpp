@@ -441,7 +441,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 
 void CODBCStatement::End_Transaction( bool commit )
 {
-	FATAL_ASSERT( State == ODBCSST_END_TRANSACTION || ( !commit && State == ODBCSST_RECOVERABLE_ERROR ) );	
+	FATAL_ASSERT( State == ODBCSST_END_TRANSACTION || ( !commit && ( State == ODBCSST_RECOVERABLE_ERROR || State == ODBCSST_PROCESS_RESULTS ) ) );	
 
 	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
 	Update_Error_Status( ODBCSOT_COMMIT_ROLLBACK_STATEMENT, error_code );
