@@ -381,12 +381,16 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 	{
 		SQLSMALLINT column_count = 0;
 		SQLRETURN ec = SQLNumResultCols( StatementHandle, &column_count );
-		if ( ec == SQL_SUCCESS )
+		if ( ec != SQL_SUCCESS )
 		{
-			CurrentResultSetWidth = column_count;
+			Update_Error_Status( ODBCSOT_FETCH_RESULTS, ec );
+			Reflect_ODBC_Error_State_Into_Statement_State();
+			return FRST_ERROR;
 		}
 
-		if ( ec != SQL_SUCCESS || CurrentResultSetWidth != ExpectedResultSetWidth )
+		CurrentResultSetWidth = column_count;
+
+		if ( CurrentResultSetWidth != ExpectedResultSetWidth )
 		{
 			std::basic_ostringstream< wchar_t > message_stream;
 			message_stream << L"\tGot a result set of width " << CurrentResultSetWidth << L" while expecting a result set of width " << ExpectedResultSetWidth;
@@ -397,6 +401,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 	}
 
 	// SQLMoreResults is the trigger that allows us to read final values from our in/out parameters, so we must call it even if there's no result set
+	// On the other hand, calling FetchScroll when there's no results is bad, so skip if appropriate
 	SQLRETURN error_code = SQL_NO_DATA;	
 	if ( CurrentResultSetWidth > 0 && ExpectedResultSetWidth > 0 )
 	{
