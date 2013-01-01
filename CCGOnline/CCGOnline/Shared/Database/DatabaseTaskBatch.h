@@ -66,7 +66,7 @@ class TDatabaseTaskBatch
 			if ( StatementText.size() == 0 )
 			{
 				IDatabaseTask *first_task = *PendingTasks.begin();
-				FATAL_ASSERT( connection->Validate_Input_Output_Signatures( first_task->Get_Task_Type(), InputParameterBlock, ResultSetBlock ) );
+				FATAL_ASSERT( connection->Validate_Input_Output_Signatures( first_task, InputParameterBlock, ResultSetBlock ) );
 				connection->Construct_Statement_Text( first_task, InputParameterBlock, StatementText );
 			}
 

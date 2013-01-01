@@ -27,6 +27,7 @@
 #include "Database/Interfaces/DatabaseEnvironmentInterface.h"
 #include "Database/Interfaces/DatabaseStatementInterface.h"
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
+#include "Database/Interfaces/DatabaseTaskInterface.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
 #include "Database/DatabaseVariableSet.h"
 
@@ -365,6 +366,82 @@ class CTestSignatureValidation4 : public IDatabaseVariableSet
 		DBUInt32InOut NicknameSequenceID;
 };
 
+class CDummyTask : public IDatabaseTask
+{
+	public:
+
+		CDummyTask( void ) {}
+		virtual ~CDummyTask() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L""; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > & /*column_names*/ ) const {}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) {}	
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 /*rows_fetched*/ ) {}		
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) {}
+
+		virtual void On_Rollback( void ) {}
+		virtual void On_Task_Success( void ) {}				
+		virtual void On_Task_Failure( void ) {}			
+};
+
+class CSignatureProcedureCallTask : public CDummyTask
+{
+	public:
+
+		CSignatureProcedureCallTask( void ) {}
+		virtual ~CSignatureProcedureCallTask() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_PROCEDURE_CALL; }
+};
+
+class CSignatureFunctionCallTask : public CDummyTask
+{
+	public:
+
+		CSignatureFunctionCallTask( void ) {}
+		virtual ~CSignatureFunctionCallTask() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_FUNCTION_CALL; }
+};
+
+class CSignatureGoodSelectTask : public CDummyTask
+{
+	public:
+
+		CSignatureGoodSelectTask( void ) {}
+		virtual ~CSignatureGoodSelectTask() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_SELECT; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const 
+		{
+			column_names.push_back( L"test1" );
+			column_names.push_back( L"test2" );
+			column_names.push_back( L"test3" );
+			column_names.push_back( L"test4" );
+		}
+
+};
+
+class CSignatureBadSelectTask : public CDummyTask
+{
+	public:
+
+		CSignatureBadSelectTask( void ) {}
+		virtual ~CSignatureBadSelectTask() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_SELECT; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const 
+		{
+			column_names.push_back( L"test1" );
+			column_names.push_back( L"test2" );
+			column_names.push_back( L"test3" );
+		}
+
+};
+
 TEST_F( ODBCMiscTests, TestSignatureValidation )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
@@ -376,40 +453,53 @@ TEST_F( ODBCMiscTests, TestSignatureValidation )
 	CTestSignatureValidation4 params4;
 	CEmptyVariableSet empty_params;
 
-	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &params2 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params1, &params2 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &params1 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &params3 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params3, &params2 ) );
-	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params4, &params2 ) );
-	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params4, &empty_params ) );
+	CSignatureProcedureCallTask *procedure_call_task = new CSignatureProcedureCallTask;
+	CSignatureFunctionCallTask *function_call_task = new CSignatureFunctionCallTask;
+	CSignatureGoodSelectTask *good_select_task = new CSignatureGoodSelectTask;
+	CSignatureBadSelectTask *bad_select_task = new CSignatureBadSelectTask;
 
-	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &empty_params ) );
-	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params2 ) );
-	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params2, &empty_params ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params2, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params1, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params2, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params2, &params3 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params3, &params2 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params4, &params2 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params4, &empty_params ) );
 
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params1 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params1, &empty_params ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params3 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &params3, &empty_params ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_PROCEDURE_CALL, &empty_params, &params4 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( procedure_call_task, &empty_params, &empty_params ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( procedure_call_task, &empty_params, &params2 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params2, &empty_params ) );
 
-	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params1, &empty_params ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params2, &params1 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params1, &params2 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params2, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &empty_params, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params1, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &empty_params, &params3 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &params3, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( procedure_call_task, &empty_params, &params4 ) );
 
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params3, &params2 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params3, &empty_params ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params3, &params1 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params4, &empty_params ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &params4, &params1 ) );
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( function_call_task, &params1, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params2, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params1, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params2, &empty_params ) );
 
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params1 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params2 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params3 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &params4 ) );
-	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( DTT_FUNCTION_CALL, &empty_params, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params3, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params3, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params3, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params4, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &params4, &params1 ) );
+
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &empty_params, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &empty_params, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &empty_params, &params3 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &empty_params, &params4 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( function_call_task, &empty_params, &empty_params ) );
+
+	ASSERT_TRUE( connection->Validate_Input_Output_Signatures( good_select_task, &empty_params, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( good_select_task, &empty_params, &empty_params ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( good_select_task, &params2, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( bad_select_task, &empty_params, &params2 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( good_select_task, &empty_params, &params3 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( good_select_task, &empty_params, &params1 ) );
+	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( good_select_task, &empty_params, &params4 ) );
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
 }

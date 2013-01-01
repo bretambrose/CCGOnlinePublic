@@ -41,6 +41,7 @@ class TDatabaseFunctionCall : public IDatabaseTask
 
 		virtual ~TDatabaseFunctionCall() {}
 
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > & /*column_names*/ ) const {}
 		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_FUNCTION_CALL; }
 
 		typedef I InputParametersType;
@@ -69,12 +70,35 @@ class TDatabaseProcedureCall : public IDatabaseTask
 
 		virtual ~TDatabaseProcedureCall() {}
 
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > & /*column_names*/ ) const {}
 		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_PROCEDURE_CALL; }
 
 		typedef I InputParametersType;
 		typedef O ResultSetType;
 
 		static const uint32 InputParameterBatchSize = ISIZE;
+		static const uint32 ResultSetBatchSize = OSIZE;
+};
+
+template < typename O, uint32 OSIZE >
+class TDatabaseSelect : public IDatabaseTask
+{
+	public:
+
+		typedef IDatabaseTask BASECLASS;
+
+		TDatabaseSelect( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~TDatabaseSelect() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_SELECT; }
+
+		typedef CEmptyVariableSet InputParametersType;
+		typedef O ResultSetType;
+
+		static const uint32 InputParameterBatchSize = 1;
 		static const uint32 ResultSetBatchSize = OSIZE;
 };
 

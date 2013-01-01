@@ -242,8 +242,7 @@ IDatabaseStatement *CODBCConnection::Get_Statement( DBStatementIDType id ) const
 	return nullptr;
 }
 
-
-void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const
+void CODBCConnection::Construct_Function_Procedure_Call_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const
 {
 	std::basic_ostringstream< wchar_t > statement_stream;
 
@@ -253,7 +252,7 @@ void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVa
 		statement_stream << L"? = ";
 	}
 
-	statement_stream << L"call " << task->Get_Procedure_Name() << L"(";
+	statement_stream << L"call " << task->Get_Database_Object_Name() << L"(";
 
 	std::vector< IDatabaseVariable * > params;
 	input_parameters->Get_Variables( params );
@@ -281,8 +280,59 @@ void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVa
 	statement_text = std::wstring( statement_stream.rdbuf()->str() );
 }
 
-bool CODBCConnection::Validate_Input_Output_Signatures( EDatabaseTaskType task_type, IDatabaseVariableSet *input_parameters, IDatabaseVariableSet *output_parameters ) const
+void CODBCConnection::Construct_Select_Statement_Text( IDatabaseTask *task, std::wstring &statement_text ) const
 {
+	std::basic_ostringstream< wchar_t > statement_stream;
+
+	statement_stream << L"SELECT ";
+
+	std::vector< const wchar_t * > column_names;
+	task->Build_Column_Name_List( column_names );
+
+	for ( uint32 i = 0; i < column_names.size(); ++i )
+	{
+		statement_stream << column_names[ i ];
+		if ( i + 1 < column_names.size() )
+		{
+			statement_stream << L", ";
+		}
+	}
+
+	statement_stream << L" FROM " << task->Get_Database_Object_Name() << L";";
+
+	statement_text = std::wstring( statement_stream.rdbuf()->str() );
+}
+
+void CODBCConnection::Construct_Table_Valued_Function_Statement_Text( IDatabaseTask * /*task*/, IDatabaseVariableSet * /*input_parameters*/, std::wstring & /*statement_text*/ ) const
+{
+	// TODO: implement
+}
+
+void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const
+{
+	switch ( task->Get_Task_Type() )
+	{
+		case DTT_FUNCTION_CALL:
+		case DTT_PROCEDURE_CALL:
+			Construct_Function_Procedure_Call_Statement_Text( task, input_parameters, statement_text );
+			break;
+
+		case DTT_SELECT:
+			Construct_Select_Statement_Text( task, statement_text );
+			break;
+
+		case DTT_TABLE_VALUED_FUNCTION_CALL:
+			Construct_Table_Valued_Function_Statement_Text( task, input_parameters, statement_text );
+			break;
+	}
+}
+
+bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, IDatabaseVariableSet *output_parameters ) const
+{
+	FATAL_ASSERT( task != nullptr && input_parameters != nullptr && output_parameters != nullptr );
+
+	EDatabaseTaskType task_type = task->Get_Task_Type();
+
 	std::vector< IDatabaseVariable * > input_params;
 	input_parameters->Get_Variables( input_params );
 
@@ -311,7 +361,7 @@ bool CODBCConnection::Validate_Input_Output_Signatures( EDatabaseTaskType task_t
 				}
 			}
 
-			if ( result_set.size() > 0 )
+			if ( result_set.size() != 0 )
 			{
 				return false;
 			}
@@ -341,15 +391,24 @@ bool CODBCConnection::Validate_Input_Output_Signatures( EDatabaseTaskType task_t
 			break;
 		}
 
-		default:
+		case DTT_SELECT:
 		{
-			// TODO: add support for direct SELECT execution
-			for ( uint32 i = 0; i < input_params.size(); ++i )
+			if ( input_params.size() != 0 )
 			{
-				if ( input_params[ i ]->Get_Parameter_Type() != DVT_INPUT )
-				{
-					return false;
-				}
+				return false;
+			}
+
+			if ( result_set.size() == 0 )
+			{
+				return false;			// what's the point of selecting nothing?
+			}
+
+			std::vector< const wchar_t * > column_names;
+			task->Build_Column_Name_List( column_names );
+
+			if ( column_names.size() != result_set.size() )
+			{
+				return false;
 			}
 
 			for ( uint32 i = 0; i < result_set.size(); ++i )
@@ -362,6 +421,16 @@ bool CODBCConnection::Validate_Input_Output_Signatures( EDatabaseTaskType task_t
 
 			break;
 		}
+
+		case DTT_TABLE_VALUED_FUNCTION_CALL:
+		{
+			// TODO: probably all in params, all in result set, at least one result column
+			break;
+		}
+
+		default:
+			FATAL_ASSERT( false );
+			break;
 	}
 
 	return true;

@@ -34,14 +34,14 @@ class IDatabaseTask
 		IDatabaseTask( void ) {}
 		virtual ~IDatabaseTask() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const = 0;
+		virtual const wchar_t *Get_Database_Object_Name( void ) const = 0;
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const = 0;
 		virtual EDatabaseTaskType Get_Task_Type( void ) const = 0;
 
 	protected:
 
 		template < typename T > friend class TDatabaseTaskBatch;
 
-		// WIP: signatures in flux
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) = 0;		
 		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) = 0;			
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) = 0;	

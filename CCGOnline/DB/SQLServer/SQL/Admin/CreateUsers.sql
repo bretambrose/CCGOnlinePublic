@@ -24,6 +24,7 @@ GRANT SELECT TO test;
 GRANT UPDATE TO test;
 
 GRANT EXECUTE TO testserver;
+GRANT SELECT TO testserver;
 GO
 
 USE ccgdb;
@@ -42,4 +43,5 @@ GRANT SELECT TO ccg;
 GRANT UPDATE TO ccg;
 
 GRANT EXECUTE TO ccgserver;
+GRANT SELECT TO ccgserver;
 GO

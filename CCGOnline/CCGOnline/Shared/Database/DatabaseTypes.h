@@ -85,7 +85,9 @@ enum EFetchResultsStatusType
 enum EDatabaseTaskType
 {
 	DTT_PROCEDURE_CALL,
-	DTT_FUNCTION_CALL
+	DTT_FUNCTION_CALL,
+	DTT_SELECT,
+	DTT_TABLE_VALUED_FUNCTION_CALL
 };
 
 class IDatabaseTask;

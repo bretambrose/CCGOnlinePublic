@@ -67,7 +67,7 @@ class CMissingProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet, 
 
 		virtual ~CMissingProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.missing_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.missing_procedure"; }
 
 		void Verify_Results( uint32 expected_rollback_count ) 
 		{
@@ -234,7 +234,7 @@ class CWrongArityProcedureCall : public TDatabaseProcedureCall< IPARAMS, ISIZE, 
 
 		virtual ~CWrongArityProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.arity_failure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.arity_failure"; }
 
 		void Verify_Results( uint32 expected_rollback_count ) 
 		{
@@ -396,7 +396,7 @@ class CBadParamConversionProcedureCall : public TDatabaseProcedureCall< CInconve
 
 		virtual ~CBadParamConversionProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.bad_input_params"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.bad_input_params"; }
 
 		void Verify_Results( uint32 expected_rollback_count ) 
 		{
@@ -530,7 +530,7 @@ class CBadParamConversionFunctionCall : public TDatabaseFunctionCall< CInconvert
 
 		virtual ~CBadParamConversionFunctionCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.bad_function_return"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.bad_function_return"; }
 
 		void Verify_Results( uint32 expected_rollback_count ) 
 		{
@@ -653,7 +653,7 @@ class CBadResultSetConversionProcedureCall : public TDatabaseProcedureCall< CEmp
 
 		virtual ~CBadResultSetConversionProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.bad_result_set_conversion"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.bad_result_set_conversion"; }
 
 		void Verify_Results( uint32 expected_rollback_count ) 
 		{
@@ -782,7 +782,7 @@ class CFunctionInputProcedureCall : public TDatabaseFunctionCall< CFunctionInput
 
 		virtual ~CFunctionInputProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.function_input_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.function_input_procedure"; }
 
 		void Verify_Results( uint32 expected_rollback_count ) 
 		{
@@ -909,7 +909,7 @@ class CProcedureInputFunctionCall : public TDatabaseProcedureCall< CProcedureInp
 
 		virtual ~CProcedureInputFunctionCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.procedure_input_function"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.procedure_input_function"; }
 
 		void Verify_Results( uint32 expected_rollback_count ) 
 		{
@@ -1069,7 +1069,7 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 
 		virtual ~CThrowExceptionProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return ProcName; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return ProcName; }
 
 		void Verify_Results( uint32 self_index, uint32 exception_index1, uint32 exception_index2 ) 
 		{
@@ -1450,7 +1450,7 @@ class CMissingSelectProcedureCall : public TDatabaseProcedureCall< CMissingSelec
 
 		virtual ~CMissingSelectProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.skip_select_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.skip_select_procedure"; }
 
 		void Verify_Results( uint32 self_index, uint32 exception_index1, uint32 exception_index2 ) 
 		{
@@ -1700,7 +1700,7 @@ class CExtraSelectProcedureCall : public TDatabaseProcedureCall< CExtraSelectPar
 
 		virtual ~CExtraSelectProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.extra_select_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.extra_select_procedure"; }
 
 		void Verify_Results( void ) 
 		{
@@ -1928,7 +1928,7 @@ class CTooManyResultsProcedureCall : public TDatabaseProcedureCall< CTooManyResu
 
 		virtual ~CTooManyResultsProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.too_many_results_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.too_many_results_procedure"; }
 
 		void Verify_Results( void ) 
 		{
@@ -2156,7 +2156,7 @@ class CExtraColumnProcedureCall : public TDatabaseProcedureCall< CExtraColumnPar
 
 		virtual ~CExtraColumnProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.extra_column_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.extra_column_procedure"; }
 
 		void Verify_Results( void ) 
 		{
@@ -2378,7 +2378,7 @@ class CMissingColumnProcedureCall : public TDatabaseProcedureCall< CMissingColum
 
 		virtual ~CMissingColumnProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.missing_column_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.missing_column_procedure"; }
 
 		void Verify_Results( void ) 
 		{
@@ -2597,7 +2597,7 @@ class CInvalidResultConversionProcedureCall : public TDatabaseProcedureCall< CIn
 
 		virtual ~CInvalidResultConversionProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.invalid_result_conversion_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.invalid_result_conversion_procedure"; }
 
 		void Verify_Results( void ) 
 		{
@@ -2825,7 +2825,7 @@ class CResultStringTruncationProcedureCall : public TDatabaseProcedureCall< CRes
 
 		virtual ~CResultStringTruncationProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.string_truncation_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.string_truncation_procedure"; }
 
 		void Verify_Results( void ) 
 		{
@@ -3007,4 +3007,436 @@ TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_25_1_30_24 )
 TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_25_1_30_26 )
 {
 	Run_ResultStringTruncationProcedureCall_Test< 25, 1 >( 30, 26 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CSelectAccountBadTableResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CSelectAccountBadTableResultSet( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		CSelectAccountBadTableResultSet( const CSelectAccountBadTableResultSet &rhs ) :
+			AccountID( rhs.AccountID ),
+			AccountEmail( rhs.AccountEmail ),
+			Nickname( rhs.Nickname ),
+			NicknameSequenceID( rhs.NicknameSequenceID )
+		{}
+
+		virtual ~CSelectAccountBadTableResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBStringIn< 255 > AccountEmail;
+		DBStringIn< 255 > Nickname;
+		DBInt32In NicknameSequenceID;
+};
+
+template< uint32 OSIZE >
+class CSelectAccountBadTableTask : public TDatabaseSelect< CSelectAccountBadTableResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseSelect< CSelectAccountBadTableResultSet, OSIZE > BASECLASS;
+
+		CSelectAccountBadTableTask( void ) : 
+			BASECLASS(),
+			Results(),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CSelectAccountBadTableTask() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.accounts_bad"; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const
+		{
+			column_names.push_back( L"account_id" );
+			column_names.push_back( L"account_email" );
+			column_names.push_back( L"nickname" );
+			column_names.push_back( L"nickname_sequence_id" );
+		}
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 0 );
+			ASSERT_TRUE( InitializeCalls == 1 );
+						
+			ASSERT_TRUE( Results.size() == 0 );
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CSelectAccountBadTableResultSet *results = static_cast< CSelectAccountBadTableResultSet * >( result_set );
+
+			for ( uint32 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { Results.clear(); ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		std::vector< CSelectAccountBadTableResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 OSIZE >
+void Run_SelectAccountBadTable_Test( uint32 task_count )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CSelectAccountBadTableTask< OSIZE > > db_task_batch;
+	std::vector< CSelectAccountBadTableTask< OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CSelectAccountBadTableTask< OSIZE > *db_task = new CSelectAccountBadTableTask< OSIZE >;
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == task_count );
+	ASSERT_TRUE( successful_tasks.size() == 0 );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, SelectAccountBadTable_1_1 )
+{
+	Run_SelectAccountBadTable_Test< 1 >( 1 );
+}
+
+TEST_F( ODBCFailureTests, SelectAccountBadTable_3_7 )
+{
+	Run_SelectAccountBadTable_Test< 3 >( 7 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CSelectAccountBadColumnResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CSelectAccountBadColumnResultSet( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		CSelectAccountBadColumnResultSet( const CSelectAccountBadColumnResultSet &rhs ) :
+			AccountID( rhs.AccountID ),
+			AccountEmail( rhs.AccountEmail ),
+			Nickname( rhs.Nickname ),
+			NicknameSequenceID( rhs.NicknameSequenceID )
+		{}
+
+		virtual ~CSelectAccountBadColumnResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBStringIn< 255 > AccountEmail;
+		DBStringIn< 255 > Nickname;
+		DBInt32In NicknameSequenceID;
+};
+
+template< uint32 OSIZE >
+class CSelectAccountBadColumnTask : public TDatabaseSelect< CSelectAccountBadColumnResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseSelect< CSelectAccountBadColumnResultSet, OSIZE > BASECLASS;
+
+		CSelectAccountBadColumnTask( void ) : 
+			BASECLASS(),
+			Results(),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CSelectAccountBadColumnTask() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.accounts"; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const
+		{
+			column_names.push_back( L"account_ids" );
+			column_names.push_back( L"account_email" );
+			column_names.push_back( L"nickname" );
+			column_names.push_back( L"nickname_sequence_id" );
+		}
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 0 );
+			ASSERT_TRUE( InitializeCalls == 1 );
+						
+			ASSERT_TRUE( Results.size() == 0 );
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CSelectAccountBadColumnResultSet *results = static_cast< CSelectAccountBadColumnResultSet * >( result_set );
+
+			for ( uint32 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { Results.clear(); ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		std::vector< CSelectAccountBadColumnResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 OSIZE >
+void Run_SelectAccountBadColumn_Test( uint32 task_count )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CSelectAccountBadColumnTask< OSIZE > > db_task_batch;
+	std::vector< CSelectAccountBadColumnTask< OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CSelectAccountBadColumnTask< OSIZE > *db_task = new CSelectAccountBadColumnTask< OSIZE >;
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == task_count );
+	ASSERT_TRUE( successful_tasks.size() == 0 );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, SelectAccountBadColumn_1_1 )
+{
+	Run_SelectAccountBadColumn_Test< 1 >( 1 );
+}
+
+TEST_F( ODBCFailureTests, SelectAccountBadColumn_3_7 )
+{
+	Run_SelectAccountBadColumn_Test< 3 >( 7 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CSelectAccountBadConversionResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CSelectAccountBadConversionResultSet( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		CSelectAccountBadConversionResultSet( const CSelectAccountBadConversionResultSet &rhs ) :
+			AccountID( rhs.AccountID ),
+			AccountEmail( rhs.AccountEmail ),
+			Nickname( rhs.Nickname ),
+			NicknameSequenceID( rhs.NicknameSequenceID )
+		{}
+
+		virtual ~CSelectAccountBadConversionResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBUInt64In AccountEmail;
+		DBStringIn< 255 > Nickname;
+		DBInt32In NicknameSequenceID;
+};
+
+template< uint32 OSIZE >
+class CSelectAccountBadConversionTask : public TDatabaseSelect< CSelectAccountBadConversionResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseSelect< CSelectAccountBadConversionResultSet, OSIZE > BASECLASS;
+
+		CSelectAccountBadConversionTask( void ) : 
+			BASECLASS(),
+			Results(),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CSelectAccountBadConversionTask() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.accounts"; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const
+		{
+			column_names.push_back( L"account_id" );
+			column_names.push_back( L"account_email" );
+			column_names.push_back( L"nickname" );
+			column_names.push_back( L"nickname_sequence_id" );
+		}
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 0 );
+			ASSERT_TRUE( InitializeCalls == 1 );
+						
+			ASSERT_TRUE( Results.size() == 0 );
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CSelectAccountBadConversionResultSet *results = static_cast< CSelectAccountBadConversionResultSet * >( result_set );
+
+			for ( uint32 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { Results.clear(); ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		std::vector< CSelectAccountBadConversionResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 OSIZE >
+void Run_SelectAccountBadConversion_Test( uint32 task_count )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CSelectAccountBadConversionTask< OSIZE > > db_task_batch;
+	std::vector< CSelectAccountBadConversionTask< OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CSelectAccountBadConversionTask< OSIZE > *db_task = new CSelectAccountBadConversionTask< OSIZE >;
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == task_count );
+	ASSERT_TRUE( successful_tasks.size() == 0 );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, SelectAccountBadConversion_1_1 )
+{
+	Run_SelectAccountBadConversion_Test< 1 >( 1 );
+}
+
+TEST_F( ODBCFailureTests, SelectAccountBadConversion_3_7 )
+{
+	Run_SelectAccountBadConversion_Test< 3 >( 7 );
 }

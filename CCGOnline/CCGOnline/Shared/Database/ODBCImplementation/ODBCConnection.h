@@ -50,9 +50,13 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 
 		virtual void Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const;
-		virtual bool Validate_Input_Output_Signatures( EDatabaseTaskType task_type, IDatabaseVariableSet *input_parameters, IDatabaseVariableSet *output_parameters ) const;
+		virtual bool Validate_Input_Output_Signatures( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, IDatabaseVariableSet *output_parameters ) const;
 
 	private:
+
+		void Construct_Function_Procedure_Call_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const;
+		void Construct_Select_Statement_Text( IDatabaseTask *task, std::wstring &statement_text ) const;
+		void Construct_Table_Valued_Function_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const;
 
 		IDatabaseStatement *Get_Statement( DBStatementIDType id ) const;
 		

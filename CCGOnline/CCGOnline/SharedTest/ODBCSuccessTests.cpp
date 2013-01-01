@@ -101,7 +101,7 @@ class CGetAllAccountsProcedureCall : public TDatabaseProcedureCall< CEmptyVariab
 
 		virtual ~CGetAllAccountsProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.get_all_accounts"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.get_all_accounts"; }
 
 		void Verify_Results( void ) 
 		{
@@ -348,7 +348,7 @@ class CGetAllAccountsInOutProcedureCall : public TDatabaseProcedureCall< CGetAll
 
 		virtual ~CGetAllAccountsInOutProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.get_all_accounts_with_in_out"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.get_all_accounts_with_in_out"; }
 
 		void Verify_Results( void ) 
 		{
@@ -534,7 +534,7 @@ class CGetAccountCountFunctionCall : public TDatabaseFunctionCall< CGetAccountCo
 
 		virtual ~CGetAccountCountFunctionCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.get_account_count"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.get_account_count"; }
 
 		void Verify_Results( void ) 
 		{
@@ -680,7 +680,7 @@ class CGetAccountEmailFunctionCall : public TDatabaseFunctionCall< CGetAccountEm
 
 		virtual ~CGetAccountEmailFunctionCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.get_account_email_by_id"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.get_account_email_by_id"; }
 
 		void Verify_Results( void ) 
 		{
@@ -804,7 +804,7 @@ class CDoNothingProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet
 
 		virtual ~CDoNothingProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.do_nothing"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.do_nothing"; }
 
 		void Verify_Results( void ) 
 		{
@@ -960,7 +960,7 @@ class CTestBooleanDataProcedureCall : public TDatabaseProcedureCall< CTestBoolea
 
 		virtual ~CTestBooleanDataProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.test_boolean_data"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.test_boolean_data"; }
 
 		void Verify_Results( void ) 
 		{
@@ -1169,7 +1169,7 @@ class CTestFPDataProcedureCall : public TDatabaseProcedureCall< CTestFPDataParam
 
 		virtual ~CTestFPDataProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.test_fp_data"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.test_fp_data"; }
 
 		void Verify_Results( void ) 
 		{
@@ -1328,7 +1328,7 @@ class CNullableFunctionCall : public TDatabaseFunctionCall< CNullableFunctionPar
 
 		virtual ~CNullableFunctionCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.get_account_by_nickname"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.get_account_by_nickname"; }
 
 		void Verify_Results( void ) 
 		{
@@ -1549,7 +1549,7 @@ class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedure
 
 		virtual ~CNullableProcedureCall() {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.nullable_procedure"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.nullable_procedure"; }
 
 		void Verify_Results( void ) 
 		{
@@ -1688,3 +1688,197 @@ TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_3_2_7_2_T_F )
 {
 	Run_ReadSeedData_NullableProcedure_Test< 3, 2 >( 7, 2, true, false );
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CSelectAccountDetailsResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CSelectAccountDetailsResultSet( void ) :
+			AccountID(),
+			AccountEmail(),
+			Nickname(),
+			NicknameSequenceID()
+		{}
+
+		CSelectAccountDetailsResultSet( const CSelectAccountDetailsResultSet &rhs ) :
+			AccountID( rhs.AccountID ),
+			AccountEmail( rhs.AccountEmail ),
+			Nickname( rhs.Nickname ),
+			NicknameSequenceID( rhs.NicknameSequenceID )
+		{}
+
+		virtual ~CSelectAccountDetailsResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &AccountEmail );
+			variables.push_back( &Nickname );
+			variables.push_back( &NicknameSequenceID );
+		}
+
+		DBUInt64In AccountID;
+		DBStringIn< 255 > AccountEmail;
+		DBStringIn< 255 > Nickname;
+		DBInt32In NicknameSequenceID;
+};
+
+template< uint32 OSIZE >
+class CSelectAccountDetailsTask : public TDatabaseSelect< CSelectAccountDetailsResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseSelect< CSelectAccountDetailsResultSet, OSIZE > BASECLASS;
+
+		CSelectAccountDetailsTask( void ) : 
+			BASECLASS(),
+			Results(),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CSelectAccountDetailsTask() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.accounts"; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const
+		{
+			column_names.push_back( L"account_id" );
+			column_names.push_back( L"account_email" );
+			column_names.push_back( L"nickname" );
+			column_names.push_back( L"nickname_sequence_id" );
+		}
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 1 );
+			ASSERT_TRUE( InitializeCalls == 1 );
+						
+			ASSERT_TRUE( Results.size() == 3 );
+			for ( uint32 i = 0; i < Results.size(); ++i )
+			{
+				ASSERT_TRUE( Results[ i ].AccountID.Get_Value() == i + 1 );
+				ASSERT_TRUE( Results[ i ].NicknameSequenceID.Get_Value() == 1 );
+				
+				std::string email;
+				Results[ i ].AccountEmail.Copy_Into( email );
+
+				std::string nickname;
+				Results[ i ].Nickname.Copy_Into( nickname );
+
+				switch ( i )
+				{
+					case 0:
+						ASSERT_TRUE( _stricmp( "bretambrose@gmail.com", email.c_str() ) == 0 );
+						ASSERT_TRUE( _stricmp( "Bret", nickname.c_str() ) == 0 );
+						break;
+
+					case 1:
+						ASSERT_TRUE( _stricmp( "petra222@yahoo.com", email.c_str() ) == 0 );
+						ASSERT_TRUE( _stricmp( "Peti", nickname.c_str() ) == 0 );
+						break;
+
+					case 2:
+						ASSERT_TRUE( _stricmp( "will@mailinator.com", email.c_str() ) == 0 );
+						ASSERT_TRUE( _stricmp( "Will", nickname.c_str() ) == 0 );
+						break;
+
+					default:
+						ASSERT_TRUE( false );
+						break;
+				}
+			}
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CSelectAccountDetailsResultSet *results = static_cast< CSelectAccountDetailsResultSet * >( result_set );
+
+			for ( uint32 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { Results.clear(); ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		std::vector< CSelectAccountDetailsResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 OSIZE >
+void Run_ReadSeedData_SelectAccountDetails_Test( uint32 task_count )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CSelectAccountDetailsTask< OSIZE > > db_task_batch;
+	std::vector< CSelectAccountDetailsTask< OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CSelectAccountDetailsTask< OSIZE > *db_task = new CSelectAccountDetailsTask< OSIZE >;
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == 0 );
+	ASSERT_TRUE( successful_tasks.size() == task_count );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_1_1 )
+{
+	Run_ReadSeedData_SelectAccountDetails_Test< 1 >( 1 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_1_3 )
+{
+	Run_ReadSeedData_SelectAccountDetails_Test< 1 >( 3 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_4_3 )
+{
+	Run_ReadSeedData_SelectAccountDetails_Test< 4 >( 3 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_4_7 )
+{
+	Run_ReadSeedData_SelectAccountDetails_Test< 4 >( 7 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_4_17 )
+{
+	Run_ReadSeedData_SelectAccountDetails_Test< 4 >( 17 );
+}
+
+

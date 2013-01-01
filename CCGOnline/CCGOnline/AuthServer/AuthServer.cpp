@@ -1685,7 +1685,7 @@ class CAddAccountDatabaseTask : public TDatabaseProcedureCall< CAddAccountInputP
 		virtual void On_Task_Success( void ) {}				
 		virtual void On_Task_Failure( void ) {}
 
-		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.add_account"; }
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.add_account"; }
 
 	private:
 
