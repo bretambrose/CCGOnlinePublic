@@ -79,6 +79,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 
 		int32 ExpectedResultSetWidth;
 		int32 CurrentResultSetWidth;
+		int32 CurrentResultSet;
 
 };
 

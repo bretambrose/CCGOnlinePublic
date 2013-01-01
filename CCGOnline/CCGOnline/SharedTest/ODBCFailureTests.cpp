@@ -1129,6 +1129,8 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 			}
 		}
 
+		bool Throws_Exception( void ) const { return ThrowException; }
+
 	protected:
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
@@ -1203,7 +1205,19 @@ void Run_ThrowExceptionProcedureCall_Test( const wchar_t *proc_name, uint32 task
 
 	ASSERT_TRUE( failed_tasks.size() == exception_count );
 	ASSERT_TRUE( successful_tasks.size() == task_count - exception_count );
-	
+
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CThrowExceptionProcedureCall< ISIZE, OSIZE > *task = static_cast< CThrowExceptionProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Throws_Exception() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CThrowExceptionProcedureCall< ISIZE, OSIZE > *task = static_cast< CThrowExceptionProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Throws_Exception() );
+	}
+		
 	for ( uint32 i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results( i, exception_index1, exception_index2 );
@@ -1270,7 +1284,7 @@ TEST_F( ODBCFailureTests, UserExceptionProcedureCall_3_2_3_0_2 )
 
 TEST_F( ODBCFailureTests, UserExceptionProcedureCall_3_2_3_1_2 )
 {
-	Run_ThrowExceptionProcedureCall_Test< 3, 2 >( L"dynamic.exception_thrower", 3, 0, 2 );
+	Run_ThrowExceptionProcedureCall_Test< 3, 2 >( L"dynamic.exception_thrower", 3, 1, 2 );
 }
 
 TEST_F( ODBCFailureTests, UserExceptionProcedureCall_3_2_6_0_1 )
@@ -1461,6 +1475,8 @@ class CMissingSelectProcedureCall : public TDatabaseProcedureCall< CMissingSelec
 			}
 		}
 
+		bool Skips_Select( void ) const { return SkipSelect; }
+
 	protected:
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
@@ -1537,7 +1553,19 @@ void Run_MissingSelectProcedureCall_Test( uint32 task_count, uint32 skip_index1,
 
 	ASSERT_TRUE( failed_tasks.size() == exception_count );
 	ASSERT_TRUE( successful_tasks.size() == task_count - exception_count );
-	
+
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CMissingSelectProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingSelectProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Skips_Select() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CMissingSelectProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingSelectProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Skips_Select() );
+	}
+		
 	for ( uint32 i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results( i, skip_index1, skip_index2 );
@@ -1692,6 +1720,8 @@ class CExtraSelectProcedureCall : public TDatabaseProcedureCall< CExtraSelectPar
 			}
 		}
 
+		bool Extra_Select( void ) const { return ExtraSelect; }
+
 	protected:
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
@@ -1760,7 +1790,19 @@ void Run_ExtraSelectProcedureCall_Test( uint32 task_count, uint32 non_extra_inde
 
 	ASSERT_TRUE( failed_tasks.size() == bad_task_count );
 	ASSERT_TRUE( successful_tasks.size() == task_count - bad_task_count );
-	
+
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CExtraSelectProcedureCall< ISIZE, OSIZE > *task = static_cast< CExtraSelectProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Extra_Select() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CExtraSelectProcedureCall< ISIZE, OSIZE > *task = static_cast< CExtraSelectProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Extra_Select() );
+	}
+		
 	for ( uint32 i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
@@ -2488,4 +2530,485 @@ TEST_F( ODBCFailureTests, MissingColumnProcedureCall_3_2_7_4 )
 TEST_F( ODBCFailureTests, MissingColumnProcedureCall_3_2_7_6 )
 {
 	Run_MissingColumnProcedureCall_Test< 3, 2 >( 7, 6 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CInvalidResultConversionParams : public IDatabaseVariableSet
+{
+	public:
+
+		CInvalidResultConversionParams( void ) :
+			DoBadConversion()
+		{}
+
+		CInvalidResultConversionParams( bool do_bad_conversion ) :
+			DoBadConversion( do_bad_conversion )
+		{}
+
+		CInvalidResultConversionParams( const CInvalidResultConversionParams &rhs ) :
+			DoBadConversion( rhs.DoBadConversion )
+		{}
+
+		virtual ~CInvalidResultConversionParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &DoBadConversion );
+		}
+
+		DBBoolIn DoBadConversion;
+};
+
+class CInvalidResultConversionResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CInvalidResultConversionResultSet( void ) :
+			Float()
+		{}
+
+		CInvalidResultConversionResultSet( const CInvalidResultConversionResultSet &rhs ) :
+			Float( rhs.Float )
+		{}
+
+		virtual ~CInvalidResultConversionResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &Float );
+		}
+
+		DBFloatIn Float;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CInvalidResultConversionProcedureCall : public TDatabaseProcedureCall< CInvalidResultConversionParams, ISIZE, CInvalidResultConversionResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CInvalidResultConversionParams, ISIZE, CInvalidResultConversionResultSet, OSIZE > BASECLASS;
+
+		CInvalidResultConversionProcedureCall( bool do_bad_conversion ) : 
+			BASECLASS(),
+			DoBadConversion( do_bad_conversion ),
+			Results(),
+			FinishedCalls( 0 ),
+			Success( false ),
+			InitializeCalls( 0 ),
+			Rollbacks( 0 )
+		{}
+
+		virtual ~CInvalidResultConversionProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.invalid_result_conversion_procedure"; }
+
+		void Verify_Results( void ) 
+		{
+			if ( !DoBadConversion )
+			{
+				ASSERT_TRUE( Success );
+				ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+				ASSERT_TRUE( Results.size() == 3 );
+				for ( uint32 i = 0; i < Results.size(); ++i )
+				{
+					ASSERT_FLOAT_EQ( Results[ i ].Float.Get_Value(), static_cast< float >( i + 1 ) );
+				}
+			}
+		}
+
+		bool Has_Bad_Conversion( void ) const { return DoBadConversion; }
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
+			CInvalidResultConversionParams *input_params = static_cast< CInvalidResultConversionParams * >( input_parameters );
+			*input_params = CInvalidResultConversionParams( DoBadConversion );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CInvalidResultConversionResultSet *results = static_cast< CInvalidResultConversionResultSet * >( result_set );
+
+			for ( int64 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+			Success = true;
+		}	
+
+		virtual void On_Rollback( void ) { 
+			Results.clear();
+			Rollbacks++; 
+			Success = false;
+		}
+
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		bool DoBadConversion;
+
+		std::vector< CInvalidResultConversionResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+		uint32 Rollbacks;
+		bool Success;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_InvalidResultConversionProcedureCall_Test( uint32 task_count, uint32 invalid_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CInvalidResultConversionProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CInvalidResultConversionProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CInvalidResultConversionProcedureCall< ISIZE, OSIZE > *db_task = new CInvalidResultConversionProcedureCall< ISIZE, OSIZE >( i == invalid_index );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	uint32 good_task_count = ( invalid_index < task_count ) ? task_count - 1 : task_count;
+
+	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
+	ASSERT_TRUE( successful_tasks.size() == good_task_count );
+	
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CInvalidResultConversionProcedureCall< ISIZE, OSIZE > *task = static_cast< CInvalidResultConversionProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Has_Bad_Conversion() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CInvalidResultConversionProcedureCall< ISIZE, OSIZE > *task = static_cast< CInvalidResultConversionProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Has_Bad_Conversion() );
+	}
+
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_1_1_1_1 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_1_1_1_0 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 1, 1 >( 1, 0 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_2_1_2_0 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 2, 1 >( 2, 0 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_2_3_2_1 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 2, 3 >( 2, 1 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_3_2_7_0 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 3, 2 >( 7, 0 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_3_2_7_2 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 3, 2 >( 7, 2 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_3_2_7_4 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 3, 2 >( 7, 4 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_3_2_7_6 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 3, 2 >( 7, 6 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_10_5_20_15 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 10, 5 >( 20, 15 );
+}
+
+TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_10_2_20_15 )
+{
+	Run_InvalidResultConversionProcedureCall_Test< 10, 2 >( 20, 15 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CResultStringTruncationParams : public IDatabaseVariableSet
+{
+	public:
+
+		CResultStringTruncationParams( void ) :
+			Truncate()
+		{}
+
+		CResultStringTruncationParams( bool truncate ) :
+			Truncate( truncate )
+		{}
+
+		CResultStringTruncationParams( const CResultStringTruncationParams &rhs ) :
+			Truncate( rhs.Truncate )
+		{}
+
+		virtual ~CResultStringTruncationParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &Truncate );
+		}
+
+		DBBoolIn Truncate;
+};
+
+class CResultStringTruncationResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CResultStringTruncationResultSet( void ) :
+			Email()
+		{}
+
+		CResultStringTruncationResultSet( const CResultStringTruncationResultSet &rhs ) :
+			Email( rhs.Email )
+		{}
+
+		virtual ~CResultStringTruncationResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &Email );
+		}
+
+		DBStringIn< 64 > Email;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CResultStringTruncationProcedureCall : public TDatabaseProcedureCall< CResultStringTruncationParams, ISIZE, CResultStringTruncationResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CResultStringTruncationParams, ISIZE, CResultStringTruncationResultSet, OSIZE > BASECLASS;
+
+		CResultStringTruncationProcedureCall( bool truncate ) : 
+			BASECLASS(),
+			Truncate( truncate ),
+			Results(),
+			FinishedCalls( 0 ),
+			Success( false ),
+			InitializeCalls( 0 ),
+			Rollbacks( 0 )
+		{}
+
+		virtual ~CResultStringTruncationProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.string_truncation_procedure"; }
+
+		void Verify_Results( void ) 
+		{
+			if ( !Truncate )
+			{
+				ASSERT_TRUE( Success );
+				ASSERT_TRUE( FinishedCalls > 0 );	// unable to constrain this any further
+				ASSERT_TRUE( Results.size() == 3 );
+				for ( uint32 i = 0; i < Results.size(); ++i )
+				{
+					std::string email;
+					Results[ i ].Email.Copy_Into( email );
+
+					switch ( i )
+					{
+						case 0:
+							ASSERT_TRUE( _stricmp( email.c_str(), "bretambrose@gmail.com" ) == 0 );
+							break;
+
+						case 1:
+							ASSERT_TRUE( _stricmp( email.c_str(), "petra222@yahoo.com" ) == 0 );
+							break;
+
+						case 2:
+							ASSERT_TRUE( _stricmp( email.c_str(), "will@mailinator.com" ) == 0 );
+							break;
+
+						default:
+							ASSERT_TRUE( false );
+							break;
+					}
+				}
+			}
+		}
+
+		bool Should_Truncate( void ) const { return Truncate; }
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
+			CResultStringTruncationParams *input_params = static_cast< CResultStringTruncationParams * >( input_parameters );
+			*input_params = CResultStringTruncationParams( Truncate );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CResultStringTruncationResultSet *results = static_cast< CResultStringTruncationResultSet * >( result_set );
+
+			for ( int64 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+			Success = true;
+		}	
+
+		virtual void On_Rollback( void ) { 
+			Results.clear();
+			Rollbacks++; 
+			Success = false;
+		}
+
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		bool Truncate;
+
+		std::vector< CResultStringTruncationResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+		uint32 Rollbacks;
+		bool Success;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_ResultStringTruncationProcedureCall_Test( uint32 task_count, uint32 invalid_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CResultStringTruncationProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CResultStringTruncationProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CResultStringTruncationProcedureCall< ISIZE, OSIZE > *db_task = new CResultStringTruncationProcedureCall< ISIZE, OSIZE >( i == invalid_index );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	uint32 good_task_count = ( invalid_index < task_count ) ? task_count - 1 : task_count;
+
+	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
+	ASSERT_TRUE( successful_tasks.size() == good_task_count );
+	
+	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	{
+		CResultStringTruncationProcedureCall< ISIZE, OSIZE > *task = static_cast< CResultStringTruncationProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( task->Should_Truncate() );
+	}
+
+	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	{
+		CResultStringTruncationProcedureCall< ISIZE, OSIZE > *task = static_cast< CResultStringTruncationProcedureCall< ISIZE, OSIZE > * >( *iter );
+		ASSERT_TRUE( !task->Should_Truncate() );
+	}
+
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_1_1_1_1 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_1_1_1_0 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 1, 1 >( 1, 0 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_2_1_2_0 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 2, 1 >( 2, 0 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_2_3_2_1 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 2, 3 >( 2, 1 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_3_2_7_0 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 3, 2 >( 7, 0 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_3_2_7_2 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 3, 2 >( 7, 2 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_3_2_7_4 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 3, 2 >( 7, 4 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_3_2_7_6 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 3, 2 >( 7, 6 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_25_5_20_15 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 25, 5 >( 20, 15 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_25_1_30_24 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 25, 1 >( 30, 24 );
+}
+
+TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_25_1_30_26 )
+{
+	Run_ResultStringTruncationProcedureCall_Test< 25, 1 >( 30, 26 );
 }

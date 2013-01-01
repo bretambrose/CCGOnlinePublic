@@ -31,6 +31,14 @@
 #include "Database/Interfaces/DatabaseVariableInterface.h"
 #include "Logging/LogInterface.h"
 
+/*
+Controls whether or not to aggressively try and determine which store proc call caused an error.  The conservative approach is
+to retry the entire batch one by one, which is slow.  The aggressive approach is to use conditionally use the row number value (whose validity is conditional
+and not particularly well-defined) and the current result set number to try and assert which call is the problem.  This is a heuristic approach
+and may fail in the face of poorly-developed store procs.
+*/
+// #define CONSERVATIVE_ODBC_ERROR_HANDLING
+
 SQLSMALLINT Get_ODBC_Variable_Type( EDatabaseVariableType variable_type )
 {
 	switch ( variable_type )
@@ -149,7 +157,9 @@ enum ODBCStatementOperationType
 
 	ODBCSOT_EXECUTE_STATEMENT,
 	ODBCSOT_COMMIT_ROLLBACK_STATEMENT,
-	ODBCSOT_FETCH_RESULTS
+	ODBCSOT_CHECK_COLUMN_COUNT,
+	ODBCSOT_FETCH_RESULT_ROWS,
+	ODBCSOT_MOVE_TO_NEXT_RESULT_SET
 };
 
 CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle ) :
@@ -161,7 +171,8 @@ CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle
 	RowStatuses( nullptr ),
 	RowsFetched( 0 ),
 	ExpectedResultSetWidth( 0 ),
-	CurrentResultSetWidth( -1 )
+	CurrentResultSetWidth( -1 ),
+	CurrentResultSet( -1 )
 {
 }
 
@@ -357,6 +368,7 @@ void CODBCStatement::Execute( uint32 batch_size )
 	}
 
 	CurrentResultSetWidth = -1;
+	CurrentResultSet = 0;
 	State = ODBCSST_PROCESS_RESULTS;
 }
 
@@ -383,7 +395,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 		SQLRETURN ec = SQLNumResultCols( StatementHandle, &column_count );
 		if ( ec != SQL_SUCCESS )
 		{
-			Update_Error_Status( ODBCSOT_FETCH_RESULTS, ec );
+			Update_Error_Status( ODBCSOT_CHECK_COLUMN_COUNT, ec );
 			Reflect_ODBC_Error_State_Into_Statement_State();
 			return FRST_ERROR;
 		}
@@ -412,6 +424,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 	if ( error_code == SQL_NO_DATA )
 	{
 		CurrentResultSetWidth = -1;
+		CurrentResultSet++;	
 		SQLRETURN ec2 = SQLMoreResults( StatementHandle );
 		if ( ec2 == SQL_NO_DATA_FOUND )
 		{
@@ -420,7 +433,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 		}
 		else if ( ec2 != SQL_SUCCESS )
 		{
-			Update_Error_Status( ODBCSOT_FETCH_RESULTS, error_code );
+			Update_Error_Status( ODBCSOT_MOVE_TO_NEXT_RESULT_SET, error_code );
 			Reflect_ODBC_Error_State_Into_Statement_State();
 			return FRST_ERROR;
 		}
@@ -431,8 +444,15 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 	}
 	else if ( error_code != SQL_SUCCESS )
 	{
-		Update_Error_Status( ODBCSOT_FETCH_RESULTS, error_code );
+		Update_Error_Status( ODBCSOT_FETCH_RESULT_ROWS, error_code );
 		Reflect_ODBC_Error_State_Into_Statement_State();
+
+		// experiment: try to empty out result set before returning
+		while ( RowsFetched > 0 && error_code != SQL_NO_DATA )
+		{
+			error_code = SQLFetchScroll( StatementHandle, SQL_FETCH_NEXT, 0 );
+		}
+
 		return FRST_ERROR;
 	}
 
@@ -492,12 +512,22 @@ void CODBCStatement::Update_Error_Status( ODBCStatementOperationType operation_t
 		case ODBCSOT_SET_ROWS_FETCHED_PTR:
 		case ODBCSOT_BIND_COLUMN:
 		case ODBCSOT_COMMIT_ROLLBACK_STATEMENT:
+		case ODBCSOT_CHECK_COLUMN_COUNT:
 			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;
 
 		case ODBCSOT_EXECUTE_STATEMENT:
-		case ODBCSOT_FETCH_RESULTS:
 			Set_Error_State_Base( DBEST_RECOVERABLE_ERROR );
+			break;
+
+		case ODBCSOT_MOVE_TO_NEXT_RESULT_SET:
+		case ODBCSOT_FETCH_RESULT_ROWS:
+			Set_Error_State_Base( DBEST_RECOVERABLE_ERROR );
+#ifdef CONSERVATIVE_ODBC_ERROR_HANDLING
+			Set_Bad_Row_Number_Base( -1 );
+#else
+			Set_Bad_Row_Number_Base( CurrentResultSet );
+#endif // 
 			break;
 						 
 		default:
