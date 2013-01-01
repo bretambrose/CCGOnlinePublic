@@ -68,6 +68,17 @@ class TODBCScalarVariableBase : public IDatabaseVariable
 
 		virtual ~TODBCScalarVariableBase() {}
 
+		TODBCScalarVariableBase< T > & operator =( const TODBCScalarVariableBase< T > &rhs )
+		{
+			if ( &rhs != this )
+			{
+				Value = rhs.Value;
+				Indicator = rhs.Indicator;
+			}
+
+			return *this;
+		}
+
 		// Baseclass interface
 		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return Get_ODBC_Value_Type( Value ); }
 		virtual uint32 Get_Decimals( void ) const { return 0; }
@@ -186,9 +197,20 @@ class DBStringBase : public IDatabaseString
 
 		virtual ~DBStringBase() {}
 
+		DBStringBase< C, BUFFER_LENGTH > & operator =( const DBStringBase< C, BUFFER_LENGTH > &rhs )
+		{
+			if ( &rhs != this )
+			{
+				memcpy( Buffer, rhs.Buffer, ( BUFFER_LENGTH + 1 ) * sizeof( C ) );
+				Indicator = rhs.Indicator;
+			}
+
+			return *this;
+		}
+
 		// Baseclass interface
 		virtual uint32 Get_Decimals( void ) const { return 0; }
-		virtual void *Get_Value_Address( void ) { return static_cast< char * >( Buffer ); }
+		virtual void *Get_Value_Address( void ) { return static_cast< void * >( Buffer ); }
 		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
 		virtual uint32 Get_Value_Size( void ) const { return BUFFER_LENGTH + 1; }
 		virtual uint32 Get_Value_Buffer_Size( void ) const { return BUFFER_LENGTH + 1; }
@@ -256,6 +278,13 @@ class DBString : public DBStringBase< char, BUFFER_LENGTH >
 
 		virtual ~DBString() {}
 
+		DBString< BUFFER_LENGTH, PT > & operator =( const DBString< BUFFER_LENGTH, PT > &rhs )
+		{
+			BASECLASS::operator =( rhs );
+
+			return *this;
+		}
+
 		// Baseclass interface
 		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return DVVT_STRING; }
 		virtual EDatabaseVariableType Get_Parameter_Type( void ) const { return PT; }
@@ -283,6 +312,11 @@ class DBString : public DBStringBase< char, BUFFER_LENGTH >
 			FATAL_ASSERT( !Is_Null() );
 
 			dest.assign( Get_Buffer() );
+		}
+
+		void Set_Value( const std::string &value )
+		{
+			Set_Value_With_Length( value.c_str(), value.size() );
 		}
 };
 
@@ -402,6 +436,13 @@ class DBWString : public DBStringBase< wchar_t, BUFFER_LENGTH >
 
 		virtual ~DBWString() {}
 
+		DBWString< BUFFER_LENGTH, PT > & operator =( const DBWString< BUFFER_LENGTH, PT > &rhs )
+		{
+			BASECLASS::operator =( rhs );
+
+			return *this;
+		}
+
 		// Baseclass interface
 		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return DVVT_WSTRING; }
 		virtual EDatabaseVariableType Get_Parameter_Type( void ) const { return PT; }
@@ -430,6 +471,11 @@ class DBWString : public DBStringBase< wchar_t, BUFFER_LENGTH >
 			FATAL_ASSERT( !Is_Null() );
 
 			dest.assign( Get_Buffer() );
+		}
+
+		void Set_Value( const std::wstring &value )
+		{
+			Set_Value_With_Length( value.c_str(), value.size() );
 		}
 };
 

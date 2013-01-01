@@ -518,11 +518,11 @@ class CGetAccountCountParams : public IDatabaseVariableSet
 };
 
 template< uint32 ISIZE >
-class CGetAccountCountFunctionCall : public TDatabaseFunctionCall< CGetAccountCountParams, ISIZE, CEmptyVariableSet, 1 >
+class CGetAccountCountFunctionCall : public TDatabaseFunctionCall< CGetAccountCountParams, ISIZE >
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CGetAccountCountParams, ISIZE, CEmptyVariableSet, 1 > BASECLASS;
+		typedef TDatabaseFunctionCall< CGetAccountCountParams, ISIZE > BASECLASS;
 
 		CGetAccountCountFunctionCall( const std::string &filter_nickname ) : 
 			BASECLASS(),
@@ -560,10 +560,6 @@ class CGetAccountCountFunctionCall : public TDatabaseFunctionCall< CGetAccountCo
 
 			InitializeCalls++; 
 		}	
-			
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 rows_fetched ) {
-			ASSERT_TRUE( rows_fetched == 0 );
-		}
 					
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) 
 		{ 
@@ -668,11 +664,11 @@ class CGetAccountEmailFunctionParams : public IDatabaseVariableSet
 };
 
 template< uint32 ISIZE >
-class CGetAccountEmailFunctionCall : public TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE, CEmptyVariableSet, 1 >
+class CGetAccountEmailFunctionCall : public TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE >
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE, CEmptyVariableSet, 1 > BASECLASS;
+		typedef TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE > BASECLASS;
 
 		CGetAccountEmailFunctionCall( uint64 account_id ) : 
 			BASECLASS(),
@@ -720,10 +716,6 @@ class CGetAccountEmailFunctionCall : public TDatabaseFunctionCall< CGetAccountEm
 
 			InitializeCalls++; 
 		}	
-			
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 rows_fetched ) {
-			ASSERT_TRUE( rows_fetched == 0 );
-		}
 					
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) 
 		{ 
@@ -1283,4 +1275,416 @@ TEST_F( ODBCSuccessTests, ReadSeedData_TestFPData_OK_Test_1_1_1 )
 TEST_F( ODBCSuccessTests, ReadSeedData_TestFPData_OK_Test_3_2_7 )
 {
 	Run_ReadSeedData_TestFPData_OK_Test< 3, 2 >( 1.0f, 2.0, 3.0f, 4.0, 7 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CNullableFunctionParams : public IDatabaseVariableSet
+{
+	public:
+
+		CNullableFunctionParams( void ) :
+			AccountID(),
+			Nickname()
+		{}
+
+		CNullableFunctionParams( const CNullableFunctionParams &rhs ) :
+			AccountID( rhs.AccountID ),
+			Nickname( rhs.Nickname )
+		{}
+
+		CNullableFunctionParams( const std::wstring &nickname ) :
+			AccountID(),
+			Nickname( nickname )
+		{}
+
+		virtual ~CNullableFunctionParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+			variables.push_back( &Nickname );
+		}
+
+		DBUInt64Out AccountID;
+		DBWStringIn< 64 > Nickname;
+};
+
+template< uint32 ISIZE >
+class CNullableFunctionCall : public TDatabaseFunctionCall< CNullableFunctionParams, ISIZE >
+{
+	public:
+
+		typedef TDatabaseFunctionCall< CNullableFunctionParams, ISIZE > BASECLASS;
+
+		CNullableFunctionCall( const std::wstring &nickname ) : 
+			BASECLASS(),
+			Nickname( nickname ),
+			AccountIDIsNull( false ),
+			FinalAccountID( -1 ),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CNullableFunctionCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.get_account_by_nickname"; }
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 1 );
+			ASSERT_TRUE( InitializeCalls == 1 );
+
+			if ( AccountIDIsNull )
+			{
+				ASSERT_TRUE( _wcsicmp( Nickname.c_str(), L"bret" ) != 0 && _wcsicmp( Nickname.c_str(), L"peti" ) != 0 && _wcsicmp( Nickname.c_str(), L"will" ) != 0 );
+			}
+			else
+			{
+				switch ( FinalAccountID )
+				{
+					case 1:
+						ASSERT_TRUE( _wcsicmp( Nickname.c_str(), L"bret" ) == 0 );
+						break;
+
+					case 2:
+						ASSERT_TRUE( _wcsicmp( Nickname.c_str(), L"peti" ) == 0 );
+						break;
+
+					case 3:
+						ASSERT_TRUE( _wcsicmp( Nickname.c_str(), L"will" ) == 0 );
+						break;
+
+					default:
+						ASSERT_TRUE( false );
+						break;
+				}
+			}
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CNullableFunctionParams *params = static_cast< CNullableFunctionParams * >( input_parameters );
+			*params = CNullableFunctionParams( Nickname );
+
+			InitializeCalls++; 
+		}	
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CNullableFunctionParams *params = static_cast< CNullableFunctionParams * >( input_parameters );
+
+			if ( params->AccountID.Is_Null() )
+			{
+				AccountIDIsNull = true;
+			}
+			else
+			{
+				FinalAccountID = params->AccountID.Get_Value();
+			}
+
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		std::wstring Nickname;
+
+		int64 FinalAccountID;
+		bool AccountIDIsNull;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 ISIZE >
+void Run_ReadSeedData_NullableFunction_OK_Test( uint32 task_count, const std::wstring &non_null_nickname, uint32 null_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CNullableFunctionCall< ISIZE > > db_task_batch;
+	std::vector< CNullableFunctionCall< ISIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CNullableFunctionCall< ISIZE > *db_task = new CNullableFunctionCall< ISIZE >( ( i == null_index ) ? L"dsfhjkfsjk" : non_null_nickname );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == 0 );
+	ASSERT_TRUE( successful_tasks.size() == task_count );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableFunctionTest_1_1_1 )
+{
+	Run_ReadSeedData_NullableFunction_OK_Test< 1 >( 1, L"Bret", 1 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableFunctionTest_1_1_0 )
+{
+	Run_ReadSeedData_NullableFunction_OK_Test< 1 >( 1, L"Peti", 0 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableFunctionTest_2_5_3 )
+{
+	Run_ReadSeedData_NullableFunction_OK_Test< 2 >( 5, L"Will", 3 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableFunctionTest_2_5_4 )
+{
+	Run_ReadSeedData_NullableFunction_OK_Test< 2 >( 5, L"Will", 4 );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CNullableProcedureParams : public IDatabaseVariableSet
+{
+	public:
+
+		CNullableProcedureParams( void ) :
+			NullAccountID(),
+			StringInOut(),
+			WStringInOut()
+		{}
+
+		CNullableProcedureParams( const CNullableProcedureParams &rhs ) :
+			NullAccountID( rhs.NullAccountID ),
+			StringInOut( rhs.StringInOut ),
+			WStringInOut( rhs.WStringInOut )
+		{}
+
+		CNullableProcedureParams( uint64 account_id, bool string_null, bool wstring_null ) :
+			NullAccountID( account_id ),
+			StringInOut(),
+			WStringInOut()
+		{
+			if ( !string_null )
+			{
+				StringInOut.Set_Value( "TestString" );
+			}
+
+			if ( !wstring_null )
+			{
+				WStringInOut.Set_Value( L"TestWString" );
+			}
+		}
+
+		virtual ~CNullableProcedureParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &NullAccountID );
+			variables.push_back( &StringInOut );
+			variables.push_back( &WStringInOut );
+		}
+
+		DBUInt64In NullAccountID;
+		DBStringInOut< 32 > StringInOut;
+		DBWStringInOut< 32 > WStringInOut;
+};
+
+class CNullableProcedureResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CNullableProcedureResultSet( void ) :
+			ID(),
+			Email()
+		{}
+
+		CNullableProcedureResultSet( const CNullableProcedureResultSet &rhs ) :
+			ID( rhs.ID ),
+			Email( rhs.Email )
+		{}
+
+		virtual ~CNullableProcedureResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ID );
+			variables.push_back( &Email );
+		}
+
+		DBUInt64In ID;
+		DBStringIn< 255 > Email;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedureParams, ISIZE, CNullableProcedureResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CNullableProcedureParams, ISIZE, CNullableProcedureResultSet, OSIZE > BASECLASS;
+
+		CNullableProcedureCall( uint64 null_account_id, bool string_null, bool wstring_null ) : 
+			BASECLASS(),
+			NullAccountID( null_account_id ),
+			StringNull( string_null ),
+			WStringNull( wstring_null ),
+			StringOut(),
+			WStringOut(),
+			Results(),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CNullableProcedureCall() {}
+
+		virtual const wchar_t *Get_Procedure_Name( void ) const { return L"dynamic.nullable_procedure"; }
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 1 );
+			ASSERT_TRUE( InitializeCalls == 1 );
+			
+			ASSERT_TRUE( WStringOut.Is_Null() == StringNull );
+			ASSERT_TRUE( StringOut.Is_Null() == WStringNull );
+			
+			ASSERT_TRUE( Results.size() == 3 );
+			for ( uint32 i = 0; i < Results.size(); ++i )
+			{
+				if ( i + 1 == NullAccountID )
+				{
+					ASSERT_TRUE( Results[ i ].ID.Is_Null() );
+				}
+				else
+				{
+					ASSERT_FALSE( Results[ i ].ID.Is_Null() );
+					ASSERT_TRUE( Results[ i ].ID.Get_Value() == i + 1 );
+				}
+			}
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CNullableProcedureParams *params = static_cast< CNullableProcedureParams * >( input_parameters );
+			*params = CNullableProcedureParams( NullAccountID, StringNull, WStringNull );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CNullableProcedureResultSet *results = static_cast< CNullableProcedureResultSet * >( result_set );
+
+			for ( uint32 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CNullableProcedureParams *params = static_cast< CNullableProcedureParams * >( input_parameters );
+
+			StringOut = params->StringInOut;
+			WStringOut = params->WStringInOut;
+
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { Results.clear(); ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		uint64 NullAccountID;
+		bool StringNull;
+		bool WStringNull;
+
+		DBStringInOut< 32 > StringOut;
+		DBWStringInOut< 32 > WStringOut;
+
+		std::vector< CNullableProcedureResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_ReadSeedData_NullableProcedure_Test( uint32 task_count, uint64 null_account_id, bool string_null, bool wstring_null )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CNullableProcedureCall< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CNullableProcedureCall< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CNullableProcedureCall< ISIZE, OSIZE > *db_task = new CNullableProcedureCall< ISIZE, OSIZE >( null_account_id, string_null, wstring_null );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == 0 );
+	ASSERT_TRUE( successful_tasks.size() == task_count );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_1_1_1_1_T_F )
+{
+	Run_ReadSeedData_NullableProcedure_Test< 1, 1 >( 1, 1, true, false );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_1_1_1_0_T_F )
+{
+	Run_ReadSeedData_NullableProcedure_Test< 1, 1 >( 1, 0, true, false );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_1_1_1_2_F_T )
+{
+	Run_ReadSeedData_NullableProcedure_Test< 1, 1 >( 1, 2, false, true );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_1_1_1_3_F_T )
+{
+	Run_ReadSeedData_NullableProcedure_Test< 1, 1 >( 1, 3, false, true );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_1_1_1_3_F_F )
+{
+	Run_ReadSeedData_NullableProcedure_Test< 1, 1 >( 1, 3, false, false );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_1_1_1_3_T_T )
+{
+	Run_ReadSeedData_NullableProcedure_Test< 1, 1 >( 1, 3, true, true );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_3_2_7_2_T_F )
+{
+	Run_ReadSeedData_NullableProcedure_Test< 3, 2 >( 7, 2, true, false );
 }

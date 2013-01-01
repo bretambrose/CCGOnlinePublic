@@ -109,10 +109,10 @@ SQLSMALLINT Get_ODBC_SQL_Value_Type( EDatabaseVariableValueType variable_value_t
 			return SQL_BIGINT;
 
 		case DVVT_STRING:
-			return SQL_CHAR;
+			return SQL_VARCHAR;
 
 		case DVVT_WSTRING:
-			return SQL_WCHAR;
+			return SQL_WVARCHAR;
 
 		case DVVT_FLOAT:
 			return SQL_FLOAT;

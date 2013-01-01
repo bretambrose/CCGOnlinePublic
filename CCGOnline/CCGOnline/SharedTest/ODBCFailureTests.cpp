@@ -514,12 +514,12 @@ class CInconvertibleFunctionParams : public IDatabaseVariableSet
 		DBUInt64In ID;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-class CBadParamConversionFunctionCall : public TDatabaseFunctionCall< CInconvertibleFunctionParams, ISIZE, CEmptyVariableSet, OSIZE >
+template< uint32 ISIZE >
+class CBadParamConversionFunctionCall : public TDatabaseFunctionCall< CInconvertibleFunctionParams, ISIZE >
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CInconvertibleFunctionParams, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+		typedef TDatabaseFunctionCall< CInconvertibleFunctionParams, ISIZE > BASECLASS;
 
 		CBadParamConversionFunctionCall( void ) : 
 			BASECLASS(),
@@ -542,9 +542,7 @@ class CBadParamConversionFunctionCall : public TDatabaseFunctionCall< CInconvert
 	protected:
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) { InitializeCalls++; }	
-			
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 /*rows_fetched*/ ) {}
-					
+								
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) { FinishedCalls++;}	
 
 		virtual void On_Rollback( void ) { Rollbacks++; }
@@ -558,17 +556,17 @@ class CBadParamConversionFunctionCall : public TDatabaseFunctionCall< CInconvert
 		uint32 Rollbacks;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32 ISIZE >
 void Run_BadParamConversionFunctionCall_Test( uint32 task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
-	TDatabaseTaskBatch< CBadParamConversionFunctionCall< ISIZE, OSIZE > > db_task_batch;
-	std::vector< CBadParamConversionFunctionCall< ISIZE, OSIZE > * > tasks;
+	TDatabaseTaskBatch< CBadParamConversionFunctionCall< ISIZE > > db_task_batch;
+	std::vector< CBadParamConversionFunctionCall< ISIZE > * > tasks;
 	for ( uint32 i = 0; i < task_count; ++i )
 	{
-		CBadParamConversionFunctionCall< ISIZE, OSIZE > *db_task = new CBadParamConversionFunctionCall< ISIZE, OSIZE >;
+		CBadParamConversionFunctionCall< ISIZE > *db_task = new CBadParamConversionFunctionCall< ISIZE >;
 		tasks.push_back( db_task );
 		db_task_batch.Add_Task( db_task );
 	}
@@ -590,29 +588,29 @@ void Run_BadParamConversionFunctionCall_Test( uint32 task_count )
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
 }
 
-TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_1_1_1 )
+TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_1_1 )
 {
-	Run_BadParamConversionFunctionCall_Test< 1, 1 >( 1 );
+	Run_BadParamConversionFunctionCall_Test< 1 >( 1 );
 }
 
-TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_1_1_2 )
+TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_1_2 )
 {
-	Run_BadParamConversionFunctionCall_Test< 1, 1 >( 1 );
+	Run_BadParamConversionFunctionCall_Test< 1 >( 1 );
 }
 
-TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_2_1_2)
+TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_2_2)
 {
-	Run_BadParamConversionFunctionCall_Test< 2, 1 >( 2 );
+	Run_BadParamConversionFunctionCall_Test< 2 >( 2 );
 }
 
-TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_2_1_5)
+TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_2_5)
 {
-	Run_BadParamConversionFunctionCall_Test< 2, 1 >( 5 );
+	Run_BadParamConversionFunctionCall_Test< 2 >( 5 );
 }
 
-TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_3_1_3)
+TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_3_3)
 {
-	Run_BadParamConversionFunctionCall_Test< 3, 1 >( 3 );
+	Run_BadParamConversionFunctionCall_Test< 3 >( 3 );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -768,12 +766,12 @@ class CFunctionInputProcedureSet : public IDatabaseVariableSet
 		DBUInt64In Input;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-class CFunctionInputProcedureCall : public TDatabaseFunctionCall< CFunctionInputProcedureSet, ISIZE, CEmptyVariableSet, OSIZE >
+template< uint32 ISIZE >
+class CFunctionInputProcedureCall : public TDatabaseFunctionCall< CFunctionInputProcedureSet, ISIZE >
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CFunctionInputProcedureSet, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+		typedef TDatabaseFunctionCall< CFunctionInputProcedureSet, ISIZE > BASECLASS;
 
 		CFunctionInputProcedureCall( void ) : 
 			BASECLASS(),
@@ -796,9 +794,7 @@ class CFunctionInputProcedureCall : public TDatabaseFunctionCall< CFunctionInput
 	protected:
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) { InitializeCalls++; }	
-			
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 /*rows_fetched*/ ) {}
-					
+								
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) { FinishedCalls++;}	
 
 		virtual void On_Rollback( void ) { Rollbacks++; }
@@ -812,17 +808,17 @@ class CFunctionInputProcedureCall : public TDatabaseFunctionCall< CFunctionInput
 		uint32 Rollbacks;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32 ISIZE >
 void Run_FunctionInputProcedureCall_Test( uint32 task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
-	TDatabaseTaskBatch< CFunctionInputProcedureCall< ISIZE, OSIZE > > db_task_batch;
-	std::vector< CFunctionInputProcedureCall< ISIZE, OSIZE > * > tasks;
+	TDatabaseTaskBatch< CFunctionInputProcedureCall< ISIZE > > db_task_batch;
+	std::vector< CFunctionInputProcedureCall< ISIZE > * > tasks;
 	for ( uint32 i = 0; i < task_count; ++i )
 	{
-		CFunctionInputProcedureCall< ISIZE, OSIZE > *db_task = new CFunctionInputProcedureCall< ISIZE, OSIZE >;
+		CFunctionInputProcedureCall< ISIZE > *db_task = new CFunctionInputProcedureCall< ISIZE >;
 		tasks.push_back( db_task );
 		db_task_batch.Add_Task( db_task );
 	}
@@ -844,29 +840,29 @@ void Run_FunctionInputProcedureCall_Test( uint32 task_count )
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
 }
 
-TEST_F( ODBCFailureTests, FunctionInputProcedureCall_1_1_1 )
+TEST_F( ODBCFailureTests, FunctionInputProcedureCall_1_1 )
 {
-	Run_FunctionInputProcedureCall_Test< 1, 1 >( 1 );
+	Run_FunctionInputProcedureCall_Test< 1 >( 1 );
 }
 
-TEST_F( ODBCFailureTests, FunctionInputProcedureCall_1_1_2 )
+TEST_F( ODBCFailureTests, FunctionInputProcedureCall_1_2 )
 {
-	Run_FunctionInputProcedureCall_Test< 1, 1 >( 2 );
+	Run_FunctionInputProcedureCall_Test< 1 >( 2 );
 }
 
-TEST_F( ODBCFailureTests, FunctionInputProcedureCall_2_1_2 )
+TEST_F( ODBCFailureTests, FunctionInputProcedureCall_2_2 )
 {
-	Run_FunctionInputProcedureCall_Test< 2, 1 >( 2 );
+	Run_FunctionInputProcedureCall_Test< 2 >( 2 );
 }
 
-TEST_F( ODBCFailureTests, FunctionInputProcedureCall_2_1_5 )
+TEST_F( ODBCFailureTests, FunctionInputProcedureCall_2_5 )
 {
-	Run_FunctionInputProcedureCall_Test< 2, 1 >( 5 );
+	Run_FunctionInputProcedureCall_Test< 2 >( 5 );
 }
 
-TEST_F( ODBCFailureTests, FunctionInputProcedureCall_3_1_3 )
+TEST_F( ODBCFailureTests, FunctionInputProcedureCall_3_3 )
 {
-	Run_FunctionInputProcedureCall_Test< 3, 1 >( 3 );
+	Run_FunctionInputProcedureCall_Test< 3 >( 3 );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

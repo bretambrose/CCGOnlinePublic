@@ -26,7 +26,9 @@
 #include "Interfaces/DatabaseTaskInterface.h"
 #include "DatabaseTypes.h"
 
-template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
+class CEmptyVariableSet;
+
+template < typename I, uint32 ISIZE >
 class TDatabaseFunctionCall : public IDatabaseTask
 {
 	public:
@@ -42,10 +44,16 @@ class TDatabaseFunctionCall : public IDatabaseTask
 		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_FUNCTION_CALL; }
 
 		typedef I InputParametersType;
-		typedef O ResultSetType;
+		typedef CEmptyVariableSet ResultSetType;
 
 		static const uint32 InputParameterBatchSize = ISIZE;
-		static const uint32 ResultSetBatchSize = OSIZE;
+		static const uint32 ResultSetBatchSize = 1;
+
+	protected:
+
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 rows_fetched ) {
+			ASSERT_TRUE( rows_fetched == 0 );
+		}
 };
 
 template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
