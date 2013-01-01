@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	DatabaseVariableSet.h
+	EmptyVariableSet.h
 		A component defining some base instances of a set of application variables.
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -20,29 +20,10 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_VARIABLE_SET_H
-#define DATABASE_VARIABLE_SET_H
+#ifndef EMPTY_VARIABLE_SET_H
+#define EMPTY_VARIABLE_SET_H
 
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
-
-class CDatabaseInputParams : public IDatabaseVariableSet
-{
-	public:
-
-		CDatabaseInputParams( void ) :
-			InErrorState( false )
-		{}
-
-		virtual ~CDatabaseInputParams() {}
-
-		virtual bool Is_In_Error_State( void ) const { return InErrorState; }
-		virtual bool Set_In_Error_State( bool in_error_state ) { InErrorState = in_error_state; }
-
-	private:
-
-		bool InErrorState;
-};
-
 
 class CEmptyVariableSet : public IDatabaseVariableSet
 {
@@ -58,4 +39,4 @@ class CEmptyVariableSet : public IDatabaseVariableSet
 		}
 };
 
-#endif // DATABASE_VARIABLE_SET_INTERFACE_H
+#endif // EMPTY_VARIABLE_SET_H

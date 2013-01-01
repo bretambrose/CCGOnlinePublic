@@ -28,7 +28,7 @@
 #include "Database/Interfaces/DatabaseStatementInterface.h"
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
-#include "Database/DatabaseVariableSet.h"
+#include "Database/EmptyVariableSet.h"
 #include "Database/DatabaseCalls.h"
 #include "Database/DatabaseTaskBatch.h"
 #include "StringUtils.h"

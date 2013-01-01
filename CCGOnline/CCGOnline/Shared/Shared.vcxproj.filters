@@ -179,9 +179,6 @@
     <ClInclude Include="Database\Interfaces\DatabaseTaskInterface.h">
       <Filter>Source Files\Database\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Database\DatabaseVariableSet.h">
-      <Filter>Source Files\Database</Filter>
-    </ClInclude>
     <ClInclude Include="Concurrency\MailboxInterfaces.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
@@ -262,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="Database\ODBCImplementation\ODBCParameterInsulation.h">
       <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\EmptyVariableSet.h">
+      <Filter>Source Files\Database</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

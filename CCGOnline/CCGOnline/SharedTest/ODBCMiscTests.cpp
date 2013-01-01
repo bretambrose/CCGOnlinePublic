@@ -29,7 +29,7 @@
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
 #include "Database/Interfaces/DatabaseTaskInterface.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
-#include "Database/DatabaseVariableSet.h"
+#include "Database/EmptyVariableSet.h"
 
 class ODBCMiscTests : public testing::Test 
 {

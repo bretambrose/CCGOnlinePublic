@@ -39,7 +39,7 @@
 #include "Database/Interfaces/DatabaseConnectionInterface.h"
 #include "Database/Interfaces/DatabaseStatementInterface.h"
 #include "Database/Interfaces/DatabaseEnvironmentInterface.h"
-#include "Database/DatabaseVariableSet.h"
+#include "Database/EmptyVariableSet.h"
 #include "Database/DatabaseCalls.h"
 #include "Database/DatabaseTaskBatch.h"
 
