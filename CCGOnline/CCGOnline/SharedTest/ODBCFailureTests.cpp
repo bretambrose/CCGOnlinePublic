@@ -3440,3 +3440,165 @@ TEST_F( ODBCFailureTests, SelectAccountBadConversion_3_7 )
 {
 	Run_SelectAccountBadConversion_Test< 3 >( 7 );
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CTVFBadColumnParams : public IDatabaseVariableSet
+{
+	public:
+
+		CTVFBadColumnParams( void ) :
+			AccountID()
+		{}
+
+		CTVFBadColumnParams( uint64 account_id ) :
+			AccountID( account_id )
+		{}
+
+		virtual ~CTVFBadColumnParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+		}
+
+		DBUInt64In AccountID;
+};
+
+class CTVFBadColumnResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CTVFBadColumnResultSet( void ) :
+			ProductDesc(),
+			ProductKeyDesc()
+		{}
+
+		virtual ~CTVFBadColumnResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ProductDesc );
+			variables.push_back( &ProductKeyDesc );
+		}
+
+		DBStringIn< 255 > ProductDesc;
+		DBStringIn< 36 > ProductKeyDesc;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CBadColumnTableValuedFunctionTask : public TDatabaseTableValuedFunctionCall< CTVFBadColumnParams, ISIZE, CTVFBadColumnResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseTableValuedFunctionCall< CTVFBadColumnParams, ISIZE, CTVFBadColumnResultSet, OSIZE > BASECLASS;
+
+		CBadColumnTableValuedFunctionTask( uint64 account_id ) : 
+			BASECLASS(),
+			AccountID( account_id ),
+			Results(),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CBadColumnTableValuedFunctionTask() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.tabled_valued_function"; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const
+		{
+			column_names.push_back( L"product_desc" );
+			column_names.push_back( L"product_key_descrip" );
+		}
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 0 );
+			ASSERT_TRUE( InitializeCalls >= 1 );
+						
+			ASSERT_TRUE( Results.size() == 0 );
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CTVFBadColumnParams *input_params = static_cast< CTVFBadColumnParams * >( input_parameters );
+			*input_params = CTVFBadColumnParams( AccountID );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CTVFBadColumnResultSet *results = static_cast< CTVFBadColumnResultSet * >( result_set );
+
+			for ( uint32 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { Results.clear(); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		uint64 AccountID;
+
+		std::vector< CTVFBadColumnResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_BadColumnTableValuedFunctionTest( uint32 task_count, uint64 account_id )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CBadColumnTableValuedFunctionTask< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CBadColumnTableValuedFunctionTask< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CBadColumnTableValuedFunctionTask< ISIZE, OSIZE > *db_task = new CBadColumnTableValuedFunctionTask< ISIZE, OSIZE >( account_id );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == task_count );
+	ASSERT_TRUE( successful_tasks.size() == 0 );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCFailureTests, BadColumnTableValuedFunctionTest_1_1_1_1 )
+{
+	Run_BadColumnTableValuedFunctionTest< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCFailureTests, BadColumnTableValuedFunctionTest_2_2_3_2 )
+{
+	Run_BadColumnTableValuedFunctionTest< 2, 2 >( 3, 2 );
+}
+
+TEST_F( ODBCFailureTests, BadColumnTableValuedFunctionTest_2_2_5_3 )
+{
+	Run_BadColumnTableValuedFunctionTest< 2, 2 >( 5, 3 );
+}

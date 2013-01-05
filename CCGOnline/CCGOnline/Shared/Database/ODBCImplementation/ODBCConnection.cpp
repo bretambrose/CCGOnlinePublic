@@ -303,9 +303,44 @@ void CODBCConnection::Construct_Select_Statement_Text( IDatabaseTask *task, std:
 	statement_text = std::wstring( statement_stream.rdbuf()->str() );
 }
 
-void CODBCConnection::Construct_Table_Valued_Function_Statement_Text( IDatabaseTask * /*task*/, IDatabaseVariableSet * /*input_parameters*/, std::wstring & /*statement_text*/ ) const
+void CODBCConnection::Construct_Table_Valued_Function_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const
 {
-	// TODO: implement
+	std::basic_ostringstream< wchar_t > statement_stream;
+
+	statement_stream << L"SELECT ";
+
+	std::vector< const wchar_t * > column_names;
+	task->Build_Column_Name_List( column_names );
+
+	for ( uint32 i = 0; i < column_names.size(); ++i )
+	{
+		statement_stream << column_names[ i ];
+		if ( i + 1 < column_names.size() )
+		{
+			statement_stream << L", ";
+		}
+	}
+
+	statement_stream << L" FROM " << task->Get_Database_Object_Name() << L"(";
+
+	std::vector< IDatabaseVariable * > params;
+	input_parameters->Get_Variables( params );
+
+	for ( uint32 i = 0; i < params.size(); ++i )
+	{
+		if ( i + 1 < params.size() )
+		{
+			statement_stream << L"?, ";
+		}
+		else
+		{
+			statement_stream << L"?";
+		}
+	}
+		
+	statement_stream << L");";
+
+	statement_text = std::wstring( statement_stream.rdbuf()->str() );
 }
 
 void CODBCConnection::Construct_Statement_Text( IDatabaseTask *task, IDatabaseVariableSet *input_parameters, std::wstring &statement_text ) const
@@ -424,7 +459,35 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 
 		case DTT_TABLE_VALUED_FUNCTION_CALL:
 		{
-			// TODO: probably all in params, all in result set, at least one result column
+			for ( uint32 i = 0; i < input_params.size(); ++i )
+			{
+				if ( input_params[ i ]->Get_Parameter_Type() != DVT_INPUT )
+				{
+					return false;
+				}
+			}
+
+			if ( result_set.size() == 0 )
+			{
+				return false;			// what's the point of selecting nothing?
+			}
+
+			std::vector< const wchar_t * > column_names;
+			task->Build_Column_Name_List( column_names );
+
+			if ( column_names.size() != result_set.size() )
+			{
+				return false;
+			}
+
+			for ( uint32 i = 0; i < result_set.size(); ++i )
+			{
+				if ( result_set[ i ]->Get_Parameter_Type() != DVT_INPUT )
+				{
+					return false;
+				}
+			}
+
 			break;
 		}
 

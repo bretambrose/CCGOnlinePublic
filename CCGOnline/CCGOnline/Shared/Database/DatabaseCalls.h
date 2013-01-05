@@ -102,4 +102,26 @@ class TDatabaseSelect : public IDatabaseTask
 		static const uint32 ResultSetBatchSize = OSIZE;
 };
 
+template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
+class TDatabaseTableValuedFunctionCall : public IDatabaseTask
+{
+	public:
+
+		typedef IDatabaseTask BASECLASS;
+
+		TDatabaseTableValuedFunctionCall( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~TDatabaseTableValuedFunctionCall() {}
+
+		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_TABLE_VALUED_FUNCTION_CALL; }
+
+		typedef I InputParametersType;
+		typedef O ResultSetType;
+
+		static const uint32 InputParameterBatchSize = ISIZE;
+		static const uint32 ResultSetBatchSize = OSIZE;
+};
+
 #endif // DATABASE_CALLS_H

@@ -1881,4 +1881,190 @@ TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_4_17 )
 	Run_ReadSeedData_SelectAccountDetails_Test< 4 >( 17 );
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class CTestTVFParams : public IDatabaseVariableSet
+{
+	public:
+
+		CTestTVFParams( void ) :
+			AccountID()
+		{}
+
+		CTestTVFParams( uint64 account_id ) :
+			AccountID( account_id )
+		{}
+
+		virtual ~CTestTVFParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &AccountID );
+		}
+
+		DBUInt64In AccountID;
+};
+
+class CTestTVFResultSet : public IDatabaseVariableSet
+{
+	public:
+
+		CTestTVFResultSet( void ) :
+			ProductDesc(),
+			ProductKeyDesc()
+		{}
+
+		virtual ~CTestTVFResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ProductDesc );
+			variables.push_back( &ProductKeyDesc );
+		}
+
+		DBStringIn< 255 > ProductDesc;
+		DBStringIn< 36 > ProductKeyDesc;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CTableValuedFunctionTask : public TDatabaseTableValuedFunctionCall< CTestTVFParams, ISIZE, CTestTVFResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseTableValuedFunctionCall< CTestTVFParams, ISIZE, CTestTVFResultSet, OSIZE > BASECLASS;
+
+		CTableValuedFunctionTask( uint64 account_id ) : 
+			BASECLASS(),
+			AccountID( account_id ),
+			Results(),
+			FinishedCalls( 0 ),
+			InitializeCalls( 0 )
+		{}
+
+		virtual ~CTableValuedFunctionTask() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.tabled_valued_function"; }
+		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const
+		{
+			column_names.push_back( L"product_desc" );
+			column_names.push_back( L"product_key_desc" );
+		}
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( FinishedCalls == 1 );
+			ASSERT_TRUE( InitializeCalls == 1 );
+			
+			if ( AccountID == 1 )
+			{			
+				ASSERT_TRUE( Results.size() == 3 );
+				for ( uint32 i = 0; i < Results.size(); ++i )
+				{		
+					std::string product_desc;
+					Results[ i ].ProductDesc.Copy_Into( product_desc );
+
+					ASSERT_TRUE( _stricmp( "JYHAD", product_desc.c_str() ) == 0 ||
+									 _stricmp( "LEGENDOFTHEFIVERINGS", product_desc.c_str() ) == 0 ||
+									 _stricmp( "NETRUNNER", product_desc.c_str() ) == 0 );
+				}
+			}
+			else
+			{
+				ASSERT_TRUE( Results.size() == 0 );
+			}
+		}
+
+	protected:
+
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			CTestTVFParams *input_params = static_cast< CTestTVFParams * >( input_parameters );
+			*input_params = CTestTVFParams( AccountID );
+
+			InitializeCalls++; 
+		}	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			CTestTVFResultSet *results = static_cast< CTestTVFResultSet * >( result_set );
+
+			for ( uint32 i = 0; i < rows_fetched; ++i )
+			{
+				Results.push_back( results[ i ] );
+			}
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) 
+		{ 
+			FinishedCalls++;
+		}	
+
+		virtual void On_Rollback( void ) { Results.clear(); ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		uint64 AccountID;
+
+		std::vector< CTestTVFResultSet > Results;
+
+		uint32 FinishedCalls;
+		uint32 InitializeCalls;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+void Run_ReadSeedData_TableValueFunctionTest( uint32 task_count, uint64 account_id )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TDatabaseTaskBatch< CTableValuedFunctionTask< ISIZE, OSIZE > > db_task_batch;
+	std::vector< CTableValuedFunctionTask< ISIZE, OSIZE > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		CTableValuedFunctionTask< ISIZE, OSIZE > *db_task = new CTableValuedFunctionTask< ISIZE, OSIZE >( account_id );
+		tasks.push_back( db_task );
+		db_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskListType successful_tasks;
+	DBTaskListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == 0 );
+	ASSERT_TRUE( successful_tasks.size() == task_count );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_1_1_1_1 )
+{
+	Run_ReadSeedData_TableValueFunctionTest< 1, 1 >( 1, 1 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_2_2_3_2 )
+{
+	Run_ReadSeedData_TableValueFunctionTest< 2, 2 >( 3, 2 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_2_2_3_1 )
+{
+	Run_ReadSeedData_TableValueFunctionTest< 2, 2 >( 3, 1 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_2_2_5_3 )
+{
+	Run_ReadSeedData_TableValueFunctionTest< 2, 2 >( 5, 3 );
+}
+
+TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_2_2_5_1 )
+{
+	Run_ReadSeedData_TableValueFunctionTest< 2, 2 >( 5, 1 );
+}
