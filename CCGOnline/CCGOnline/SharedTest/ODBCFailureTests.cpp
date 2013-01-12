@@ -125,6 +125,7 @@ void Run_MissingProcedureCall_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 
@@ -292,6 +293,7 @@ void Run_WrongArityProcedureCall_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, TooFewParamsProcedureCall_1_1_1 )
@@ -454,6 +456,7 @@ void Run_BadParamConversionProcedureCall_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, BadParamConversionProcedureCall_1_1_1 )
@@ -586,6 +589,7 @@ void Run_BadParamConversionFunctionCall_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_1_1 )
@@ -711,6 +715,7 @@ void Run_BadResultSetConversionProcedureCall_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, BadResultSetConversionProcedureCall_1_1_1 )
@@ -838,6 +843,7 @@ void Run_FunctionInputProcedureCall_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, FunctionInputProcedureCall_1_1 )
@@ -967,6 +973,7 @@ void Run_ProcedureInputFunctionCall_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, ProcedureInputFunctionCall_1_1_1 )
@@ -1221,6 +1228,7 @@ void Run_ThrowExceptionProcedureCall_Test( const wchar_t *proc_name, uint32 task
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, UserExceptionProcedureCall_1_1_1_0_NULL )
@@ -1569,6 +1577,7 @@ void Run_MissingSelectProcedureCall_Test( uint32 task_count, uint32 skip_index1,
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, MissingSelectProcedureCall_1_1_1_0_NULL )
@@ -1806,6 +1815,7 @@ void Run_ExtraSelectProcedureCall_Test( uint32 task_count, uint32 non_extra_inde
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 
@@ -2035,6 +2045,7 @@ void Run_TooManyResultsProcedureCall_Test( uint32 task_count, uint32 extra_index
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_1_1_1_1 )
@@ -2263,6 +2274,7 @@ void Run_ExtraColumnProcedureCall_Test( uint32 task_count, uint32 extra_index )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_1_1_1_1 )
@@ -2486,6 +2498,7 @@ void Run_MissingColumnProcedureCall_Test( uint32 task_count, uint32 missing_inde
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, MissingColumnProcedureCall_1_1_1_1 )
@@ -2704,6 +2717,7 @@ void Run_InvalidResultConversionProcedureCall_Test( uint32 task_count, uint32 in
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_1_1_1_1 )
@@ -2952,6 +2966,7 @@ void Run_ResultStringTruncationProcedureCall_Test( uint32 task_count, uint32 inv
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_1_1_1_1 )
@@ -3141,6 +3156,7 @@ void Run_SelectAccountBadTable_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, SelectAccountBadTable_1_1 )
@@ -3285,6 +3301,7 @@ void Run_SelectAccountBadColumn_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, SelectAccountBadColumn_1_1 )
@@ -3429,6 +3446,7 @@ void Run_SelectAccountBadConversion_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, SelectAccountBadConversion_1_1 )
@@ -3586,6 +3604,7 @@ void Run_BadColumnTableValuedFunctionTest( uint32 task_count, uint64 account_id 
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCFailureTests, BadColumnTableValuedFunctionTest_1_1_1_1 )

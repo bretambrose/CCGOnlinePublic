@@ -189,6 +189,8 @@
     <ClInclude Include="CRC.h" />
     <ClInclude Include="CRCValue.h" />
     <ClInclude Include="Database\DatabaseCalls.h" />
+    <ClInclude Include="Database\DatabaseProcessBase.h" />
+    <ClInclude Include="Database\DatabaseProcessMessages.h" />
     <ClInclude Include="Database\DatabaseTaskBatch.h" />
     <ClInclude Include="Database\DatabaseTypes.h" />
     <ClInclude Include="Database\EmptyVariableSet.h" />
@@ -249,6 +251,8 @@
     <ClCompile Include="Concurrency\TaskProcessBase.cpp" />
     <ClCompile Include="Concurrency\ThreadProcessBase.cpp" />
     <ClCompile Include="CRC.cpp" />
+    <ClCompile Include="Database\DatabaseProcessBase.cpp" />
+    <ClCompile Include="Database\DatabaseProcessMessages.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCConnection.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCEnvironment.cpp" />
     <ClCompile Include="Database\ODBCImplementation\ODBCFactory.cpp" />

@@ -100,6 +100,12 @@ void CODBCEnvironment::Shutdown_Connection( DBConnectionIDType connection_id )
 	Connections.erase( iter );
 }
 
+void CODBCEnvironment::Shutdown_Connection( IDatabaseConnection *connection )
+{
+	FATAL_ASSERT( connection != nullptr );
+	Shutdown_Connection( connection->Get_ID() );
+}
+
 IDatabaseConnection *CODBCEnvironment::Add_Connection( const std::wstring &connection_string, bool cache_statements )
 {
 	if ( State != ODBCEST_INITIALIZED )

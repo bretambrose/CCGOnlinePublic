@@ -41,6 +41,7 @@ class CODBCEnvironment : public CODBCObjectBase, public IDatabaseEnvironment
 		virtual void Initialize( void );
 		virtual void Shutdown( void );
 		virtual void Shutdown_Connection( DBConnectionIDType connection_id );
+		virtual void Shutdown_Connection( IDatabaseConnection *connection );
 
 		virtual IDatabaseConnection *Add_Connection( const std::wstring &connection_string, bool cache_statements );
 		

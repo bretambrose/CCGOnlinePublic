@@ -59,7 +59,7 @@ TEST_F( ODBCMiscTests, AllocateAndCleanup )
 
 	connection->Release_Statement( statement );
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
-
+	delete connection;
 }
 
 class CGetAccountResultSet : public IDatabaseVariableSet
@@ -165,6 +165,7 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts1_OK )
 	ASSERT_TRUE( connection->Get_Error_State() == DBEST_SUCCESS );
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 
 	delete []params_array;
 }
@@ -252,6 +253,7 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 	ASSERT_TRUE( connection->Get_Error_State() == DBEST_SUCCESS );
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 // valid as function input, invalid all other times
@@ -502,4 +504,5 @@ TEST_F( ODBCMiscTests, TestSignatureValidation )
 	ASSERT_FALSE( connection->Validate_Input_Output_Signatures( good_select_task, &empty_params, &params4 ) );
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }

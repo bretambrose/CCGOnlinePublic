@@ -1560,6 +1560,7 @@ bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /
 
 	connection->Release_Statement( statement );
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 
 	delete []params_array;
 
@@ -1652,6 +1653,7 @@ bool Handle_Fetch_Account( const CSlashCommandInstance &instance, std::wstring &
 
 	connection->Release_Statement( statement );
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 
 	delete []params_array;
 
@@ -1725,6 +1727,7 @@ bool Handle_Add_Account_Batch( const CSlashCommandInstance &instance, std::wstri
 	add_account_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 	
 	for ( uint32 i = 0; i < add_count; ++i )
 	{

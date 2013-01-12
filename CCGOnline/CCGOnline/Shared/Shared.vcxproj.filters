@@ -263,6 +263,12 @@
     <ClInclude Include="Database\EmptyVariableSet.h">
       <Filter>Source Files\Database</Filter>
     </ClInclude>
+    <ClInclude Include="Database\DatabaseProcessBase.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseProcessMessages.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -372,6 +378,12 @@
     </ClCompile>
     <ClCompile Include="Database\ODBCImplementation\ODBCParameters.cpp">
       <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\DatabaseProcessBase.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\DatabaseProcessMessages.cpp">
+      <Filter>Source Files\Database</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

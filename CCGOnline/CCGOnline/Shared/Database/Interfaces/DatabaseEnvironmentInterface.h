@@ -38,6 +38,7 @@ class IDatabaseEnvironment
 		virtual void Initialize( void ) = 0;
 		virtual void Shutdown( void ) = 0;
 		virtual void Shutdown_Connection( DBConnectionIDType connection_id ) = 0;
+		virtual void Shutdown_Connection( IDatabaseConnection *connection ) = 0;
 
 		virtual IDatabaseConnection *Add_Connection( const std::wstring &connection_string, bool cache_statements ) = 0;
 

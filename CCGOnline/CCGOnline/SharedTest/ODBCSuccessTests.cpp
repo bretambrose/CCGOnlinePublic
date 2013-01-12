@@ -197,6 +197,7 @@ void Run_ReadSeedData_GetAllAccounts_OK_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeededData_GetAllAccounts_1_1_1_OK )
@@ -266,6 +267,7 @@ void Run_ReadSeedData_GetAllAccounts_OK_ReuseStatement_Test( uint32 task_count, 
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeededData_GetAllAccounts_1_1_1_OK_UseCache )
@@ -471,6 +473,7 @@ void Run_ReadSeedData_GetAllAccountsWithInOut_OK_Test( const std::string &filter
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_GetAllAccountsWithInOut_OK_Test_NoFilter_2_2 )
@@ -613,6 +616,7 @@ void Run_ReadSeedData_GetAccountCount_OK_Test( const std::string &filtered_name,
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_GetAccountCount_OK_Test_NoFilter_1_1 )
@@ -769,6 +773,7 @@ void Run_ReadSeedData_GetAccountEmail_OK_Test( uint64 account_id, uint32 task_co
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_GetAccountEmail_OK_Test_GoodID_1_1 )
@@ -867,6 +872,7 @@ void Run_DoNothing_OK_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, DoNothing_OK_Test_1_1 )
@@ -1050,6 +1056,7 @@ void Run_ReadSeedData_TestBooleanData_OK_Test( bool in, bool in_out, uint32 task
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_TestBooleanData_OK_Test_1_1_1_true_true )
@@ -1265,6 +1272,7 @@ void Run_ReadSeedData_TestFPData_OK_Test( float float_in, double double_in, floa
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_TestFPData_OK_Test_1_1_1 )
@@ -1432,6 +1440,7 @@ void Run_ReadSeedData_NullableFunction_OK_Test( uint32 task_count, const std::ws
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_NullableFunctionTest_1_1_1 )
@@ -1652,6 +1661,7 @@ void Run_ReadSeedData_NullableProcedure_Test( uint32 task_count, uint64 null_acc
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_1_1_1_1_T_F )
@@ -1854,6 +1864,7 @@ void Run_ReadSeedData_SelectAccountDetails_Test( uint32 task_count )
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_1_1 )
@@ -2042,6 +2053,7 @@ void Run_ReadSeedData_TableValueFunctionTest( uint32 task_count, uint64 account_
 	}
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
 }
 
 TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_1_1_1_1 )
