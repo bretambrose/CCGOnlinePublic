@@ -23,6 +23,7 @@
 #ifndef DATABASE_TASK_BATCH_H
 #define DATABASE_TASK_BATCH_H
 
+#include "Interfaces/DatabaseTaskBatchInterface.h"
 #include "Interfaces/DatabaseConnectionInterface.h"
 #include "Interfaces/DatabaseStatementInterface.h"
 #include "Interfaces/DatabaseTaskInterface.h"
@@ -31,11 +32,14 @@
 #include "EnumConversion.h"
 
 template < typename T >
-class TDatabaseTaskBatch
+class TDatabaseTaskBatch : public IDatabaseTaskBatch
 {
 	public:
 
+		typedef IDatabaseTaskBatch BASECLASS;
+
 		TDatabaseTaskBatch( void ) :
+			BASECLASS(),
 			PendingTasks(),
 			InputParameterBlock( nullptr ),
 			ResultSetBlock( nullptr ),
@@ -48,15 +52,20 @@ class TDatabaseTaskBatch
 			ResultSetBlock = new BatchResultSetType[ T::ResultSetBatchSize ];
 		}
 
-		~TDatabaseTaskBatch()
+		virtual ~TDatabaseTaskBatch()
 		{
 			delete []InputParameterBlock;
 			delete []ResultSetBlock;
 		}
 
-		void Add_Task( IDatabaseTask *task ) { PendingTasks.push_back( task ); }
+		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const
+		{
+			return Loki::TypeInfo( typeid( T ) );
+		}
 
-		void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		virtual void Add_Task( IDatabaseTask *task ) { PendingTasks.push_back( task ); }
+
+		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
 		{
 			if ( PendingTasks.size() == 0 )
 			{
@@ -101,6 +110,11 @@ class TDatabaseTaskBatch
 			FATAL_ASSERT( statement->Is_Ready_For_Use() );
 
 			connection->Release_Statement( statement );
+		}
+
+		virtual bool Has_Tasks( void ) const
+		{
+			return PendingTasks.size() > 0;
 		}
 
 	private:

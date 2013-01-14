@@ -28,12 +28,33 @@
 
 class CEmptyVariableSet;
 
-template < typename I, uint32 ISIZE >
-class TDatabaseFunctionCall : public IDatabaseTask
+class CDatabaseTaskBase : public IDatabaseTask
 {
 	public:
 
 		typedef IDatabaseTask BASECLASS;
+
+		CDatabaseTaskBase( void ) :
+			BASECLASS(),
+			ID( DatabaseTaskIDType::INVALID )
+		{}
+
+		virtual ~CDatabaseTaskBase() {}
+
+		virtual DatabaseTaskIDType::Enum Get_ID( void ) const { return ID; }
+		virtual void Set_ID( DatabaseTaskIDType::Enum id ) { ID = id; }
+
+	private:
+
+		DatabaseTaskIDType::Enum ID;
+};
+
+template < typename I, uint32 ISIZE >
+class TDatabaseFunctionCall : public CDatabaseTaskBase
+{
+	public:
+
+		typedef CDatabaseTaskBase BASECLASS;
 
 		TDatabaseFunctionCall( void ) :
 			BASECLASS()
@@ -58,11 +79,11 @@ class TDatabaseFunctionCall : public IDatabaseTask
 };
 
 template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
-class TDatabaseProcedureCall : public IDatabaseTask
+class TDatabaseProcedureCall : public CDatabaseTaskBase
 {
 	public:
 
-		typedef IDatabaseTask BASECLASS;
+		typedef CDatabaseTaskBase BASECLASS;
 
 		TDatabaseProcedureCall( void ) :
 			BASECLASS()
@@ -81,11 +102,11 @@ class TDatabaseProcedureCall : public IDatabaseTask
 };
 
 template < typename O, uint32 OSIZE >
-class TDatabaseSelect : public IDatabaseTask
+class TDatabaseSelect : public CDatabaseTaskBase
 {
 	public:
 
-		typedef IDatabaseTask BASECLASS;
+		typedef CDatabaseTaskBase BASECLASS;
 
 		TDatabaseSelect( void ) :
 			BASECLASS()
@@ -103,11 +124,11 @@ class TDatabaseSelect : public IDatabaseTask
 };
 
 template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
-class TDatabaseTableValuedFunctionCall : public IDatabaseTask
+class TDatabaseTableValuedFunctionCall : public CDatabaseTaskBase
 {
 	public:
 
-		typedef IDatabaseTask BASECLASS;
+		typedef CDatabaseTaskBase BASECLASS;
 
 		TDatabaseTableValuedFunctionCall( void ) :
 			BASECLASS()

@@ -28,6 +28,12 @@
 class CRunDatabaseTaskRequest;
 class IDatabaseConnection;
 class IDatabaseEnvironment;
+class IDatabaseTaskBatch;
+
+namespace DatabaseTaskIDType
+{
+	enum Enum;
+}
 
 class CDatabaseProcessBase : public CThreadProcessBase
 {
@@ -54,9 +60,26 @@ class CDatabaseProcessBase : public CThreadProcessBase
 		// CThreadProcessBase interface
 		virtual uint32 Get_Sleep_Interval_In_Milliseconds( void ) const;
 
+		void Add_Batch( IDatabaseTaskBatch *batch );
+
 	private:
 
 		void Handle_Run_Database_Task_Request( EProcessID::Enum process_id, const shared_ptr< const CRunDatabaseTaskRequest > &message );
+
+		DatabaseTaskIDType::Enum Allocate_Task_ID( void );
+
+		typedef stdext::hash_map< Loki::TypeInfo, IDatabaseTaskBatch *, STypeInfoContainerHelper > BatchTableType;
+		typedef std::vector< Loki::TypeInfo > BatchOrderingType;
+
+		typedef std::pair< EProcessID::Enum, shared_ptr< const CRunDatabaseTaskRequest > > PendingRequestPairType;
+		typedef stdext::hash_map< DatabaseTaskIDType::Enum, PendingRequestPairType > PendingRequestTableType;
+
+		BatchTableType Batches;
+		BatchOrderingType BatchOrdering;
+
+		PendingRequestTableType PendingRequests;
+
+		DatabaseTaskIDType::Enum NextID;
 
 		IDatabaseEnvironment *Environment;
 		std::wstring ConnectionString;

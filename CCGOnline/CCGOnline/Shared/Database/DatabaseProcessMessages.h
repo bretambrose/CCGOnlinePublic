@@ -38,13 +38,13 @@ class CRunDatabaseTaskRequest : public IProcessMessage
 			Task( task )
 		{}
 
-		virtual ~CRunDatabaseTaskRequest() {}
+		virtual ~CRunDatabaseTaskRequest();
 
-		IDatabaseTask *Get_Task( void ) const { return Task; }
+		IDatabaseTask *Get_Task( void ) const { return Task.get(); }
 
 	private:
 
-		IDatabaseTask *Task;
+		unique_ptr< IDatabaseTask > Task;
 };
 
 class CRunDatabaseTaskResponse : public IProcessMessage
@@ -53,19 +53,19 @@ class CRunDatabaseTaskResponse : public IProcessMessage
 
 		typedef IProcessMessage BASECLASS;
 		
-		CRunDatabaseTaskResponse( IDatabaseTask *task, bool success ) :
-			Task( task ),
+		CRunDatabaseTaskResponse( const shared_ptr< const CRunDatabaseTaskRequest > &request, bool success ) :
+			Request( request ),
 			Success( success )
 		{}
 
-		virtual ~CRunDatabaseTaskResponse() {}
+		virtual ~CRunDatabaseTaskResponse();
 
-		IDatabaseTask *Get_Task( void ) const { return Task; }
+		const shared_ptr< const CRunDatabaseTaskRequest > &Get_Request( void ) const { return Request; }
 		bool Was_Successful( void ) const { return Success; }
 
 	private:
 
-		IDatabaseTask *Task;
+		shared_ptr< const CRunDatabaseTaskRequest > Request;
 		bool Success;
 };
 

@@ -24,13 +24,19 @@
 
 #include "DatabaseProcessBase.h"
 
+#include "Database/Interfaces/DatabaseTaskBatchInterface.h"
 #include "Database/Interfaces/DatabaseConnectionInterface.h"
 #include "Database/Interfaces/DatabaseEnvironmentInterface.h"
+#include "Database/Interfaces/DatabaseTaskInterface.h"
 #include "MessageHandling/ProcessMessageHandler.h"
 #include "DatabaseProcessMessages.h"
 
 CDatabaseProcessBase::CDatabaseProcessBase( IDatabaseEnvironment *environment, const std::wstring &connection_string, bool process_task_results_locally, const SProcessProperties &properties ) :
 	BASECLASS( properties ),
+	Batches(),
+	BatchOrdering(),
+	PendingRequests(),
+	NextID( static_cast< DatabaseTaskIDType::Enum >( DatabaseTaskIDType::INVALID + 1 ) ),
 	Environment( environment ),
 	ConnectionString( connection_string ),
 	ProcessTaskResultsLocally( process_task_results_locally ),
@@ -59,6 +65,16 @@ void CDatabaseProcessBase::Cleanup( void )
 
 	BASECLASS::Cleanup();
 
+	PendingRequests.clear();
+
+	for ( auto iter = Batches.cbegin(); iter != Batches.end(); ++iter )
+	{
+		delete iter->second;
+	}
+
+	Batches.clear();
+	BatchOrdering.clear();
+
 	if ( Connection != nullptr )
 	{
 		Environment->Shutdown_Connection( Connection );
@@ -75,6 +91,59 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 	FATAL_ASSERT( Connection != nullptr );
 
 	BASECLASS::Per_Frame_Logic_End();
+
+	DBTaskListType successes;
+	DBTaskListType failures;
+
+	for ( auto iter = BatchOrdering.cbegin(); iter != BatchOrdering.cend(); ++iter )
+	{
+		auto batch_task_iter = Batches.find( *iter );
+		FATAL_ASSERT( batch_task_iter != Batches.end() );
+
+		IDatabaseTaskBatch *batch = batch_task_iter->second;
+		if ( batch->Has_Tasks() )
+		{
+			batch->Execute_Tasks( Connection, successes, failures );
+		}
+	}
+
+	for ( DBTaskListType::const_iterator success_iter = successes.cbegin(); success_iter != successes.cend(); ++success_iter )
+	{
+		IDatabaseTask *task = *success_iter;
+		auto pending_request_iter = PendingRequests.find( task->Get_ID() );
+		FATAL_ASSERT( pending_request_iter != PendingRequests.end() );
+
+		if ( ProcessTaskResultsLocally )
+		{
+			( *success_iter )->On_Task_Success();
+		}
+		else
+		{
+			shared_ptr< CRunDatabaseTaskResponse > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, true ) );
+			Send_Process_Message( pending_request_iter->second.first, response );
+		}
+
+		PendingRequests.erase( pending_request_iter );
+	}
+
+	for ( DBTaskListType::const_iterator failure_iter = failures.cbegin(); failure_iter != failures.cend(); ++failure_iter )
+	{
+		IDatabaseTask *task = *failure_iter;
+		auto pending_request_iter = PendingRequests.find( task->Get_ID() );
+		FATAL_ASSERT( pending_request_iter != PendingRequests.end() );
+
+		if ( ProcessTaskResultsLocally )
+		{
+			( *failure_iter )->On_Task_Failure();
+		}
+		else
+		{
+			shared_ptr< CRunDatabaseTaskResponse > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, false ) );
+			Send_Process_Message( pending_request_iter->second.first, response );
+		}
+
+		PendingRequests.erase( pending_request_iter );
+	}
 }
 
 void CDatabaseProcessBase::Register_Message_Handlers( void )
@@ -89,6 +158,36 @@ uint32 CDatabaseProcessBase::Get_Sleep_Interval_In_Milliseconds( void ) const
 	return 1;
 }
 
-void CDatabaseProcessBase::Handle_Run_Database_Task_Request( EProcessID::Enum /*process_id*/, const shared_ptr< const CRunDatabaseTaskRequest > & /*message*/ )
+void CDatabaseProcessBase::Add_Batch( IDatabaseTaskBatch *batch )
 {
+	FATAL_ASSERT( batch != nullptr );
+
+	Loki::TypeInfo type_info = batch->Get_Task_Type_Info();
+	FATAL_ASSERT( Batches.find( type_info ) == Batches.end() );
+
+	Batches.insert( BatchTableType::value_type( type_info, batch ) );
+	BatchOrdering.push_back( type_info );
+}
+
+void CDatabaseProcessBase::Handle_Run_Database_Task_Request( EProcessID::Enum process_id, const shared_ptr< const CRunDatabaseTaskRequest > &message )
+{
+	IDatabaseTask *task = message->Get_Task();
+
+	Loki::TypeInfo hash_key( typeid( *task ) );
+	auto iter = Batches.find( hash_key );
+	FATAL_ASSERT( iter != Batches.end() );
+
+	DatabaseTaskIDType::Enum task_id = Allocate_Task_ID();
+	task->Set_ID( task_id );
+	iter->second->Add_Task( task );
+
+	PendingRequests.insert( PendingRequestTableType::value_type( task_id, PendingRequestPairType( process_id, message ) ) );
+}
+
+DatabaseTaskIDType::Enum CDatabaseProcessBase::Allocate_Task_ID( void )
+{
+	DatabaseTaskIDType::Enum id = NextID;
+	NextID = static_cast< DatabaseTaskIDType::Enum >( NextID + 1 );
+
+	return id;
 }

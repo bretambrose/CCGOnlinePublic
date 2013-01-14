@@ -30,6 +30,7 @@
 #include "Database/Interfaces/DatabaseTaskInterface.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
 #include "Database/EmptyVariableSet.h"
+#include "Database/DatabaseCalls.h"
 
 class ODBCMiscTests : public testing::Test 
 {
@@ -368,11 +369,16 @@ class CTestSignatureValidation4 : public IDatabaseVariableSet
 		DBUInt32InOut NicknameSequenceID;
 };
 
-class CDummyTask : public IDatabaseTask
+class CDummyTask : public CDatabaseTaskBase
 {
 	public:
 
-		CDummyTask( void ) {}
+		typedef CDatabaseTaskBase BASECLASS;
+
+		CDummyTask( void ) :
+			BASECLASS()
+		{}
+
 		virtual ~CDummyTask() {}
 
 		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L""; }

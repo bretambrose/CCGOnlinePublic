@@ -269,6 +269,9 @@
     <ClInclude Include="Database\DatabaseProcessMessages.h">
       <Filter>Source Files\Database</Filter>
     </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseTaskBatchInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

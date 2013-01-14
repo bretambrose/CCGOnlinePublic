@@ -197,6 +197,7 @@
     <ClInclude Include="Database\Interfaces\DatabaseConnectionInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseEnvironmentInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseStatementInterface.h" />
+    <ClInclude Include="Database\Interfaces\DatabaseTaskBatchInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseTaskInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseVariableInterface.h" />
     <ClInclude Include="Database\Interfaces\DatabaseVariableSetInterface.h" />

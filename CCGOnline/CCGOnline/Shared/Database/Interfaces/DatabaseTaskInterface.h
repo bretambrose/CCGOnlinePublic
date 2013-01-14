@@ -27,6 +27,14 @@ class IDatabaseVariableSet;
 
 enum EDatabaseTaskType;
 
+namespace DatabaseTaskIDType
+{
+	enum Enum
+	{
+		INVALID
+	};
+}
+
 class IDatabaseTask
 {
 	public:
@@ -34,9 +42,15 @@ class IDatabaseTask
 		IDatabaseTask( void ) {}
 		virtual ~IDatabaseTask() {}
 
+		virtual DatabaseTaskIDType::Enum Get_ID( void ) const = 0;
+		virtual void Set_ID( DatabaseTaskIDType::Enum id ) = 0;
+
 		virtual const wchar_t *Get_Database_Object_Name( void ) const = 0;
 		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const = 0;
 		virtual EDatabaseTaskType Get_Task_Type( void ) const = 0;
+
+		virtual void On_Task_Success( void ) = 0;					
+		virtual void On_Task_Failure( void ) = 0;		
 
 	protected:
 
@@ -46,9 +60,7 @@ class IDatabaseTask
 		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) = 0;			
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) = 0;	
 
-		virtual void On_Rollback( void ) = 0;
-		virtual void On_Task_Success( void ) = 0;					
-		virtual void On_Task_Failure( void ) = 0;					
+		virtual void On_Rollback( void ) = 0;			
 
 };
 
