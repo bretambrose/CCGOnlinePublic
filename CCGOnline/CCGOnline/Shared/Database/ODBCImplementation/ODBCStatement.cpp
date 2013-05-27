@@ -528,3 +528,16 @@ void CODBCStatement::Log_Error_State( void ) const
 	BASECLASS::Log_Error_State_Base();
 }
 
+void CODBCStatement::Return_To_Ready( void )
+{
+	if ( State == ODBCSST_READY )
+	{	
+		return;
+	}
+
+	FATAL_ASSERT( State == ODBCSST_RECOVERABLE_ERROR || State == ODBCSST_PROCESS_RESULTS );  
+
+	Refresh_Error_Status( SQL_SUCCESS);
+
+	State = ODBCSST_READY;
+}

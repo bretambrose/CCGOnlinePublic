@@ -128,6 +128,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 				if ( execute_result == ExecuteDBTaskListResult::SUCCESS )
 				{
 					statement->Get_Connection()->End_Transaction( true );
+					statement->Return_To_Ready();
 
 					for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
 					{
@@ -139,10 +140,14 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 				else
 				{
 					statement->Get_Connection()->End_Transaction( false );
+					statement->Return_To_Ready();
 
 					for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
 					{
-						( *iter )->On_Rollback();
+						if ( iter != bad_task )
+						{
+							( *iter )->On_Rollback();
+						}
 					}
 
 					if ( execute_result == ExecuteDBTaskListResult::FAILED_SPECIFIC_TASK )

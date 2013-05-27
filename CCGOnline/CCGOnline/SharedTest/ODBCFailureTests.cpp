@@ -1108,7 +1108,6 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 			Results(),
 			AccountCount( 0 ),
 			FinishedCalls( 0 ),
-			InitializeCalls( 0 ),
 			Rollbacks( 0 )
 		{}
 
@@ -1121,20 +1120,13 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 			FATAL_ASSERT( exception_index1 < exception_index2 );
 
 			uint32 expected_rollbacks = 0;
-			uint32 expected_inits = 1;
 			uint32 my_batch = self_index / ISIZE;
-			uint32 my_batch_index = self_index % ISIZE;
 
 			if ( my_batch == exception_index1 / ISIZE )
 			{
 				if ( self_index != exception_index1 )
 				{
 					expected_rollbacks++;
-				}
-
-				if ( my_batch_index > exception_index1 % ISIZE )
-				{
-					expected_inits++;
 				}
 			}
 
@@ -1144,14 +1136,8 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 				{
 					expected_rollbacks++;
 				}
-
-				if ( my_batch_index > exception_index2 % ISIZE )
-				{
-					expected_inits++;
-				}
 			}
 
-			ASSERT_TRUE( InitializeCalls == expected_inits );
 			ASSERT_TRUE( Rollbacks == expected_rollbacks );
 
 			if ( self_index == exception_index1 || self_index == exception_index2 )
@@ -1177,8 +1163,6 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) {
 			CExceptionInputParams *input_params = static_cast< CExceptionInputParams * >( input_parameters );
 			*input_params = CExceptionInputParams( ThrowException );
-
-			InitializeCalls++; 
 		}	
 			
 		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
@@ -1217,7 +1201,6 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 		uint64 AccountCount;
 
 		uint32 FinishedCalls;
-		uint32 InitializeCalls;
 		uint32 Rollbacks;
 };
 

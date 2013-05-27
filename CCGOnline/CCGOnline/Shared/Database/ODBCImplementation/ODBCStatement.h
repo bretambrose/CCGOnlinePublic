@@ -48,6 +48,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count );
 		virtual void Execute( uint32 batch_size );
 		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched );
+		virtual void Return_To_Ready( void );
 
 		virtual bool Needs_Binding( void ) const;
 		virtual bool Is_Ready_For_Use( void ) const;
