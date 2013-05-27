@@ -28,8 +28,6 @@
 #include "ODBCParameterInsulation.h"
 #include "StringUtils.h"
 
-void Convert_Database_Variable_To_String( IDatabaseVariable *variable, std::string &value );
-
 template < typename T >
 EDatabaseVariableValueType Get_ODBC_Value_Type( const T & /*dummy*/ )
 {

@@ -29,6 +29,7 @@
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
 #include "Database/Interfaces/DatabaseTaskInterface.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
+#include "Database/ODBCImplementation/ODBCVariableSet.h"
 #include "Database/EmptyVariableSet.h"
 #include "Database/DatabaseCalls.h"
 
@@ -63,11 +64,14 @@ TEST_F( ODBCMiscTests, AllocateAndCleanup )
 	delete connection;
 }
 
-class CGetAccountResultSet : public IDatabaseVariableSet
+class CGetAccountResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CGetAccountResultSet( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -158,7 +162,7 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts1_OK )
 		expected_account_id++;
 	}
 
-	statement->End_Transaction( true );
+	connection->End_Transaction( true );
 	ASSERT_TRUE( statement->Get_Error_State() == DBEST_SUCCESS );
 	ASSERT_TRUE( statement->Is_Ready_For_Use() );
 
@@ -246,7 +250,7 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 
 	ASSERT_TRUE( expected_account_id == TOTAL_ROWS + 1 );
 
-	statement->End_Transaction( true );
+	connection->End_Transaction( true );
 	ASSERT_TRUE( statement->Get_Error_State() == DBEST_SUCCESS );
 	ASSERT_TRUE( statement->Is_Ready_For_Use() );
 
@@ -258,11 +262,14 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 }
 
 // valid as function input, invalid all other times
-class CTestSignatureValidation1 : public IDatabaseVariableSet
+class CTestSignatureValidation1 : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestSignatureValidation1( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -286,11 +293,14 @@ class CTestSignatureValidation1 : public IDatabaseVariableSet
 };
 
 // valid as procedure input or output, invalid all other times
-class CTestSignatureValidation2 : public IDatabaseVariableSet
+class CTestSignatureValidation2 : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestSignatureValidation2( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -314,11 +324,14 @@ class CTestSignatureValidation2 : public IDatabaseVariableSet
 };
 
 // never valid as input or output
-class CTestSignatureValidation3 : public IDatabaseVariableSet
+class CTestSignatureValidation3 : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestSignatureValidation3( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -342,11 +355,14 @@ class CTestSignatureValidation3 : public IDatabaseVariableSet
 };
 
 // valid as procedure input if there is non-empty result set
-class CTestSignatureValidation4 : public IDatabaseVariableSet
+class CTestSignatureValidation4 : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestSignatureValidation4( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),

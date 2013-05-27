@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	ODBCParameters.cpp
-		A component defining various ODBC specific parameter types to be used as inputs to stored procedures
+	ODBCVariableSet.cpp
+		A component defining 
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -22,12 +22,13 @@
 
 #include "stdafx.h"
 
+#include "ODBCVariableSet.h"
+
 #include "ODBCParameters.h"
 
 #include <sstream>
 
-// Split off in a global function to avoid the stream dependence in the parameter header file
-void Convert_Database_Variable_To_String( IDatabaseVariable *variable, std::string &value )
+void CODBCVariableSet::Convert_Variable_To_String( IDatabaseVariable *variable, std::string &value ) const
 {
 	std::basic_ostringstream< char > varstream;
 

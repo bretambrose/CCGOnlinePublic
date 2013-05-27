@@ -28,6 +28,7 @@ enum DBErrorStateType;
 enum EFetchResultsStatusType;
 
 class IDatabaseVariableSet;
+class IDatabaseConnection;
 
 class IDatabaseStatement
 {
@@ -44,13 +45,13 @@ class IDatabaseStatement
 		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size ) = 0;
 		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count ) = 0;
 		virtual void Execute( uint32 batch_size ) = 0;
-		virtual void End_Transaction( bool commit ) = 0;
 		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched ) = 0;
 
 		virtual bool Needs_Binding( void ) const = 0;
 		virtual bool Is_Ready_For_Use( void ) const = 0;
 		virtual bool Is_In_Error_State( void ) const = 0;
 		virtual bool Should_Have_Results( void ) const = 0;
+		virtual IDatabaseConnection *Get_Connection( void ) const = 0;
 
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;
 		virtual int32 Get_Bad_Row_Number( void ) const = 0;

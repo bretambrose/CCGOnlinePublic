@@ -23,27 +23,37 @@
 #ifndef DATABASE_TASK_INTERFACE_H
 #define DATABASE_TASK_INTERFACE_H
 
+#include "DatabaseTaskBaseInterface.h"
+
+#include "Database/DatabaseTypes.h"
+
 class IDatabaseVariableSet;
+class IDatabaseCallContext;
+class IDatabaseStatement;
 
 enum EDatabaseTaskType;
 
-namespace DatabaseTaskIDType
+namespace ExecuteDBTaskListResult
 {
-	enum Enum
-	{
-		INVALID
-	};
+	enum Enum;
 }
 
-class IDatabaseTask
+namespace DBUtils
+{
+	void Execute_Task_List( IDatabaseCallContext *, IDatabaseStatement *, const DBTaskListType &, ExecuteDBTaskListResult::Enum &, DBTaskListType::const_iterator & );
+}
+
+class IDatabaseTask : public IDatabaseTaskBase
 {
 	public:
 		
-		IDatabaseTask( void ) {}
-		virtual ~IDatabaseTask() {}
+		typedef IDatabaseTaskBase BASECLASS;
 
-		virtual DatabaseTaskIDType::Enum Get_ID( void ) const = 0;
-		virtual void Set_ID( DatabaseTaskIDType::Enum id ) = 0;
+		IDatabaseTask( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~IDatabaseTask() {}
 
 		virtual const wchar_t *Get_Database_Object_Name( void ) const = 0;
 		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const = 0;
@@ -55,6 +65,7 @@ class IDatabaseTask
 	protected:
 
 		template < typename T > friend class TDatabaseTaskBatch;
+		friend void DBUtils::Execute_Task_List( IDatabaseCallContext *, IDatabaseStatement *, const DBTaskListType &, ExecuteDBTaskListResult::Enum &, DBTaskListType::const_iterator & );
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) = 0;		
 		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) = 0;			

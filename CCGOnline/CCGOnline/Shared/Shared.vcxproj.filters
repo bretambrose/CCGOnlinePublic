@@ -272,6 +272,33 @@
     <ClInclude Include="Database\Interfaces\DatabaseTaskBatchInterface.h">
       <Filter>Source Files\Database\Interfaces</Filter>
     </ClInclude>
+    <ClInclude Include="Database\Interfaces\CompoundDatabaseTaskInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseTaskBaseInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\CompoundDatabaseTaskBatch.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\CompoundDatabaseTaskBatchInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\CompoundDatabaseTask.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseCallContext.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\DatabaseTaskBatchUtilities.h">
+      <Filter>Source Files\Database</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\ODBCImplementation\ODBCVariableSet.h">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\Interfaces\DatabaseCallContextInterface.h">
+      <Filter>Source Files\Database\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -379,14 +406,20 @@
     <ClCompile Include="Concurrency\ThreadProcessBase.cpp">
       <Filter>Source Files\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="Database\ODBCImplementation\ODBCParameters.cpp">
-      <Filter>Source Files\Database\ODBCImplementation</Filter>
-    </ClCompile>
     <ClCompile Include="Database\DatabaseProcessBase.cpp">
       <Filter>Source Files\Database</Filter>
     </ClCompile>
     <ClCompile Include="Database\DatabaseProcessMessages.cpp">
       <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\DatabaseCalls.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\DatabaseTaskBatchUtilities.cpp">
+      <Filter>Source Files\Database</Filter>
+    </ClCompile>
+    <ClCompile Include="Database\ODBCImplementation\ODBCVariableSet.cpp">
+      <Filter>Source Files\Database\ODBCImplementation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

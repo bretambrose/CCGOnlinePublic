@@ -32,6 +32,7 @@ class IDatabaseVariableSet
 		virtual ~IDatabaseVariableSet() {}
 
 		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables ) = 0;
+		virtual void Convert_Variable_To_String( IDatabaseVariable *variable, std::string &value ) const = 0;
 };
 
 #endif // DATABASE_VARIABLE_SET_INTERFACE_H

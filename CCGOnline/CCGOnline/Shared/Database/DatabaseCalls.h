@@ -36,6 +36,7 @@ class CDatabaseTaskBase : public IDatabaseTask
 
 		CDatabaseTaskBase( void ) :
 			BASECLASS(),
+			Parent( nullptr ),
 			ID( DatabaseTaskIDType::INVALID )
 		{}
 
@@ -44,7 +45,14 @@ class CDatabaseTaskBase : public IDatabaseTask
 		virtual DatabaseTaskIDType::Enum Get_ID( void ) const { return ID; }
 		virtual void Set_ID( DatabaseTaskIDType::Enum id ) { ID = id; }
 
+	protected:
+
+		virtual void Set_Parent( ICompoundDatabaseTask *parent );
+		virtual ICompoundDatabaseTask *Get_Parent( void ) const { return Parent; }
+
 	private:
+
+		ICompoundDatabaseTask *Parent;
 
 		DatabaseTaskIDType::Enum ID;
 };

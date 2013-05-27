@@ -46,7 +46,8 @@ enum ODBCConnectionOperationType
 {
 	ODBCCOT_CONNECT_TO_DB,
 	ODBCCOT_ALLOCATE_STATEMENT_HANDLE,
-	ODBCCOT_TOGGLE_AUTO_COMMIT
+	ODBCCOT_TOGGLE_AUTO_COMMIT,
+	ODBCCOT_COMMIT
 };
 
 CODBCConnection::CODBCConnection( DBConnectionIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, bool cache_statements ) :
@@ -151,7 +152,7 @@ IDatabaseStatement *CODBCConnection::Allocate_Statement( const std::wstring &sta
 
 	DBStatementIDType new_id = NextStatementID;
 	NextStatementID = static_cast< DBStatementIDType >( NextStatementID + 1 );
-	IDatabaseStatement *new_statement = new CODBCStatement( new_id, EnvironmentHandle, ConnectionHandle, statement_handle );
+	IDatabaseStatement *new_statement = new CODBCStatement( new_id, this, EnvironmentHandle, ConnectionHandle, statement_handle );
 	new_statement->Initialize( upper_statement_text );
 
 	if ( UseStatementCaching )
@@ -223,6 +224,10 @@ void CODBCConnection::Update_Error_Status( ODBCConnectionOperationType operation
 
 		case ODBCCOT_ALLOCATE_STATEMENT_HANDLE:
 			Set_Error_State_Base( DBEST_RECOVERABLE_ERROR );
+			break;
+
+		case ODBCCOT_COMMIT:
+			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;
 
 		default:
@@ -497,4 +502,17 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 	}
 
 	return true;
+}
+
+void CODBCConnection::End_Transaction( bool commit )
+{
+	FATAL_ASSERT( State == ODBCCST_CONNECTED );	
+
+	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
+	Update_Error_Status( ODBCCOT_COMMIT, error_code );
+	if ( !Was_Last_ODBC_Operation_Successful() )
+	{
+		State = ODBCCST_FATAL_ERROR;
+		return;
+	}
 }

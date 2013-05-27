@@ -35,7 +35,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 
 		typedef CODBCObjectBase BASECLASS;
 
-		CODBCStatement( DBStatementIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle );
+		CODBCStatement( DBStatementIDType id, IDatabaseConnection *connection, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle );
 		virtual ~CODBCStatement();
 
 		virtual void Initialize( const std::wstring &statement_text );
@@ -47,13 +47,13 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size );
 		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count );
 		virtual void Execute( uint32 batch_size );
-		virtual void End_Transaction( bool commit );
 		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched );
 
 		virtual bool Needs_Binding( void ) const;
 		virtual bool Is_Ready_For_Use( void ) const;
 		virtual bool Is_In_Error_State( void ) const;
 		virtual bool Should_Have_Results( void ) const { return ExpectedResultSetWidth > 0; }
+		virtual IDatabaseConnection *Get_Connection( void ) const { return Connection; }
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 		virtual int32 Get_Bad_Row_Number( void ) const { return Get_Bad_Row_Number_Base(); }
@@ -67,6 +67,8 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		void Reflect_ODBC_Error_State_Into_Statement_State( void );
 
 		DBStatementIDType ID;
+
+		IDatabaseConnection *Connection;
 
 		ODBCStatementStateType State;
 

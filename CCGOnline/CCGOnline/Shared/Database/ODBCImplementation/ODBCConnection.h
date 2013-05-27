@@ -46,6 +46,7 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 
 		virtual IDatabaseStatement *Allocate_Statement( const std::wstring &statement_text );
 		virtual void Release_Statement( IDatabaseStatement *statement );
+		virtual void End_Transaction( bool commit );
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
 

@@ -28,6 +28,7 @@
 #include "Database/Interfaces/DatabaseStatementInterface.h"
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
+#include "Database/ODBCImplementation/ODBCVariableSet.h"
 #include "Database/EmptyVariableSet.h"
 #include "Database/DatabaseCalls.h"
 #include "Database/DatabaseTaskBatch.h"
@@ -159,16 +160,20 @@ TEST_F( ODBCFailureTests, MissingProcedureCall_3_1_3 )
 	Run_MissingProcedureCall_Test< 3, 1 >( 3 );
 }
 
-class CTooFewInputParams : public IDatabaseVariableSet
+class CTooFewInputParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTooFewInputParams( void ) :
+			BASECLASS(),
 			ID( 0 ),
 			Nickname( "Bret" )
 		{}
 
 		CTooFewInputParams( const CTooFewInputParams &rhs ) :
+			BASECLASS( rhs ),
 			ID( rhs.ID ),
 			Nickname( rhs.Nickname )
 		{}
@@ -185,11 +190,14 @@ class CTooFewInputParams : public IDatabaseVariableSet
 		DBString< 32 > Nickname;
 };
 
-class CTooManyInputParams : public IDatabaseVariableSet
+class CTooManyInputParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTooManyInputParams( void ) :
+			BASECLASS(),
 			ID( 0 ),
 			Nickname( "Bret" ),
 			NicknameSequenceID( 1 ),
@@ -197,6 +205,7 @@ class CTooManyInputParams : public IDatabaseVariableSet
 		{}
 
 		CTooManyInputParams( const CTooManyInputParams &rhs ) :
+			BASECLASS( rhs ),
 			ID( rhs.ID ),
 			Nickname( rhs.Nickname ),
 			NicknameSequenceID( rhs.NicknameSequenceID ),
@@ -360,15 +369,19 @@ TEST_F( ODBCFailureTests, TooManyParamsProcedureCall_3_1_3 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CInconvertibleProcedureParams : public IDatabaseVariableSet
+class CInconvertibleProcedureParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CInconvertibleProcedureParams( void ) :
+			BASECLASS(),
 			String( "Bret" )
 		{}
 
 		CInconvertibleProcedureParams( const CInconvertibleProcedureParams &rhs ) :
+			BASECLASS( rhs ),
 			String( rhs.String )
 		{}
 
@@ -491,16 +504,20 @@ TEST_F( ODBCFailureTests, BadParamConversionProcedureCall_3_1_3 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CInconvertibleFunctionParams : public IDatabaseVariableSet
+class CInconvertibleFunctionParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CInconvertibleFunctionParams( void ) :
+			BASECLASS(),
 			Float(),
 			ID()
 		{}
 
 		CInconvertibleFunctionParams( const CInconvertibleFunctionParams &rhs ) :
+			BASECLASS( rhs ),
 			Float( rhs.Float ),
 			ID( rhs.ID )
 		{}
@@ -619,15 +636,19 @@ TEST_F( ODBCFailureTests, BadParamConversionFunctionCall_3_3)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CInconvertibleResultSet : public IDatabaseVariableSet
+class CInconvertibleResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CInconvertibleResultSet( void ) :
+			BASECLASS(),
 			Float()
 		{}
 
 		CInconvertibleResultSet( const CInconvertibleResultSet &rhs ) :
+			BASECLASS( rhs ),
 			Float( rhs.Float )
 		{}
 
@@ -745,16 +766,20 @@ TEST_F( ODBCFailureTests, BadResultSetConversionProcedureCall_3_1_3 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CFunctionInputProcedureSet : public IDatabaseVariableSet
+class CFunctionInputProcedureSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CFunctionInputProcedureSet( void ) :
+			BASECLASS(),
 			Result(),
 			Input()
 		{}
 
 		CFunctionInputProcedureSet( const CFunctionInputProcedureSet &rhs ) :
+			BASECLASS( rhs ),
 			Result( rhs.Result ),
 			Input( rhs.Input )
 		{}
@@ -873,16 +898,20 @@ TEST_F( ODBCFailureTests, FunctionInputProcedureCall_3_3 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CProcedureInputFunctionSet : public IDatabaseVariableSet
+class CProcedureInputFunctionSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CProcedureInputFunctionSet( void ) :
+			BASECLASS(),
 			Input1(),
 			Input2()
 		{}
 
 		CProcedureInputFunctionSet( const CProcedureInputFunctionSet &rhs ) :
+			BASECLASS( rhs ),
 			Input1( rhs.Input1 ),
 			Input2( rhs.Input2 )
 		{}
@@ -1003,21 +1032,26 @@ TEST_F( ODBCFailureTests, ProcedureInputFunctionCall_3_1_3 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CExceptionInputParams : public IDatabaseVariableSet
+class CExceptionInputParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CExceptionInputParams( void ) :
+			BASECLASS(),
 			Throw(),
 			AccountCount()
 		{}
 
 		CExceptionInputParams( bool throw_exception ) :
+			BASECLASS(),
 			Throw( throw_exception ),
 			AccountCount()
 		{}
 
 		CExceptionInputParams( const CExceptionInputParams &rhs ) :
+			BASECLASS( rhs ),
 			Throw( rhs.Throw ),
 			AccountCount( rhs.AccountCount )
 		{}
@@ -1034,15 +1068,19 @@ class CExceptionInputParams : public IDatabaseVariableSet
 		DBUInt64InOut AccountCount;
 };
 
-class CExceptionOutputParams : public IDatabaseVariableSet
+class CExceptionOutputParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CExceptionOutputParams( void ) :
+			BASECLASS(),
 			ID()
 		{}
 
 		CExceptionOutputParams( const CExceptionOutputParams &rhs ) :
+			BASECLASS( rhs ),
 			ID( rhs.ID )
 		{}
 
@@ -1385,21 +1423,26 @@ TEST_F( ODBCFailureTests, UniquenessViolationProcedureCall_3_2_6_4_5 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CMissingSelectParams : public IDatabaseVariableSet
+class CMissingSelectParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CMissingSelectParams( void ) :
+			BASECLASS(),
 			SkipSelect(),
 			AccountCount()
 		{}
 
 		CMissingSelectParams( bool skip_select ) :
+			BASECLASS(),
 			SkipSelect( skip_select ),
 			AccountCount()
 		{}
 
 		CMissingSelectParams( const CMissingSelectParams &rhs ) :
+			BASECLASS( rhs ),
 			SkipSelect( rhs.SkipSelect ),
 			AccountCount( rhs.AccountCount )
 		{}
@@ -1416,15 +1459,19 @@ class CMissingSelectParams : public IDatabaseVariableSet
 		DBUInt64InOut AccountCount;
 };
 
-class CMissingSelectResultSet : public IDatabaseVariableSet
+class CMissingSelectResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CMissingSelectResultSet( void ) :
+			BASECLASS(),
 			ID()
 		{}
 
 		CMissingSelectResultSet( const CMissingSelectResultSet &rhs ) :
+			BASECLASS( rhs ),
 			ID( rhs.ID )
 		{}
 
@@ -1659,21 +1706,26 @@ TEST_F( ODBCFailureTests, MissingSelectProcedureCall_3_1_6_4_5 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CExtraSelectParams : public IDatabaseVariableSet
+class CExtraSelectParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CExtraSelectParams( void ) :
+			BASECLASS(),
 			ExtraSelect(),
 			AccountCount()
 		{}
 
 		CExtraSelectParams( bool extra_select ) :
+			BASECLASS(),
 			ExtraSelect( extra_select ),
 			AccountCount()
 		{}
 
 		CExtraSelectParams( const CExtraSelectParams &rhs ) :
+			BASECLASS( rhs ),
 			ExtraSelect( rhs.ExtraSelect ),
 			AccountCount( rhs.AccountCount )
 		{}
@@ -1871,19 +1923,24 @@ TEST_F( ODBCFailureTests, ExtraSelectProcedureCall_3_1_6_4 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CTooManyResultsParams : public IDatabaseVariableSet
+class CTooManyResultsParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTooManyResultsParams( void ) :
+			BASECLASS(),
 			ExtraSelect()
 		{}
 
 		CTooManyResultsParams( bool extra_select ) :
+			BASECLASS(),
 			ExtraSelect( extra_select )
 		{}
 
 		CTooManyResultsParams( const CTooManyResultsParams &rhs ) :
+			BASECLASS( rhs ),
 			ExtraSelect( rhs.ExtraSelect )
 		{}
 
@@ -1897,15 +1954,19 @@ class CTooManyResultsParams : public IDatabaseVariableSet
 		DBBoolIn ExtraSelect;
 };
 
-class CTooManyResultsResultSet : public IDatabaseVariableSet
+class CTooManyResultsResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTooManyResultsResultSet( void ) :
+			BASECLASS(),
 			ID()
 		{}
 
 		CTooManyResultsResultSet( const CTooManyResultsResultSet &rhs ) :
+			BASECLASS( rhs ),
 			ID( rhs.ID )
 		{}
 
@@ -2100,19 +2161,24 @@ TEST_F( ODBCFailureTests, TooManyResultsProcedureCall_3_1_6_4 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CExtraColumnParams : public IDatabaseVariableSet
+class CExtraColumnParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CExtraColumnParams( void ) :
+			BASECLASS(),
 			ExtraColumn()
 		{}
 
 		CExtraColumnParams( bool extra_column ) :
+			BASECLASS(),
 			ExtraColumn( extra_column )
 		{}
 
 		CExtraColumnParams( const CExtraColumnParams &rhs ) :
+			BASECLASS( rhs ),
 			ExtraColumn( rhs.ExtraColumn )
 		{}
 
@@ -2126,15 +2192,19 @@ class CExtraColumnParams : public IDatabaseVariableSet
 		DBBoolIn ExtraColumn;
 };
 
-class CExtraColumnResultSet : public IDatabaseVariableSet
+class CExtraColumnResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CExtraColumnResultSet( void ) :
+			BASECLASS(),
 			ID()
 		{}
 
 		CExtraColumnResultSet( const CExtraColumnResultSet &rhs ) :
+			BASECLASS( rhs ),
 			ID( rhs.ID )
 		{}
 
@@ -2319,19 +2389,24 @@ TEST_F( ODBCFailureTests, ExtraColumnProcedureCall_3_2_7_6 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CMissingColumnParams : public IDatabaseVariableSet
+class CMissingColumnParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CMissingColumnParams( void ) :
+			BASECLASS(),
 			MissingColumn()
 		{}
 
 		CMissingColumnParams( bool missing_column ) :
+			BASECLASS(),
 			MissingColumn( missing_column )
 		{}
 
 		CMissingColumnParams( const CMissingColumnParams &rhs ) :
+			BASECLASS( rhs ),
 			MissingColumn( rhs.MissingColumn )
 		{}
 
@@ -2345,16 +2420,20 @@ class CMissingColumnParams : public IDatabaseVariableSet
 		DBBoolIn MissingColumn;
 };
 
-class CMissingColumnResultSet : public IDatabaseVariableSet
+class CMissingColumnResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CMissingColumnResultSet( void ) :
+			BASECLASS(),
 			ID1(),
 			ID2()
 		{}
 
 		CMissingColumnResultSet( const CMissingColumnResultSet &rhs ) :
+			BASECLASS( rhs ),
 			ID1( rhs.ID1 ),
 			ID2( rhs.ID2 )
 		{}
@@ -2543,19 +2622,24 @@ TEST_F( ODBCFailureTests, MissingColumnProcedureCall_3_2_7_6 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CInvalidResultConversionParams : public IDatabaseVariableSet
+class CInvalidResultConversionParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CInvalidResultConversionParams( void ) :
+			BASECLASS(),
 			DoBadConversion()
 		{}
 
 		CInvalidResultConversionParams( bool do_bad_conversion ) :
+			BASECLASS(),
 			DoBadConversion( do_bad_conversion )
 		{}
 
 		CInvalidResultConversionParams( const CInvalidResultConversionParams &rhs ) :
+			BASECLASS( rhs ),
 			DoBadConversion( rhs.DoBadConversion )
 		{}
 
@@ -2569,15 +2653,19 @@ class CInvalidResultConversionParams : public IDatabaseVariableSet
 		DBBoolIn DoBadConversion;
 };
 
-class CInvalidResultConversionResultSet : public IDatabaseVariableSet
+class CInvalidResultConversionResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CInvalidResultConversionResultSet( void ) :
+			BASECLASS(),
 			Float()
 		{}
 
 		CInvalidResultConversionResultSet( const CInvalidResultConversionResultSet &rhs ) :
+			BASECLASS( rhs ),
 			Float( rhs.Float )
 		{}
 
@@ -2772,19 +2860,24 @@ TEST_F( ODBCFailureTests, InvalidResultConversionProcedureCall_10_2_20_15 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CResultStringTruncationParams : public IDatabaseVariableSet
+class CResultStringTruncationParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CResultStringTruncationParams( void ) :
+			BASECLASS(),
 			Truncate()
 		{}
 
 		CResultStringTruncationParams( bool truncate ) :
+			BASECLASS(),
 			Truncate( truncate )
 		{}
 
 		CResultStringTruncationParams( const CResultStringTruncationParams &rhs ) :
+			BASECLASS( rhs ),
 			Truncate( rhs.Truncate )
 		{}
 
@@ -2798,15 +2891,19 @@ class CResultStringTruncationParams : public IDatabaseVariableSet
 		DBBoolIn Truncate;
 };
 
-class CResultStringTruncationResultSet : public IDatabaseVariableSet
+class CResultStringTruncationResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CResultStringTruncationResultSet( void ) :
+			BASECLASS(),
 			Email()
 		{}
 
 		CResultStringTruncationResultSet( const CResultStringTruncationResultSet &rhs ) :
+			BASECLASS( rhs ),
 			Email( rhs.Email )
 		{}
 
@@ -3026,11 +3123,14 @@ TEST_F( ODBCFailureTests, ResultStringTruncationProcedureCall_25_1_30_26 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CSelectAccountBadTableResultSet : public IDatabaseVariableSet
+class CSelectAccountBadTableResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CSelectAccountBadTableResultSet( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -3038,6 +3138,7 @@ class CSelectAccountBadTableResultSet : public IDatabaseVariableSet
 		{}
 
 		CSelectAccountBadTableResultSet( const CSelectAccountBadTableResultSet &rhs ) :
+			BASECLASS( rhs ),
 			AccountID( rhs.AccountID ),
 			AccountEmail( rhs.AccountEmail ),
 			Nickname( rhs.Nickname ),
@@ -3171,11 +3272,14 @@ TEST_F( ODBCFailureTests, SelectAccountBadTable_3_7 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CSelectAccountBadColumnResultSet : public IDatabaseVariableSet
+class CSelectAccountBadColumnResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CSelectAccountBadColumnResultSet( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -3183,6 +3287,7 @@ class CSelectAccountBadColumnResultSet : public IDatabaseVariableSet
 		{}
 
 		CSelectAccountBadColumnResultSet( const CSelectAccountBadColumnResultSet &rhs ) :
+			BASECLASS( rhs ),
 			AccountID( rhs.AccountID ),
 			AccountEmail( rhs.AccountEmail ),
 			Nickname( rhs.Nickname ),
@@ -3316,11 +3421,14 @@ TEST_F( ODBCFailureTests, SelectAccountBadColumn_3_7 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CSelectAccountBadConversionResultSet : public IDatabaseVariableSet
+class CSelectAccountBadConversionResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CSelectAccountBadConversionResultSet( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -3328,6 +3436,7 @@ class CSelectAccountBadConversionResultSet : public IDatabaseVariableSet
 		{}
 
 		CSelectAccountBadConversionResultSet( const CSelectAccountBadConversionResultSet &rhs ) :
+			BASECLASS( rhs ),
 			AccountID( rhs.AccountID ),
 			AccountEmail( rhs.AccountEmail ),
 			Nickname( rhs.Nickname ),
@@ -3461,15 +3570,19 @@ TEST_F( ODBCFailureTests, SelectAccountBadConversion_3_7 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CTVFBadColumnParams : public IDatabaseVariableSet
+class CTVFBadColumnParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTVFBadColumnParams( void ) :
+			BASECLASS(),
 			AccountID()
 		{}
 
 		CTVFBadColumnParams( uint64 account_id ) :
+			BASECLASS(),
 			AccountID( account_id )
 		{}
 
@@ -3483,11 +3596,14 @@ class CTVFBadColumnParams : public IDatabaseVariableSet
 		DBUInt64In AccountID;
 };
 
-class CTVFBadColumnResultSet : public IDatabaseVariableSet
+class CTVFBadColumnResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTVFBadColumnResultSet( void ) :
+			BASECLASS(),
 			ProductDesc(),
 			ProductKeyDesc()
 		{}

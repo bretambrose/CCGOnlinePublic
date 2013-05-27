@@ -28,6 +28,7 @@
 #include "Database/Interfaces/DatabaseStatementInterface.h"
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
+#include "Database/ODBCImplementation/ODBCVariableSet.h"
 #include "Database/EmptyVariableSet.h"
 #include "Database/DatabaseCalls.h"
 #include "Database/DatabaseTaskBatch.h"
@@ -51,11 +52,14 @@ class ODBCSuccessTests : public testing::Test
 
 };
 
-class CGetAccountProcedureResultSet : public IDatabaseVariableSet
+class CGetAccountProcedureResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CGetAccountProcedureResultSet( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -63,6 +67,7 @@ class CGetAccountProcedureResultSet : public IDatabaseVariableSet
 		{}
 
 		CGetAccountProcedureResultSet( const CGetAccountProcedureResultSet &rhs ) :
+			BASECLASS( rhs ),
 			AccountID( rhs.AccountID ),
 			AccountEmail( rhs.AccountEmail ),
 			Nickname( rhs.Nickname ),
@@ -287,11 +292,14 @@ TEST_F( ODBCSuccessTests, ReadSeededData_GetAllAccounts_2_2_7_OK_UseCache )
 
 /////////////////////////////
 
-class CGetAllAccountsInOutParams : public IDatabaseVariableSet
+class CGetAllAccountsInOutParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CGetAllAccountsInOutParams( void ) :
+			BASECLASS(),
 			FilteredNickname(),
 			InTest(),
 			OutTest(),
@@ -299,6 +307,7 @@ class CGetAllAccountsInOutParams : public IDatabaseVariableSet
 		{}
 
 		CGetAllAccountsInOutParams( const CGetAllAccountsInOutParams &rhs ) :
+			BASECLASS( rhs ),
 			FilteredNickname( rhs.FilteredNickname ),
 			InTest( rhs.InTest ),
 			Count( rhs.Count ),
@@ -306,6 +315,7 @@ class CGetAllAccountsInOutParams : public IDatabaseVariableSet
 		{}
 
 		CGetAllAccountsInOutParams( const std::string &filtered_nickname, uint64 in_test, uint64 out_test ) :
+			BASECLASS(),
 			FilteredNickname( filtered_nickname ),
 			InTest( in_test ),
 			Count( 0 ),
@@ -489,21 +499,26 @@ TEST_F( ODBCSuccessTests, ReadSeedData_GetAllAccountsWithInOut_OK_Test_BretFilte
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // Function tests
 
-class CGetAccountCountParams : public IDatabaseVariableSet
+class CGetAccountCountParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CGetAccountCountParams( void ) :
+			BASECLASS(),
 			AccountCount(),
 			FilteredNickname()
 		{}
 
 		CGetAccountCountParams( const CGetAccountCountParams &rhs ) :
+			BASECLASS( rhs ),
 			AccountCount( rhs.AccountCount ),
 			FilteredNickname( rhs.FilteredNickname )
 		{}
 
 		CGetAccountCountParams( const std::string &filtered_nickname ) :
+			BASECLASS(),
 			AccountCount(),
 			FilteredNickname( filtered_nickname )
 		{}
@@ -636,21 +651,26 @@ TEST_F( ODBCSuccessTests, ReadSeedData_GetAccountCount_OK_Test_BretFilter_3_7 )
 
 ////
 
-class CGetAccountEmailFunctionParams : public IDatabaseVariableSet
+class CGetAccountEmailFunctionParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CGetAccountEmailFunctionParams( void ) :
+			BASECLASS(),
 			AccountEmail(),
 			AccountID()
 		{}
 
 		CGetAccountEmailFunctionParams( const CGetAccountEmailFunctionParams &rhs ) :
+			BASECLASS( rhs ),
 			AccountEmail( rhs.AccountEmail ),
 			AccountID( rhs.AccountID )
 		{}
 
 		CGetAccountEmailFunctionParams( uint64 account_id ) :
+			BASECLASS(),
 			AccountEmail(),
 			AccountID( account_id )
 		{}
@@ -894,21 +914,26 @@ TEST_F( ODBCSuccessTests, DoNothing_OK_Test_3_7 )
 // Boolean input/output test
 
 
-class CTestBooleanDataParams : public IDatabaseVariableSet
+class CTestBooleanDataParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestBooleanDataParams( void ) :
+			BASECLASS(),
 			TestIn(),
 			TestInOut()
 		{}
 
 		CTestBooleanDataParams( const CTestBooleanDataParams &rhs ) :
+			BASECLASS( rhs ),
 			TestIn( rhs.TestIn ),
 			TestInOut( rhs.TestInOut )
 		{}
 
 		CTestBooleanDataParams( bool in, bool in_out ) :
+			BASECLASS(),
 			TestIn( in ),
 			TestInOut( in_out )
 		{}
@@ -925,15 +950,19 @@ class CTestBooleanDataParams : public IDatabaseVariableSet
 		DBBoolInOut TestInOut;
 };
 
-class CTestBooleanDataResultSet : public IDatabaseVariableSet
+class CTestBooleanDataResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestBooleanDataResultSet( void ) :
+			BASECLASS(),
 			Test()
 		{}
 
 		CTestBooleanDataResultSet( const CTestBooleanDataResultSet &rhs ) :
+			BASECLASS( rhs ),
 			Test( rhs.Test )
 		{}
 
@@ -1087,11 +1116,14 @@ TEST_F( ODBCSuccessTests, ReadSeedData_TestBooleanData_OK_Test_2_2_5_false_true 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Float and double input/output test
 
-class CTestFPDataParams : public IDatabaseVariableSet
+class CTestFPDataParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestFPDataParams( void ) :
+			BASECLASS(),
 			TestFloatIn(),
 			TestDoubleIn(),
 			TestFloatInOut(),
@@ -1099,6 +1131,7 @@ class CTestFPDataParams : public IDatabaseVariableSet
 		{}
 
 		CTestFPDataParams( const CTestFPDataParams &rhs ) :
+			BASECLASS( rhs ),
 			TestFloatIn( rhs.TestFloatIn ),
 			TestDoubleIn( rhs.TestDoubleIn ),
 			TestFloatInOut( rhs.TestFloatInOut ),
@@ -1106,6 +1139,7 @@ class CTestFPDataParams : public IDatabaseVariableSet
 		{}
 
 		CTestFPDataParams( float float_in, double double_in, float float_in_out, double double_in_out ) :
+			BASECLASS(),
 			TestFloatIn( float_in ),
 			TestDoubleIn( double_in ),
 			TestFloatInOut( float_in_out ),
@@ -1128,16 +1162,20 @@ class CTestFPDataParams : public IDatabaseVariableSet
 		DBDoubleInOut TestDoubleInOut;
 };
 
-class CTestFPDataResultSet : public IDatabaseVariableSet
+class CTestFPDataResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestFPDataResultSet( void ) :
+			BASECLASS(),
 			FloatTest(),
 			DoubleTest()
 		{}
 
 		CTestFPDataResultSet( const CTestFPDataResultSet &rhs ) :
+			BASECLASS( rhs ),
 			FloatTest( rhs.FloatTest ),
 			DoubleTest( rhs.DoubleTest )
 		{}
@@ -1287,21 +1325,26 @@ TEST_F( ODBCSuccessTests, ReadSeedData_TestFPData_OK_Test_3_2_7 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CNullableFunctionParams : public IDatabaseVariableSet
+class CNullableFunctionParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CNullableFunctionParams( void ) :
+			BASECLASS(),
 			AccountID(),
 			Nickname()
 		{}
 
 		CNullableFunctionParams( const CNullableFunctionParams &rhs ) :
+			BASECLASS( rhs ),
 			AccountID( rhs.AccountID ),
 			Nickname( rhs.Nickname )
 		{}
 
 		CNullableFunctionParams( const std::wstring &nickname ) :
+			BASECLASS(),
 			AccountID(),
 			Nickname( nickname )
 		{}
@@ -1465,23 +1508,28 @@ TEST_F( ODBCSuccessTests, ReadSeedData_NullableFunctionTest_2_5_4 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CNullableProcedureParams : public IDatabaseVariableSet
+class CNullableProcedureParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CNullableProcedureParams( void ) :
+			BASECLASS(),
 			NullAccountID(),
 			StringInOut(),
 			WStringInOut()
 		{}
 
 		CNullableProcedureParams( const CNullableProcedureParams &rhs ) :
+			BASECLASS( rhs ),
 			NullAccountID( rhs.NullAccountID ),
 			StringInOut( rhs.StringInOut ),
 			WStringInOut( rhs.WStringInOut )
 		{}
 
 		CNullableProcedureParams( uint64 account_id, bool string_null, bool wstring_null ) :
+			BASECLASS(),
 			NullAccountID( account_id ),
 			StringInOut(),
 			WStringInOut()
@@ -1511,16 +1559,20 @@ class CNullableProcedureParams : public IDatabaseVariableSet
 		DBWStringInOut< 32 > WStringInOut;
 };
 
-class CNullableProcedureResultSet : public IDatabaseVariableSet
+class CNullableProcedureResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CNullableProcedureResultSet( void ) :
+			BASECLASS(),
 			ID(),
 			Email()
 		{}
 
 		CNullableProcedureResultSet( const CNullableProcedureResultSet &rhs ) :
+			BASECLASS( rhs ),
 			ID( rhs.ID ),
 			Email( rhs.Email )
 		{}
@@ -1701,11 +1753,14 @@ TEST_F( ODBCSuccessTests, ReadSeedData_NullableProcedureTest_3_2_7_2_T_F )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CSelectAccountDetailsResultSet : public IDatabaseVariableSet
+class CSelectAccountDetailsResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CSelectAccountDetailsResultSet( void ) :
+			BASECLASS(),
 			AccountID(),
 			AccountEmail(),
 			Nickname(),
@@ -1713,6 +1768,7 @@ class CSelectAccountDetailsResultSet : public IDatabaseVariableSet
 		{}
 
 		CSelectAccountDetailsResultSet( const CSelectAccountDetailsResultSet &rhs ) :
+			BASECLASS( rhs ),
 			AccountID( rhs.AccountID ),
 			AccountEmail( rhs.AccountEmail ),
 			Nickname( rhs.Nickname ),
@@ -1894,15 +1950,19 @@ TEST_F( ODBCSuccessTests, ReadSeedData_SelectAccountDetails_4_17 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class CTestTVFParams : public IDatabaseVariableSet
+class CTestTVFParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestTVFParams( void ) :
+			BASECLASS(),
 			AccountID()
 		{}
 
 		CTestTVFParams( uint64 account_id ) :
+			BASECLASS(),
 			AccountID( account_id )
 		{}
 
@@ -1916,11 +1976,14 @@ class CTestTVFParams : public IDatabaseVariableSet
 		DBUInt64In AccountID;
 };
 
-class CTestTVFResultSet : public IDatabaseVariableSet
+class CTestTVFResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CTestTVFResultSet( void ) :
+			BASECLASS(),
 			ProductDesc(),
 			ProductKeyDesc()
 		{}

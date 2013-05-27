@@ -35,6 +35,7 @@
 #include "SlashCommands/SlashCommandInstance.h"
 #include "Database/ODBCImplementation/ODBCFactory.h"
 #include "Database/ODBCImplementation/ODBCParameters.h"
+#include "Database/ODBCImplementation/ODBCVariableSet.h"
 #include "Database/Interfaces/DatabaseVariableSetInterface.h"
 #include "Database/Interfaces/DatabaseConnectionInterface.h"
 #include "Database/Interfaces/DatabaseStatementInterface.h"
@@ -1476,17 +1477,21 @@ namespace NAuthServer
 	}
 }
 
-class CAddAccountInputParams : public IDatabaseVariableSet
+class CAddAccountInputParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CAddAccountInputParams( void ) :
+			BASECLASS(),
 			AccountEmail(),
 			Nickname(),
 			PasswordHash()
 		{}
 
 		CAddAccountInputParams( const std::string &account_email, const std::string &nickname, const std::string &password_hash ) :
+			BASECLASS(),
 			AccountEmail( account_email ),
 			Nickname( nickname ),
 			PasswordHash( password_hash )
@@ -1556,7 +1561,7 @@ bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /
 		fetch_status = statement->Fetch_Results( rows_fetched );
 	}
 
-	statement->End_Transaction( true );
+	connection->End_Transaction( true );
 
 	connection->Release_Statement( statement );
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
@@ -1567,15 +1572,19 @@ bool Handle_Add_Account( const CSlashCommandInstance &instance, std::wstring & /
 	return true;
 }
 
-class CFetchAccountInputParams : public IDatabaseVariableSet
+class CFetchAccountInputParams : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CFetchAccountInputParams( void ) :
+			BASECLASS(),
 			AccountEmail()
 		{}
 
 		CFetchAccountInputParams( const std::string &account_email ) :
+			BASECLASS(),
 			AccountEmail( account_email )
 		{}
 
@@ -1589,11 +1598,14 @@ class CFetchAccountInputParams : public IDatabaseVariableSet
 		DBString< 255 > AccountEmail;
 };
 
-class CFetchAccountResultSet : public IDatabaseVariableSet
+class CFetchAccountResultSet : public CODBCVariableSet
 {
 	public:
 
+		typedef CODBCVariableSet BASECLASS;
+
 		CFetchAccountResultSet( void ) :
+			BASECLASS(),
 			AccountID(),
 			Nickname(),
 			NicknameSequenceID()
@@ -1649,7 +1661,7 @@ bool Handle_Fetch_Account( const CSlashCommandInstance &instance, std::wstring &
 		fetch_status = statement->Fetch_Results( rows_fetched );
 	}
 
-	statement->End_Transaction( true );
+	connection->End_Transaction( true );
 
 	connection->Release_Statement( statement );
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );

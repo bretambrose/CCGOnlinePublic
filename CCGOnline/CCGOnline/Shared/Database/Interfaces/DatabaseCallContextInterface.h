@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	DatabaseTaskBatchInterface.h
+	DatabaseCallContextInterface.h
 		A component defining 
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -20,24 +20,30 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_INTERFACE_H
-#define DATABASE_TASK_BATCH_INTERFACE_H
+#ifndef DATABASE_CALL_CONTEXT_INTERFACE_H
+#define DATABASE_CALL_CONTEXT_INTERFACE_H
 
-#include "Database/DatabaseTypes.h"
+class IDatabaseVariableSet;
 
-class IDatabaseTask;
-class IDatabaseConnection;
-
-class IDatabaseTaskBatch
+class IDatabaseCallContext 
 {
 	public:
 
-		IDatabaseTaskBatch( void ) {}
-		virtual ~IDatabaseTaskBatch() {}
+		IDatabaseCallContext() {}
+		virtual ~IDatabaseCallContext() {}
 
-		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const = 0;
-		virtual void Add_Task( IDatabaseTask *task ) = 0;
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks ) = 0;
+		virtual IDatabaseVariableSet *Get_Param_Rows( void ) = 0;
+		virtual IDatabaseVariableSet *Get_Param_Row( uint32 index ) = 0;
+		virtual uint32 Get_Param_Row_Count( void ) const = 0;
+		virtual uint32 Get_Sizeof_Param_Type( void ) const = 0;
+
+		virtual IDatabaseVariableSet *Get_Result_Rows( void ) = 0;
+		virtual IDatabaseVariableSet *Get_Result_Row( uint32 index ) = 0;
+		virtual uint32 Get_Result_Row_Count( void ) const = 0;
+		virtual uint32 Get_Sizeof_Result_Type( void ) const = 0;
+
+		virtual const std::wstring & Get_Statement_Text( void ) const = 0;
+		virtual void Set_Statement_Text( const std::wstring &statement_text ) = 0;
 };
 
-#endif // DATABASE_TASK_BATCH_H
+#endif // DATABASE_CALL_CONTEXT_INTERFACE_H

@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	DatabaseTaskBatchInterface.h
+	CompoundDatabaseTaskInterface.h
 		A component defining 
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -20,24 +20,37 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_INTERFACE_H
-#define DATABASE_TASK_BATCH_INTERFACE_H
+#ifndef COMPOUND_DATABASE_TASK_INTERFACE_H
+#define COMPOUND_DATABASE_TASK_INTERFACE_H
 
-#include "Database/DatabaseTypes.h"
+#include "DatabaseTaskBaseInterface.h"
 
 class IDatabaseTask;
-class IDatabaseConnection;
+template< typename T > class TCompoundDatabaseTaskBatch;
 
-class IDatabaseTaskBatch
+class ICompoundDatabaseTask : public IDatabaseTaskBase
 {
 	public:
+		
+		typedef IDatabaseTaskBase BASECLASS;
 
-		IDatabaseTaskBatch( void ) {}
-		virtual ~IDatabaseTaskBatch() {}
+		ICompoundDatabaseTask( void ) {}
+		virtual ~ICompoundDatabaseTask() {}
 
-		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const = 0;
-		virtual void Add_Task( IDatabaseTask *task ) = 0;
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks ) = 0;
+		virtual void Add_Child_Task( IDatabaseTask *task ) = 0;
+
+	protected:
+
+		template< typename T > friend class TCompoundDatabaseTaskBatch;
+
+		virtual void On_Task_Success( void ) = 0;					
+		virtual void On_Task_Failure( void ) = 0;		
+
+		virtual void Seed_Child_Tasks( void ) = 0;
+		virtual void Clear_Child_Tasks( void ) = 0;
+		virtual void On_Child_Task_Success( const Loki::TypeInfo &child_type ) = 0;
+		virtual void Get_Child_Tasks_Of_Type( const Loki::TypeInfo &child_type, DBTaskListType &tasks ) const = 0;
+
 };
 
-#endif // DATABASE_TASK_BATCH_H
+#endif // COMPOUND_DATABASE_TASK_INTERFACE_H

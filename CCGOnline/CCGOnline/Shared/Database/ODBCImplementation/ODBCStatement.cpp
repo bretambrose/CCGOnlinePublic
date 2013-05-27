@@ -136,7 +136,6 @@ enum ODBCStatementStateType
 	ODBCSST_BOUND_INPUT,
 	ODBCSST_READY,
 	ODBCSST_PROCESS_RESULTS,
-	ODBCSST_END_TRANSACTION,
 
 	ODBCSST_SHUTDOWN,
 	ODBCSST_RECOVERABLE_ERROR,
@@ -156,15 +155,15 @@ enum ODBCStatementOperationType
 	ODBCSOT_BIND_COLUMN,
 
 	ODBCSOT_EXECUTE_STATEMENT,
-	ODBCSOT_COMMIT_ROLLBACK_STATEMENT,
 	ODBCSOT_CHECK_COLUMN_COUNT,
 	ODBCSOT_FETCH_RESULT_ROWS,
 	ODBCSOT_MOVE_TO_NEXT_RESULT_SET
 };
 
-CODBCStatement::CODBCStatement( DBStatementIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle ) :
+CODBCStatement::CODBCStatement( DBStatementIDType id, IDatabaseConnection *connection, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle ) :
 	BASECLASS( environment_handle, connection_handle, statement_handle ),
 	ID( id ),
+	Connection( connection ),
 	State( ODBCSST_UNINITIALIZED ),
 	StatementText( L"" ),
 	ResultSetRowCount( 1 ),
@@ -217,6 +216,8 @@ void CODBCStatement::Shutdown( void )
 
 		Invalidate_Handles();
 	}
+
+	Connection = nullptr;
 
 	State = ODBCSST_SHUTDOWN;
 }
@@ -376,7 +377,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 {
 	rows_fetched = 0;
 
-	if ( State == ODBCSST_END_TRANSACTION )
+	if ( State == ODBCSST_READY )
 	{
 		return FRST_FINISHED_ALL;
 	}
@@ -428,7 +429,7 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 		SQLRETURN ec2 = SQLMoreResults( StatementHandle );
 		if ( ec2 == SQL_NO_DATA_FOUND )
 		{
-			State = ODBCSST_END_TRANSACTION;
+			State = ODBCSST_READY;
 			return FRST_FINISHED_ALL;
 		}
 		else if ( ec2 != SQL_SUCCESS )
@@ -457,21 +458,6 @@ EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
 	}
 
 	return FRST_ONGOING;
-}
-
-void CODBCStatement::End_Transaction( bool commit )
-{
-	FATAL_ASSERT( State == ODBCSST_END_TRANSACTION || ( !commit && ( State == ODBCSST_RECOVERABLE_ERROR || State == ODBCSST_PROCESS_RESULTS ) ) );	
-
-	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
-	Update_Error_Status( ODBCSOT_COMMIT_ROLLBACK_STATEMENT, error_code );
-	if ( !Was_Last_ODBC_Operation_Successful() )
-	{
-		Reflect_ODBC_Error_State_Into_Statement_State();
-		return;
-	}
-
-	State = ODBCSST_READY;
 }
 
 bool CODBCStatement::Needs_Binding( void ) const
@@ -511,7 +497,6 @@ void CODBCStatement::Update_Error_Status( ODBCStatementOperationType operation_t
 		case ODBCSOT_SET_ROW_STATUS_ARRAY:
 		case ODBCSOT_SET_ROWS_FETCHED_PTR:
 		case ODBCSOT_BIND_COLUMN:
-		case ODBCSOT_COMMIT_ROLLBACK_STATEMENT:
 		case ODBCSOT_CHECK_COLUMN_COUNT:
 			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;

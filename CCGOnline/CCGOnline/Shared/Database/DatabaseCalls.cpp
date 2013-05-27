@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	DatabaseTaskBatchInterface.h
-		A component defining 
+	DatabaseCalls.cpp
+		A component defining ??
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,24 +20,17 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_INTERFACE_H
-#define DATABASE_TASK_BATCH_INTERFACE_H
+#include "stdafx.h"
 
-#include "Database/DatabaseTypes.h"
+#include "DatabaseCalls.h"
 
-class IDatabaseTask;
-class IDatabaseConnection;
+#include "Interfaces/CompoundDatabaseTaskInterface.h"
 
-class IDatabaseTaskBatch
+
+void CDatabaseTaskBase::Set_Parent( ICompoundDatabaseTask *parent )
 {
-	public:
+	FATAL_ASSERT( parent != nullptr );
 
-		IDatabaseTaskBatch( void ) {}
-		virtual ~IDatabaseTaskBatch() {}
-
-		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const = 0;
-		virtual void Add_Task( IDatabaseTask *task ) = 0;
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks ) = 0;
-};
-
-#endif // DATABASE_TASK_BATCH_H
+	Parent = parent;
+	ID = parent->Get_ID();
+}

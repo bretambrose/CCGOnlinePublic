@@ -101,10 +101,7 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 		FATAL_ASSERT( batch_task_iter != Batches.end() );
 
 		IDatabaseTaskBatch *batch = batch_task_iter->second;
-		if ( batch->Has_Tasks() )
-		{
-			batch->Execute_Tasks( Connection, successes, failures );
-		}
+		batch->Execute_Tasks( Connection, successes, failures );
 	}
 
 	for ( DBTaskListType::const_iterator success_iter = successes.cbegin(); success_iter != successes.cend(); ++success_iter )

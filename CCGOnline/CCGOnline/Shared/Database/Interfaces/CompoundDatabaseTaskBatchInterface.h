@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	DatabaseTaskBatchInterface.h
+	CompoundDatabaseTaskBatchInterface.h
 		A component defining 
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -20,24 +20,26 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_INTERFACE_H
-#define DATABASE_TASK_BATCH_INTERFACE_H
+#ifndef COMPOUND_DATABASE_TASK_BATCH_INTERFACE_H
+#define COMPOUND_DATABASE_TASK_BATCH_INTERFACE_H
 
-#include "Database/DatabaseTypes.h"
+#include "DatabaseTaskBatchInterface.h"
 
-class IDatabaseTask;
-class IDatabaseConnection;
+struct SCompoundChildVariableSets;
 
-class IDatabaseTaskBatch
+class ICompoundDatabaseTaskBatch : public IDatabaseTaskBatch
 {
 	public:
 
-		IDatabaseTaskBatch( void ) {}
-		virtual ~IDatabaseTaskBatch() {}
+		typedef IDatabaseTaskBatch BASECLASS;
 
-		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const = 0;
-		virtual void Add_Task( IDatabaseTask *task ) = 0;
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks ) = 0;
+		ICompoundDatabaseTaskBatch( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~ICompoundDatabaseTaskBatch() {}
+
+		virtual void Register_Child_Variable_Sets( const Loki::TypeInfo &type_info, const SCompoundChildVariableSets &variable_sets ) = 0;
 };
 
-#endif // DATABASE_TASK_BATCH_H
+#endif // COMPOUND_DATABASE_TASK_BATCH_INTERFACE_H

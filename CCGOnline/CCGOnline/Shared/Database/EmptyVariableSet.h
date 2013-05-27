@@ -37,6 +37,11 @@ class CEmptyVariableSet : public IDatabaseVariableSet
 		virtual void Get_Variables( std::vector< IDatabaseVariable * > & /*variables*/ )
 		{
 		}
+
+		virtual void Convert_Variable_To_String( IDatabaseVariable * /*variable*/, std::string & /*value*/ ) const
+		{
+		}
+
 };
 
 #endif // EMPTY_VARIABLE_SET_H

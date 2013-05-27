@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	DatabaseTaskBatchInterface.h
+	DatabaseTaskBatchUtilities.h
 		A component defining 
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -20,24 +20,30 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_INTERFACE_H
-#define DATABASE_TASK_BATCH_INTERFACE_H
+#ifndef DATABASE_TASK_BATCH_UTILITES_H
+#define DATABASE_TASK_BATCH_UTILITES_H
 
-#include "Database/DatabaseTypes.h"
+#include "DatabaseTypes.h"
 
-class IDatabaseTask;
-class IDatabaseConnection;
+class IDatabaseCallContext;
+class IDatabaseStatement;
 
-class IDatabaseTaskBatch
+namespace ExecuteDBTaskListResult
 {
-	public:
+	enum Enum
+	{
+		SUCCESS,
+		FAILED_SPECIFIC_TASK,
+		FAILED_UNKNOWN_TASK
+	};
+}
 
-		IDatabaseTaskBatch( void ) {}
-		virtual ~IDatabaseTaskBatch() {}
+namespace DBUtils
+{
 
-		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const = 0;
-		virtual void Add_Task( IDatabaseTask *task ) = 0;
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks ) = 0;
-};
+	void Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseStatement *statement, const DBTaskListType &sub_list, ExecuteDBTaskListResult::Enum &result, DBTaskListType::const_iterator &first_failed_task );
 
-#endif // DATABASE_TASK_BATCH_H
+}
+
+
+#endif // DATABASE_TASK_BATCH_UTILITES_H

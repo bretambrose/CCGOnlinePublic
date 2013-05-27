@@ -44,6 +44,7 @@ class IDatabaseConnection
 
 		virtual IDatabaseStatement *Allocate_Statement( const std::wstring &statement_text ) = 0;
 		virtual void Release_Statement( IDatabaseStatement *statement ) = 0;
+		virtual void End_Transaction( bool commit ) = 0;
 
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;
 

@@ -1,6 +1,6 @@
 /**********************************************************************************************************************
 
-	DatabaseTaskBatchInterface.h
+	ODBCVariableSet.h
 		A component defining 
 
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
@@ -20,24 +20,21 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_INTERFACE_H
-#define DATABASE_TASK_BATCH_INTERFACE_H
+#ifndef ODBC_VARIABLE_SET_H
+#define ODBC_VARIABLE_SET_H
 
-#include "Database/DatabaseTypes.h"
+#include "Database/Interfaces/DatabaseVariableSetInterface.h"
 
-class IDatabaseTask;
-class IDatabaseConnection;
-
-class IDatabaseTaskBatch
+class CODBCVariableSet : public IDatabaseVariableSet
 {
 	public:
 
-		IDatabaseTaskBatch( void ) {}
-		virtual ~IDatabaseTaskBatch() {}
+		typedef IDatabaseVariableSet BASECLASS;
 
-		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const = 0;
-		virtual void Add_Task( IDatabaseTask *task ) = 0;
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks ) = 0;
+		CODBCVariableSet( void ) {}
+		CODBCVariableSet( const CODBCVariableSet & /*rhs*/ ) {}
+
+		virtual void Convert_Variable_To_String( IDatabaseVariable *variable, std::string &value ) const;
 };
 
-#endif // DATABASE_TASK_BATCH_H
+#endif // ODBC_VARIABLE_SET_H
