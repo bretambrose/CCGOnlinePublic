@@ -91,7 +91,9 @@ enum EDatabaseTaskType
 };
 
 class IDatabaseTask;
+class ICompoundDatabaseTask;
 
 typedef std::list< IDatabaseTask * > DBTaskListType;
+typedef std::list< ICompoundDatabaseTask * > DBCompoundTaskListType;
 
 #endif // DATABASE_TYPES_H
