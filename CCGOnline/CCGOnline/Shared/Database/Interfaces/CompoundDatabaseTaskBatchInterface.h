@@ -25,7 +25,7 @@
 
 #include "DatabaseTaskBatchInterface.h"
 
-struct SCompoundChildVariableSets;
+class IDatabaseCallContext;
 
 class ICompoundDatabaseTaskBatch : public IDatabaseTaskBatch
 {
@@ -39,7 +39,7 @@ class ICompoundDatabaseTaskBatch : public IDatabaseTaskBatch
 
 		virtual ~ICompoundDatabaseTaskBatch() {}
 
-		virtual void Register_Child_Variable_Sets( const Loki::TypeInfo &type_info, const SCompoundChildVariableSets &variable_sets ) = 0;
+		virtual void Register_Child_Variable_Sets( const Loki::TypeInfo &type_info, IDatabaseCallContext *child_call_context ) = 0;
 };
 
 #endif // COMPOUND_DATABASE_TASK_BATCH_INTERFACE_H

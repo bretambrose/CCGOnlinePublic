@@ -24,8 +24,6 @@
 #ifndef ENUM_CONVERSION_H
 #define ENUM_CONVERSION_H
 
-#include "TypeInfoUtils.h"
-
 enum EConvertibleEnumProperties
 {
 	CEP_NONE						= 0,

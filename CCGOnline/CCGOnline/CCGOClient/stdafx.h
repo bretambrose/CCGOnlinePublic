@@ -29,6 +29,7 @@
 #include <vector>
 #include <set>
 #include <hash_map>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <string>
@@ -53,4 +54,4 @@ using std::tr1::static_pointer_cast;
 // self includes
 #include "PlatformTypes.h"
 #include "DebugAssert.h"
-
+#include "TypeInfoUtils.h"

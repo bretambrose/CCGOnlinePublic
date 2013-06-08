@@ -26,7 +26,6 @@
 #include "ManagedProcessInterface.h"
 
 #include "ProcessProperties.h"
-#include "TypeInfoUtils.h"
 
 class CAddMailboxMessage;
 class CReleaseMailboxRequest;

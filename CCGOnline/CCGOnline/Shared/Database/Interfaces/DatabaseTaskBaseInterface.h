@@ -43,6 +43,9 @@ class IDatabaseTaskBase
 		virtual DatabaseTaskIDType::Enum Get_ID( void ) const = 0;
 		virtual void Set_ID( DatabaseTaskIDType::Enum id ) = 0;	
 
+		virtual void On_Task_Success( void ) = 0;					
+		virtual void On_Task_Failure( void ) = 0;	
+
 	protected:	
 
 		virtual void Set_Parent( ICompoundDatabaseTask *parent ) = 0;

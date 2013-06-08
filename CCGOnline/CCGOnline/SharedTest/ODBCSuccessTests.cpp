@@ -30,6 +30,7 @@
 #include "Database/ODBCImplementation/ODBCParameters.h"
 #include "Database/ODBCImplementation/ODBCVariableSet.h"
 #include "Database/EmptyVariableSet.h"
+#include "Database/CompoundDatabaseTaskBatch.h"
 #include "Database/DatabaseCalls.h"
 #include "Database/DatabaseTaskBatch.h"
 #include "StringUtils.h"
@@ -188,8 +189,8 @@ void Run_ReadSeedData_GetAllAccounts_OK_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -257,8 +258,8 @@ void Run_ReadSeedData_GetAllAccounts_OK_ReuseStatement_Test( uint32 task_count, 
 			db_task_batch.Add_Task( db_task );
 		}
 
-		DBTaskListType successful_tasks;
-		DBTaskListType failed_tasks;
+		DBTaskBaseListType successful_tasks;
+		DBTaskBaseListType failed_tasks;
 		db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 		ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -469,8 +470,8 @@ void Run_ReadSeedData_GetAllAccountsWithInOut_OK_Test( const std::string &filter
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -617,8 +618,8 @@ void Run_ReadSeedData_GetAccountCount_OK_Test( const std::string &filtered_name,
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -779,8 +780,8 @@ void Run_ReadSeedData_GetAccountEmail_OK_Test( uint64 account_id, uint32 task_co
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -878,8 +879,8 @@ void Run_DoNothing_OK_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -1071,8 +1072,8 @@ void Run_ReadSeedData_TestBooleanData_OK_Test( bool in, bool in_out, uint32 task
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -1296,8 +1297,8 @@ void Run_ReadSeedData_TestFPData_OK_Test( float float_in, double double_in, floa
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -1469,8 +1470,8 @@ void Run_ReadSeedData_NullableFunction_OK_Test( uint32 task_count, const std::ws
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -1699,8 +1700,8 @@ void Run_ReadSeedData_NullableProcedure_Test( uint32 task_count, uint64 null_acc
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -1906,8 +1907,8 @@ void Run_ReadSeedData_SelectAccountDetails_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -2102,8 +2103,8 @@ void Run_ReadSeedData_TableValueFunctionTest( uint32 task_count, uint64 account_
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == 0 );
@@ -2142,4 +2143,87 @@ TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_2_2_5_3 )
 TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_2_2_5_1 )
 {
 	Run_ReadSeedData_TableValueFunctionTest< 2, 2 >( 5, 1 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Compound Tests
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 OSIZE1 >
+class CTrivialCompoundTask : public TCompoundDatabaseTask< BATCH_SIZE >
+{
+	public:
+
+		typedef TCompoundDatabaseTask< BATCH_SIZE > BASECLASS;
+
+		CTrivialCompoundTask( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~CTrivialCompoundTask() {}
+
+		static void Register_Child_Tasks( ICompoundDatabaseTaskBatch *task_batch )
+		{
+			Register_Database_Child_Task_Type< CGetAllAccountsProcedureCall< ISIZE1, OSIZE1 > >( task_batch );
+		}
+		
+		void Verify_Results( void )
+		{
+			DBTaskListType child_tasks;
+			Get_All_Child_Tasks( child_tasks );
+
+			std::for_each( child_tasks.begin(), child_tasks.end(), []( IDatabaseTask *task ) {
+					CGetAllAccountsProcedureCall< ISIZE1, OSIZE1 > *child_task = static_cast< CGetAllAccountsProcedureCall< ISIZE1, OSIZE1 > * >( task );
+					child_task->Verify_Results();
+				}
+			);
+		}
+
+		virtual void On_Task_Success( void ) {}				
+		virtual void On_Task_Failure( void ) {}	
+
+		virtual void Seed_Child_Tasks( void )
+		{
+			Add_Child_Task( new CGetAllAccountsProcedureCall< ISIZE1, OSIZE1 > );
+		}
+
+	private:
+};
+
+template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 OSIZE1 >
+void Run_TrivialCompoundTask_Test( uint32 task_count )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	TCompoundDatabaseTaskBatch< CTrivialCompoundTask< BATCH_SIZE, ISIZE1, OSIZE1 > > db_compound_task_batch;
+	std::vector< CTrivialCompoundTask< BATCH_SIZE, ISIZE1, OSIZE1 > * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		auto db_task = new CTrivialCompoundTask< BATCH_SIZE, ISIZE1, OSIZE1 >;
+		db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( i + 1 ) );
+		tasks.push_back( db_task );
+		db_compound_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
+	db_compound_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == 0 );
+	ASSERT_TRUE( successful_tasks.size() == task_count );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
+}
+
+TEST_F( ODBCSuccessTests, TrvialCompoundTasks_1_1_1_1_OK )
+{
+	Run_TrivialCompoundTask_Test< 1, 1, 1 >( 1 );
 }

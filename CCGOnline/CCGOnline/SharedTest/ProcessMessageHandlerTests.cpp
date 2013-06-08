@@ -27,7 +27,6 @@
 #include "Concurrency/Messaging/ProcessManagementMessages.h"
 #include "Concurrency/ProcessConstants.h"
 #include "Concurrency/ProcessID.h"
-#include "TypeInfoUtils.h"
 
 class CMockMessageHandlerTracker
 {

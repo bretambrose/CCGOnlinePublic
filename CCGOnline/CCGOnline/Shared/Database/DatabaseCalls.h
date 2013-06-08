@@ -23,6 +23,7 @@
 #ifndef DATABASE_CALLS_H
 #define DATABASE_CALLS_H
 
+#include "Interfaces/CompoundDatabaseTaskInterface.h"
 #include "Interfaces/DatabaseTaskInterface.h"
 #include "DatabaseTypes.h"
 
@@ -151,6 +152,73 @@ class TDatabaseTableValuedFunctionCall : public CDatabaseTaskBase
 
 		static const uint32 InputParameterBatchSize = ISIZE;
 		static const uint32 ResultSetBatchSize = OSIZE;
+};
+
+// Compound
+
+class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
+{
+	public:
+
+		typedef ICompoundDatabaseTask BASECLASS;
+
+		CCompoundDatabaseTaskBase( void ) :
+			BASECLASS(),
+			ID( DatabaseTaskIDType::INVALID ),
+			Children(),
+			SuccessCallbacks()
+		{}
+
+		virtual ~CCompoundDatabaseTaskBase();
+
+		// IDatabaseTask interface
+		virtual DatabaseTaskIDType::Enum Get_ID( void ) const { return ID; }
+		virtual void Set_ID( DatabaseTaskIDType::Enum id ) { ID = id; }
+
+		// ICompoundDatabaseTask interface
+		virtual void Add_Child_Task( IDatabaseTask *task );
+		virtual void On_Child_Task_Success( const Loki::TypeInfo &child_type );
+
+		virtual void Clear_Child_Tasks( void );
+		virtual void Get_Child_Tasks_Of_Type( const Loki::TypeInfo &child_type, DBTaskListType &tasks ) const;
+		virtual void Get_All_Child_Tasks( DBTaskListType &tasks ) const;
+
+	protected:
+
+		typedef FastDelegate1< const Loki::TypeInfo > ChildSuccessHandlerFunctorType;
+
+		// IDatabaseTask interface
+		virtual void Set_Parent( ICompoundDatabaseTask * /*parent*/ ) { FATAL_ASSERT( false ); }
+		virtual ICompoundDatabaseTask *Get_Parent( void ) const { return nullptr; }
+
+		void Register_Child_Type_Success_Callback( const Loki::TypeInfo &child_type, const ChildSuccessHandlerFunctorType &success_callback );
+
+	private:
+
+		typedef stdext::hash_map< Loki::TypeInfo, ChildSuccessHandlerFunctorType, STypeInfoContainerHelper > ChildTypeCallbackTableType;
+
+		DatabaseTaskIDType::Enum ID;
+
+		DBTaskListTableType Children;
+
+		ChildTypeCallbackTableType SuccessCallbacks;
+};
+
+template < uint32 BATCH_SIZE >
+class TCompoundDatabaseTask : public CCompoundDatabaseTaskBase {
+	public:
+
+		typedef CCompoundDatabaseTaskBase BASECLASS;
+
+		TCompoundDatabaseTask( void ) :
+			BASECLASS()
+		{}
+
+		virtual ~TCompoundDatabaseTask() {}
+
+		static const uint32 CompoundTaskBatchSize = BATCH_SIZE;
+
+	private:
 };
 
 #endif // DATABASE_CALLS_H

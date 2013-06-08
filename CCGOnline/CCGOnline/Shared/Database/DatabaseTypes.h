@@ -90,10 +90,15 @@ enum EDatabaseTaskType
 	DTT_TABLE_VALUED_FUNCTION_CALL
 };
 
+class IDatabaseTaskBase;
 class IDatabaseTask;
 class ICompoundDatabaseTask;
 
+typedef std::list< IDatabaseTaskBase * > DBTaskBaseListType;
 typedef std::list< IDatabaseTask * > DBTaskListType;
 typedef std::list< ICompoundDatabaseTask * > DBCompoundTaskListType;
+
+typedef stdext::hash_map< Loki::TypeInfo, DBTaskListType *, STypeInfoContainerHelper > DBTaskListTableType;
+typedef std::pair< Loki::TypeInfo, DBTaskListType * > DBTaskListTablePairType;
 
 #endif // DATABASE_TYPES_H

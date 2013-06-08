@@ -24,7 +24,10 @@
 #define COMPOUND_DATABASE_TASK_BATCH_H
 
 #include "Interfaces/CompoundDatabaseTaskBatchInterface.h"
+#include "Interfaces/DatabaseTaskBaseInterface.h"
 #include "DatabaseCallContext.h"
+#include "DatabaseTaskBatchUtilities.h"
+#include "Logging/LogInterface.h"
 
 class ICompoundDatabaseTask;
 
@@ -33,12 +36,12 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 {
 	public:
 
-		typedef IDatabaseTaskBatch BASECLASS;
+		typedef ICompoundDatabaseTaskBatch BASECLASS;
 
 		TCompoundDatabaseTaskBatch( void ) :
 			BASECLASS(),
 			ChildOrdering(),
-			ChildTypes(),
+			ChildCallContexts(),
 			PendingTasks(),
 			TaskName( typeid( T ).name() )
 		{
@@ -49,12 +52,9 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 		{
 			FATAL_ASSERT( PendingTasks.size() == 0 );
 
-			for ( auto iter = ChildTypes.begin(); iter != ChildTypes.end(); ++iter )
-			{
-				delete iter->second;
-			}
+			std::for_each( ChildCallContexts.begin(), ChildCallContexts.end(), []( ChildCallContextPair &pair ){ delete pair.second; } );
 
-			ChildTypes.clear();
+			ChildCallContexts.clear();
 			ChildOrdering.clear();
 		}
 
@@ -63,55 +63,51 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 			return Loki::TypeInfo( typeid( T ) );
 		}
 
-		virtual void Add_Task( ICompoundDatabaseTask *task ) { PendingTasks.push_back( task ); }
+		virtual void Add_Task( IDatabaseTask * /*task*/ ) { FATAL_ASSERT( false ); }
+		virtual void Add_Task( ICompoundDatabaseTask *task ) { PendingTasks.push_back( static_cast< ICompoundDatabaseTask* >( task ) ); }
 
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
 		{
+			successful_tasks.clear();
+			failed_tasks.clear();
+
 			if ( PendingTasks.size() == 0 )
 			{
 				return;
 			}
 
-			successful_tasks.clear();
-			failed_tasks.clear();
-
-			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
+			LOG( LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
 
 			while ( PendingTasks.size() > 0 )
 			{
 				DBCompoundTaskListType sub_list;
 
-				while ( PendingTasks.size() > 0 && sub_list.size() < T::TaskBatchSize )
-				{
-					sub_list.push_back( PendingTasks.front() );
-					PendingTasks.pop_front();
-				}
+				auto splice_iter = PendingTasks.begin();
+				std::advance( splice_iter, min( static_cast< uint32 >( PendingTasks.size() ), T::CompoundTaskBatchSize ) );
+				sub_list.splice( sub_list.end(), PendingTasks, PendingTasks.begin(), splice_iter );
 
 				Process_Parent_Task_List( connection, sub_list, successful_tasks, failed_tasks );
 			}
 
-			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << " Failures: " << failed_tasks.size() );
+			LOG( LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << ", Failures: " << failed_tasks.size() );
 		}
 
 		virtual void Register_Child_Variable_Sets( const Loki::TypeInfo &type_info, IDatabaseCallContext *child_call_context )
 		{
-			FATAL_ASSERT( ChildTypes.find( type_info ) == ChildTypes.end() );
+			FATAL_ASSERT( ChildCallContexts.find( type_info ) == ChildCallContexts.end() );
 			ChildOrdering.push_back( type_info );
 
-			ChildTypes.insert( ChildTypeTable::value_type( type_info, child_call_context ) );
+			ChildCallContexts[ type_info ] = child_call_context;
 		}
 
 	private:
 
-		void Process_Parent_Task_List( IDatabaseConnection *connection, DBCompoundTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		void Process_Parent_Task_List( IDatabaseConnection *connection, DBCompoundTaskListType &sub_list, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
 		{
 			while ( sub_list.size() > 0 )
 			{
-				for ( auto iter = sub_list.cbegin(); iter != sub_list.cend(); ++iter )
-				{
-					( *iter )->Clear_Child_Tasks();
-					( *iter )->Seed_Child_Tasks();
-				}
+				std::for_each( sub_list.cbegin(), sub_list.cend(), []( ICompoundDatabaseTask *task ) { task->Clear_Child_Tasks(); } );
+				std::for_each( sub_list.cbegin(), sub_list.cend(), []( ICompoundDatabaseTask *task ) { task->Seed_Child_Tasks(); } );
 
 				DatabaseTaskIDType::Enum bad_task = DatabaseTaskIDType::INVALID;
 				ExecuteDBTaskListResult::Enum process_child_result = ExecuteDBTaskListResult::SUCCESS;
@@ -119,37 +115,41 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				for ( auto tt_iter = ChildOrdering.cbegin(); tt_iter != ChildOrdering.cend(); ++tt_iter )
 				{
 					DBTaskListType child_list;
-					for ( auto iter = sub_list.cbegin(); iter != sub_list.cend(); ++iter )
-					{
-						( *iter )->Get_Child_Tasks_Of_Type( *tt_iter, child_list );
-					}
+					std::for_each( sub_list.cbegin(), sub_list.cend(), [ &tt_iter, &child_list ]( ICompoundDatabaseTask *task ) { task->Get_Child_Tasks_Of_Type( *tt_iter, child_list ); } );
 
 					if( child_list.size() == 0 )
 					{
 						continue;
 					}
 
+					LOG( LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << ", ChildTask " << tt_iter->name() << " - TaskCount: " << child_list.size() );
+
 					auto context_iter = ChildCallContexts.find( *tt_iter );
 					FATAL_ASSERT( context_iter != ChildCallContexts.end() );
 
 					IDatabaseCallContext *call_context = context_iter->second;
 
-					ExecuteDBTaskListResult::Enum process_child_result = Process_Child_Task_List( call_context, connection, *tt_iter, child_list, bad_task );
-					if ( process_child_result == ExecuteDBTaskListResult::SUCCESS )
-					{
-						std::for_each( child_list.begin(), child_list.end(), [&tt_iter] ( DBTaskListType::iterator iter ) { ( *iter )->On_Child_Task_Type_Success( tt_iter );});
-					}
-					else
+					process_child_result = Process_Child_Task_List( call_context, connection, child_list, bad_task );
+					if ( process_child_result != ExecuteDBTaskListResult::SUCCESS )
 					{
 						break;
 					}
+					
+					std::for_each( sub_list.begin(), sub_list.end(), [&tt_iter] ( ICompoundDatabaseTask *task ) { task->On_Child_Task_Success( *tt_iter );});
 				}
 
 				// commit/rollback etc...
 				if(process_child_result == ExecuteDBTaskListResult::SUCCESS)
 				{
 					connection->End_Transaction( true );
-					successful_tasks.splice( successful_tasks.end(), sub_list );
+
+					// have to use manual loops due to lack of co/contra - variance in STL algorithms
+					for( auto iter = sub_list.begin(); iter != sub_list.end(); ++iter )
+					{
+						successful_tasks.push_back( *iter );
+					}
+
+					sub_list.clear();
 				}
 				else
 				{
@@ -157,13 +157,14 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 
 					if ( sub_list.size() == 1 )
 					{
-						failed_tasks.splice( failed_tasks.end(), sub_list );
+						failed_tasks.push_back( *( sub_list.begin() ) );
+						sub_list.clear();
 						return;
 					}
 
 					if ( bad_task != DatabaseTaskIDType::INVALID )
 					{
-						auto find_iter = std::find( sub_list.begin(), sub_list.end(), [bad_task]( DBTaskListType::iterator s_iter ){ return ( *s_iter )->Get_ID() == bad_task; } );
+						auto find_iter = std::find_if( sub_list.begin(), sub_list.end(), [bad_task]( ICompoundDatabaseTask *task ){ return task->Get_ID() == bad_task; } );
 						if ( find_iter != sub_list.end() )
 						{
 							failed_tasks.push_back( *find_iter );
@@ -192,6 +193,11 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 
 		ExecuteDBTaskListResult::Enum Process_Child_Task_List( IDatabaseCallContext *call_context, IDatabaseConnection *connection, const DBTaskListType &child_list, DatabaseTaskIDType::Enum &bad_task_id )
 		{
+			if ( child_list.size() == 0 )
+			{
+				return ExecuteDBTaskListResult::SUCCESS;
+			}
+
 			if ( call_context->Get_Statement_Text().size() == 0 )
 			{
 				IDatabaseTask *first_task = *child_list.begin();
@@ -214,8 +220,6 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 
 			FATAL_ASSERT( statement->Is_Ready_For_Use() );
 
-			// LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
-
 			DBTaskListType child_list_copy;
 			std::copy( child_list.begin(), child_list.end(), back_inserter(child_list_copy) );
 
@@ -223,11 +227,9 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 			{
 				DBTaskListType sub_list;
 
-				while ( child_list_copy.size() > 0 && sub_list.size() < call_context->Get_Param_Row_Count() )
-				{
-					sub_list.push_back( child_list_copy.front() );
-					child_list_copy.pop_front();
-				}
+				auto end_of_splice_iter = child_list_copy.begin();
+				std::advance( end_of_splice_iter, min( child_list_copy.size(), call_context->Get_Param_Row_Count() ) );
+				sub_list.splice( sub_list.end(), child_list_copy, child_list_copy.begin(), end_of_splice_iter );
 
 				ExecuteDBTaskListResult::Enum result = ExecuteDBTaskListResult::SUCCESS;
 				DBTaskListType::const_iterator failure_iter = sub_list.end();
@@ -244,15 +246,16 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				}
 			}
 
-			// LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << " Failures: " << failed_tasks.size() );
-
 			FATAL_ASSERT( statement->Is_Ready_For_Use() );
 
 			connection->Release_Statement( statement );
+
+			return ExecuteDBTaskListResult::SUCCESS;
 		}
 
 		typedef std::vector< Loki::TypeInfo > ChildTypeVector;
-		typedef stdext::hash_map< Loki::TypeInfo, IDatabaseCallContext *, STypeInfoHelper > ChildCallContextTable;
+		typedef stdext::hash_map< Loki::TypeInfo, IDatabaseCallContext *, STypeInfoContainerHelper > ChildCallContextTable;
+		typedef std::pair< const Loki::TypeInfo, IDatabaseCallContext * > ChildCallContextPair;
 
 		ChildTypeVector ChildOrdering;
 		ChildCallContextTable ChildCallContexts;
@@ -266,13 +269,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 template< typename T >
 void Register_Database_Child_Task_Type( ICompoundDatabaseTaskBatch *compound_batch )
 {
-	uint32 params_batch_size = T::InputParameterBatchSize;
-	FATAL_ASSERT( params_batch_size > 0 );
-
-	uint32 result_set_batch_size = T::ResultSetBatchSize;
-	FATAL_ASSERT( result_set_batch_size > 0 );
-
-   IDatabaseCallContext *child_call_context = new CDatabaseCallContext< T::InputParametersType, params_batch_size, T::ResultSetType, result_set_batch_size >();
+   IDatabaseCallContext *child_call_context = new CDatabaseCallContext< T::InputParametersType, T::InputParameterBatchSize, T::ResultSetType, T::ResultSetBatchSize >();
 
 	compound_batch->Register_Child_Variable_Sets( Loki::TypeInfo( typeid( T ) ), child_call_context );
 }

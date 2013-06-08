@@ -23,8 +23,6 @@
 #ifndef XML_SERIALIZATION_REGISTRAR_H
 #define XML_SERIALIZATION_REGISTRAR_H
 
-#include "TypeInfoUtils.h"
-
 class IXMLSerializer;
 
 typedef FastDelegate0< IXMLSerializer * > XMLSerializerCreationDelegate;

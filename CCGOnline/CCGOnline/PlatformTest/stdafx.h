@@ -29,6 +29,7 @@
 #include <vector>
 #include <set>
 #include <hash_map>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <string>

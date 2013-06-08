@@ -92,8 +92,8 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 
 	BASECLASS::Per_Frame_Logic_End();
 
-	DBTaskListType successes;
-	DBTaskListType failures;
+	DBTaskBaseListType successes;
+	DBTaskBaseListType failures;
 
 	for ( auto iter = BatchOrdering.cbegin(); iter != BatchOrdering.cend(); ++iter )
 	{
@@ -104,9 +104,9 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 		batch->Execute_Tasks( Connection, successes, failures );
 	}
 
-	for ( DBTaskListType::const_iterator success_iter = successes.cbegin(); success_iter != successes.cend(); ++success_iter )
+	for ( auto success_iter = successes.cbegin(); success_iter != successes.cend(); ++success_iter )
 	{
-		IDatabaseTask *task = *success_iter;
+		IDatabaseTaskBase *task = *success_iter;
 		auto pending_request_iter = PendingRequests.find( task->Get_ID() );
 		FATAL_ASSERT( pending_request_iter != PendingRequests.end() );
 
@@ -123,9 +123,9 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 		PendingRequests.erase( pending_request_iter );
 	}
 
-	for ( DBTaskListType::const_iterator failure_iter = failures.cbegin(); failure_iter != failures.cend(); ++failure_iter )
+	for ( auto failure_iter = failures.cbegin(); failure_iter != failures.cend(); ++failure_iter )
 	{
-		IDatabaseTask *task = *failure_iter;
+		IDatabaseTaskBase *task = *failure_iter;
 		auto pending_request_iter = PendingRequests.find( task->Get_ID() );
 		FATAL_ASSERT( pending_request_iter != PendingRequests.end() );
 

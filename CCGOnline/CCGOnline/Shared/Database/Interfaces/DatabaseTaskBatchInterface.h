@@ -25,6 +25,7 @@
 
 #include "Database/DatabaseTypes.h"
 
+class ICompoundDatabaseTask;
 class IDatabaseTask;
 class IDatabaseConnection;
 
@@ -37,7 +38,8 @@ class IDatabaseTaskBatch
 
 		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const = 0;
 		virtual void Add_Task( IDatabaseTask *task ) = 0;
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks ) = 0;
+		virtual void Add_Task( ICompoundDatabaseTask *task ) = 0;
+		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks ) = 0;
 };
 
 #endif // DATABASE_TASK_BATCH_H

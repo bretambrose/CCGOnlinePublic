@@ -57,10 +57,7 @@ class IDatabaseTask : public IDatabaseTaskBase
 
 		virtual const wchar_t *Get_Database_Object_Name( void ) const = 0;
 		virtual void Build_Column_Name_List( std::vector< const wchar_t * > &column_names ) const = 0;
-		virtual EDatabaseTaskType Get_Task_Type( void ) const = 0;
-
-		virtual void On_Task_Success( void ) = 0;					
-		virtual void On_Task_Failure( void ) = 0;		
+		virtual EDatabaseTaskType Get_Task_Type( void ) const = 0;	
 
 	protected:
 

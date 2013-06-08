@@ -111,8 +111,8 @@ void Run_MissingProcedureCall_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -287,8 +287,8 @@ void Run_WrongArityProcedureCall_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -454,8 +454,8 @@ void Run_BadParamConversionProcedureCall_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -591,8 +591,8 @@ void Run_BadParamConversionFunctionCall_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -721,8 +721,8 @@ void Run_BadResultSetConversionProcedureCall_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -853,8 +853,8 @@ void Run_FunctionInputProcedureCall_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -987,8 +987,8 @@ void Run_ProcedureInputFunctionCall_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -1221,8 +1221,8 @@ void Run_ThrowExceptionProcedureCall_Test( const wchar_t *proc_name, uint32 task
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 exception_count = ( exception_index2 < task_count ) ? 2 : 1;
@@ -1579,8 +1579,8 @@ void Run_MissingSelectProcedureCall_Test( uint32 task_count, uint32 skip_index1,
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 exception_count = ( skip_index2 < task_count ) ? 2 : 1;
@@ -1822,8 +1822,8 @@ void Run_ExtraSelectProcedureCall_Test( uint32 task_count, uint32 non_extra_inde
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 bad_task_count = ( non_extra_index < task_count ) ? task_count - 1 : task_count;
@@ -2061,8 +2061,8 @@ void Run_TooManyResultsProcedureCall_Test( uint32 task_count, uint32 extra_index
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 good_task_count = ( extra_index < task_count ) ? task_count - 1 : task_count;
@@ -2299,8 +2299,8 @@ void Run_ExtraColumnProcedureCall_Test( uint32 task_count, uint32 extra_index )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 good_task_count = ( extra_index < task_count ) ? task_count - 1 : task_count;
@@ -2532,8 +2532,8 @@ void Run_MissingColumnProcedureCall_Test( uint32 task_count, uint32 missing_inde
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 good_task_count = ( missing_index < task_count ) ? task_count - 1 : task_count;
@@ -2760,8 +2760,8 @@ void Run_InvalidResultConversionProcedureCall_Test( uint32 task_count, uint32 in
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 good_task_count = ( invalid_index < task_count ) ? task_count - 1 : task_count;
@@ -3018,8 +3018,8 @@ void Run_ResultStringTruncationProcedureCall_Test( uint32 task_count, uint32 inv
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	uint32 good_task_count = ( invalid_index < task_count ) ? task_count - 1 : task_count;
@@ -3226,8 +3226,8 @@ void Run_SelectAccountBadTable_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -3375,8 +3375,8 @@ void Run_SelectAccountBadColumn_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -3524,8 +3524,8 @@ void Run_SelectAccountBadConversion_Test( uint32 task_count )
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );
@@ -3689,8 +3689,8 @@ void Run_BadColumnTableValuedFunctionTest( uint32 task_count, uint64 account_id 
 		db_task_batch.Add_Task( db_task );
 	}
 
-	DBTaskListType successful_tasks;
-	DBTaskListType failed_tasks;
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
 	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	ASSERT_TRUE( failed_tasks.size() == task_count );

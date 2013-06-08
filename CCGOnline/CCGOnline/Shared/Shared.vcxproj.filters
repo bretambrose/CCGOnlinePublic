@@ -284,9 +284,6 @@
     <ClInclude Include="Database\Interfaces\CompoundDatabaseTaskBatchInterface.h">
       <Filter>Source Files\Database\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="Database\CompoundDatabaseTask.h">
-      <Filter>Source Files\Database</Filter>
-    </ClInclude>
     <ClInclude Include="Database\DatabaseCallContext.h">
       <Filter>Source Files\Database</Filter>
     </ClInclude>

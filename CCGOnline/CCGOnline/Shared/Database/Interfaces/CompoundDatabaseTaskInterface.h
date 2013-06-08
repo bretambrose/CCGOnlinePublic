@@ -25,7 +25,8 @@
 
 #include "DatabaseTaskBaseInterface.h"
 
-class IDatabaseTask;
+#include "DatabaseTypes.h"
+
 template< typename T > class TCompoundDatabaseTaskBatch;
 
 class ICompoundDatabaseTask : public IDatabaseTaskBase
@@ -38,18 +39,12 @@ class ICompoundDatabaseTask : public IDatabaseTaskBase
 		virtual ~ICompoundDatabaseTask() {}
 
 		virtual void Add_Child_Task( IDatabaseTask *task ) = 0;
-
-	protected:
-
-		template< typename T > friend class TCompoundDatabaseTaskBatch;
-
-		virtual void On_Task_Success( void ) = 0;					
-		virtual void On_Task_Failure( void ) = 0;		
+		virtual void On_Child_Task_Success( const Loki::TypeInfo &child_type ) = 0;
 
 		virtual void Seed_Child_Tasks( void ) = 0;
 		virtual void Clear_Child_Tasks( void ) = 0;
-		virtual void On_Child_Task_Success( const Loki::TypeInfo &child_type ) = 0;
 		virtual void Get_Child_Tasks_Of_Type( const Loki::TypeInfo &child_type, DBTaskListType &tasks ) const = 0;
+		virtual void Get_All_Child_Tasks( DBTaskListType &tasks ) const = 0;
 
 };
 

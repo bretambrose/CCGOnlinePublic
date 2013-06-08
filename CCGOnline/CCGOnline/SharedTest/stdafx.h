@@ -29,6 +29,7 @@
 #include <vector>
 #include <set>
 #include <hash_map>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <string>
@@ -54,5 +55,6 @@ using std::unique_ptr;
 // self includes
 #include "PlatformTypes.h"
 #include "DebugAssert.h"
+#include "TypeInfoUtils.h"
 #include "gtest/gtest.h"
 

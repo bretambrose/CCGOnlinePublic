@@ -1735,7 +1735,7 @@ bool Handle_Add_Account_Batch( const CSlashCommandInstance &instance, std::wstri
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	FATAL_ASSERT( connection != nullptr );
 
-	DBTaskListType successful_tasks, failed_tasks;
+	DBTaskBaseListType successful_tasks, failed_tasks;
 	add_account_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
 
 	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );

@@ -64,8 +64,9 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 		}
 
 		virtual void Add_Task( IDatabaseTask *task ) { PendingTasks.push_back( task ); }
+		virtual void Add_Task( ICompoundDatabaseTask * /*task*/ ) { FATAL_ASSERT( false ); }
 
-		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
 		{
 			if ( PendingTasks.size() == 0 )
 			{
@@ -118,7 +119,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 
 	private:
 
-		void Process_Task_List( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskListType &successful_tasks, DBTaskListType &failed_tasks )
+		void Process_Task_List( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
 		{
 			while( sub_list.size() > 0 )
 			{

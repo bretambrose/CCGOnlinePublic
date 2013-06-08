@@ -24,7 +24,6 @@
 #define CONCURRENCY_MANAGER_H
 
 #include "ProcessProperties.h"
-#include "TypeInfoUtils.h"
 
 class IManagedProcess;
 class CReadOnlyMailbox;
