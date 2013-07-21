@@ -24,7 +24,7 @@
 #ifndef ODBC_OBJECT_BASE_H
 #define ODBC_OBJECT_BASE_H
 
-#include <Windows.h>
+#include "WindowsWrapper.h"
 #include <sql.h>
 
 enum DBErrorStateType;

@@ -2227,3 +2227,13 @@ TEST_F( ODBCSuccessTests, TrvialCompoundTasks_1_1_1_1_OK )
 {
 	Run_TrivialCompoundTask_Test< 1, 1, 1 >( 1 );
 }
+
+TEST_F( ODBCSuccessTests, TrvialCompoundTasks_2_1_1_3_OK )
+{
+	Run_TrivialCompoundTask_Test< 2, 1, 1 >( 3 );
+}
+
+TEST_F( ODBCSuccessTests, TrvialCompoundTasks_3_2_2_7_OK )
+{
+	Run_TrivialCompoundTask_Test< 3, 2, 2 >( 7 );
+}

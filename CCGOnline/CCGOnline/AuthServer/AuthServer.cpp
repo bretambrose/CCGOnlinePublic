@@ -24,7 +24,7 @@
 
 #include "ServerShared.h"
 
-#include <Windows.h>
+#include "WindowsWrapper.h"
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>

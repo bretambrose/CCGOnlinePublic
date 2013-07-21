@@ -101,11 +101,10 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 			{
 				DBTaskListType sub_list;
 
-				while ( PendingTasks.size() > 0 && sub_list.size() < T::InputParameterBatchSize )
-				{
-					sub_list.push_back( PendingTasks.front() );
-					PendingTasks.pop_front();
-				}
+				auto splice_iter = PendingTasks.begin();
+				uint32 advance_amount = std::min<uint32>( 0, 1 ); // static_cast< uint32 >( PendingTasks.size() ), T::InputParameterBatchSize );
+				std::advance( splice_iter, advance_amount );
+				sub_list.splice( sub_list.end(), PendingTasks, PendingTasks.begin(), splice_iter );
 
 				Process_Task_List( statement, sub_list, successful_tasks, failed_tasks );
 			}
@@ -131,11 +130,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 					statement->Get_Connection()->End_Transaction( true );
 					statement->Return_To_Ready();
 
-					for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
-					{
-						successful_tasks.push_back( *iter );
-					}
-
+					std::for_each( sub_list.begin(), sub_list.end(), [ &successful_tasks ]( IDatabaseTask *task ){ successful_tasks.push_back( task ); } );
 					sub_list.clear();
 				}
 				else

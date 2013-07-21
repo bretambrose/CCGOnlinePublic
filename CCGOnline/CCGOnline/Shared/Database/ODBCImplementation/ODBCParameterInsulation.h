@@ -23,9 +23,23 @@
 #ifndef ODBC_PARAMETER_INSULATION_H
 #define ODBC_PARAMETER_INSULATION_H
 
-//#define INSULATE_FROM_WINDOWS_HEADERS
+#define INSULATE_FROM_WINDOWS_HEADERS
 
 #ifdef INSULATE_FROM_WINDOWS_HEADERS
+
+/*
+typedef short				SQLSMALLINT;
+
+typedef SQLSMALLINT     SQLRETURN;
+
+typedef void*					SQLHANDLE;
+
+typedef SQLHANDLE               SQLHENV;
+typedef SQLHANDLE               SQLHDBC;
+typedef SQLHANDLE               SQLHSTMT;
+typedef SQLHANDLE               SQLHDESC;
+
+*/
 
 static const int32 IP_SQL_NULL_DATA = -1;
 static const int32 IP_SQL_NTS = -3;
@@ -38,7 +52,7 @@ static const int32 IP_SQL_NTS = -3;
 
 #else
 
-#include <Windows.h>
+#include "WindowsWrapper.h"
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>

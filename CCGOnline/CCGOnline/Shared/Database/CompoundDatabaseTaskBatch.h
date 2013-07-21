@@ -83,7 +83,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				DBCompoundTaskListType sub_list;
 
 				auto splice_iter = PendingTasks.begin();
-				std::advance( splice_iter, min( static_cast< uint32 >( PendingTasks.size() ), T::CompoundTaskBatchSize ) );
+				std::advance( splice_iter, std::min( static_cast< uint32 >( PendingTasks.size() ), T::CompoundTaskBatchSize ) );
 				sub_list.splice( sub_list.end(), PendingTasks, PendingTasks.begin(), splice_iter );
 
 				Process_Parent_Task_List( connection, sub_list, successful_tasks, failed_tasks );
@@ -106,8 +106,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 		{
 			while ( sub_list.size() > 0 )
 			{
-				std::for_each( sub_list.cbegin(), sub_list.cend(), []( ICompoundDatabaseTask *task ) { task->Clear_Child_Tasks(); } );
-				std::for_each( sub_list.cbegin(), sub_list.cend(), []( ICompoundDatabaseTask *task ) { task->Seed_Child_Tasks(); } );
+				std::for_each( sub_list.cbegin(), sub_list.cend(), []( ICompoundDatabaseTask *task ) { task->Clear_Child_Tasks(); task->Seed_Child_Tasks(); } );
 
 				DatabaseTaskIDType::Enum bad_task = DatabaseTaskIDType::INVALID;
 				ExecuteDBTaskListResult::Enum process_child_result = ExecuteDBTaskListResult::SUCCESS;
@@ -143,12 +142,8 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				{
 					connection->End_Transaction( true );
 
-					// have to use manual loops due to lack of co/contra - variance in STL algorithms
-					for( auto iter = sub_list.begin(); iter != sub_list.end(); ++iter )
-					{
-						successful_tasks.push_back( *iter );
-					}
-
+					// can't use splice due to type difference
+					std::for_each( sub_list.begin(), sub_list.end(), [ &successful_tasks ]( ICompoundDatabaseTask *task ){ successful_tasks.push_back( task ); } );
 					sub_list.clear();
 				}
 				else
@@ -228,7 +223,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				DBTaskListType sub_list;
 
 				auto end_of_splice_iter = child_list_copy.begin();
-				std::advance( end_of_splice_iter, min( child_list_copy.size(), call_context->Get_Param_Row_Count() ) );
+				std::advance( end_of_splice_iter, std::min( static_cast<uint32>(child_list_copy.size()), call_context->Get_Param_Row_Count() ) );
 				sub_list.splice( sub_list.end(), child_list_copy, child_list_copy.begin(), end_of_splice_iter );
 
 				ExecuteDBTaskListResult::Enum result = ExecuteDBTaskListResult::SUCCESS;
