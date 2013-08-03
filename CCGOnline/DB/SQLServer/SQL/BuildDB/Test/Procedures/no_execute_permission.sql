@@ -16,7 +16,6 @@ BEGIN
 END
 GO
 
--- doesn't seem to work
 REVOKE EXECUTE ON OBJECT::dynamic.no_execute_permission FROM testserver;
 
 GO

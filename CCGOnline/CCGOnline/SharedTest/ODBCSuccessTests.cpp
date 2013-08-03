@@ -39,14 +39,14 @@ class ODBCSuccessTests : public testing::Test
 {
 	public:
 	
-	static void SetUpTestCase() 
+	static void SetUpTestCase( void ) 
 	{
 		system( "rebuild_test_db.bat 1> nul" );
 
 		CODBCFactory::Create_Environment();
 	}
 
-	static void TearDownTestCase() 
+	static void TearDownTestCase( void ) 
 	{
 		CODBCFactory::Destroy_Environment();
 	}	  
@@ -2149,6 +2149,29 @@ TEST_F( ODBCSuccessTests, ReadSeedData_TableValueFunctionTest_2_2_5_1 )
 // Compound Tests
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class ODBCCompoundSuccessTests : public testing::Test 
+{
+	public:
+	
+	static void SetUpTestCase( void ) 
+	{
+		system( "rebuild_test_db.bat 1> nul" );
+
+		CODBCFactory::Create_Environment();
+	}
+
+	virtual void SetUp( void )
+	{
+		system( "clear_test_write_tables.bat 1> nul" );
+	}
+
+	static void TearDownTestCase( void ) 
+	{
+		CODBCFactory::Destroy_Environment();
+	}	  
+
+};
+
 template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 OSIZE1 >
 class CTrivialCompoundTask : public TCompoundDatabaseTask< BATCH_SIZE >
 {
@@ -2223,17 +2246,17 @@ void Run_TrivialCompoundTask_Test( uint32 task_count )
 	delete connection;
 }
 
-TEST_F( ODBCSuccessTests, TrvialCompoundTasks_1_1_1_1_OK )
+TEST_F( ODBCCompoundSuccessTests, TrvialCompoundTasks_1_1_1_1_OK )
 {
 	Run_TrivialCompoundTask_Test< 1, 1, 1 >( 1 );
 }
 
-TEST_F( ODBCSuccessTests, TrvialCompoundTasks_2_1_1_3_OK )
+TEST_F( ODBCCompoundSuccessTests, TrvialCompoundTasks_2_1_1_3_OK )
 {
 	Run_TrivialCompoundTask_Test< 2, 1, 1 >( 3 );
 }
 
-TEST_F( ODBCSuccessTests, TrvialCompoundTasks_3_2_2_7_OK )
+TEST_F( ODBCCompoundSuccessTests, TrvialCompoundTasks_3_2_2_7_OK )
 {
 	Run_TrivialCompoundTask_Test< 3, 2, 2 >( 7 );
 }

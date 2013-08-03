@@ -102,7 +102,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 				DBTaskListType sub_list;
 
 				auto splice_iter = PendingTasks.begin();
-				uint32 advance_amount = std::min<uint32>( 0, 1 ); // static_cast< uint32 >( PendingTasks.size() ), T::InputParameterBatchSize );
+				uint32 advance_amount = std::min<uint32>( static_cast< uint32 >( PendingTasks.size() ), T::InputParameterBatchSize );
 				std::advance( splice_iter, advance_amount );
 				sub_list.splice( sub_list.end(), PendingTasks, PendingTasks.begin(), splice_iter );
 
