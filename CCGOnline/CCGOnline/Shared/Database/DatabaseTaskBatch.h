@@ -52,7 +52,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 
 		virtual ~TDatabaseTaskBatch()
 		{
-			FATAL_ASSERT( PendingTasks.size() == 0 );
+			FATAL_ASSERT( PendingTasks.empty() );
 
 			delete CallContext;
 			CallContext = nullptr;
@@ -68,7 +68,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 
 		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
 		{
-			if ( PendingTasks.size() == 0 )
+			if ( PendingTasks.empty() )
 			{
 				return;
 			}
@@ -97,7 +97,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 
 			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
 
-			while ( PendingTasks.size() > 0 )
+			while ( !PendingTasks.empty() )
 			{
 				DBTaskListType sub_list;
 
@@ -120,7 +120,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 
 		void Process_Task_List( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
 		{
-			while( sub_list.size() > 0 )
+			while( !sub_list.empty() )
 			{
 				ExecuteDBTaskListResult::Enum execute_result;
 				DBTaskListType::const_iterator bad_task;

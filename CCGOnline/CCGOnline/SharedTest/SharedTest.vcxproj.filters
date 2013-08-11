@@ -38,6 +38,9 @@
     <ClInclude Include="SharedTestProcessSubject.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ODBCShared.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

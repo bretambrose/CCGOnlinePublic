@@ -48,7 +48,7 @@ static void Log_DB_Error( IDatabaseStatement *statement, IDatabaseVariableSet *i
 	{
 		std::vector< IDatabaseVariable * > params;
 		input_params->Get_Variables( params );
-		if ( params.size() > 0 )
+		if ( !params.empty() )
 		{
 			LOG( LL_LOW, "\tDumping Parameters:" );
 			for ( uint32 i = 0; i < params.size(); ++i )
@@ -83,7 +83,7 @@ static void Extract_Batch_Error( IDatabaseCallContext *call_context,
 											ExecuteDBTaskListResult::Enum &result, 
 											DBTaskListType::const_iterator &first_failed_task )
 {
-	FATAL_ASSERT( sub_list.size() > 0 );
+	FATAL_ASSERT( !sub_list.empty() );
 
 	if ( sub_list.size() == 1 )
 	{
@@ -120,7 +120,7 @@ void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseSt
 	result = ExecuteDBTaskListResult::SUCCESS;
 	first_failed_task = sub_list.cend();
 
-	if ( sub_list.size() == 0 )
+	if ( sub_list.empty() )
 	{
 		return;
 	}

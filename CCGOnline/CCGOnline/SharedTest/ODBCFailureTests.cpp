@@ -22,7 +22,9 @@
 
 #include "stdafx.h"
 
+#include "Database/CompoundDatabaseTaskBatch.h"
 #include "Database/ODBCImplementation/ODBCFactory.h"
+#include "Database/Interfaces/CompoundDatabaseTaskBatchInterface.h"
 #include "Database/Interfaces/DatabaseConnectionInterface.h"
 #include "Database/Interfaces/DatabaseEnvironmentInterface.h"
 #include "Database/Interfaces/DatabaseStatementInterface.h"
@@ -32,6 +34,7 @@
 #include "Database/EmptyVariableSet.h"
 #include "Database/DatabaseCalls.h"
 #include "Database/DatabaseTaskBatch.h"
+#include "ODBCShared.h"
 #include "StringUtils.h"
 
 class ODBCFailureTests : public testing::Test 
@@ -3719,4 +3722,445 @@ TEST_F( ODBCFailureTests, BadColumnTableValuedFunctionTest_2_2_3_2 )
 TEST_F( ODBCFailureTests, BadColumnTableValuedFunctionTest_2_2_5_3 )
 {
 	Run_BadColumnTableValuedFunctionTest< 2, 2 >( 5, 3 );
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Compound Tests
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class ODBCCompoundFailureTests : public testing::Test 
+{
+	public:
+	
+	static void SetUpTestCase( void ) 
+	{
+		system( "rebuild_test_db.bat 1> nul" );
+
+		CODBCFactory::Create_Environment();
+	}
+
+	virtual void SetUp( void )
+	{
+		system( "clear_test_write_tables.bat 1> nul" );
+	}
+
+	static void TearDownTestCase( void ) 
+	{
+		CODBCFactory::Destroy_Environment();
+	}	  
+
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class CFailableCompoundInsertParams : public CODBCVariableSet
+{
+	public:
+
+		typedef CODBCVariableSet BASECLASS;
+
+		CFailableCompoundInsertParams( void ) :
+			BASECLASS(),
+			ID(),
+			UserData(),
+			ShouldFail()
+		{}
+
+		CFailableCompoundInsertParams( uint64 id, uint64 user_data, bool should_fail ) :
+			BASECLASS(),
+			ID( id ),
+			UserData( user_data ),
+			ShouldFail( should_fail )
+		{}
+
+		virtual ~CFailableCompoundInsertParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ID );
+			variables.push_back( &UserData );
+			variables.push_back( &ShouldFail );
+		}
+
+		DBUInt64In ID;
+		DBUInt64In UserData;
+		DBBoolIn ShouldFail;
+};
+
+template< uint32 ISIZE >
+class CFailableCompoundInsertProcedureCall : public TDatabaseProcedureCall< CFailableCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CFailableCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 > BASECLASS;
+
+		CFailableCompoundInsertProcedureCall( uint64 id, uint64 index, bool should_fail ) : 
+			BASECLASS(),
+			ID( id ),
+			Index( index ),
+			ShouldFail( should_fail )
+		{}
+
+		virtual ~CFailableCompoundInsertProcedureCall() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.test_failable_compound_insert"; }
+
+		void Verify_Results( void ) {}
+
+	protected:
+
+		// WIP: signatures in flux
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			 CFailableCompoundInsertParams* params = static_cast< CFailableCompoundInsertParams * >( input_parameters );
+			 *params = CFailableCompoundInsertParams( ID, Index, ShouldFail );
+	   }	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 rows_fetched ) 
+		{
+			ASSERT_TRUE( rows_fetched == 0 );
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) {}	
+
+		virtual void On_Rollback( void ) { ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		uint64 ID;
+		uint64 Index;
+		bool ShouldFail;
+
+};
+
+class CFailableCompoundInsertCountParams : public CODBCVariableSet
+{
+	public:
+
+		typedef CODBCVariableSet BASECLASS;
+
+		CFailableCompoundInsertCountParams( void ) :
+			BASECLASS(),
+			ID(),
+			ShouldFail()
+		{}
+
+		CFailableCompoundInsertCountParams( uint64 id, bool should_fail ) :
+			BASECLASS(),
+			ID( id ),
+			ShouldFail( should_fail )
+		{}
+
+		virtual ~CFailableCompoundInsertCountParams() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &ID );
+			variables.push_back( &ShouldFail );
+		}
+
+		DBUInt64In ID;
+		DBBoolIn ShouldFail;
+};
+
+class CFailableCompoundInsertCountResultSet : public CODBCVariableSet
+{
+	public:
+
+		typedef CODBCVariableSet BASECLASS;
+
+		CFailableCompoundInsertCountResultSet( void ) :
+			BASECLASS(),
+			InsertCount()
+		{}
+
+		virtual ~CFailableCompoundInsertCountResultSet() {}
+
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
+		{
+			variables.push_back( &InsertCount );
+		}
+
+		DBUInt64In InsertCount;
+};
+
+template< uint32 ISIZE, uint32 OSIZE >
+class CFailableCompoundInsertCountProcedureCall : public TDatabaseProcedureCall< CFailableCompoundInsertCountParams, ISIZE, CFailableCompoundInsertCountResultSet, OSIZE >
+{
+	public:
+
+		typedef TDatabaseProcedureCall< CFailableCompoundInsertCountParams, ISIZE, CFailableCompoundInsertCountResultSet, OSIZE > BASECLASS;
+
+		CFailableCompoundInsertCountProcedureCall( uint64 id, uint64 expected_count, bool should_fail ) : 
+			BASECLASS(),
+			ID( id ),
+			Count( 0 ),
+			ExpectedCount( expected_count ),
+			ShouldFail( should_fail )
+		{}
+
+		virtual ~CFailableCompoundInsertCountProcedureCall() {}
+
+		virtual const wchar_t *Get_Database_Object_Name( void ) const { return L"dynamic.test_failable_compound_insert_count"; }
+
+		void Verify_Results( void ) 
+		{
+			ASSERT_TRUE( ShouldFail || Count == ExpectedCount );
+		}
+
+	protected:
+
+		// WIP: signatures in flux
+		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) 
+		{ 
+			 CFailableCompoundInsertCountParams* params = static_cast< CFailableCompoundInsertCountParams * >( input_parameters );
+			 *params = CFailableCompoundInsertCountParams( ID, ShouldFail );
+	   }	
+			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		{
+			ASSERT_TRUE( rows_fetched == 1 );
+
+			CFailableCompoundInsertCountResultSet* results = static_cast< CFailableCompoundInsertCountResultSet * >( result_set );
+			Count = results[ 0 ].InsertCount.Get_Value();
+		}
+					
+		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) {}	
+
+		virtual void On_Rollback( void ) { ASSERT_TRUE( false ); }
+		virtual void On_Task_Success( void ) { ASSERT_TRUE( false ); }				
+		virtual void On_Task_Failure( void ) { ASSERT_TRUE( false ); }
+
+	private:
+
+		uint64 ID;
+		uint64 Count;
+		uint64 ExpectedCount;
+		bool ShouldFail;
+
+};
+
+enum ChildTaskFailureType
+{
+	CTFT_NONE,
+	CTFT_FIRST,
+	CTFT_SECOND
+};
+
+template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 ISIZE2, uint32 OSIZE2 >
+class CFailableCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
+{
+	public:
+
+		typedef TCompoundDatabaseTask< BATCH_SIZE > BASECLASS;
+
+		typedef CFailableCompoundInsertProcedureCall< ISIZE1 > Child1Type;
+		typedef CFailableCompoundInsertCountProcedureCall< ISIZE2, OSIZE2 > Child2Type;
+
+		CFailableCompoundInsertTask( uint64 id, uint64 insert_count, ChildTaskFailureType failure_type, uint32 failure_index ) :
+			BASECLASS(),
+			ID( id ),
+			InsertCount( insert_count ),
+			FailureType( failure_type ),
+			FailureIndex( failure_index )
+		{
+			Register_Child_Type_Success_Callback( Loki::TypeInfo( typeid( Child1Type ) ), FastDelegate0<>(this, &CFailableCompoundInsertTask::On_Insert_Success) );
+		}
+
+		virtual ~CFailableCompoundInsertTask() {}
+
+		static void Register_Child_Tasks( ICompoundDatabaseTaskBatch *task_batch )
+		{
+			Register_Database_Child_Task_Type< Child1Type >( task_batch );
+			Register_Database_Child_Task_Type< Child2Type >( task_batch );
+		}
+		
+		void Verify_Results( void )
+		{
+			DBTaskListType child_tasks;
+			Get_Child_Tasks_Of_Type( Loki::TypeInfo( typeid( Child1Type ) ), child_tasks );
+
+			std::for_each( child_tasks.begin(), child_tasks.end(), []( IDatabaseTask *task ) {
+					Child1Type *child_task = static_cast< Child1Type * >( task );
+					child_task->Verify_Results();
+				}
+			);
+
+			child_tasks.clear();
+			Get_Child_Tasks_Of_Type( Loki::TypeInfo( typeid( Child2Type ) ), child_tasks );
+
+			std::for_each( child_tasks.begin(), child_tasks.end(), []( IDatabaseTask *task ) {
+					Child2Type *child_task = static_cast< Child2Type * >( task );
+					child_task->Verify_Results();
+				}
+			);
+		}
+
+		virtual void On_Task_Success( void ) {}				
+		virtual void On_Task_Failure( void ) {}	
+
+		virtual void Seed_Child_Tasks( void )
+		{
+			for( uint32 i = 0; i < InsertCount; ++i )
+			{
+				Add_Child_Task( new Child1Type( ID, i + 1, FailureType == CTFT_FIRST && i == FailureIndex ) );
+			}
+		}
+
+	private:
+
+		void On_Insert_Success()
+		{
+			Add_Child_Task( new Child2Type( ID, InsertCount, FailureType == CTFT_SECOND ) );
+		}
+
+		uint64 ID;
+		uint64 InsertCount;
+		ChildTaskFailureType FailureType;
+		uint32 FailureIndex;
+};
+
+uint32 Get_Insert_Count( IDatabaseConnection *connection, uint32 row_id )
+{
+	typedef CCompoundInsertCountProcedureCall< 1, 1 > TaskType;
+	TDatabaseTaskBatch< TaskType > db_task_batch;
+	std::vector< TaskType * > tasks;
+
+	auto db_task = new TaskType( row_id + 1, 0 );
+	db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( 1 ) );
+	tasks.push_back( db_task );
+	db_task_batch.Add_Task( db_task );
+
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
+	db_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	FATAL_ASSERT( failed_tasks.size() == 0 );
+	FATAL_ASSERT( successful_tasks.size() == 1 );
+	
+	return tasks[ 0 ]->Get_Insert_Count();
+}
+
+template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 ISIZE2, uint32 INSERT_COUNT >
+void Run_FirstFailableCompoundInsertTask_Test( uint32 task_count, uint32 bad_task, uint32 bad_first_child_index )
+{
+	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
+	ASSERT_TRUE( connection != nullptr );
+
+	typedef CFailableCompoundInsertTask< BATCH_SIZE, ISIZE1, ISIZE2, 1 > CompoundTaskType;
+	TCompoundDatabaseTaskBatch< CompoundTaskType > db_compound_task_batch;
+	std::vector< CompoundTaskType * > tasks;
+	for ( uint32 i = 0; i < task_count; ++i )
+	{
+		auto db_task = new CompoundTaskType( i + 1, INSERT_COUNT, ( i == bad_task ) ? CTFT_FIRST : CTFT_NONE, bad_first_child_index );
+		db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( i + 1 ) );
+		tasks.push_back( db_task );
+		db_compound_task_batch.Add_Task( db_task );
+	}
+
+	DBTaskBaseListType successful_tasks;
+	DBTaskBaseListType failed_tasks;
+	db_compound_task_batch.Execute_Tasks( connection, successful_tasks, failed_tasks );
+
+	ASSERT_TRUE( failed_tasks.size() == 1 );
+	ASSERT_TRUE( successful_tasks.size() == task_count - 1 );
+	
+	for ( uint32 i = 0; i < tasks.size(); ++i )
+	{
+		tasks[ i ]->Verify_Results();
+		delete tasks[ i ];
+	}
+
+	ASSERT_TRUE( Get_Insert_Count( connection, bad_task ) == 0 );
+
+	CODBCFactory::Get_Environment()->Shutdown_Connection( connection->Get_ID() );
+	delete connection;
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_1_1_1_1_0_0 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 1, 1, 1 >( 1, 0, 0 );
+}
+
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_1_1_2_1_0_0 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 1, 1, 2 >( 1, 0, 0 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_1_1_2_1_0_1 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 1, 1, 2 >( 1, 0, 1 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_3_1_0_0 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 3 >( 1, 0, 0 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_3_1_0_1 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 3 >( 1, 0, 1 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_3_1_0_2 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 3 >( 1, 0, 2 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_5_1_0_4 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 5 >( 1, 0, 4 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_3_2_0_0 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 3 >( 2, 0, 0 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_3_2_0_2 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 3 >( 2, 0, 2 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_3_2_1_0 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 3 >( 2, 1, 0 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_1_2_1_3_2_1_2 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 1, 2, 1, 3 >( 2, 1, 2 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_2_3_1_7_2_0_5 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 2, 3, 1, 7 >( 2, 0, 5 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_2_3_1_7_2_0_6 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 2, 3, 1, 7 >( 2, 0, 6 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_2_3_1_7_2_1_5 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 2, 3, 1, 7 >( 2, 1, 5 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_2_3_1_7_2_1_6 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 2, 3, 1, 7 >( 2, 1, 6 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_2_3_1_7_5_2_6 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 2, 3, 1, 7 >( 5, 2, 6 );
+}
+
+TEST_F( ODBCCompoundFailureTests, FirstFailableCompoundInsertTasks_2_3_1_7_5_4_3 )
+{
+	Run_FirstFailableCompoundInsertTask_Test< 2, 3, 1, 7 >( 5, 4, 3 );
 }

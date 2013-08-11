@@ -105,7 +105,7 @@ void CCompoundDatabaseTaskBase::On_Child_Task_Success( const Loki::TypeInfo &chi
 		return;
 	}
 
-	iter->second( child_type );
+	iter->second();
 }
 
 void CCompoundDatabaseTaskBase::Register_Child_Type_Success_Callback( const Loki::TypeInfo &child_type, const ChildSuccessHandlerFunctorType &success_callback )

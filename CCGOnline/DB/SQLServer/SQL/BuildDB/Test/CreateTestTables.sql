@@ -85,5 +85,5 @@ CREATE TABLE dynamic.test_transactions
 		test_transaction_id BIGINT NOT NULL,
 		user_data BIGINT NOT NULL,
 
-		CONSTRAINT d_test_transactions_pk PRIMARY KEY (test_transaction_id)
+		CONSTRAINT d_test_transactions_pk PRIMARY KEY (test_transaction_id, user_data)
 	);

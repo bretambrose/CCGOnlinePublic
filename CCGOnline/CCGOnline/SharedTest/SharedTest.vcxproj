@@ -90,6 +90,7 @@
       <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\pugixml;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,6 +114,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)D32
       <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\pugixml;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +141,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)D64
       <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\pugixml;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,6 +169,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R32
       <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;X64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Platform;$(SolutionDir)\pugixml;$(SolutionDir)\Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,6 +190,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64
   <ItemGroup>
     <ClInclude Include="GeneratedCode\RegisterSharedTestEnums.h" />
     <ClInclude Include="Helpers\ProcessHelpers.h" />
+    <ClInclude Include="ODBCShared.h" />
     <ClInclude Include="ReflectionTests.h" />
     <ClInclude Include="SharedTestProcessSubject.h" />
     <ClInclude Include="stdafx.h" />

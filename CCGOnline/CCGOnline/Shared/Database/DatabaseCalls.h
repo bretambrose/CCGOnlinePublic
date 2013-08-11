@@ -185,7 +185,7 @@ class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
 
 	protected:
 
-		typedef FastDelegate1< const Loki::TypeInfo > ChildSuccessHandlerFunctorType;
+		typedef FastDelegate0<> ChildSuccessHandlerFunctorType;
 
 		// IDatabaseTask interface
 		virtual void Set_Parent( ICompoundDatabaseTask * /*parent*/ ) { FATAL_ASSERT( false ); }

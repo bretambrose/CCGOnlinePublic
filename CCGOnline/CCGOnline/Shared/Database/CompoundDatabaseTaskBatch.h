@@ -50,7 +50,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 
 		virtual ~TCompoundDatabaseTaskBatch()
 		{
-			FATAL_ASSERT( PendingTasks.size() == 0 );
+			FATAL_ASSERT( PendingTasks.empty() );
 
 			std::for_each( ChildCallContexts.begin(), ChildCallContexts.end(), []( ChildCallContextPair &pair ){ delete pair.second; } );
 
@@ -71,14 +71,14 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 			successful_tasks.clear();
 			failed_tasks.clear();
 
-			if ( PendingTasks.size() == 0 )
+			if ( PendingTasks.empty() )
 			{
 				return;
 			}
 
 			LOG( LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
 
-			while ( PendingTasks.size() > 0 )
+			while ( !PendingTasks.empty() )
 			{
 				DBCompoundTaskListType sub_list;
 
@@ -104,7 +104,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 
 		void Process_Parent_Task_List( IDatabaseConnection *connection, DBCompoundTaskListType &sub_list, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
 		{
-			while ( sub_list.size() > 0 )
+			while ( !sub_list.empty() )
 			{
 				std::for_each( sub_list.cbegin(), sub_list.cend(), []( ICompoundDatabaseTask *task ) { task->Clear_Child_Tasks(); task->Seed_Child_Tasks(); } );
 
@@ -116,7 +116,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 					DBTaskListType child_list;
 					std::for_each( sub_list.cbegin(), sub_list.cend(), [ &tt_iter, &child_list ]( ICompoundDatabaseTask *task ) { task->Get_Child_Tasks_Of_Type( *tt_iter, child_list ); } );
 
-					if( child_list.size() == 0 )
+					if( child_list.empty() )
 					{
 						continue;
 					}
@@ -188,7 +188,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 
 		ExecuteDBTaskListResult::Enum Process_Child_Task_List( IDatabaseCallContext *call_context, IDatabaseConnection *connection, const DBTaskListType &child_list, DatabaseTaskIDType::Enum &bad_task_id )
 		{
-			if ( child_list.size() == 0 )
+			if ( child_list.empty() )
 			{
 				return ExecuteDBTaskListResult::SUCCESS;
 			}
@@ -218,7 +218,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 			DBTaskListType child_list_copy;
 			std::copy( child_list.begin(), child_list.end(), back_inserter(child_list_copy) );
 
-			while ( child_list_copy.size() > 0 )
+			while ( !child_list_copy.empty() )
 			{
 				DBTaskListType sub_list;
 
