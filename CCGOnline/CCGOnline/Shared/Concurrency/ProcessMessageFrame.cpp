@@ -28,6 +28,30 @@
 #include "Messaging/ProcessMessage.h"
 
 /**********************************************************************************************************************
+	CProcessMessageFrame::CProcessMessageFrame -- constructor
+
+		process_id -- source of the messages
+					
+**********************************************************************************************************************/
+CProcessMessageFrame::CProcessMessageFrame( EProcessID::Enum process_id ) :
+	ProcessID( process_id ),
+	Messages()
+{
+}
+
+/**********************************************************************************************************************
+	CProcessMessageFrame::CProcessMessageFrame -- move constructor
+
+		rhs -- move source
+					
+**********************************************************************************************************************/
+CProcessMessageFrame::CProcessMessageFrame( CProcessMessageFrame &&rhs ) :
+	ProcessID( rhs.ProcessID ),
+	Messages( std::move( rhs.Messages ) )
+{
+}
+
+/**********************************************************************************************************************
 	CProcessMessageFrame::~CProcessMessageFrame -- destructor, defined internally to avoid header dependency on
 		IProcessMessage
 					
@@ -42,8 +66,22 @@ CProcessMessageFrame::~CProcessMessageFrame()
 		message -- message to add to the frame
 					
 **********************************************************************************************************************/
-void CProcessMessageFrame::Add_Message( const shared_ptr< const IProcessMessage > &message )
+void CProcessMessageFrame::Add_Message( unique_ptr< const IProcessMessage > &message )
 {
-	Messages.push_back( message );
+	Messages.emplace_back( std::move( message ) );
 }
+
+/**********************************************************************************************************************
+	CProcessMessageFrame::Add_Message -- adds a message to the container
+
+		message -- message to add to the frame
+					
+**********************************************************************************************************************/
+void CProcessMessageFrame::Add_Message( unique_ptr< const IProcessMessage > &&message )
+{
+	Messages.emplace_back( std::move( message ) );
+}
+
+
+
 

@@ -66,7 +66,7 @@ void CProcessBaseTester::Log( const std::wstring &log_string )
 	CProcessStatics::Set_Current_Process( nullptr );
 }
 
-const CProcessBase::FrameTableType &CProcessBaseTester::Get_Frame_Table( void ) const 
+CProcessBase::FrameTableType &CProcessBaseTester::Get_Frame_Table( void ) const 
 { 
 	return Get_Process()->PendingOutboundFrames; 
 }
@@ -91,14 +91,24 @@ shared_ptr< CWriteOnlyMailbox > CProcessBaseTester::Get_Manager_Mailbox( void ) 
 	return Get_Process()->ManagerMailbox; 
 }
 
-shared_ptr< CProcessMessageFrame > CProcessBaseTester::Get_Log_Frame( void ) const 
+const unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Log_Frame( void ) const 
 { 
 	return Get_Process()->LogFrame; 
 }
 
-shared_ptr< CProcessMessageFrame > CProcessBaseTester::Get_Manager_Frame( void ) const 
+const unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Manager_Frame( void ) const 
 { 
 	return Get_Process()->ManagerFrame; 
+}
+
+bool CProcessBaseTester::Has_Frame( EProcessID::Enum id ) const
+{
+	return Get_Process()->PendingOutboundFrames.find( id ) != Get_Process()->PendingOutboundFrames.end();
+}
+
+const unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Frame( EProcessID::Enum id ) const
+{
+	return Get_Process()->PendingOutboundFrames.find( id )->second;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

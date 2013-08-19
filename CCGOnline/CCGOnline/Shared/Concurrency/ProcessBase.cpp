@@ -108,12 +108,13 @@ void CProcessBase::Cleanup( void )
 		message -- message to output to the log file
 					
 **********************************************************************************************************************/
-void CProcessBase::Log( const std::wstring &message )
+void CProcessBase::Log( std::wstring &&message )
 {
 	// actual logging thread should override this function and never call the baseclass
 	FATAL_ASSERT( ID != EProcessID::LOGGING );
 
-	Send_Process_Message( EProcessID::LOGGING, shared_ptr< const IProcessMessage >( new CLogRequestMessage( Properties, message ) ) );
+	unique_ptr< const IProcessMessage > log_request( new CLogRequestMessage( Properties, std::move( message ) ) );
+	Send_Process_Message( EProcessID::LOGGING, log_request );
 }
 
 /**********************************************************************************************************************
@@ -140,7 +141,19 @@ shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID::Enum proc
 		message -- message to send
 					
 **********************************************************************************************************************/
-void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, const shared_ptr< const IProcessMessage > &message )
+void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message )
+{
+	Send_Process_Message( dest_process_id, std::move( message ) );
+}
+
+/**********************************************************************************************************************
+	CProcessBase::Send_Process_Message -- sends a message to another process
+
+		dest_process_id -- id of the process to send to
+		message -- message to send
+					
+**********************************************************************************************************************/
+void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &&message )
 {
 	// manager and logging threads are special-cased in order to avoid race conditions related to rescheduling
 	if ( dest_process_id == EProcessID::CONCURRENCY_MANAGER )
@@ -167,9 +180,9 @@ void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, const
 		auto iter = PendingOutboundFrames.find( dest_process_id );
 		if ( iter == PendingOutboundFrames.end() )
 		{
-			shared_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( ID ) );
+			unique_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( ID ) );
 			frame->Add_Message( message );
-			PendingOutboundFrames.insert( FrameTableType::value_type( dest_process_id, frame ) );
+			PendingOutboundFrames.insert( FrameTableType::value_type( dest_process_id, std::move( frame ) ) );
 			return;
 		}
 
@@ -183,7 +196,18 @@ void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, const
 		message -- message to send
 					
 **********************************************************************************************************************/
-void CProcessBase::Send_Manager_Message( const shared_ptr< const IProcessMessage > &message )
+void CProcessBase::Send_Manager_Message( unique_ptr< const IProcessMessage > &message )
+{
+	Send_Process_Message( EProcessID::CONCURRENCY_MANAGER, message );
+}
+
+/**********************************************************************************************************************
+	CProcessBase::Send_Manager_Message -- sends a message to the concurrency manager
+
+		message -- message to send
+					
+**********************************************************************************************************************/
+void CProcessBase::Send_Manager_Message( unique_ptr< const IProcessMessage > &&message )
 {
 	Send_Process_Message( EProcessID::CONCURRENCY_MANAGER, message );
 }
@@ -200,7 +224,7 @@ void CProcessBase::Flush_Regular_Messages( void )
 		// under normal circumstances, send all messages to threads we have an interface for
 		std::vector< EProcessID::Enum > sent_frames;
 
-		for ( auto frame_iterator = PendingOutboundFrames.cbegin(); frame_iterator != PendingOutboundFrames.cend(); ++frame_iterator )
+		for ( auto frame_iterator = PendingOutboundFrames.begin(); frame_iterator != PendingOutboundFrames.end(); ++frame_iterator )
 		{
 			shared_ptr< CWriteOnlyMailbox > writeable_mailbox = Get_Mailbox( frame_iterator->first );
 			if ( writeable_mailbox != nullptr )
@@ -220,7 +244,7 @@ void CProcessBase::Flush_Regular_Messages( void )
 	{
 		// when shutting down, we sometimes restrict what threads can be sent to depending on the nature of the shut down
 		// soft shut downs allow messages to be sent arbitrarily, hard shutdowns restrict to manager or log thread only
-		for ( auto frame_iterator = PendingOutboundFrames.cbegin(); frame_iterator != PendingOutboundFrames.cend(); ++frame_iterator )
+		for ( auto frame_iterator = PendingOutboundFrames.begin(); frame_iterator != PendingOutboundFrames.end(); ++frame_iterator )
 		{
 			if ( State == EPS_SHUTTING_DOWN_SOFT || frame_iterator->first == EProcessID::CONCURRENCY_MANAGER || frame_iterator->first == EProcessID::LOGGING )
 			{
@@ -342,17 +366,17 @@ void CProcessBase::Service_Message_Frames( void )
 	}
 
 	// get all the queued incoming messages
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	MyMailbox->Remove_Frames( frames );
 
 	// iterate each frame
 	for ( uint32 i = 0; i < frames.size(); ++i )
 	{
-		const shared_ptr< CProcessMessageFrame > &frame = frames[ i ];
+		unique_ptr< CProcessMessageFrame > &frame = frames[ i ];
 		EProcessID::Enum source_process_id = frame->Get_Process_ID();
 
-		// iterate each message within the frame
-		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+		// iterate all messages in the frame
+		for ( auto iter = frame->begin(), end = frame->end(); iter != end; ++iter )
 		{
 			Handle_Message( source_process_id, *iter );
 		}
@@ -391,7 +415,8 @@ void CProcessBase::Handle_Shutdown_Mailboxes( void )
 		Remove_Process_ID_From_Tables( process_id );
 
 		// let the manager know we've release this interface
-		Send_Manager_Message( shared_ptr< const IProcessMessage >( new CReleaseMailboxResponse( process_id ) ) );
+		unique_ptr< const IProcessMessage > release_msg( new CReleaseMailboxResponse( process_id ) );
+		Send_Manager_Message( release_msg );
 	}
 
 	ShutdownMailboxes.clear();
@@ -415,7 +440,7 @@ bool CProcessBase::Should_Reschedule( void ) const
 		message -- the process message to handle
 					
 **********************************************************************************************************************/
-void CProcessBase::Handle_Message( EProcessID::Enum process_id, const shared_ptr< const IProcessMessage > &message )
+void CProcessBase::Handle_Message( EProcessID::Enum process_id, unique_ptr< const IProcessMessage > &message )
 {
 	const IProcessMessage *msg_base = message.get();
 
@@ -444,13 +469,13 @@ void CProcessBase::Register_Message_Handlers( void )
 		handler -- message handling delegate
 					
 **********************************************************************************************************************/
-void CProcessBase::Register_Handler( const std::type_info &message_type_info, const shared_ptr< IProcessMessageHandler > &handler )
+void CProcessBase::Register_Handler( const std::type_info &message_type_info, unique_ptr< IProcessMessageHandler > &handler )
 {
 	Loki::TypeInfo key( message_type_info );
 
 	FATAL_ASSERT( MessageHandlers.find( key ) == MessageHandlers.end() );
 
-	MessageHandlers[ key ] = handler;
+	MessageHandlers[ key ] = std::move( handler );
 }
 
 /**********************************************************************************************************************
@@ -460,7 +485,7 @@ void CProcessBase::Register_Handler( const std::type_info &message_type_info, co
 		message -- the AddMailboxMessage message
 					
 **********************************************************************************************************************/
-void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process_id*/, const shared_ptr< const CAddMailboxMessage > &message )
+void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process_id*/, unique_ptr< const CAddMailboxMessage > &message )
 {
 	EProcessID::Enum add_id = message->Get_Mailbox()->Get_Process_ID();
 	FATAL_ASSERT( add_id != EProcessID::CONCURRENCY_MANAGER && add_id != EProcessID::LOGGING );
@@ -482,7 +507,7 @@ void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process
 		message -- message to handle
 					
 **********************************************************************************************************************/
-void CProcessBase::Handle_Release_Mailbox_Request( EProcessID::Enum source_process_id, const shared_ptr< const CReleaseMailboxRequest > &request )
+void CProcessBase::Handle_Release_Mailbox_Request( EProcessID::Enum source_process_id, unique_ptr< const CReleaseMailboxRequest > &request )
 {
 	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
 
@@ -499,7 +524,7 @@ void CProcessBase::Handle_Release_Mailbox_Request( EProcessID::Enum source_proce
 		message -- the ShutdownThread request
 					
 **********************************************************************************************************************/
-void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, const shared_ptr< const CShutdownSelfRequest > &message )
+void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, unique_ptr< const CShutdownSelfRequest > &message )
 {
 	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
 	FATAL_ASSERT( !Is_Shutting_Down() );
@@ -515,7 +540,8 @@ void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process
 
 	On_Shutdown_Self_Request();
 
-	Send_Manager_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfResponse() ) );	
+	unique_ptr< const IProcessMessage > shutdown_self_msg( new CShutdownSelfResponse() );
+	Send_Manager_Message( shutdown_self_msg );	
 }
 
 /**********************************************************************************************************************
@@ -543,10 +569,8 @@ void CProcessBase::Flush_System_Messages( void )
 	// Flush logging messages if possible
 	if ( LoggingMailbox.get() != nullptr && LogFrame.get() != nullptr )
 	{
-		shared_ptr< CProcessMessageFrame > log_frame( LogFrame );
+		LoggingMailbox->Add_Frame( LogFrame );
 		LogFrame.reset();
-
-		LoggingMailbox->Add_Frame( log_frame );
 	}
 
 	// Clear log interface if necessary
@@ -558,10 +582,8 @@ void CProcessBase::Flush_System_Messages( void )
 	// Flush manager messages if possible
 	if ( ManagerMailbox.get() != nullptr && ManagerFrame.get() != nullptr )
 	{
-		shared_ptr< CProcessMessageFrame > manager_frame( ManagerFrame );
+		ManagerMailbox->Add_Frame( ManagerFrame );
 		ManagerFrame.reset();
-
-		ManagerMailbox->Add_Frame( manager_frame );
 	}
 
 	// Clear manager interface if necessary

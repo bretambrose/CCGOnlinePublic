@@ -44,13 +44,19 @@ class CTBBConcurrentQueue : public IConcurrentQueue< T >
 		}
 
 		// Base class public pure virtual interface implementations
-		virtual void Add_Item( const T &item )
+		virtual void Enqueue_Item( T && /*item*/ )
 		{
-			Queue.push( item );
+			 // TBI
 		}
 
-		virtual void Remove_Items( std::vector< T > &items )
+		virtual void Enqueue_Item( T & /*item*/ )
 		{
+			 // TBI
+		}
+
+		virtual void Remove_Items( std::vector< T > & /*items*/ )
+		{
+#ifdef TOFIX
 			items.clear();
 
 			T item;
@@ -58,6 +64,7 @@ class CTBBConcurrentQueue : public IConcurrentQueue< T >
 			{
 				items.push_back( item );
 			}
+#endif // TOFIX
 		}
 
 	private:

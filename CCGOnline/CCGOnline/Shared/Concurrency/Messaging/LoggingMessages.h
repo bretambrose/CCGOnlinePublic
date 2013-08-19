@@ -39,6 +39,7 @@ class CLogRequestMessage : public IProcessMessage
 
 		typedef IProcessMessage BASECLASS;
 
+		CLogRequestMessage( const SProcessProperties &source_properties, std::wstring &&message );
 		CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message );
 		virtual ~CLogRequestMessage() {}
 

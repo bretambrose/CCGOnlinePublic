@@ -120,16 +120,17 @@ class CConcurrencyManagerTester
 		{
 			auto thread_set_copy = RescheduledProcesses;
 
-			std::vector< shared_ptr< CProcessMessageFrame > > frames;
+			std::vector< unique_ptr< CProcessMessageFrame > > frames;
 			shared_ptr< CReadOnlyMailbox > read_interface = Manager->Get_My_Mailbox();
 			read_interface->Remove_Frames( frames );
 
 			// go through all frames, looking for reschedule messages
 			for ( uint32 i = 0; i < frames.size(); ++i )
 			{
-				shared_ptr< CProcessMessageFrame > frame = frames[ i ];
+				unique_ptr< CProcessMessageFrame > &frame = frames[ i ];
 				EProcessID::Enum process_id = frame->Get_Process_ID();
-				for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+
+				for ( auto iter = frame->cbegin(), end = frame->cend(); iter != end; ++iter )
 				{
 					const IProcessMessage *raw_message = iter->get();
 					if ( Loki::TypeInfo( typeid( *raw_message ) ) == Loki::TypeInfo( typeid( CRescheduleProcessMessage ) ) )
@@ -177,8 +178,9 @@ class CConcurrencyManagerTester
 		{
 			if ( Manager->ProcessRecords.size() > 0 )
 			{
-				shared_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
-				frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownManagerMessage ) );
+				unique_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
+				unique_ptr< const IProcessMessage > shutdown_msg( new CShutdownManagerMessage );
+				frame->Add_Message( shutdown_msg );
 
 				shared_ptr< CWriteOnlyMailbox > write_interface = Manager->Get_Mailbox( MANAGER_PROCESS_ID );
 				write_interface->Add_Frame( frame );
@@ -296,25 +298,30 @@ class CMailboxTestProcess : public CDoNothingProcess
 				const SProcessProperties &properties = Get_Properties();
 				if ( properties == VP_PROPERTY1 )
 				{
-					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( VP_PROPERTY2 ) ) );
+					unique_ptr< const IProcessMessage > get_mailbox_msg( new CGetMailboxByPropertiesRequest( VP_PROPERTY2 ) );
+					Send_Manager_Message( get_mailbox_msg );
 				}
 				else if ( properties == VP_PROPERTY2 )
 				{
 					SProcessProperties multimatch( ETestExtendedProcessSubject::AI, 1, 0, 0 );
-					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
+					unique_ptr< const IProcessMessage > get_mailbox_msg( new CGetMailboxByPropertiesRequest( multimatch ) );
+					Send_Manager_Message( get_mailbox_msg );
 				}
 				else if ( properties == VP_PROPERTY3 )
 				{
 					SProcessProperties multimatch( ETestExtendedProcessSubject::AI, 2, 0, 0 );
-					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByPropertiesRequest( multimatch ) ) );
+					unique_ptr< const IProcessMessage > get_mailbox_msg( new CGetMailboxByPropertiesRequest( multimatch ) );
+					Send_Manager_Message( get_mailbox_msg );
 				}
 				else if ( properties == VP_PROPERTY4 )
 				{
-					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByIDRequest( EProcessID::FIRST_FREE_ID ) ) );
+					unique_ptr< const IProcessMessage > get_mailbox_msg( new CGetMailboxByIDRequest( EProcessID::FIRST_FREE_ID ) );
+					Send_Manager_Message( get_mailbox_msg );
 				}
 				else if ( properties == VP_PROPERTY5 )
 				{
-					Send_Manager_Message( shared_ptr< const IProcessMessage >( new CGetMailboxByIDRequest( static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 50 ) ) ) );
+					unique_ptr< const IProcessMessage > get_mailbox_msg( new CGetMailboxByIDRequest( static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 50 ) ) );
+					Send_Manager_Message( get_mailbox_msg );
 				}
 			}
 
@@ -344,11 +351,20 @@ class CSpawnMailboxGetProcess : public CTaskProcessBase
 		{
 			if ( !HasBeenServiced )
 			{
-				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY1 ) ), true, false ) ) );
-				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY2 ) ), false, true ) ) );
-				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY3 ) ), false, true ) ) );
-				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY4 ) ), false, false ) ) );
-				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY5 ) ), false, false ) ) );
+				unique_ptr< const IProcessMessage > add_message1( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY1 ) ), true, false ) );
+				Send_Manager_Message( add_message1 );
+
+				unique_ptr< const IProcessMessage > add_message2( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY2 ) ), false, true ) );
+				Send_Manager_Message( add_message2 );
+				
+				unique_ptr< const IProcessMessage > add_message3( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY3 ) ), false, true ) );
+				Send_Manager_Message( add_message3 );
+				
+				unique_ptr< const IProcessMessage > add_message4( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY4 ) ), false, false ) );
+				Send_Manager_Message( add_message4 );
+				
+				unique_ptr< const IProcessMessage > add_message5( new CAddNewProcessMessage( shared_ptr< IProcess >( new CMailboxTestProcess( VP_PROPERTY5 ) ), false, false ) );
+				Send_Manager_Message( add_message5 );
 
 				HasBeenServiced = true;
 			}
@@ -472,7 +488,8 @@ class CSuicidalProcess : public CTaskProcessBase
 		{
 			if ( !HasBeenServiced )
 			{
-				Send_Manager_Message( shared_ptr< const IProcessMessage >( new CShutdownProcessMessage( Get_ID() ) ) );
+				unique_ptr< const IProcessMessage > shutdown_msg( new CShutdownProcessMessage( Get_ID() ) );
+				Send_Manager_Message( shutdown_msg );
 				HasBeenServiced = true;
 			}
 

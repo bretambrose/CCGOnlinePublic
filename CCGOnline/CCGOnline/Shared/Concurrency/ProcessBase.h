@@ -54,9 +54,11 @@ class CProcessBase : public IManagedProcess
 		virtual const SProcessProperties &Get_Properties( void ) const { return Properties; }
 		virtual EProcessID::Enum Get_ID( void ) const { return ID; }
 
-		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, const shared_ptr< const IProcessMessage > &message );
-		virtual void Send_Manager_Message( const shared_ptr< const IProcessMessage > &message );
-		virtual void Log( const std::wstring &message );
+		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message );
+		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &&message );
+		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &message );
+		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &&message );
+		virtual void Log( std::wstring &&message );
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const { return TaskScheduler.get(); }
 
@@ -70,6 +72,8 @@ class CProcessBase : public IManagedProcess
 		virtual void Cleanup( void );
 
 		virtual void Run( const CProcessExecutionContext &context );
+
+		void Register_Handler( const std::type_info &message_type_info, unique_ptr< IProcessMessageHandler > &handler );
 
 	protected:
 
@@ -88,8 +92,6 @@ class CProcessBase : public IManagedProcess
 		// protected message handling (derived overridable/modifiable)
 		virtual void Register_Message_Handlers( void );
 
-		void Register_Handler( const std::type_info &message_type_info, const shared_ptr< IProcessMessageHandler > &handler );
-
 		virtual void On_Shutdown_Self_Request( void ) {}
 
 	private:
@@ -106,11 +108,11 @@ class CProcessBase : public IManagedProcess
 		void Flush_Regular_Messages( void );
 
 		void Service_Message_Frames( void );
-		void Handle_Message( EProcessID::Enum processS_id, const shared_ptr< const IProcessMessage > &message );
+		void Handle_Message( EProcessID::Enum process_id, unique_ptr< const IProcessMessage > &message );
 
-		void Handle_Add_Mailbox_Message( EProcessID::Enum process_id, const shared_ptr< const CAddMailboxMessage > &message );
-		void Handle_Release_Mailbox_Request( EProcessID::Enum process_id, const shared_ptr< const CReleaseMailboxRequest > &request );
-		void Handle_Shutdown_Self_Request( EProcessID::Enum process_id, const shared_ptr< const CShutdownSelfRequest > &message );
+		void Handle_Add_Mailbox_Message( EProcessID::Enum process_id, unique_ptr< const CAddMailboxMessage > &message );
+		void Handle_Release_Mailbox_Request( EProcessID::Enum process_id, unique_ptr< const CReleaseMailboxRequest > &request );
+		void Handle_Shutdown_Self_Request( EProcessID::Enum process_id, unique_ptr< const CShutdownSelfRequest > &message );
 
 		void Handle_Shutdown_Mailboxes( void );
 
@@ -119,11 +121,10 @@ class CProcessBase : public IManagedProcess
 
 		// Type definitions
 		typedef stdext::hash_map< EProcessID::Enum, shared_ptr< CWriteOnlyMailbox > > MailboxTableType;
-		typedef stdext::hash_map< EProcessID::Enum, shared_ptr< CWriteOnlyMailbox > > MailboxTableType;
-		typedef stdext::hash_map< EProcessID::Enum, shared_ptr< CProcessMessageFrame > > FrameTableType;
 		typedef stdext::hash_map< EProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
 		typedef std::multimap< SProcessProperties, EProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
-		typedef stdext::hash_map< Loki::TypeInfo, shared_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
+		typedef stdext::hash_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
+		typedef stdext::hash_map< EProcessID::Enum, unique_ptr< CProcessMessageFrame > > FrameTableType;
 
 		// Private Data
 		// Simple state
@@ -134,8 +135,8 @@ class CProcessBase : public IManagedProcess
 
 		// Message frames
 		FrameTableType PendingOutboundFrames;
-		shared_ptr< CProcessMessageFrame > ManagerFrame;
-		shared_ptr< CProcessMessageFrame > LogFrame;
+		unique_ptr< CProcessMessageFrame > ManagerFrame;
+		unique_ptr< CProcessMessageFrame > LogFrame;
 
 		// Process interfaces
 		IDToProcessPropertiesTableType IDToPropertiesTable;

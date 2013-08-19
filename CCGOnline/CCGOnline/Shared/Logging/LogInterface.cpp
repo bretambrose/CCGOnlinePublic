@@ -194,19 +194,42 @@ void CLogInterface::Service_Logging( const CProcessExecutionContext &context )
 		message -- string to be logged
 		
 **********************************************************************************************************************/
+void CLogInterface::Log( std::wstring &message )
+{
+	Log( std::move( message ) );
+}
+
+/**********************************************************************************************************************
+	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
+	
+		message -- string to be logged
+		
+**********************************************************************************************************************/
 void CLogInterface::Log( const std::wstring &message )
+{
+	std::wstring message_copy( message );
+	Log( std::move( message_copy ) );
+}
+
+/**********************************************************************************************************************
+	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
+	
+		message -- string to be logged
+		
+**********************************************************************************************************************/
+void CLogInterface::Log( std::wstring &&message )
 {
 	IProcess *virtual_process = CProcessStatics::Get_Current_Process();
 	if ( virtual_process != nullptr )
 	{
-		virtual_process->Log( message );
+		virtual_process->Log( std::move( message ) );
 		return;
 	}
 
 	CConcurrencyManager *manager = CProcessStatics::Get_Concurrency_Manager();
 	if ( manager != nullptr )
 	{
-		manager->Log( message );
+		manager->Log( std::move( message ) );
 	}
 }
 
@@ -218,7 +241,8 @@ void CLogInterface::Log( const std::wstring &message )
 **********************************************************************************************************************/
 void CLogInterface::Log( const wchar_t *message )
 {
-	Log( std::wstring( message ) );
+	std::wstring wmessage( message );
+	Log( std::move( wmessage ) );
 }
 
 /**********************************************************************************************************************
@@ -229,7 +253,8 @@ void CLogInterface::Log( const wchar_t *message )
 **********************************************************************************************************************/
 void CLogInterface::Log( const std::basic_ostringstream< wchar_t > &message_stream )
 {
-	Log( message_stream.rdbuf()->str() );
+	std::wstring message( message_stream.rdbuf()->str() );
+	Log( std::move( message ) );
 }
 
 /**********************************************************************************************************************
@@ -243,7 +268,7 @@ void CLogInterface::Log( const std::string &message )
 	std::wstring w_message;
 	NStringUtils::String_To_WideString( message, w_message );
 
-	Log( w_message );
+	Log( std::move( w_message ) );
 }
 
 /**********************************************************************************************************************
@@ -257,7 +282,7 @@ void CLogInterface::Log( const char *message )
 	std::wstring w_message;
 	NStringUtils::String_To_WideString( message, w_message );
 
-	Log( w_message );
+	Log( std::move( w_message ) );
 }
 
 /**********************************************************************************************************************

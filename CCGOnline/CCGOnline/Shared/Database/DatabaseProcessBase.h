@@ -64,14 +64,14 @@ class CDatabaseProcessBase : public CThreadProcessBase
 
 	private:
 
-		void Handle_Run_Database_Task_Request( EProcessID::Enum process_id, const shared_ptr< const CRunDatabaseTaskRequest > &message );
+		void Handle_Run_Database_Task_Request( EProcessID::Enum process_id, unique_ptr< const CRunDatabaseTaskRequest > &message );
 
 		DatabaseTaskIDType::Enum Allocate_Task_ID( void );
 
 		typedef stdext::hash_map< Loki::TypeInfo, IDatabaseTaskBatch *, STypeInfoContainerHelper > BatchTableType;
 		typedef std::vector< Loki::TypeInfo > BatchOrderingType;
 
-		typedef std::pair< EProcessID::Enum, shared_ptr< const CRunDatabaseTaskRequest > > PendingRequestPairType;
+		typedef std::pair< EProcessID::Enum, unique_ptr< const CRunDatabaseTaskRequest > > PendingRequestPairType;
 		typedef stdext::hash_map< DatabaseTaskIDType::Enum, PendingRequestPairType > PendingRequestTableType;
 
 		BatchTableType Batches;

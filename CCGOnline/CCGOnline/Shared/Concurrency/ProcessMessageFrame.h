@@ -36,25 +36,29 @@ class CProcessMessageFrame
 {
 	public:
 
-		CProcessMessageFrame( EProcessID::Enum process_id ) :
-			ProcessID( process_id ),
-			Messages()
-		{}
+		typedef std::vector< unique_ptr< const IProcessMessage > > MessageFrameContainerType;
+
+		CProcessMessageFrame( EProcessID::Enum process_id );
+		CProcessMessageFrame( CProcessMessageFrame &&rhs );
 
 		~CProcessMessageFrame();
 
 		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
-		void Add_Message( const shared_ptr< const IProcessMessage > &message );
+		void Add_Message( unique_ptr< const IProcessMessage > &message );
+		void Add_Message( unique_ptr< const IProcessMessage > &&message );
 
-		std::vector< shared_ptr< const IProcessMessage > >::const_iterator Get_Frame_Begin( void ) const { return Messages.cbegin(); }
-		std::vector< shared_ptr< const IProcessMessage > >::const_iterator Get_Frame_End( void ) const { return Messages.cend(); }
+		MessageFrameContainerType::iterator begin( void ) { return Messages.begin(); }
+		MessageFrameContainerType::iterator end( void ) { return Messages.end(); }
+
+		MessageFrameContainerType::const_iterator cbegin( void ) const { return Messages.cbegin(); }
+		MessageFrameContainerType::const_iterator cend( void ) const { return Messages.cend(); }
 
 	private:
 
 		EProcessID::Enum ProcessID;
 
-		std::vector< shared_ptr< const IProcessMessage > > Messages;
+		std::vector< unique_ptr< const IProcessMessage > > Messages;
 
 };
 

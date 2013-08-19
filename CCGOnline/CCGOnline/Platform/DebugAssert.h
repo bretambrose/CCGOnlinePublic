@@ -25,7 +25,7 @@
 
 class ISimplePlatformMutex;
 
-typedef FastDelegate1< const std::wstring &, void > DLogFunctionType;
+typedef FastDelegate1< std::wstring &, void > DLogFunctionType;
 
 // A static class to handle all assertion failures.  Multi-threaded safe via a mutex.
 class CAssertSystem

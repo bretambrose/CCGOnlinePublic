@@ -154,21 +154,21 @@ TEST_F( LoggingTests, Direct_Logging )
 	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
 
-	shared_ptr< CProcessMessageFrame > ai_frame( new CProcessMessageFrame( TEST_KEY1 ) );
-	ai_frame->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
-	ai_frame->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
+	unique_ptr< CProcessMessageFrame > ai_frame( new CProcessMessageFrame( TEST_KEY1 ) );
+	ai_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
+	ai_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( ai_frame );
 
-	shared_ptr< CProcessMessageFrame > manager_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	manager_frame->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_TEST_MESSAGE ) ) );
+	unique_ptr< CProcessMessageFrame > manager_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	manager_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( manager_frame );
 
-	shared_ptr< CProcessMessageFrame > db_frame( new CProcessMessageFrame( TEST_KEY2 ) );
-	db_frame->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS2, LOG_TEST_MESSAGE ) ) );
+	unique_ptr< CProcessMessageFrame > db_frame( new CProcessMessageFrame( TEST_KEY2 ) );
+	db_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS2, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( db_frame );
 
-	shared_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	shutdown_frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	shutdown_frame->Add_Message( unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	log_tester.Service();
@@ -228,8 +228,8 @@ TEST_F( LoggingTests, Static_Logging )
 
 	dummy_process->Flush_System_Messages();
 
-	shared_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	shutdown_frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	shutdown_frame->Add_Message( unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	log_tester.Service();

@@ -25,6 +25,63 @@
 #include "Shared.h"
 #include "GeneratedCode/RegisterSharedTestEnums.h"
 
+class Movable
+{
+	public:
+		Movable( uint32 data ) :
+			Data( data )
+		{}
+
+		Movable( void ) :
+			Data( 0 )
+		{}
+
+		Movable( const Movable &rhs ) :
+			Data( rhs.Data )
+		{}
+
+		~Movable() {}
+
+		uint32 Data;
+};
+
+class Holder
+{
+	public:
+		
+		Holder( void ) :
+			Movables()
+		{}
+
+		Holder( Holder &&rhs ) :
+			Movables( std::move( rhs.Movables ) )
+		{}
+
+		void Add_Via_Move1( unique_ptr< Movable > &movable )
+		{
+			Movables.emplace_back( std::move( movable ) );
+		}
+
+/*		void Add_Via_Move2( unique_ptr< Movable > &&movable )
+		{
+			Movables.emplace_back( movable );
+		}
+*/
+		void Fetch( std::vector< unique_ptr< Movable > > &movables )
+		{
+			movables.reserve( movables.size() + Movables.size() );
+			
+			std::move( Movables.begin(), Movables.end(), std::back_inserter( movables ) );
+
+			Movables.clear();
+		}
+
+	private:
+
+		std::vector< unique_ptr< Movable > > Movables;
+};
+
+
 namespace NSharedTest
 {
 	void Initialize( void )

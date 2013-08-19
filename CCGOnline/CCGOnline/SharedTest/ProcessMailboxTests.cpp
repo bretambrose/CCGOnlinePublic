@@ -38,36 +38,35 @@ static const std::wstring LOG_MESSAGES[] = {
 
 TEST( VirtualProcessMailboxTests, Add_Remove )
 {
-	CProcessMailbox *mailbox = new CProcessMailbox( EProcessID::LOGGING, LOGGING_PROCESS_PROPERTIES );
+	unique_ptr< CProcessMailbox > mailbox( new CProcessMailbox( EProcessID::LOGGING, LOGGING_PROCESS_PROPERTIES ) );
 
-	shared_ptr< CProcessMessageFrame > frame1( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	frame1->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
-	frame1->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
+	unique_ptr< CProcessMessageFrame > frame1( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	frame1->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
+	frame1->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
 
-	shared_ptr< CProcessMessageFrame > frame2( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	frame2->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 2 ] ) ) );
-	frame2->Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 3 ] ) ) );
+	unique_ptr< CProcessMessageFrame > frame2( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	frame2->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 2 ] ) ) );
+	frame2->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 3 ] ) ) );
 
 	shared_ptr< CWriteOnlyMailbox > write_interface = mailbox->Get_Writable_Mailbox();
 	write_interface->Add_Frame( frame1 );
 	write_interface->Add_Frame( frame2 );
 
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	shared_ptr< CReadOnlyMailbox > read_interface = mailbox->Get_Readable_Mailbox();
 	read_interface->Remove_Frames( frames );
 
 	uint32 log_index = 0;
 	for ( uint32 i = 0; i < frames.size(); ++i )
 	{
-		shared_ptr< CProcessMessageFrame > frame = frames[ i ];
-		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+		unique_ptr< CProcessMessageFrame > &frame = frames[ i ];
+
+		for ( auto iter = frame->cbegin(), end = frame->cend(); iter != end; ++iter )
 		{
-			shared_ptr< const CLogRequestMessage > log_request = static_pointer_cast< const CLogRequestMessage >( *iter );
+			const CLogRequestMessage *log_request = static_cast< const CLogRequestMessage * >( iter->get() );
 			ASSERT_TRUE( log_request->Get_Message() == LOG_MESSAGES[ log_index ] );
 
 			++log_index;
 		}
 	}
-
-	delete mailbox;
 }

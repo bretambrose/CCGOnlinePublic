@@ -179,7 +179,7 @@ void CLoggingProcess::Register_Message_Handlers( void )
 		message -- the log request message
 		
 **********************************************************************************************************************/
-void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_process_id, const shared_ptr< const CLogRequestMessage > &message )
+void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_process_id, unique_ptr< const CLogRequestMessage > &message )
 {
 	Handle_Log_Request_Message_Aux( source_process_id, message->Get_Source_Properties(), message->Get_Message(), message->Get_Time() );
 }
@@ -202,17 +202,16 @@ void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_pr
 
 	// Find the appropriate log file to write to; if one does not exist, create it
 	EProcessSubject::Enum subject = properties.Get_Subject_As< EProcessSubject::Enum >();
-	shared_ptr< CLogFile > log_file = Get_Log_File( subject );
-	if ( log_file.get() == nullptr )
+	CLogFile *log_file = Get_Log_File( subject );
+	if ( log_file == nullptr )
 	{
-		log_file.reset( new CLogFile( subject, Build_File_Name( subject ) ) );
-
+		log_file = new CLogFile( subject, Build_File_Name( subject ) );
 		log_file->Initialize();
 
-		LogFiles[ subject ] = log_file;
+		LogFiles.insert( LogFileTableType::value_type( subject, log_file ) );
 	}
 
-	FATAL_ASSERT( log_file.get() != nullptr );
+	FATAL_ASSERT( log_file != nullptr );
 
 	log_file->Append_Logging_Message( Build_Log_Message( source_process_id, properties, message, system_time ) );
 }
@@ -244,15 +243,15 @@ std::wstring CLoggingProcess::Build_File_Name( EProcessSubject::Enum subject ) c
 		Returns: pointer to the corresponding log file, or null
 		
 **********************************************************************************************************************/
-shared_ptr< CLogFile > CLoggingProcess::Get_Log_File( EProcessSubject::Enum subject ) const
+CLogFile *CLoggingProcess::Get_Log_File( EProcessSubject::Enum subject ) const
 {
 	auto iter = LogFiles.find( subject );
 	if ( iter != LogFiles.end() )
 	{
-		return iter->second;
+		return iter->second.get();
 	}
 
-	return shared_ptr< CLogFile >( nullptr );
+	return nullptr;
 }
 
 /**********************************************************************************************************************
@@ -308,7 +307,7 @@ ETimeType CLoggingProcess::Get_Time_Type( void ) const
 		message -- message to log
 		
 **********************************************************************************************************************/
-void CLoggingProcess::Log( const std::wstring &message )
+void CLoggingProcess::Log( std::wstring &&message )
 {
 	Handle_Log_Request_Message_Aux( Get_ID(), Get_Properties(), message, CPlatformTime::Get_Raw_Time() );
 }

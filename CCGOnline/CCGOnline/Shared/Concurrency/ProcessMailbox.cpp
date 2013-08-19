@@ -27,10 +27,8 @@
 
 #include "MailboxInterfaces.h"
 #include "Concurrency/Containers/TBBConcurrentQueue.h"
+#include "Concurrency/Containers/LockingConcurrentQueue.h"
 #include "ProcessMessageFrame.h"
-
-// Controls which concurrent queue implementation we use
-typedef CTBBConcurrentQueue< shared_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
 
 /**********************************************************************************************************************
 	CProcessMailbox::CProcessMailbox -- constructor
@@ -45,7 +43,7 @@ CProcessMailbox::CProcessMailbox( EProcessID::Enum process_id, const SProcessPro
 	WriteOnlyMailbox( nullptr ),
 	ReadOnlyMailbox( nullptr )
 {
-	shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > queue( new ProcessToProcessQueueType );
+	shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > queue = static_pointer_cast< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > >( std::make_shared< ProcessToProcessQueueType >() );
 
 	WriteOnlyMailbox.reset( new CWriteOnlyMailbox( process_id, properties, queue ) );
 	ReadOnlyMailbox.reset( new CReadOnlyMailbox( queue ) );

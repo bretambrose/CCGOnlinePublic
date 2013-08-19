@@ -34,7 +34,7 @@ class IMessageHandler
 		IMessageHandler( void ) {}
 		virtual ~IMessageHandler() {}
 
-		virtual void Handle_Message( MessageSourceType source, const shared_ptr< const MessageBaseType > &message ) const = 0;
+		virtual void Handle_Message( MessageSourceType source, unique_ptr< const MessageBaseType > &message ) const = 0;
 };
 
 #endif // MESSAGE_HANDLER_H

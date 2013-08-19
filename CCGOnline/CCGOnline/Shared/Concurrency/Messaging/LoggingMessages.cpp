@@ -33,10 +33,23 @@
 		message -- what to write to the process's log file
 		
 **********************************************************************************************************************/
+CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_properties, std::wstring &&message ) :
+	SourceProperties( source_properties ),
+	Message( std::move( message ) ),
+	Time( CPlatformTime::Get_Raw_Time() )
+{
+}
+
+/**********************************************************************************************************************
+	CLogRequestMessage::CLogRequestMessage -- constructor
+	
+		source_properties -- properties of the requesting process
+		message -- what to write to the process's log file
+		
+**********************************************************************************************************************/
 CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message ) :
 	SourceProperties( source_properties ),
 	Message( message ),
 	Time( CPlatformTime::Get_Raw_Time() )
 {
 }
-

@@ -44,18 +44,27 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 		}
 
 		// Base class public interface implementations
-		virtual void Add_Item( const T &item )
+		virtual void Enqueue_Item( T &&item )
 		{
-			CSimplePlatformMutexLocker locker( Lock );
+			CSimplePlatformMutexLocker locker( Lock.get() );
 
-			Items.push_back( item );
+			Items.emplace_back( std::move( item ) );
 		}
 
-		virtual void Remove_Items( std::vector< T, std::allocator< T > > &items )
+		virtual void Enqueue_Item( T &item )
 		{
-			CSimplePlatformMutexLocker locker( Lock );
+			CSimplePlatformMutexLocker locker( Lock.get() );
 
-			items = Items;
+			Items.emplace_back( std::move( item ) );
+		}
+
+		virtual void Remove_Items( std::vector< T > &items )
+		{
+			CSimplePlatformMutexLocker locker( Lock.get() );
+
+			items.reserve( items.size() + Items.size() );
+			std::move( Items.begin(), Items.end(), std::back_inserter( items ) );
+
 			Items.clear();
 		}
 

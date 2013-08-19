@@ -33,7 +33,7 @@ class TProcessMessageHandler : public IProcessMessageHandler
 	public:
 
 		// signature of the actual handling function for a specific message type
-		typedef FastDelegate2< EProcessID::Enum, const shared_ptr< const MessageType > &, void > HandlerFunctorType;
+		typedef FastDelegate2< EProcessID::Enum, unique_ptr< const MessageType > &, void > HandlerFunctorType;
 
 		typedef IProcessMessageHandler BASECLASS;
 
@@ -52,11 +52,13 @@ class TProcessMessageHandler : public IProcessMessageHandler
 			MessageHandler( message_handler )
 		{}
 
-		virtual void Handle_Message( EProcessID::Enum source_process_id, const shared_ptr< const IProcessMessage > &message ) const
+		virtual void Handle_Message( EProcessID::Enum source_process_id, unique_ptr< const IProcessMessage > &message ) const
 		{
 			// The handlers are tracked generically so they can go in one big hash table, but our forwarding delegates
 			// have specific type signatures, requiring a down cast that preserves smart pointer reference counting
-			shared_ptr< const MessageType > down_cast_message = static_pointer_cast< const MessageType >( message );
+			const MessageType *raw_msg = static_cast< const MessageType * >( message.release() );
+
+			unique_ptr< const MessageType > down_cast_message( raw_msg );
 			MessageHandler( source_process_id, down_cast_message );
 		}
 
@@ -65,7 +67,16 @@ class TProcessMessageHandler : public IProcessMessageHandler
 		HandlerFunctorType MessageHandler;
 };
 
+template < typename T, typename U >
+void Register_This_Handler( U* registry, void (U::*handler_function)( EProcessID::Enum, unique_ptr< const T > & ) )
+{
+	unique_ptr< IProcessMessageHandler > handler( new TProcessMessageHandler< T >( TProcessMessageHandler< T >::HandlerFunctorType( registry, handler_function ) ) );
+	registry->Register_Handler( typeid( T ), handler );
+}
+
 // Utility macro for handler registration
-#define REGISTER_THIS_HANDLER( x, y, z ) Register_Handler( typeid( x ), shared_ptr< IProcessMessageHandler >( new TProcessMessageHandler< x >( TProcessMessageHandler< x >::HandlerFunctorType( this, &y::z ) ) ) );
+//#define REGISTER_THIS_HANDLER( x, y, z ) Register_Handler( typeid( x ), unique_ptr< IProcessMessageHandler >( new TProcessMessageHandler< x >( TProcessMessageHandler< x >::HandlerFunctorType( this, &y::z ) ) ) );
+
+#define REGISTER_THIS_HANDLER( x, y, z ) Register_This_Handler< x, y >( this, &y::z );
 
 #endif // PROCESS_MESSAGE_HANDLER_H

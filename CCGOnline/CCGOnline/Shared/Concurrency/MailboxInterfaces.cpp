@@ -37,7 +37,7 @@
 **********************************************************************************************************************/
 CWriteOnlyMailbox::CWriteOnlyMailbox( EProcessID::Enum process_id, 
 												  const SProcessProperties &properties, 
-												  const shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > &write_queue ) :
+												  const shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > &write_queue ) :
 	ProcessID( process_id ),
 	Properties( properties ),
 	WriteQueue( write_queue )
@@ -59,11 +59,11 @@ CWriteOnlyMailbox::~CWriteOnlyMailbox()
 		frame -- the message frame to add
 					
 **********************************************************************************************************************/
-void CWriteOnlyMailbox::Add_Frame( const shared_ptr< CProcessMessageFrame > &frame )
+void CWriteOnlyMailbox::Add_Frame( unique_ptr< CProcessMessageFrame > &frame )
 {
 	FATAL_ASSERT( frame.get() != nullptr );
 
-	WriteQueue->Add_Item( frame );
+	WriteQueue->Enqueue_Item( std::move( frame ) );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void CWriteOnlyMailbox::Add_Frame( const shared_ptr< CProcessMessageFrame > &fra
 		read_queue -- the concurrent queue of message frames that will get read from
 					
 **********************************************************************************************************************/
-CReadOnlyMailbox::CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< shared_ptr< CProcessMessageFrame > > > &read_queue ) :
+CReadOnlyMailbox::CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > &read_queue ) :
 	ReadQueue( read_queue )
 {
 	FATAL_ASSERT( ReadQueue.get() != nullptr );
@@ -95,7 +95,7 @@ CReadOnlyMailbox::~CReadOnlyMailbox()
 		frames -- output parameter for all the frames currently on the read queue
 					
 **********************************************************************************************************************/
-void CReadOnlyMailbox::Remove_Frames( std::vector< shared_ptr< CProcessMessageFrame > > &frames )
+void CReadOnlyMailbox::Remove_Frames( std::vector< unique_ptr< CProcessMessageFrame > > &frames )
 {
 	ReadQueue->Remove_Items( frames );
 }

@@ -49,7 +49,10 @@ class CProcessBaseTester
 		static void Set_Has_Process_Service_Executed( void ) { HasProcessServiceExecuted = true; }
 		static bool Get_Has_Process_Service_Executed( void ) { return HasProcessServiceExecuted; }
 
-		const CProcessBase::FrameTableType &Get_Frame_Table( void ) const;
+		bool Has_Frame( EProcessID::Enum id ) const;
+		const unique_ptr< CProcessMessageFrame > &Get_Frame( EProcessID::Enum id ) const;
+
+		CProcessBase::FrameTableType &Get_Frame_Table( void ) const;
 		const CProcessBase::MailboxTableType &Get_Mailbox_Table( void ) const;
 
 		shared_ptr< CWriteOnlyMailbox > Get_Logging_Mailbox( void ) const;
@@ -57,8 +60,8 @@ class CProcessBaseTester
 
 		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const;
 
-		shared_ptr< CProcessMessageFrame > Get_Log_Frame( void ) const;
-		shared_ptr< CProcessMessageFrame > Get_Manager_Frame( void ) const;
+		const unique_ptr< CProcessMessageFrame > &Get_Log_Frame( void ) const;
+		const unique_ptr< CProcessMessageFrame > &Get_Manager_Frame( void ) const;
 
 		virtual CProcessBase *Get_Process( void ) const = 0;
 

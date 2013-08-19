@@ -30,11 +30,17 @@ class CWriteOnlyMailbox;
 class CReadOnlyMailbox;
 class CProcessMessageFrame;
 template < typename T > class IConcurrentQueue;
+template < typename T > class CTBBConcurrentQueue;
+template < typename T > class CLockingConcurrentQueue;
 
 namespace EProcessID
 {
 	enum Enum;
 }
+
+// Controls which concurrent queue implementation we use
+//typedef CTBBConcurrentQueue< unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
+typedef CLockingConcurrentQueue< unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
 
 // A class that holds both the read and write interfaces of a thread task
 class CProcessMailbox

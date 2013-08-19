@@ -36,13 +36,13 @@ TEST( VirtualProcessMessageFrameTests, Add_Remove )
 {
 	CProcessMessageFrame message_frame( EProcessID::LOGGING );
 
-	message_frame.Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
-	message_frame.Add_Message( shared_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
+	message_frame.Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
+	message_frame.Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
 
 	uint32 i = 0;
-	for ( auto iter = message_frame.Get_Frame_Begin(); iter != message_frame.Get_Frame_End(); ++iter, ++i )
+	for ( auto iter = message_frame.cbegin(), end = message_frame.cend(); iter != end; ++iter, ++i )
 	{
-		shared_ptr< const CLogRequestMessage > base_message = static_pointer_cast< const CLogRequestMessage >( *iter );
-		ASSERT_TRUE( base_message->Get_Message() == LOG_MESSAGES[ i ] );
+		const CLogRequestMessage *log_message = static_cast< const CLogRequestMessage * >( iter->get() );
+		ASSERT_TRUE( log_message->Get_Message() == LOG_MESSAGES[ i ] );
 	}
 }

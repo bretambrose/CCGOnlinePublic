@@ -43,6 +43,7 @@
 #include "PlatformThread.h"
 #include "SharedTestProcessSubject.h"
 
+
 class ProcessTests : public testing::Test 
 {
 	protected:  
@@ -117,6 +118,7 @@ class CBasicServiceTestTask : public CScheduledTask
 SProcessProperties AI_PROPS( ETestExtendedProcessSubject::AI  );
 
 
+
 TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 {
 	static const double FIRST_SERVICE_TIME = 1.0;
@@ -133,12 +135,11 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 	process_tester.Service( FIRST_SERVICE_TIME );
 	ASSERT_FALSE( CTaskProcessBaseTester::Get_Has_Process_Service_Executed() );
 
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 	ASSERT_TRUE( frames.size() == 1 );
 
-	shared_ptr< CProcessMessageFrame > frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -157,8 +158,7 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 	ASSERT_TRUE( frames.size() == 1 );
 
-	frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -172,6 +172,8 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 	process_tester.Service( THIRD_SERVICE_TIME );
 	ASSERT_TRUE( CTaskProcessBaseTester::Get_Has_Process_Service_Executed() );
 }
+
+
 
 static const SProcessProperties DB_PROPS( ETestExtendedProcessSubject::DATABASE );
 static const EProcessID::Enum DB_PROCESS_ID = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 1 );
@@ -189,7 +191,7 @@ class CSendAddMailboxMessageServiceTask : public CScheduledTask
 
 		virtual bool Execute( double time_seconds, double &reschedule_time_seconds )
 		{
-			CProcessStatics::Get_Current_Process()->Send_Process_Message( DB_PROCESS_ID, shared_ptr< const IProcessMessage >( new CAddMailboxMessage( Mailbox ) ) );
+			CProcessStatics::Get_Current_Process()->Send_Process_Message( DB_PROCESS_ID, unique_ptr< const IProcessMessage >( new CAddMailboxMessage( Mailbox ) ) );
 
 			reschedule_time_seconds = time_seconds + .1;
 			return true;
@@ -200,6 +202,7 @@ class CSendAddMailboxMessageServiceTask : public CScheduledTask
 		shared_ptr< CWriteOnlyMailbox > Mailbox;
 };
 
+
 TEST_F( ProcessTests, Send_Message )
 {
 	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
@@ -209,11 +212,14 @@ TEST_F( ProcessTests, Send_Message )
 
 	process_tester.Service( 1.0 );
 
-	// Verify pending message due to no interface
-	auto frame_table = process_tester.Get_Frame_Table();
+	auto const &frame_table = process_tester.Get_Frame_Table();
+
+	ASSERT_TRUE( frame_table.size() == 1 );
 	ASSERT_TRUE( frame_table.find( DB_PROCESS_ID ) != frame_table.end() );
-	shared_ptr< CProcessMessageFrame > db_frame = frame_table.find( DB_PROCESS_ID )->second;
-	for ( auto iter = db_frame->Get_Frame_Begin(); iter != db_frame->Get_Frame_End(); ++iter )
+
+	const unique_ptr< CProcessMessageFrame > &db_frame = process_tester.Get_Frame( DB_PROCESS_ID ); 
+
+	for ( auto iter = db_frame->cbegin(), end = db_frame->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -223,12 +229,12 @@ TEST_F( ProcessTests, Send_Message )
 
 		ASSERT_TRUE( add_mailbox_message->Get_Mailbox().get() == process_tester.Get_Self_Proxy()->Get_Writable_Mailbox().get() );
 	}
-
+		
 	shared_ptr< CProcessMailbox > db_conn( new CProcessMailbox( DB_PROCESS_ID, DB_PROPS ) );
 
 	// notify the thread of the db interface
-	shared_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CAddMailboxMessage( db_conn->Get_Writable_Mailbox() ) ) );
+	unique_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CAddMailboxMessage( db_conn->Get_Writable_Mailbox() ) ) );
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
 	process_tester.Service( 2.0 );
@@ -239,16 +245,14 @@ TEST_F( ProcessTests, Send_Message )
 	ASSERT_TRUE( interfaces.find( DB_PROCESS_ID ) != interfaces.end() );
 
 	// verify both (send task is recurrent) messages sent to the db thread's mailbox
-	frame_table = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( frame_table.size() == 0 );
 
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	db_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	ASSERT_TRUE( frames.size() == 1 );
 
-	shared_ptr< CProcessMessageFrame > frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -274,10 +278,10 @@ TEST_F( ProcessTests, Add_Mailbox_And_Logging )
 	process_tester.Log( LOG_MESSAGE_2 );
 
 	// Verify pending message due to no interface
-	shared_ptr< CProcessMessageFrame > log_frame = process_tester.Get_Log_Frame();
+	const unique_ptr< CProcessMessageFrame > &log_frame = process_tester.Get_Log_Frame();
 	ASSERT_TRUE( log_frame.get() != nullptr );
 	
-	for ( auto iter = log_frame->Get_Frame_Begin(); iter != log_frame->Get_Frame_End(); ++iter )
+	for ( auto iter = log_frame->cbegin(), end = log_frame->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -301,17 +305,15 @@ TEST_F( ProcessTests, Add_Mailbox_And_Logging )
 	process_tester.Service( 2.0 );
 
 	// verify second log message sent to the log thread's mailbox
-	auto frame_table = process_tester.Get_Frame_Table();
+	auto const &frame_table = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( frame_table.size() == 0 );
 
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	log_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	ASSERT_TRUE( frames.size() == 1 );
-
-	shared_ptr< CProcessMessageFrame > frame = frames[ 0 ];
-	ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	ASSERT_TRUE( frames[ 0 ]->Get_Process_ID() == AI_PROCESS_ID );
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -328,15 +330,14 @@ TEST_F( ProcessTests, Add_Mailbox_And_Logging )
 	process_tester.Service( 3.0 );
 
 	// verify third log message sent to the log thread's mailbox
-	frame_table = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( frame_table.size() == 0 );
 
+	frames.clear();
 	log_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	ASSERT_TRUE( frames.size() == 1 );
 
-	frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -367,7 +368,7 @@ class CSendMailboxMessageTask : public CScheduledTask
 
 		virtual bool Execute( double /*time_seconds*/, double & /*reschedule_time_seconds*/ )
 		{
-			CProcessStatics::Get_Current_Process()->Send_Process_Message( TargetProcessID, shared_ptr< const IProcessMessage >( new CAddMailboxMessage( Mailbox ) ) );
+			CProcessStatics::Get_Current_Process()->Send_Process_Message( TargetProcessID, unique_ptr< const IProcessMessage >( new CAddMailboxMessage( Mailbox ) ) );
 			return false;
 		}
 
@@ -387,8 +388,8 @@ TEST_F( ProcessTests, Shutdown_Interface )
 	shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
 	shared_ptr< CProcessMailbox > ui_conn( new CProcessMailbox( UI_PROCESS_ID, UI_PROPS ) );
 
-	shared_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
+	unique_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
 	// generate a message that goes nowhere
@@ -403,13 +404,13 @@ TEST_F( ProcessTests, Shutdown_Interface )
 	ASSERT_TRUE( mailboxes.find( UI_PROCESS_ID ) != mailboxes.end() );
 
 	// verify pending message that was not able to be sent
-	auto frame_table = process_tester.Get_Frame_Table();
+	auto const &frame_table = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( frame_table.size() == 1 );
 	ASSERT_TRUE( frame_table.find( DB_PROCESS_ID ) != frame_table.end() );
 
-	shared_ptr< CProcessMessageFrame > frame = frame_table.find( DB_PROCESS_ID )->second;
+	const unique_ptr< CProcessMessageFrame > &frame = process_tester.Get_Frame( DB_PROCESS_ID ); 
 	ASSERT_TRUE( frame->Get_Process_ID() == tester_id );
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frame->cbegin(), end = frame->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -425,9 +426,9 @@ TEST_F( ProcessTests, Shutdown_Interface )
 	process_tester.Get_Process()->Get_Task_Scheduler()->Submit_Task( simple_task );
 
 	// shutdown both a known interface (UI_PROCESS_ID) and an unknown interface (DB_PROCESS_ID)
-	shared_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
-	shutdown_frame->Add_Message( shared_ptr< const IProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
-	shutdown_frame->Add_Message( shared_ptr< const IProcessMessage >( new CReleaseMailboxRequest( DB_PROCESS_ID ) ) );
+	unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
+	shutdown_frame->Add_Message( unique_ptr< const IProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
+	shutdown_frame->Add_Message( unique_ptr< const IProcessMessage >( new CReleaseMailboxRequest( DB_PROCESS_ID ) ) );
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	process_tester.Service( 1.0 );
@@ -440,13 +441,12 @@ TEST_F( ProcessTests, Shutdown_Interface )
 	ASSERT_TRUE( process_tester.Get_Frame_Table().size() == 0 );
 
 	// verify ui message reached destination
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	ui_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	ASSERT_TRUE( frames.size() == 1 );
 
-	frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -458,13 +458,14 @@ TEST_F( ProcessTests, Shutdown_Interface )
 	}
 
 	// verify only pending messages are shutdown acknowledgements
+	frames.clear();
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
 	{
-		frame = *outer_iter;
+		const unique_ptr< CProcessMessageFrame > &frame = *outer_iter;
 		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
 
-		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+		for ( auto iter = frame->cbegin(), end = frame->cend(); iter != end; ++iter )
 		{
 			const IProcessMessage *raw_message = iter->get();
 
@@ -492,11 +493,11 @@ TEST_F( ProcessTests, Shutdown_Soft )
 	shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
 	process_tester.Set_Logging_Mailbox( log_conn->Get_Writable_Mailbox() );
 
-	shared_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
+	unique_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
 
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
 
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
@@ -514,7 +515,7 @@ TEST_F( ProcessTests, Shutdown_Soft )
 	process_tester.Service( 0.0 );
 
 	// thread should have no outbound frames
-	auto outbound_frames = process_tester.Get_Frame_Table();
+	auto const &outbound_frames = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( outbound_frames.size() == 0 );
 
 	// thread should have no interfaces
@@ -522,13 +523,12 @@ TEST_F( ProcessTests, Shutdown_Soft )
 	ASSERT_TRUE( mailboxes.size() == 0 );	
 
 	// verify a single log message sent
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	log_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	ASSERT_TRUE( frames.size() == 1 );
 
-	auto frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -541,12 +541,12 @@ TEST_F( ProcessTests, Shutdown_Soft )
 	}
 
 	// verify the ui message sent
+	frames.clear();
 	ui_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	ASSERT_TRUE( frames.size() == 1 );
 
-	frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter !=end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -558,14 +558,15 @@ TEST_F( ProcessTests, Shutdown_Soft )
 	}
 
 	// verify the acknowledgement messages sent to the manager
+	frames.clear();
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
 	{
-		frame = *outer_iter;
+		const unique_ptr< CProcessMessageFrame > &frame = *outer_iter;
 		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
 
-		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+		for ( auto iter = frame->cbegin(), end = frame->cend(); iter != end; ++iter )
 		{
 			const IProcessMessage *raw_message = iter->get();
 
@@ -593,11 +594,11 @@ TEST_F( ProcessTests, Shutdown_Hard )
 	shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
 	process_tester.Set_Logging_Mailbox( log_conn->Get_Writable_Mailbox() );
 
-	shared_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
+	unique_ptr< CProcessMessageFrame > added_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
 
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
-	added_frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfRequest( true ) ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CAddMailboxMessage( ui_conn->Get_Writable_Mailbox() ) ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CReleaseMailboxRequest( UI_PROCESS_ID ) ) );
+	added_frame->Add_Message( unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( true ) ) );
 
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( added_frame );
 
@@ -615,7 +616,7 @@ TEST_F( ProcessTests, Shutdown_Hard )
 	process_tester.Service( 0.0 );
 
 	// thread should have no outbound frames
-	auto outbound_frames = process_tester.Get_Frame_Table();
+	auto const &outbound_frames = process_tester.Get_Frame_Table();
 	ASSERT_TRUE( outbound_frames.size() == 0 );
 
 	// thread should have no interfaces
@@ -623,13 +624,12 @@ TEST_F( ProcessTests, Shutdown_Hard )
 	ASSERT_TRUE( mailboxes.size() == 0 );	
 
 	// verify a single log message sent
-	std::vector< shared_ptr< CProcessMessageFrame > > frames;
+	std::vector< unique_ptr< CProcessMessageFrame > > frames;
 	log_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	ASSERT_TRUE( frames.size() == 1 );
 
-	auto frame = frames[ 0 ];
-	for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+	for ( auto iter = frames[ 0 ]->cbegin(), end = frames[ 0 ]->cend(); iter != end; ++iter )
 	{
 		const IProcessMessage *raw_message = iter->get();
 
@@ -642,18 +642,20 @@ TEST_F( ProcessTests, Shutdown_Hard )
 	}
 
 	// verify the ui message was not sent
+	frames.clear();
 	ui_conn->Get_Readable_Mailbox()->Remove_Frames( frames );
 	ASSERT_TRUE( frames.size() == 0 );
 
 	// verify the acknowledgement messages sent to the manager
+	frames.clear();
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 
 	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
 	{
-		frame = *outer_iter;
+		const unique_ptr< CProcessMessageFrame > &frame = *outer_iter;
 		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
 
-		for ( auto iter = frame->Get_Frame_Begin(); iter != frame->Get_Frame_End(); ++iter )
+		for ( auto iter = frame->cbegin(), end = frame->cend(); iter != end; ++iter )
 		{
 			const IProcessMessage *raw_message = iter->get();
 
@@ -692,8 +694,8 @@ TEST_F( ProcessTests, Thread_Shutdown )
 
 	ASSERT_TRUE( platform_thread->Is_Running() );
 
-	shared_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
-	shutdown_frame->Add_Message( shared_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
+	shutdown_frame->Add_Message( unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
 
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
@@ -702,3 +704,5 @@ TEST_F( ProcessTests, Thread_Shutdown )
 		NPlatform::Sleep( 1 );
 	}
 }
+
+

@@ -121,6 +121,7 @@ void CTaskProcessBase::Service_Reschedule( void )
 {
 	if ( Should_Reschedule() )
 	{
-		Send_Manager_Message( shared_ptr< const IProcessMessage >( new CRescheduleProcessMessage( Get_Reschedule_Time() ) ) );
+		unique_ptr< const IProcessMessage > reschedule_msg( new CRescheduleProcessMessage( Get_Reschedule_Time() ) );
+		Send_Manager_Message( reschedule_msg );
 	}
 }

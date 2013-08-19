@@ -67,6 +67,8 @@ class CLogInterface
 
 		// Functions to actually log information to a file
 		static void Log( const std::basic_ostringstream< wchar_t > &message_stream );
+		static void Log( std::wstring &message );
+		static void Log( std::wstring &&message );
 		static void Log( const std::wstring &message );
 		static void Log( const wchar_t *message );
 
