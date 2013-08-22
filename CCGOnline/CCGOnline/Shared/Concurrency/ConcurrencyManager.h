@@ -141,12 +141,12 @@ class CConcurrencyManager
 		// Types
 		typedef std::multimap< EProcessID::Enum, unique_ptr< const CGetMailboxByPropertiesRequest > > GetMailboxByPropertiesRequestCollectionType;
 
-		typedef stdext::hash_map< EProcessID::Enum, unique_ptr< CProcessMessageFrame > > FrameTableType;
-		typedef stdext::hash_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
-		typedef stdext::hash_map< EProcessID::Enum, shared_ptr< CProcessRecord > > ProcessRecordTableType;
+		typedef std::unordered_map< EProcessID::Enum, unique_ptr< CProcessMessageFrame > > FrameTableType;
+		typedef std::unordered_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
+		typedef std::unordered_map< EProcessID::Enum, shared_ptr< CProcessRecord > > ProcessRecordTableType;
 
-		typedef stdext::hash_map< EProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
-		typedef std::multimap< SProcessProperties, EProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
+		typedef std::unordered_map< EProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
+		typedef std::unordered_multimap< SProcessProperties, EProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
 
 		// Private Data
 		ProcessRecordTableType ProcessRecords;
@@ -159,7 +159,7 @@ class CConcurrencyManager
 
 		ProcessMessageHandlerTableType MessageHandlers;
 
-		stdext::hash_map< ETimeType, shared_ptr< CTaskScheduler > > TaskSchedulers;
+		std::unordered_map< ETimeType, shared_ptr< CTaskScheduler > > TaskSchedulers;
 		unique_ptr< CTimeKeeper > TimeKeeper;
 
 		unique_ptr< tbb::task_scheduler_init > TBBTaskSchedulerInit;

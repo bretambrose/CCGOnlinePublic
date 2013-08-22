@@ -138,7 +138,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 			MemberRecords[ member_name ] = member_record;
 		}
 
-		stdext::hash_map< std::wstring, XMLMemberRecordType > MemberRecords;
+		std::unordered_map< std::wstring, XMLMemberRecordType > MemberRecords;
 };
 
 // A serializer for a std::vector of some type
@@ -318,7 +318,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 
 	private:
 
-		stdext::hash_map< T, IXMLSerializer * > Serializers;
+		std::unordered_map< T, IXMLSerializer * > Serializers;
 };
 
 

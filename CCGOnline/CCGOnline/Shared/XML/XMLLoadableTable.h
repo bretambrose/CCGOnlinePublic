@@ -35,7 +35,7 @@ class CXMLLoadableTable
 		//typedef FastDelegate1< const T *, const K & > KeyExtractionDelegate;
 		typedef const K & ( T::* KeyExtractorMemberFunction )( void ) const ;
 		typedef void ( T::* PostLoadMemberFunction )( void );
-		typedef typename stdext::hash_map< K, const T * >::const_iterator TableIterator;
+		typedef typename std::unordered_map< K, const T * >::const_iterator TableIterator;
 
 		CXMLLoadableTable( KeyExtractorMemberFunction key_extractor, const wchar_t *top_child = nullptr, IXMLSerializer *serializer = nullptr ) :
 			KeyExtractor( key_extractor ),
@@ -137,7 +137,7 @@ class CXMLLoadableTable
 
 		IXMLSerializer *Serializer;
 
-		stdext::hash_map< K, const T * > Loadables;
+		std::unordered_map< K, const T * > Loadables;
 };
 
 

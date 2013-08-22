@@ -75,7 +75,7 @@ class CLoggingProcess : public CTaskProcessBase
 		void Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64 system_time );
 
 		// Private Data
-		typedef stdext::hash_map< EProcessSubject::Enum, unique_ptr< CLogFile > > LogFileTableType; 
+		typedef std::unordered_map< EProcessSubject::Enum, unique_ptr< CLogFile > > LogFileTableType; 
 		LogFileTableType LogFiles;
 
 		uint32 PID;

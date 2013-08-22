@@ -45,7 +45,7 @@ class CTimeKeeper
 		const STickTime &Get_Base_Time( ETimeType time_type ) const;
 		const STickTime &Get_Current_Time( ETimeType time_type ) const;
 
-		typedef stdext::hash_map< ETimeType, STickTime > TimeTableType;
+		typedef std::unordered_map< ETimeType, STickTime > TimeTableType;
 
 		TimeTableType CurrentTimes;
 		TimeTableType BaseTimes;

@@ -68,11 +68,11 @@ class CDatabaseProcessBase : public CThreadProcessBase
 
 		DatabaseTaskIDType::Enum Allocate_Task_ID( void );
 
-		typedef stdext::hash_map< Loki::TypeInfo, IDatabaseTaskBatch *, STypeInfoContainerHelper > BatchTableType;
+		typedef std::unordered_map< Loki::TypeInfo, IDatabaseTaskBatch *, STypeInfoContainerHelper > BatchTableType;
 		typedef std::vector< Loki::TypeInfo > BatchOrderingType;
 
 		typedef std::pair< EProcessID::Enum, unique_ptr< const CRunDatabaseTaskRequest > > PendingRequestPairType;
-		typedef stdext::hash_map< DatabaseTaskIDType::Enum, PendingRequestPairType > PendingRequestTableType;
+		typedef std::unordered_map< DatabaseTaskIDType::Enum, PendingRequestPairType > PendingRequestTableType;
 
 		BatchTableType Batches;
 		BatchOrderingType BatchOrdering;

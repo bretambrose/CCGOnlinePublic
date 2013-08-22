@@ -55,7 +55,7 @@ class CODBCEnvironment : public CODBCObjectBase, public IDatabaseEnvironment
 
 		ODBCEnvironmentStateType State;
 
-		stdext::hash_map< DBConnectionIDType, IDatabaseConnection * > Connections;
+		std::unordered_map< DBConnectionIDType, IDatabaseConnection * > Connections;
 	
 		DBConnectionIDType NextConnectionID;
 

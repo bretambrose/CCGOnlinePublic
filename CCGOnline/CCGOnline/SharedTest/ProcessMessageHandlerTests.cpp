@@ -83,7 +83,7 @@ class CMockMessageHandlerTracker
 			LastShutdownProcessID = message->Get_Process_ID();
 		}
 
-		typedef stdext::hash_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > MessageHandlerTableType;
+		typedef std::unordered_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > MessageHandlerTableType;
 		MessageHandlerTableType MessageHandlers;
 
 		std::wstring LastLogMessage;

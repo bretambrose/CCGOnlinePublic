@@ -59,9 +59,9 @@ class CSlashCommandManager
 		// Data
 		static CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition > *DataDefinitions;
 
-		static stdext::hash_map< std::wstring, const CSlashCommandDefinition * > Definitions;
+		static std::unordered_map< std::wstring, const CSlashCommandDefinition * > Definitions;
 
-		static stdext::hash_map< std::wstring, CommandHandlerDelegate > CommandHandlers;
+		static std::unordered_map< std::wstring, CommandHandlerDelegate > CommandHandlers;
 };
 
 #endif // SLASH_COMMAND_MANAGER_H

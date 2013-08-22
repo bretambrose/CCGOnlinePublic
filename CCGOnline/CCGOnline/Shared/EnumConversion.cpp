@@ -58,8 +58,8 @@ class CConvertibleEnum
 
 		EConvertibleEnumProperties Properties;
 
-		stdext::hash_map< std::string, uint64 > NameToValueTable;
-		stdext::hash_map< uint64, std::string > ValueToNameTable;
+		std::unordered_map< std::string, uint64 > NameToValueTable;
+		std::unordered_map< uint64, std::string > ValueToNameTable;
 };
 
 /**********************************************************************************************************************
@@ -313,8 +313,8 @@ bool CConvertibleEnum::Convert_Bitfield_Internal( uint64 value, std::string &mas
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-stdext::hash_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > CEnumConverter::Enums;
-stdext::hash_map< std::string, CConvertibleEnum * > CEnumConverter::EnumsByName;
+std::unordered_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > CEnumConverter::Enums;
+std::unordered_map< std::string, CConvertibleEnum * > CEnumConverter::EnumsByName;
 
 /**********************************************************************************************************************
 	CEnumConverter::Cleanup -- deletes the enum objects used to perform conversions

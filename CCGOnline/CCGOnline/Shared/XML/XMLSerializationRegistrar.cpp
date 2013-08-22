@@ -25,7 +25,7 @@
 #include "XMLSerializationRegistrar.h"
 
 
-stdext::hash_map< Loki::TypeInfo, IXMLSerializerFactory *, STypeInfoContainerHelper > CXMLSerializationRegistrar::SerializerFactoryTable;
+std::unordered_map< Loki::TypeInfo, IXMLSerializerFactory *, STypeInfoContainerHelper > CXMLSerializationRegistrar::SerializerFactoryTable;
 
 /**********************************************************************************************************************
 	CXMLSerializationRegistrar::Shutdown -- cleans up all the serialization proxies held by the registrar

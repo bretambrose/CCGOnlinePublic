@@ -120,11 +120,11 @@ class CProcessBase : public IManagedProcess
 		void Remove_Process_ID_From_Tables( EProcessID::Enum process_id );
 
 		// Type definitions
-		typedef stdext::hash_map< EProcessID::Enum, shared_ptr< CWriteOnlyMailbox > > MailboxTableType;
-		typedef stdext::hash_map< EProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
-		typedef std::multimap< SProcessProperties, EProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
-		typedef stdext::hash_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
-		typedef stdext::hash_map< EProcessID::Enum, unique_ptr< CProcessMessageFrame > > FrameTableType;
+		typedef std::unordered_map< EProcessID::Enum, shared_ptr< CWriteOnlyMailbox > > MailboxTableType;
+		typedef std::unordered_map< EProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
+		typedef std::unordered_multimap< SProcessProperties, EProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
+		typedef std::unordered_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
+		typedef std::unordered_map< EProcessID::Enum, unique_ptr< CProcessMessageFrame > > FrameTableType;
 
 		// Private Data
 		// Simple state

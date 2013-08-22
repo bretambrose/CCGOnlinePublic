@@ -69,8 +69,8 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 
 		ODBCConnectionStateType State;
 
-		stdext::hash_map< DBStatementIDType, IDatabaseStatement * > Statements;
-		stdext::hash_map< std::wstring, DBStatementIDType > CachedStatements;
+		std::unordered_map< DBStatementIDType, IDatabaseStatement * > Statements;
+		std::unordered_map< std::wstring, DBStatementIDType > CachedStatements;
 
 		DBStatementIDType NextStatementID;
 

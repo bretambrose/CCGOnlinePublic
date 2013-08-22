@@ -103,8 +103,8 @@ class CEnumConverter
 		static bool Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::string &entry_name );
 		static bool Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::wstring &entry_name );
 
-		static stdext::hash_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > Enums;
-		static stdext::hash_map< std::string, CConvertibleEnum * > EnumsByName;
+		static std::unordered_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > Enums;
+		static std::unordered_map< std::string, CConvertibleEnum * > EnumsByName;
 };
 
 #endif // ENUM_CONVERSION_H

@@ -137,7 +137,7 @@ class CXMLSerializationRegistrar
 
 		static void Register_Serializer_Internal( const std::type_info &type_id, IXMLSerializerFactory *factory );
 
-		static stdext::hash_map< Loki::TypeInfo, IXMLSerializerFactory *, STypeInfoContainerHelper > SerializerFactoryTable;
+		static std::unordered_map< Loki::TypeInfo, IXMLSerializerFactory *, STypeInfoContainerHelper > SerializerFactoryTable;
 
 };
 

@@ -33,8 +33,8 @@
 #include <regex>
 
 CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition > *CSlashCommandManager::DataDefinitions( nullptr );
-stdext::hash_map< std::wstring, const CSlashCommandDefinition * > CSlashCommandManager::Definitions;
-stdext::hash_map< std::wstring, CSlashCommandManager::CommandHandlerDelegate > CSlashCommandManager::CommandHandlers;
+std::unordered_map< std::wstring, const CSlashCommandDefinition * > CSlashCommandManager::Definitions;
+std::unordered_map< std::wstring, CSlashCommandManager::CommandHandlerDelegate > CSlashCommandManager::CommandHandlers;
 
 /**********************************************************************************************************************
 	CSlashCommandManager::Initialize -- initializes the system 

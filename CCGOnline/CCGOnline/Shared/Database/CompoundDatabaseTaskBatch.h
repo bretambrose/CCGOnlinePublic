@@ -249,7 +249,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 		}
 
 		typedef std::vector< Loki::TypeInfo > ChildTypeVector;
-		typedef stdext::hash_map< Loki::TypeInfo, IDatabaseCallContext *, STypeInfoContainerHelper > ChildCallContextTable;
+		typedef std::unordered_map< Loki::TypeInfo, IDatabaseCallContext *, STypeInfoContainerHelper > ChildCallContextTable;
 		typedef std::pair< const Loki::TypeInfo, IDatabaseCallContext * > ChildCallContextPair;
 
 		ChildTypeVector ChildOrdering;

@@ -195,7 +195,7 @@ class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
 
 	private:
 
-		typedef stdext::hash_map< Loki::TypeInfo, ChildSuccessHandlerFunctorType, STypeInfoContainerHelper > ChildTypeCallbackTableType;
+		typedef std::unordered_map< Loki::TypeInfo, ChildSuccessHandlerFunctorType, STypeInfoContainerHelper > ChildTypeCallbackTableType;
 
 		DatabaseTaskIDType::Enum ID;
 
