@@ -9,8 +9,8 @@ CCGOnline/CCGOnline/AuthServer/Intermediate/
 CCGOnline/CCGOnline/AuthServer/GeneratedCode/
 CCGOnline/CCGOnline/CCGOClient/Intermediate/
 CCGOnline/CCGOnline/CCGOClient/GeneratedCode/
-CCGOnline/CCGOnline/Platform/Intermediate/
-CCGOnline/CCGOnline/Platform/GeneratedCode/
+CCGOnline/CCGOnline/IP_Platform/Intermediate/
+CCGOnline/CCGOnline/IP_Platform/GeneratedCode/
 CCGOnline/CCGOnline/PlatformTest/Intermediate/
 CCGOnline/CCGOnline/PlatformTest/GeneratedCode/
 CCGOnline/CCGOnline/ServerShared/Intermediate/
