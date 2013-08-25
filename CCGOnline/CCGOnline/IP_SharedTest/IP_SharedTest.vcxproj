@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{CCA663C3-310D-4051-A135-5D34D63F4BAF}</ProjectGuid>
+    <ProjectGuid>{836AF358-29E3-47D2-81F2-1D1CCD7117F3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>CCGOClient</RootNamespace>
+    <RootNamespace>IP_SharedTest</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -87,19 +87,22 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\pugixml;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;pugixml.lib;shlwapi.lib;Dbghelp.lib;tbbmalloc_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\ia32\vc10;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\ia32\vc10</AdditionalLibraryDirectories>
+      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;DbgHelp.lib;shlwapi.lib;gtest-md.lib;pugixml.lib;tbbmalloc_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Client\$(ProjectName)D32.exe
-copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Client\$(ProjectName)D32.pdb
+      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Tests\$(ProjectName)D32.exe
+copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)D32.pdb
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -108,20 +111,24 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Client\$(ProjectName)D3
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;X64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\pugixml;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;pugixml.lib;shlwapi.lib;Dbghelp.lib;tbbmalloc_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\intel64\vc10;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\intel64\vc10</AdditionalLibraryDirectories>
+      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;DbgHelp.lib;shlwapi.lib;gtest-md.lib;pugixml.lib;tbbmalloc_debug.lib;msvcrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Client\$(ProjectName)D64.exe
-copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Client\$(ProjectName)D64.pdb
-</Command>
+      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Tests\$(ProjectName)D64.exe
+copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)D64.pdb</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,21 +138,24 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Client\$(ProjectName)D6
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\pugixml;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;pugixml.lib;shlwapi.lib;Dbghelp.lib;tbbmalloc.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\ia32\vc10;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\ia32\vc10</AdditionalLibraryDirectories>
+      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;DbgHelp.lib;shlwapi.lib;gtest-md.lib;pugixml.lib;tbbmalloc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Client\$(ProjectName)R32.exe
-copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Client\$(ProjectName)R32.pdb
+      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Tests\$(ProjectName)R32.exe
+copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R32.pdb
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -156,47 +166,62 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Client\$(ProjectName)R3
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;X64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;PLAIN_ASSERTS;X64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\pugixml;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include;$(SolutionDir)\gtest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(SolutionDir)\IP_Platform;$(SolutionDir)\IP_Shared;$(SolutionDir)\External\tbb\include;$(SolutionDir)\External\loki\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;pugixml.lib;shlwapi.lib;Dbghelp.lib;tbbmalloc.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\intel64\vc10;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Output\$(Platform)\$(Configuration);$(SolutionDir)\External\tbb\lib\intel64\vc10</AdditionalLibraryDirectories>
+      <AdditionalDependencies>IP_Shared.lib;IP_Platform.lib;DbgHelp.lib;shlwapi.lib;gtest-md.lib;pugixml.lib;tbbmalloc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Client\$(ProjectName)R64.exe
-copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Client\$(ProjectName)R64.pdb
+      <Command>copy $(TargetPath) $(SolutionDir)..\Run\Tests\$(ProjectName)R64.exe
+copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(ProjectName)R64.pdb
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="CCGOClient.ico" />
-    <None Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="CCGOClient.h" />
-    <ClInclude Include="GeneratedCode\RegisterCCGOClientEnums.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="GeneratedCode\RegisterIP_SharedTestEnums.h" />
+    <ClInclude Include="Helpers\ProcessHelpers.h" />
+    <ClInclude Include="ReflectionTests.h" />
+    <ClInclude Include="SharedTestProcessSubject.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="XMLLoadableTests.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CCGOClient.cpp" />
-    <ClCompile Include="GeneratedCode\RegisterCCGOClientEnums.cpp" />
+    <ClCompile Include="ConcurrencyManagerTests.cpp" />
+    <ClCompile Include="ConcurrentQueueTests.cpp" />
+    <ClCompile Include="EnumConversionTests.cpp" />
+    <ClCompile Include="ExceptionHandlingTests.cpp" />
+    <ClCompile Include="GeneratedCode\RegisterIP_SharedTestEnums.cpp" />
+    <ClCompile Include="Helpers\ProcessHelpers.cpp" />
+    <ClCompile Include="IP_SharedTest.cpp" />
+    <ClCompile Include="LoggingTests.cpp" />
+    <ClCompile Include="PriorityQueueTests.cpp" />
+    <ClCompile Include="ProcessMailboxTests.cpp" />
+    <ClCompile Include="ProcessMessageFrameTests.cpp" />
+    <ClCompile Include="ProcessMessageHandlerTests.cpp" />
+    <ClCompile Include="ProcessPropertiesTests.cpp" />
+    <ClCompile Include="ProcessTests.cpp" />
+    <ClCompile Include="ReflectionTests.cpp" />
+    <ClCompile Include="SlashCommandTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="CCGOClient.rc" />
+    <ClCompile Include="TaskSchedulerTests.cpp" />
+    <ClCompile Include="TimeTests.cpp" />
+    <ClCompile Include="XMLLoadableTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

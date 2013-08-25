@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	AuthServer.cpp
-		Entry point for auth server application
+	PlatformProcessTests.cpp
+		defines unit tests for process-related platform-specific functionality
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -10,7 +10,7 @@
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,  
+	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -22,25 +22,30 @@
 
 #include "stdafx.h"
 
-#include "IP_Shared.h"
-#include "GeneratedCode/RegisterAuthServerEnums.h"
+#include <fstream>
+#include <iostream>
 
-namespace NAuthServer
+#include "PlatformProcess.h"
+
+class PlatformProcessTests : public testing::Test 
 {
-	void Initialize( void )
-	{
-		NIPShared::Initialize();
-		Register_AuthServer_Enums();
-	}
+	protected:  
 
-	void Shutdown( void )
-	{
-		NIPShared::Shutdown();
-	}
-}
+		static void SetUpTestCase( void ) 
+		{			
+		}
 
-int main( int /*argc*/, wchar_t* /*argv*/[] )
+		static void TearDownTestCase( void )
+		{
+		}
+
+	private:
+
+
+};
+
+TEST_F( PlatformProcessTests, Exe_Name )
 {
-	return 0;
+	ASSERT_TRUE( NPlatform::Get_Service_Name() == L"IP_PlatformTest" );
 }
 

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	AuthServer.cpp
-		Entry point for auth server application
+	stdafx.cpp
+		pre-compiled header includes
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -10,7 +10,7 @@
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,  
+	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -20,27 +20,41 @@
 
 **********************************************************************************************************************/
 
-#include "stdafx.h"
+#pragma once
 
-#include "IP_Shared.h"
-#include "GeneratedCode/RegisterAuthServerEnums.h"
+#include "targetver.h"
 
-namespace NAuthServer
-{
-	void Initialize( void )
-	{
-		NIPShared::Initialize();
-		Register_AuthServer_Enums();
-	}
+// std includes
+#include <list>
+#include <vector>
+#include <set>
+#include <unordered_map>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <string>
+#include <algorithm>
+#include <assert.h>
 
-	void Shutdown( void )
-	{
-		NIPShared::Shutdown();
-	}
-}
+// Loki includes
+#include "loki/LokiTypeInfo.h"
 
-int main( int /*argc*/, wchar_t* /*argv*/[] )
-{
-	return 0;
-}
+// Misc includes
+#pragma warning( push )
+#pragma warning( disable : 4100 )
+#include "FastDelegate.h"
+#pragma warning( pop ) 
+
+// Global using directives; be careful with these
+using namespace fastdelegate;
+
+using std::tr1::shared_ptr;
+using std::tr1::static_pointer_cast;
+using std::unique_ptr;
+
+// self includes
+#include "PlatformTypes.h"
+#include "DebugAssert.h"
+#include "TypeInfoUtils.h"
+#include "gtest/gtest.h"
 

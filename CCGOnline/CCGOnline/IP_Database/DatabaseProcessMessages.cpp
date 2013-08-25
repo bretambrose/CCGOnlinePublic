@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	AuthServer.cpp
-		Entry point for auth server application
+	DatabaseProcessMessages.cpp
+		A component containing definitions for persistence-related process messages
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -10,7 +10,7 @@
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,  
+	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -22,25 +22,14 @@
 
 #include "stdafx.h"
 
-#include "IP_Shared.h"
-#include "GeneratedCode/RegisterAuthServerEnums.h"
+#include "DatabaseProcessMessages.h"
 
-namespace NAuthServer
+#include "Interfaces/DatabaseTaskInterface.h"
+
+CRunDatabaseTaskRequest::~CRunDatabaseTaskRequest()
 {
-	void Initialize( void )
-	{
-		NIPShared::Initialize();
-		Register_AuthServer_Enums();
-	}
-
-	void Shutdown( void )
-	{
-		NIPShared::Shutdown();
-	}
 }
 
-int main( int /*argc*/, wchar_t* /*argv*/[] )
+CRunDatabaseTaskResponse::~CRunDatabaseTaskResponse()
 {
-	return 0;
 }
-

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	AuthServer.cpp
-		Entry point for auth server application
+	targetver.h
+		Windows versioning stuff
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -10,7 +10,7 @@
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,  
+	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -20,27 +20,15 @@
 
 **********************************************************************************************************************/
 
-#include "stdafx.h"
+#pragma once
 
-#include "IP_Shared.h"
-#include "GeneratedCode/RegisterAuthServerEnums.h"
+// Including SDKDDKVer.h defines the highest available Windows platform.
 
-namespace NAuthServer
-{
-	void Initialize( void )
-	{
-		NIPShared::Initialize();
-		Register_AuthServer_Enums();
-	}
+// If you wish to build your application for a previous Windows platform, include WinSDKVer.h and
+// set the _WIN32_WINNT macro to the platform you wish to support before including SDKDDKVer.h.
 
-	void Shutdown( void )
-	{
-		NIPShared::Shutdown();
-	}
-}
+#ifdef WIN32
 
-int main( int /*argc*/, wchar_t* /*argv*/[] )
-{
-	return 0;
-}
+#include <SDKDDKVer.h>
 
+#endif // WIN32

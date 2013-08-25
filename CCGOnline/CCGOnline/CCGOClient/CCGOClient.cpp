@@ -27,19 +27,19 @@
 
 #include <tchar.h>
 #include "GeneratedCode\RegisterCCGOClientEnums.h"
-#include "Shared.h"
+#include "IP_Shared.h"
 
 namespace NCCGOClient
 {
 	void Initialize( void )
 	{
-		NShared::Initialize();
+		NIPShared::Initialize();
 		Register_CCGOClient_Enums();
 	}
 
 	void Shutdown( void )
 	{
-		NShared::Shutdown();
+		NIPShared::Shutdown();
 	}
 }
 

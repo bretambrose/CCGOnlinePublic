@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DF65F98E-1E9C-44F3-B71C-BE6DB4AE8BF3}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{05DAB44F-91CA-409A-BD5C-FD738C7B10CE}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Concurrency">
+      <UniqueIdentifier>{D3653C20-D44C-465D-A487-56ECDF244228}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Concurrency\Containers">
+      <UniqueIdentifier>{A0E56DC7-F1FC-4A1A-B424-B3E5DAB9A07E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{6677D897-6AE8-48C7-99B7-E168D5D54F52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MessageHandling">
+      <UniqueIdentifier>{D27FBD50-2E43-498C-89D2-FA038D6CED69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TaskScheduler">
+      <UniqueIdentifier>{3055F094-35DD-42CB-9A2E-541828958EB8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Time">
+      <UniqueIdentifier>{D85C985D-E17E-47EC-BB43-6DF21BC2DD90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GeneratedCode">
+      <UniqueIdentifier>{7f91654a-0135-4b22-8178-5f5989858a65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\XML">
+      <UniqueIdentifier>{793d6836-37dc-46fb-b2c0-a49d0fc03a6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SlashCommands">
+      <UniqueIdentifier>{a94ceaed-e039-4a4a-891e-1cd692dce0ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Concurrency\Messaging">
+      <UniqueIdentifier>{3e72eefd-12c3-4c6b-8392-6775bd2038d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRC.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CRCValue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IP_Shared.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ConcurrencyManager.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LogInterface.h">
+      <Filter>Source Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeInfoUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\MessageHandler.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="PriorityQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskScheduler\TaskScheduler.h">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeKeeper.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskScheduler\ScheduledTask.h">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskScheduler\ScheduledTaskPolicies.h">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClInclude>
+    <ClInclude Include="StructuredExceptionHandler.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TickTime.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeType.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeUtils.h">
+      <Filter>Source Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumConversion.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedCode\RegisterIP_SharedEnums.h">
+      <Filter>Source Files\GeneratedCode</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\PrimitiveXMLSerializers.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\XMLSerializationRegistrar.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLSerializerInterface.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\XMLLoadableTable.h">
+      <Filter>Source Files\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandDefinition.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedXMLSerializerRegistration.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandManager.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandInstance.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="SlashCommands\SlashCommandDataDefinition.h">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\MailboxInterfaces.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\ExchangeMailboxMessages.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\LoggingMessages.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\ConcurrentQueueInterface.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\LockingConcurrentQueue.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Containers\TBBConcurrentQueue.h">
+      <Filter>Source Files\Concurrency\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\ProcessManagementMessages.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\Messaging\ProcessMessage.h">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ManagedProcessInterface.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessBase.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessConstants.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessExecutionContext.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessID.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessInterface.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessMailbox.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessMessageFrame.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessProperties.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessStatics.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessSubject.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\ProcessMessageHandler.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandling\ProcessMessageHandlerBase.h">
+      <Filter>Source Files\MessageHandling</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LoggingProcess.h">
+      <Filter>Source Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ProcessExecutionMode.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\TaskProcessBase.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Concurrency\ThreadProcessBase.h">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CRC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IP_Shared.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ConcurrencyManager.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LogInterface.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskScheduler\TaskScheduler.cpp">
+      <Filter>Source Files\TaskScheduler</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\TimeKeeper.cpp">
+      <Filter>Source Files\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="StructuredExceptionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\TimeUtils.cpp">
+      <Filter>Source Files\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="EnumConversion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedCode\RegisterIP_SharedEnums.cpp">
+      <Filter>Source Files\GeneratedCode</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\PrimitiveXMLSerializers.cpp">
+      <Filter>Source Files\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\XMLSerializationRegistrar.cpp">
+      <Filter>Source Files\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandDefinition.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedXMLSerializerRegistration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandManager.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandInstance.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="SlashCommands\SlashCommandDataDefinition.cpp">
+      <Filter>Source Files\SlashCommands</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\MailboxInterfaces.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\Messaging\ExchangeMailboxMessages.cpp">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\Messaging\LoggingMessages.cpp">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\Messaging\ProcessManagementMessages.cpp">
+      <Filter>Source Files\Concurrency\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessBase.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessMailbox.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessMessageFrame.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessProperties.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ProcessStatics.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\LoggingProcess.cpp">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\TaskProcessBase.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Concurrency\ThreadProcessBase.cpp">
+      <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	AuthServer.cpp
-		Entry point for auth server application
+	IP_ServerShared.h
+		Component containing initialize/shutdown for the IP_ServerShared library; calls Server library initalize/shutdown
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -10,7 +10,7 @@
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,  
+	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -20,27 +20,13 @@
 
 **********************************************************************************************************************/
 
-#include "stdafx.h"
+#ifndef IP_SERVER_SHARED_H
+#define IP_SERVER_SHARED_H
 
-#include "IP_Shared.h"
-#include "GeneratedCode/RegisterAuthServerEnums.h"
-
-namespace NAuthServer
+namespace NIPServerShared
 {
-	void Initialize( void )
-	{
-		NIPShared::Initialize();
-		Register_AuthServer_Enums();
-	}
+	void Initialize( void );
+	void Shutdown( void );
+} 
 
-	void Shutdown( void )
-	{
-		NIPShared::Shutdown();
-	}
-}
-
-int main( int /*argc*/, wchar_t* /*argv*/[] )
-{
-	return 0;
-}
-
+#endif // SERVER_SHARED_H
