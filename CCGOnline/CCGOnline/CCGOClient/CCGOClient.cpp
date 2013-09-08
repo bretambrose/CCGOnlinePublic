@@ -23,11 +23,11 @@
 #include "stdafx.h"
 
 #include "CCGOClient.h"
-#include "WindowsWrapper.h"
+#include "IPPlatform/WindowsWrapper.h"
 
 #include <tchar.h>
 #include "GeneratedCode\RegisterCCGOClientEnums.h"
-#include "IP_Shared.h"
+#include "IPShared/IPShared.h"
 
 namespace NCCGOClient
 {

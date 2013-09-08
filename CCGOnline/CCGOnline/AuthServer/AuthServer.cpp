@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 
-#include "IP_Shared.h"
+#include "IPShared/IPShared.h"
 #include "GeneratedCode/RegisterAuthServerEnums.h"
 
 namespace NAuthServer

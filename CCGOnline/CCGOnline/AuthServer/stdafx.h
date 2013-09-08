@@ -36,15 +36,15 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "MemoryAllocation.h"
+#include "IPPlatform/MemoryAllocation.h"
 
 // Loki includes
-#include "loki/LokiTypeInfo.h"
+#include "loki/include/loki/LokiTypeInfo.h"
 
 // Misc includes
 #pragma warning( push )
 #pragma warning( disable : 4100 )
-#include "FastDelegate.h"
+#include "IPPlatform/FastDelegate.h"
 #pragma warning( pop ) 
 
 // Global using directives; be careful with these
@@ -55,7 +55,7 @@ using std::tr1::static_pointer_cast;
 using std::unique_ptr;
 
 // self includes
-#include "PlatformTypes.h"
-#include "DebugAssert.h"
-#include "TypeInfoUtils.h"
+#include "IPPlatform/PlatformTypes.h"
+#include "IPPlatform/DebugAssert.h"
+#include "IPShared/TypeInfoUtils.h"
 

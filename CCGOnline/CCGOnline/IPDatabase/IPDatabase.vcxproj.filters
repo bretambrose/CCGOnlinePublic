@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DF65F98E-1E9C-44F3-B71C-BE6DB4AE8BF3}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{05DAB44F-91CA-409A-BD5C-FD738C7B10CE}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Interfaces">
+      <UniqueIdentifier>{b90ad7e4-f174-42fd-aeb9-92f7021a3cc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ODBCImplementation">
+      <UniqueIdentifier>{a3b94267-eece-4342-b4d1-c47ac62ed89c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IPDatabase.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseConnectionInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseEnvironmentInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseStatementInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCEnvironment.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCConnection.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCStatement.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCObjectBase.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCFactory.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseTypes.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCParameters.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseVariableInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseVariableSetInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseTaskBatch.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseTaskInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseCalls.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCParameterInsulation.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="EmptyVariableSet.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseProcessBase.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseProcessMessages.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseTaskBatchInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\CompoundDatabaseTaskInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseTaskBaseInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="CompoundDatabaseTaskBatch.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\CompoundDatabaseTaskBatchInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseCallContext.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DatabaseTaskBatchUtilities.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ODBCImplementation\ODBCVariableSet.h">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Interfaces\DatabaseCallContextInterface.h">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPDatabase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCImplementation\ODBCEnvironment.cpp">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCImplementation\ODBCConnection.cpp">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCImplementation\ODBCStatement.cpp">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCImplementation\ODBCObjectBase.cpp">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCImplementation\ODBCFactory.cpp">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseProcessBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseProcessMessages.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseCalls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DatabaseTaskBatchUtilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ODBCImplementation\ODBCVariableSet.cpp">
+      <Filter>Source Files\ODBCImplementation</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

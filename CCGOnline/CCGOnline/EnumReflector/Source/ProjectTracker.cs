@@ -145,7 +145,7 @@ namespace EnumReflector
 			cpp_text.Append( "#include \"stdafx.h\"" );
 			cpp_text.Append( END_OF_LINE );
 			cpp_text.Append( END_OF_LINE );
-			cpp_text.Append( "#include \"EnumConversion.h\"" );
+			cpp_text.Append( "#include \"IPShared/EnumConversion.h\"" );
 			cpp_text.Append( END_OF_LINE );
 			cpp_text.Append( END_OF_LINE );
 
