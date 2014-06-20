@@ -44,10 +44,10 @@ int main(int argc, wchar_t* argv[])
 	NIPSharedTest::Initialize();
 
 	::testing::InitGoogleTest(&argc, argv);
-	RUN_ALL_TESTS();
+	int result_code = RUN_ALL_TESTS();
 
 	NIPSharedTest::Shutdown();
 
-	return 0;
+	return result_code;
 }
 

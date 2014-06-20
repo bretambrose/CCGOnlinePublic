@@ -253,8 +253,7 @@ void CLogInterface::Log( const wchar_t *message )
 **********************************************************************************************************************/
 void CLogInterface::Log( const std::basic_ostringstream< wchar_t > &message_stream )
 {
-	std::wstring message( message_stream.rdbuf()->str() );
-	Log( std::move( message ) );
+	Log( std::move( message_stream.rdbuf()->str() ) );
 }
 
 /**********************************************************************************************************************

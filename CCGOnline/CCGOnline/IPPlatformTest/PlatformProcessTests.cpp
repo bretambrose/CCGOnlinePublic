@@ -46,6 +46,5 @@ class PlatformProcessTests : public testing::Test
 
 TEST_F( PlatformProcessTests, Exe_Name )
 {
-	ASSERT_TRUE( NPlatform::Get_Service_Name() == L"IP_PlatformTest" );
+	ASSERT_TRUE( NPlatform::Get_Service_Name() == L"IPPlatformTest" );
 }
-

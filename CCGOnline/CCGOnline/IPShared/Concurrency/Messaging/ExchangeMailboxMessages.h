@@ -84,7 +84,7 @@ class CAddMailboxMessage : public IProcessMessage
 
 		virtual ~CAddMailboxMessage();
 
-		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( void ) const { return Mailbox; }
+		const shared_ptr< CWriteOnlyMailbox > &Get_Mailbox( void ) const { return Mailbox; }
 
 	private:
 

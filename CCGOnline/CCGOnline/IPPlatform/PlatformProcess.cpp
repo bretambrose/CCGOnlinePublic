@@ -24,6 +24,7 @@
 
 #include "PlatformProcess.h"
 
+#include <regex>
 #include "Shlwapi.h"
 #include "StringUtils.h"
 
@@ -46,19 +47,20 @@ uint32 NPlatform::Get_Self_PID( void )
 **********************************************************************************************************************/
 std::wstring NPlatform::Get_Exe_Name( void )
 {
+
 	static wchar_t file_name_buffer[ 1024 ];
 	::GetModuleFileName( 0, file_name_buffer, sizeof( file_name_buffer ) );
 
-	wchar_t *filename = ::PathFindFileName( file_name_buffer );
+	static std::tr1::wregex _FilenamePattern(L".*\\\\(\\w+)\\.(\\w*)$");	
 
-	static wchar_t _buffer[ 1024 ];
+	std::wstring file_name(file_name_buffer);
 
-	wchar_t *next_token = nullptr;
+	std::tr1::wcmatch filename_match_results;
+	std::tr1::regex_search(file_name.c_str(), filename_match_results, _FilenamePattern);
 
-	::wcscpy_s( _buffer, sizeof( _buffer ), filename );
-	wchar_t *suffix = ::wcstok_s( _buffer, L".", &next_token );
+	std::wstring exe_name = filename_match_results[1];
 
-	return std::wstring( suffix );
+	return exe_name;
 }
 
 /**********************************************************************************************************************

@@ -25,9 +25,9 @@
 int main(int argc, wchar_t* argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);
-	RUN_ALL_TESTS();
+	int result_code = RUN_ALL_TESTS();
 
-	return 0;
+	return result_code;
 }
 
 

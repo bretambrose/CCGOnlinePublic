@@ -70,8 +70,8 @@ TEST_F( PlatformFileSystemTests, Directory_Ops )
 {
 	ASSERT_FALSE( NPlatform::Directory_Exists( std::wstring( L"GarbageDirectory" ) ) );
 	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"Data" ) ) );
-	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"External_DLL_32" ) ) );
-	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"External_DLL_64" ) ) );
+	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"x86\\External_DLLs" ) ) );
+	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"x64\\External_DLLs" ) ) );
 
 	ASSERT_FALSE( NPlatform::Directory_Exists( TEST_DIRECTORY ) );
 	NPlatform::Create_Directory( TEST_DIRECTORY );
@@ -120,3 +120,4 @@ TEST_F( PlatformFileSystemTests, Strip_Path )
 	ASSERT_TRUE( NPlatform::Strip_Path( path2 ) == test_file_name );
 	ASSERT_TRUE( NPlatform::Strip_Path( path3 ) == test_file_name );
 }
+

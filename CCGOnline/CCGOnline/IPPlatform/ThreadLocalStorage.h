@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
 	ThreadLocalStorage.h
-		A component that allocated and manages thread local storage
+		A component that allocates and manages thread local storage
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 

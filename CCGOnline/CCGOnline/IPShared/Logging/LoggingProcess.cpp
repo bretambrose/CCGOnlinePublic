@@ -205,10 +205,10 @@ void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_pr
 	CLogFile *log_file = Get_Log_File( subject );
 	if ( log_file == nullptr )
 	{
-		log_file = new CLogFile( subject, Build_File_Name( subject ) );
-		log_file->Initialize();
-
-		LogFiles.insert( LogFileTableType::value_type( subject, log_file ) );
+		unique_ptr< CLogFile > file( new CLogFile( subject, Build_File_Name( subject ) ) );
+		file->Initialize();
+		log_file = file.get();
+		LogFiles.insert( LogFileTableType::value_type( subject, std::move( file ) ) );
 	}
 
 	FATAL_ASSERT( log_file != nullptr );

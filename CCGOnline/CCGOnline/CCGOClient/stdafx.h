@@ -33,6 +33,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <functional>
 #include <algorithm>
 #include <assert.h>
 
