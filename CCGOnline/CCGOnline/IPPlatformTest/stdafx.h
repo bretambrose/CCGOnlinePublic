@@ -55,6 +55,7 @@ using std::tr1::static_pointer_cast;
 // self includes
 #include "IPPlatform/PlatformTypes.h"
 #include "IPPlatform/DebugAssert.h"
+#include "IPPlatform/Universal.h"
 #include "gtest/gtest.h"
 
 

@@ -132,10 +132,10 @@ void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64 val
 	NStringUtils::To_Upper_Case( entry_name, upper_entry_name );
 
 	auto name_iter = NameToValueTable.find( upper_entry_name );
-	FATAL_ASSERT( name_iter == NameToValueTable.end() );
+	FATAL_ASSERT( name_iter == NameToValueTable.cend() );
 
 	auto value_iter = ValueToNameTable.find( value );
-	FATAL_ASSERT( value_iter == ValueToNameTable.end() );
+	FATAL_ASSERT( value_iter == ValueToNameTable.cend() );
 
 	NameToValueTable[ upper_entry_name ] = value;
 	ValueToNameTable[ value ] = upper_entry_name;
@@ -156,7 +156,7 @@ bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64 &
 	NStringUtils::To_Upper_Case( entry_name, upper_entry_name );
 
 	auto iter = NameToValueTable.find( upper_entry_name );
-	if ( iter == NameToValueTable.end() )
+	if ( iter == NameToValueTable.cend() )
 	{
 		return false;
 	}
@@ -177,7 +177,7 @@ bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64 &
 bool CConvertibleEnum::Convert_Internal( uint64 value, std::string &entry_name ) const
 {
 	auto iter = ValueToNameTable.find( value );
-	if ( iter == ValueToNameTable.end() )
+	if ( iter == ValueToNameTable.cend() )
 	{
 		return false;
 	}
@@ -313,7 +313,7 @@ bool CConvertibleEnum::Convert_Bitfield_Internal( uint64 value, std::string &mas
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-std::unordered_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > CEnumConverter::Enums;
+CEnumConverter::EnumTableType CEnumConverter::Enums;
 std::unordered_map< std::string, CConvertibleEnum * > CEnumConverter::EnumsByName;
 
 /**********************************************************************************************************************
@@ -322,11 +322,7 @@ std::unordered_map< std::string, CConvertibleEnum * > CEnumConverter::EnumsByNam
 **********************************************************************************************************************/
 void CEnumConverter::Cleanup( void )
 {
-	for ( auto iter = Enums.begin(); iter != Enums.end(); ++iter )
-	{
-		delete iter->second;
-	}
-
+	std::for_each(Enums.begin(), Enums.end(), []( const EnumTableType::value_type &val ){ SAFE_DELETE( val.second ); } );
 	Enums.clear();
 	EnumsByName.clear();
 }
@@ -342,11 +338,11 @@ void CEnumConverter::Cleanup( void )
 void CEnumConverter::Register_Enum_Internal( const std::type_info &enum_type_id, const std::string &enum_name, EConvertibleEnumProperties properties )
 {
 	Loki::TypeInfo enum_type_info( enum_type_id );
-	FATAL_ASSERT( Enums.find( enum_type_info ) == Enums.end() );
+	FATAL_ASSERT( Enums.find( enum_type_info ) == Enums.cend() );
 
 	std::string upper_enum_name;
 	NStringUtils::To_Upper_Case( enum_name, upper_enum_name );
-	FATAL_ASSERT( EnumsByName.find( upper_enum_name ) == EnumsByName.end() );
+	FATAL_ASSERT( EnumsByName.find( upper_enum_name ) == EnumsByName.cend() );
 
 	CConvertibleEnum *enum_object = new CConvertibleEnum( enum_name, properties );
 	Enums[ enum_type_info ] = enum_object;

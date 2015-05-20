@@ -23,11 +23,11 @@
 #ifndef PRIMITIVE_XML_SERIALIZERS_H
 #define PRIMITIVE_XML_SERIALIZERS_H
 
-#include "XMLSerializerInterface.h"
+#include "IPShared/Serialization/XML/XMLSerializerInterface.h"
 #include "pugixml/pugixml.h"
 #include "IPPlatform/StringUtils.h"
 #include "IPShared/EnumConversion.h"
-#include "XMLSerializationRegistrar.h"
+#include "IPShared/Serialization/SerializationBase.h"
 
 namespace XMLSerialization
 {
@@ -48,17 +48,9 @@ class CCompositeXMLSerializer : public IXMLSerializer
 			MemberRecords()
 		{}
 
-		virtual ~CCompositeXMLSerializer()
-		{
-			for ( auto iter = MemberRecords.begin(); iter != MemberRecords.end(); ++iter )
-			{
-				delete iter->second.second;
-			}
+		virtual ~CCompositeXMLSerializer() = default;
 
-			MemberRecords.clear();
-		}
-
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
 		{
 			uint8 *byte_base_ptr = reinterpret_cast< uint8 * >( destination );
 
@@ -69,7 +61,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 				NStringUtils::To_Upper_Case( node_name, upper_name );
 
 				auto member_iter = MemberRecords.find( upper_name );
-				FATAL_ASSERT( member_iter != MemberRecords.end() );
+				FATAL_ASSERT( member_iter != MemberRecords.cend() );
 
 				IXMLSerializer *serializer = member_iter->second.second;
 				uint8 *member_ptr = byte_base_ptr + member_iter->second.first;
@@ -84,7 +76,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 				NStringUtils::To_Upper_Case( attribute_name, upper_attribute_name );
 
 				auto record_iter = MemberRecords.find( upper_attribute_name );
-				if ( record_iter == MemberRecords.end() )
+				if ( record_iter == MemberRecords.cend() )
 				{
 					if ( upper_attribute_name == L"TYPE" )
 					{
@@ -97,34 +89,14 @@ class CCompositeXMLSerializer : public IXMLSerializer
 				IXMLSerializer *serializer = record_iter->second.second;
 				uint8 *member_ptr = byte_base_ptr + record_iter->second.first;
 
-				serializer->Load_From_XML( att_iter.value(), member_ptr );
+				serializer->Load_From_String( att_iter.value(), member_ptr );
 			}
 		}
 
-		template< typename T, typename S >
-		void Add( const std::wstring &element_name, S T::* dummy_member )
+		void Add( const std::wstring &element_name, uint64_t offset, IXMLSerializer *serializer )
 		{
 			std::wstring upper_name;
 			NStringUtils::To_Upper_Case( element_name, upper_name );
-
-			T dummy_object;
-			S *member_pointer = &( dummy_object.*dummy_member );
-
-			uint64 offset = reinterpret_cast< char * >( member_pointer ) - reinterpret_cast< char * >( &dummy_object );
-
-			Add_Member_Record( upper_name,  XMLMemberRecordType( offset, CXMLSerializationRegistrar::Create_Serializer( typeid( S ) ) ) );
-		}
-
-		template< typename T, typename S >
-		void Add( const std::wstring &element_name, S T::* dummy_member, IXMLSerializer *serializer )
-		{
-			std::wstring upper_name;
-			NStringUtils::To_Upper_Case( element_name, upper_name );
-
-			T dummy_object;
-			S *member_pointer = &( dummy_object.*dummy_member );
-
-			uint64 offset = reinterpret_cast< char * >( member_pointer ) - reinterpret_cast< char * >( &dummy_object );
 
 			Add_Member_Record( upper_name,  XMLMemberRecordType( offset, serializer ) );
 		}
@@ -133,88 +105,80 @@ class CCompositeXMLSerializer : public IXMLSerializer
 
 		virtual void Add_Member_Record( const std::wstring &member_name, const XMLMemberRecordType &member_record )
 		{
-			FATAL_ASSERT( MemberRecords.find( member_name ) == MemberRecords.end() );
+			FATAL_ASSERT( MemberRecords.find( member_name ) == MemberRecords.cend() );
 
 			MemberRecords[ member_name ] = member_record;
 		}
 
-		std::unordered_map< std::wstring, XMLMemberRecordType > MemberRecords;
+		typedef std::unordered_map< std::wstring, XMLMemberRecordType > MemberRecordTableType;
+		MemberRecordTableType MemberRecords;
 };
 
 // A serializer for a std::vector of some type
-template< typename T >
 class CVectorXMLSerializer : public IXMLSerializer
 {
 	public:
 
-		CVectorXMLSerializer( IXMLSerializer *entry_serializer = nullptr ) :
-			EntrySerializer( entry_serializer )
+		CVectorXMLSerializer( IXMLSerializer *entry_serializer, DPrepDestinationForRead prep_delegate ) :
+			EntrySerializer( entry_serializer ),
+			PrepDelegate( prep_delegate )
 		{
-			if ( EntrySerializer == nullptr )
-			{
-				EntrySerializer = CXMLSerializationRegistrar::Create_Serializer( typeid( T ) );
-			}
-
 			FATAL_ASSERT( EntrySerializer != nullptr );
+			FATAL_ASSERT( PrepDelegate != false );
 		}
 
-		virtual ~CVectorXMLSerializer()
+		template< typename T >
+		static IXMLSerializer* Create( IXMLSerializer *t_serializer )
 		{
-			if ( EntrySerializer != nullptr )
-			{
-				delete EntrySerializer;
-				EntrySerializer = nullptr;
-			}
+			return new CVectorXMLSerializer( t_serializer, Prep_Vector_For_Read< T > );
 		}
 
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
-		{
-			std::vector< T > *dest = reinterpret_cast< std::vector< T > * >( destination );
+		virtual ~CVectorXMLSerializer() = default;
 
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
+		{
 			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
 			{
-				dest->push_back( T() );
-				EntrySerializer->Load_From_XML( iter, &( *dest )[ dest->size() - 1 ] );
+				EntrySerializer->Load_From_XML( iter, PrepDelegate( destination ) );
 			}
 		}
 
 	private:
 
 		IXMLSerializer *EntrySerializer;
+		DPrepDestinationForRead PrepDelegate;
 };
 
 // A serializer for a pointer to some type
-template< typename T >
 class CPointerXMLSerializer : public IXMLSerializer
 {
 	public:
 
-		CPointerXMLSerializer( IXMLSerializer *t_serializer ) :
-			TSerializer( t_serializer )
+		CPointerXMLSerializer( IXMLSerializer *t_serializer, DPrepDestinationForRead prep_delegate ) :
+			TSerializer( t_serializer ),
+			PrepDelegate( prep_delegate )
 		{
 			FATAL_ASSERT( TSerializer != nullptr );
+			FATAL_ASSERT( PrepDelegate != false );
 		}
 
-		virtual ~CPointerXMLSerializer()
+		template< typename T >
+		static IXMLSerializer* Create( IXMLSerializer *t_serializer )
 		{
-			if ( TSerializer != nullptr )
-			{
-				delete TSerializer;
-				TSerializer = nullptr;
-			}
+			return new CPointerXMLSerializer( t_serializer, Prep_Pointer_For_Read< T > );
 		}
 
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
-		{
-			T **dest = reinterpret_cast< T ** >( destination );
-			*dest = new T;
+		virtual ~CPointerXMLSerializer() = default;
 
-			TSerializer->Load_From_XML( xml_node, *dest );
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
+		{
+			TSerializer->Load_From_XML( xml_node, PrepDelegate( destination ) );
 		}
 
 	private:
 
 		IXMLSerializer *TSerializer;
+		DPrepDestinationForRead PrepDelegate;
 };
 
 // A serializer for an enum
@@ -225,14 +189,14 @@ class CEnumXMLSerializer : public IXMLSerializer
 
 		CEnumXMLSerializer( void ) {}
 
-		virtual ~CEnumXMLSerializer() {}
+		virtual ~CEnumXMLSerializer() = default;
 
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
 		{
-			Load_From_XML( xml_node.child_value(), destination );
+			Load_From_String( xml_node.child_value(), destination );
 		}
 
-		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
 			T *dest = reinterpret_cast< T * >( destination );
 
@@ -251,14 +215,14 @@ class CEnumPointerXMLSerializer : public IXMLSerializer
 
 		CEnumPointerXMLSerializer( void ) {}
 
-		virtual ~CEnumPointerXMLSerializer() {}
+		virtual ~CEnumPointerXMLSerializer() = default;
 
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
 		{
 			Load_From_XML( xml_node.child_value(), destination );
 		}
 
-		virtual void Load_From_XML( const wchar_t *value, void *destination ) const
+		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
 			T **dest = reinterpret_cast< T ** >( destination );
 			*dest = new T;
@@ -281,17 +245,9 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 		{
 		}
 
-		virtual ~CEnumPolymorphicXMLSerializer()
-		{
-			for ( auto iter = Serializers.begin(); iter != Serializers.end(); ++iter )
-			{
-				delete iter->second;
-			}
+		virtual ~CEnumPolymorphicXMLSerializer() = default;
 
-			Serializers.clear();
-		}
-
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const
+		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
 		{
 			pugi::xml_attribute attrib = xml_node.attribute( L"Type" );
 
@@ -311,14 +267,16 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 
 		void Add( T key, IXMLSerializer *serializer )
 		{
-			FATAL_ASSERT( Serializers.find( key ) == Serializers.end() );
+			FATAL_ASSERT( Serializers.find( key ) == Serializers.cend() );
 
 			Serializers[ key ] = serializer;
 		}
 
 	private:
 
-		std::unordered_map< T, IXMLSerializer * > Serializers;
+		typedef std::unordered_map< T, IXMLSerializer * > SerializerTableType;
+
+		SerializerTableType Serializers;
 };
 
 

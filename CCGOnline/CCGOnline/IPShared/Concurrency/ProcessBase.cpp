@@ -126,7 +126,7 @@ void CProcessBase::Log( std::wstring &&message )
 shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID::Enum process_id ) const
 {
 	auto interface_iter = Mailboxes.find( process_id );
-	if ( interface_iter != Mailboxes.end() )
+	if ( interface_iter != Mailboxes.cend() )
 	{
 		return interface_iter->second;
 	}
@@ -178,7 +178,7 @@ void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, uniqu
 	{
 		// find or create a frame for the destination thread
 		auto iter = PendingOutboundFrames.find( dest_process_id );
-		if ( iter == PendingOutboundFrames.end() )
+		if ( iter == PendingOutboundFrames.cend() )
 		{
 			unique_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( ID ) );
 			frame->Add_Message( message );
@@ -224,7 +224,7 @@ void CProcessBase::Flush_Regular_Messages( void )
 		// under normal circumstances, send all messages to threads we have an interface for
 		std::vector< EProcessID::Enum > sent_frames;
 
-		for ( auto frame_iterator = PendingOutboundFrames.begin(); frame_iterator != PendingOutboundFrames.end(); ++frame_iterator )
+		for ( auto frame_iterator = PendingOutboundFrames.begin(), end = PendingOutboundFrames.end(); frame_iterator != end; ++frame_iterator )
 		{
 			shared_ptr< CWriteOnlyMailbox > writeable_mailbox = Get_Mailbox( frame_iterator->first );
 			if ( writeable_mailbox != nullptr )
@@ -235,7 +235,7 @@ void CProcessBase::Flush_Regular_Messages( void )
 		}
 
 		// erase only the frames that we sent
-		for ( uint32 i = 0; i < sent_frames.size(); i++ )
+		for ( size_t i = 0, size = sent_frames.size(); i < size; i++ )
 		{
 			PendingOutboundFrames.erase( sent_frames[ i ] );
 		}
@@ -244,7 +244,7 @@ void CProcessBase::Flush_Regular_Messages( void )
 	{
 		// when shutting down, we sometimes restrict what threads can be sent to depending on the nature of the shut down
 		// soft shut downs allow messages to be sent arbitrarily, hard shutdowns restrict to manager or log thread only
-		for ( auto frame_iterator = PendingOutboundFrames.begin(); frame_iterator != PendingOutboundFrames.end(); ++frame_iterator )
+		for ( auto frame_iterator = PendingOutboundFrames.begin(), end = PendingOutboundFrames.end(); frame_iterator != end; ++frame_iterator )
 		{
 			if ( State == EPS_SHUTTING_DOWN_SOFT || frame_iterator->first == EProcessID::CONCURRENCY_MANAGER || frame_iterator->first == EProcessID::LOGGING )
 			{
@@ -391,12 +391,12 @@ void CProcessBase::Service_Message_Frames( void )
 **********************************************************************************************************************/
 void CProcessBase::Handle_Shutdown_Mailboxes( void )
 {
-	for ( auto iter = ShutdownMailboxes.cbegin(); iter != ShutdownMailboxes.cend(); ++iter )
+	for ( auto iter = ShutdownMailboxes.cbegin(), end = ShutdownMailboxes.cend(); iter != end; ++iter )
 	{
 		EProcessID::Enum process_id = *iter;
 
 		auto interface_iter = Mailboxes.find( process_id );
-		if ( interface_iter == Mailboxes.end() )
+		if ( interface_iter == Mailboxes.cend() )
 		{
 			auto frame_iter = PendingOutboundFrames.find( process_id );
 			if ( frame_iter != PendingOutboundFrames.end() )
@@ -407,7 +407,7 @@ void CProcessBase::Handle_Shutdown_Mailboxes( void )
 		else
 		{
 			// should have been sent in the flush that preceding this call
-			FATAL_ASSERT( PendingOutboundFrames.find( process_id ) == PendingOutboundFrames.end() );
+			FATAL_ASSERT( PendingOutboundFrames.find( process_id ) == PendingOutboundFrames.cend() );
 
 			Mailboxes.erase( interface_iter );
 		}
@@ -446,7 +446,7 @@ void CProcessBase::Handle_Message( EProcessID::Enum process_id, unique_ptr< cons
 
 	Loki::TypeInfo hash_key( typeid( *msg_base ) );
 	auto iter = MessageHandlers.find( hash_key );
-	FATAL_ASSERT( iter != MessageHandlers.end() );
+	FATAL_ASSERT( iter != MessageHandlers.cend() );
 
 	iter->second->Handle_Message( process_id, message );
 }
@@ -473,7 +473,7 @@ void CProcessBase::Register_Handler( const std::type_info &message_type_info, un
 {
 	Loki::TypeInfo key( message_type_info );
 
-	FATAL_ASSERT( MessageHandlers.find( key ) == MessageHandlers.end() );
+	FATAL_ASSERT( MessageHandlers.find( key ) == MessageHandlers.cend() );
 
 	MessageHandlers[ key ] = std::move( handler );
 }
@@ -490,7 +490,7 @@ void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process
 	EProcessID::Enum add_id = message->Get_Mailbox()->Get_Process_ID();
 	FATAL_ASSERT( add_id != EProcessID::CONCURRENCY_MANAGER && add_id != EProcessID::LOGGING );
 
-	if ( Mailboxes.find( add_id ) == Mailboxes.end() )
+	if ( Mailboxes.find( add_id ) == Mailboxes.cend() )
 	{
 		Mailboxes.insert( MailboxTableType::value_type( add_id, message->Get_Mailbox() ) );
 
@@ -606,14 +606,14 @@ void CProcessBase::Flush_System_Messages( void )
 **********************************************************************************************************************/
 void CProcessBase::Remove_Process_ID_From_Tables( EProcessID::Enum process_id )
 {
-	IDToProcessPropertiesTableType::iterator iter1 = IDToPropertiesTable.find( process_id );
-	if ( iter1 == IDToPropertiesTable.end() )
+	auto iter1 = IDToPropertiesTable.find( process_id );
+	if ( iter1 == IDToPropertiesTable.cend() )
 	{
 		return;
 	}
 
-	ProcessPropertiesToIDTableType::iterator ub_iter2 = PropertiesToIDTable.upper_bound( iter1->second );
-	for ( ProcessPropertiesToIDTableType::iterator iter2 = PropertiesToIDTable.lower_bound( iter1->second ); iter2 != ub_iter2; ++iter2 )
+	auto ub_iter2 = PropertiesToIDTable.upper_bound( iter1->second );
+	for ( auto iter2 = PropertiesToIDTable.lower_bound( iter1->second ); iter2 != ub_iter2; ++iter2 )
 	{
 		if ( iter2->second == process_id )
 		{
@@ -637,7 +637,7 @@ void CProcessBase::Build_Process_ID_List_By_Properties( const SProcessProperties
 {
 	process_ids.clear();
 
-	for ( IDToProcessPropertiesTableType::const_iterator iter = IDToPropertiesTable.cbegin(); iter != IDToPropertiesTable.cend(); ++iter )
+	for ( auto iter = IDToPropertiesTable.cbegin(), end = IDToPropertiesTable.cend(); iter != end; ++iter )
 	{
 		if ( properties.Matches( iter->second ) )
 		{

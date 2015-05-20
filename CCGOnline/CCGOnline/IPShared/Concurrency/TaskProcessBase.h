@@ -37,9 +37,9 @@ class CTaskProcessBase : public CProcessBase
 		virtual ~CTaskProcessBase();
 
 		// IThreadTask interface
-		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const;
+		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const override;
 
-		virtual void Run( const CProcessExecutionContext &context );
+		virtual void Run( const CProcessExecutionContext &context ) override;
 
 	protected:
 
@@ -50,7 +50,7 @@ class CTaskProcessBase : public CProcessBase
 		virtual double Get_Reschedule_Interval( void ) const;
 
 		// Base schedule interface
-		virtual void Service_Reschedule( void );
+		virtual void Service_Reschedule( void ) override;
 
 	private:
 

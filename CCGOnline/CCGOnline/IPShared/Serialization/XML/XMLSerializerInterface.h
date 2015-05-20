@@ -37,7 +37,7 @@ class IXMLSerializer
 		virtual ~IXMLSerializer() {}
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const = 0;
-		virtual void Load_From_XML( const wchar_t * /*value*/, void * /*destination*/ ) const { FATAL_ASSERT( false ); }
+		virtual void Load_From_String( const wchar_t * /*value*/, void * /*destination*/ ) const { FATAL_ASSERT( false ); }
 
 };
 

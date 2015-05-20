@@ -33,8 +33,7 @@ class IConcurrentQueue
 
 		virtual ~IConcurrentQueue() {}
 
-		virtual void Enqueue_Item( T &&item ) = 0;
-		virtual void Enqueue_Item( T &item ) = 0;
+		virtual void Move_Item( T &&item ) = 0;
 
 		virtual void Remove_Items( std::vector< T > &items ) = 0;
 

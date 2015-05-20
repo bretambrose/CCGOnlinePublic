@@ -61,7 +61,7 @@ class CProcessBaseExaminer
 		bool Has_Mailbox_With_Properties( const SProcessProperties &properties ) const
 		{
 			auto mailboxes = Get_Mailbox_Table();
-			for ( auto iter = mailboxes.cbegin(); iter != mailboxes.cend(); ++iter )
+			for ( auto iter = mailboxes.cbegin(), end = mailboxes.cend(); iter != end; ++iter )
 			{
 				if ( properties.Matches( iter->second->Get_Properties() ) )
 				{

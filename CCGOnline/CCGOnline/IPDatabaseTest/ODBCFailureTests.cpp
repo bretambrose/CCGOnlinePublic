@@ -1233,13 +1233,13 @@ void Run_ThrowExceptionProcedureCall_Test( const wchar_t *proc_name, uint32 task
 	ASSERT_TRUE( failed_tasks.size() == exception_count );
 	ASSERT_TRUE( successful_tasks.size() == task_count - exception_count );
 
-	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	for ( auto iter = failed_tasks.cbegin(), end = failed_tasks.cend(); iter != end; ++iter )
 	{
 		CThrowExceptionProcedureCall< ISIZE, OSIZE > *task = static_cast< CThrowExceptionProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( task->Throws_Exception() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CThrowExceptionProcedureCall< ISIZE, OSIZE > *task = static_cast< CThrowExceptionProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Throws_Exception() );
@@ -1591,13 +1591,13 @@ void Run_MissingSelectProcedureCall_Test( uint32 task_count, uint32 skip_index1,
 	ASSERT_TRUE( failed_tasks.size() == exception_count );
 	ASSERT_TRUE( successful_tasks.size() == task_count - exception_count );
 
-	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	for ( auto iter = failed_tasks.cbegin(), end = failed_tasks.cend(); iter != end; ++iter )
 	{
 		CMissingSelectProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingSelectProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( task->Skips_Select() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CMissingSelectProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingSelectProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Skips_Select() );
@@ -1840,7 +1840,7 @@ void Run_ExtraSelectProcedureCall_Test( uint32 task_count, uint32 non_extra_inde
 		ASSERT_TRUE( task->Extra_Select() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CExtraSelectProcedureCall< ISIZE, OSIZE > *task = static_cast< CExtraSelectProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Extra_Select() );
@@ -2073,13 +2073,13 @@ void Run_TooManyResultsProcedureCall_Test( uint32 task_count, uint32 extra_index
 	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
 	ASSERT_TRUE( successful_tasks.size() == good_task_count );
 	
-	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	for ( auto iter = failed_tasks.cbegin(), end = failed_tasks.cend(); iter != end; ++iter )
 	{
 		CTooManyResultsProcedureCall< ISIZE, OSIZE > *task = static_cast< CTooManyResultsProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( task->Has_Extra_Select() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CTooManyResultsProcedureCall< ISIZE, OSIZE > *task = static_cast< CTooManyResultsProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Has_Extra_Select() );
@@ -2311,13 +2311,13 @@ void Run_ExtraColumnProcedureCall_Test( uint32 task_count, uint32 extra_index )
 	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
 	ASSERT_TRUE( successful_tasks.size() == good_task_count );
 	
-	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	for ( auto iter = failed_tasks.cbegin(), end = failed_tasks.cend(); iter != end; ++iter )
 	{
 		CExtraColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CExtraColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( task->Has_Extra_Column() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CExtraColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CExtraColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Has_Extra_Column() );
@@ -2544,13 +2544,13 @@ void Run_MissingColumnProcedureCall_Test( uint32 task_count, uint32 missing_inde
 	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
 	ASSERT_TRUE( successful_tasks.size() == good_task_count );
 	
-	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	for ( auto iter = failed_tasks.cbegin(), end = failed_tasks.cend(); iter != end; ++iter )
 	{
 		CMissingColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( task->Has_Missing_Column() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CMissingColumnProcedureCall< ISIZE, OSIZE > *task = static_cast< CMissingColumnProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Has_Missing_Column() );
@@ -2772,13 +2772,13 @@ void Run_InvalidResultConversionProcedureCall_Test( uint32 task_count, uint32 in
 	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
 	ASSERT_TRUE( successful_tasks.size() == good_task_count );
 	
-	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	for ( auto iter = failed_tasks.cbegin(), end = failed_tasks.cend(); iter != end; ++iter )
 	{
 		CInvalidResultConversionProcedureCall< ISIZE, OSIZE > *task = static_cast< CInvalidResultConversionProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( task->Has_Bad_Conversion() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CInvalidResultConversionProcedureCall< ISIZE, OSIZE > *task = static_cast< CInvalidResultConversionProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Has_Bad_Conversion() );
@@ -3030,13 +3030,13 @@ void Run_ResultStringTruncationProcedureCall_Test( uint32 task_count, uint32 inv
 	ASSERT_TRUE( failed_tasks.size() == task_count - good_task_count );
 	ASSERT_TRUE( successful_tasks.size() == good_task_count );
 	
-	for ( auto iter = failed_tasks.cbegin(); iter != failed_tasks.cend(); ++iter )
+	for ( auto iter = failed_tasks.cbegin(), end = failed_tasks.cend(); iter != end; ++iter )
 	{
 		CResultStringTruncationProcedureCall< ISIZE, OSIZE > *task = static_cast< CResultStringTruncationProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( task->Should_Truncate() );
 	}
 
-	for ( auto iter = successful_tasks.cbegin(); iter != successful_tasks.cend(); ++iter )
+	for ( auto iter = successful_tasks.cbegin(), end = successful_tasks.cend(); iter != end; ++iter )
 	{
 		CResultStringTruncationProcedureCall< ISIZE, OSIZE > *task = static_cast< CResultStringTruncationProcedureCall< ISIZE, OSIZE > * >( *iter );
 		ASSERT_TRUE( !task->Should_Truncate() );

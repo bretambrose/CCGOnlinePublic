@@ -23,16 +23,35 @@
 #include "stdafx.h"
 
 #include "IPShared/Concurrency/Containers/LockingConcurrentQueue.h"
+#include "IPShared/Concurrency/Containers/TBBConcurrentQueue.h"
 #include "IPShared/Concurrency/Messaging/LoggingMessages.h"
 #include "IPShared/Concurrency/ProcessConstants.h"
 
-TEST( ConcurrentQueueTests, Add_Remove )
+TEST( ConcurrentQueueTests, Add_Remove_Locking )
 {
 	IConcurrentQueue< int > *int_queue = new CLockingConcurrentQueue< int >();
 
-	int_queue->Enqueue_Item( 5 );
-	int_queue->Enqueue_Item( 10 );
-	int_queue->Enqueue_Item( 15 );
+	int_queue->Move_Item( 5 );
+	int_queue->Move_Item( 10 );
+	int_queue->Move_Item( 15 );
+
+	std::vector< int > items;
+	int_queue->Remove_Items( items );
+
+	ASSERT_TRUE( items[ 0 ] == 5 );
+	ASSERT_TRUE( items[ 1 ] == 10 );
+	ASSERT_TRUE( items[ 2 ] == 15 );
+
+	delete int_queue;
+}
+
+TEST( ConcurrentQueueTests, Add_Remove_Lockless )
+{
+	IConcurrentQueue< int > *int_queue = new CTBBConcurrentQueue< int >();
+
+	int_queue->Move_Item( 5 );
+	int_queue->Move_Item( 10 );
+	int_queue->Move_Item( 15 );
 
 	std::vector< int > items;
 	int_queue->Remove_Items( items );
@@ -47,17 +66,37 @@ TEST( ConcurrentQueueTests, Add_Remove )
 static const std::wstring LOG_MESSAGE_1( L"Log Message 1" );
 static const std::wstring LOG_MESSAGE_2( L"Log Message 2" );
 
-TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr )
+TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr_Locking )
 {
 	IConcurrentQueue< unique_ptr< const CLogRequestMessage > > *message_queue = new CLockingConcurrentQueue< unique_ptr< const CLogRequestMessage > >();
 
-	{
-		unique_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
-		message_queue->Enqueue_Item( message1 );
-	}
+	unique_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
+	message_queue->Move_Item( std::move( message1 ) );
 
 	unique_ptr< const CLogRequestMessage > message2( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_2 ) );
-	message_queue->Enqueue_Item( message2 );
+	message_queue->Move_Item( std::move( message2 ) );
+
+	std::vector< unique_ptr< const CLogRequestMessage > > items;
+	message_queue->Remove_Items( items );
+
+	ASSERT_TRUE( items[ 0 ]->Get_Message() == LOG_MESSAGE_1 );
+	ASSERT_TRUE( items[ 0 ]->Get_Source_Properties() == MANAGER_PROCESS_PROPERTIES );
+	ASSERT_TRUE( items[ 1 ]->Get_Message() == LOG_MESSAGE_2 );
+	ASSERT_TRUE( items[ 1 ]->Get_Source_Properties() == MANAGER_PROCESS_PROPERTIES );
+
+	delete message_queue;
+	message_queue = nullptr;
+}
+
+TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr_Lockless )
+{
+	IConcurrentQueue< unique_ptr< const CLogRequestMessage > > *message_queue = new CTBBConcurrentQueue< unique_ptr< const CLogRequestMessage > >();
+
+	unique_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
+	message_queue->Move_Item( std::move( message1 ) );
+
+	unique_ptr< const CLogRequestMessage > message2( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_2 ) );
+	message_queue->Move_Item( std::move( message2 ) );
 
 	std::vector< unique_ptr< const CLogRequestMessage > > items;
 	message_queue->Remove_Items( items );

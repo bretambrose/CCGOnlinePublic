@@ -37,13 +37,13 @@ class CThreadProcessBase : public CProcessBase
 		virtual ~CThreadProcessBase();
 
 		// IThreadTask interface
-		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const;
+		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const override;
 
-		virtual void Run( const CProcessExecutionContext &context );
+		virtual void Run( const CProcessExecutionContext &context ) override;
 
 	protected:
 
-		virtual double Get_Current_Process_Time( void ) const;
+		virtual double Get_Current_Process_Time( void ) const override;
 
 		virtual uint32 Get_Sleep_Interval_In_Milliseconds( void ) const = 0;
 

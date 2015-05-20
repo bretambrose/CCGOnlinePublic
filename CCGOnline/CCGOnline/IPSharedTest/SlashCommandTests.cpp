@@ -25,6 +25,8 @@
 #include "IPShared/SlashCommands/SlashCommandManager.h"
 #include "IPShared/SlashCommands/SlashCommandInstance.h"
 
+#ifdef NEVER
+
 class SlashCommandTests : public testing::Test 
 {
 	protected:  
@@ -125,3 +127,5 @@ TEST_F( SlashCommandTests, Commands_Bad )
 	ASSERT_FALSE( CSlashCommandManager::Parse_Command( L"/test subby false", command_instance, error_msg ) );
 	ASSERT_FALSE( CSlashCommandManager::Parse_Command( L"/test subby false notanumber", command_instance, error_msg ) );
 }
+
+#endif

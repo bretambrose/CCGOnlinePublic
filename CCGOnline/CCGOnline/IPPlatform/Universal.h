@@ -1,7 +1,8 @@
 /**********************************************************************************************************************
 
-	stdafx.h
-		Set of includes that make up the pre-compiled header file
+	Universal.h
+		A component that contains miscellaneous functionality that should be available anywhere in the solution.  All
+		precompiled headers should include this file.
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,42 +21,10 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#ifndef UNIVERSAL_H
+#define UNIVERSAL_H
 
-#include "targetver.h"
+#define SAFE_DELETE(x) if((x) != nullptr) { delete (x); }
+#define SAFE_DELETE_ARRAY(x) if((x) != nullptr) { delete [](x); }
 
-// std includes
-#include <list>
-#include <vector>
-#include <set>
-#include <unordered_map>
-#include <iterator>
-#include <map>
-#include <memory>
-#include <string>
-#include <functional>
-#include <algorithm>
-#include <assert.h>
-
-// Loki includes
-#include "loki/include/loki/LokiTypeInfo.h"
-
-// Misc includes
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-#include "FastDelegate.h"
-#pragma warning( pop ) 
-
-// Global using directives; be careful with these
-using namespace fastdelegate;
-
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
-using std::unique_ptr;
-
-// self includes
-#include "PlatformTypes.h"
-#include "DebugAssert.h"
-#include "WindowsWrapper.h"
-#include "Universal.h"
-
+#endif // UNIVERSAL_H

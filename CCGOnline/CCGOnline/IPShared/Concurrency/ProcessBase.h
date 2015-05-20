@@ -49,29 +49,29 @@ class CProcessBase : public IManagedProcess
 		virtual ~CProcessBase();
 
 		// IThreadTask interface
-		virtual void Initialize( EProcessID::Enum id );
+		virtual void Initialize( EProcessID::Enum id ) override;
 
-		virtual const SProcessProperties &Get_Properties( void ) const { return Properties; }
-		virtual EProcessID::Enum Get_ID( void ) const { return ID; }
+		virtual const SProcessProperties &Get_Properties( void ) const override { return Properties; }
+		virtual EProcessID::Enum Get_ID( void ) const override { return ID; }
 
-		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message );
-		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &&message );
-		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &message );
-		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &&message );
-		virtual void Log( std::wstring &&message );
+		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message ) override;
+		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &&message ) override;
+		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &message ) override;
+		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &&message ) override;
+		virtual void Log( std::wstring &&message ) override;
 
-		virtual CTaskScheduler *Get_Task_Scheduler( void ) const { return TaskScheduler.get(); }
+		virtual CTaskScheduler *Get_Task_Scheduler( void ) const override { return TaskScheduler.get(); }
 
-		virtual void Flush_System_Messages( void );
+		virtual void Flush_System_Messages( void ) override;
 
 		// IManagerThreadTask interface
-		virtual void Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox );
-		virtual void Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox );
-		virtual void Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &mailbox );
+		virtual void Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) override;
+		virtual void Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) override;
+		virtual void Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &mailbox ) override;
 
-		virtual void Cleanup( void );
+		virtual void Cleanup( void ) override;
 
-		virtual void Run( const CProcessExecutionContext &context );
+		virtual void Run( const CProcessExecutionContext &context ) override;
 
 		void Register_Handler( const std::type_info &message_type_info, unique_ptr< IProcessMessageHandler > &handler );
 

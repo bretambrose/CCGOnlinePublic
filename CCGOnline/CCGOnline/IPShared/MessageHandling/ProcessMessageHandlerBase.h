@@ -45,7 +45,7 @@ class IProcessMessageHandler : public IMessageHandler< EProcessID::Enum, IProces
 			BASECLASS()
 		{}
 
-		virtual ~IProcessMessageHandler() {}
+		virtual ~IProcessMessageHandler() = default;
 
 };
 

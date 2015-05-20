@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 
@@ -51,9 +52,9 @@ namespace IPCodeGen
 		// Private interface
 		private static void Process_Command_Line_Arguments( string[] arguments )
 		{
-			if ( arguments.Length != 2 )
+			if ( arguments.Length != 3 )
 			{
-				throw new Exception( "IpCodeGen expects two arguments: execution mode (NORMAL/CLEAN), and top level directory path" );
+				throw new Exception( "IpCodeGen expects three arguments: execution mode (NORMAL/CLEAN), top level directory path, and solution name" );
 			}
 
 			string upper_arg1 = arguments[ 0 ].ToUpper();
@@ -71,6 +72,7 @@ namespace IPCodeGen
 			}
 
 			TopLevelDirectory = arguments[ 1 ] + Path.DirectorySeparatorChar;
+			SolutionName = arguments[2];
 		}
 
 		private static void Clean_Output_Files()
@@ -84,6 +86,43 @@ namespace IPCodeGen
 				}
 				catch	
 				{
+				}
+			}
+		}
+
+		private enum ESolutionFileReadState
+		{
+			None,
+			InProject,
+			InProjectDependencies
+		}
+
+		private static void Read_Solution_File()
+		{
+			string solution_full_path = OutputDirectory + SolutionName + ".sln";
+
+			using ( FileStream fs = File.Open( solution_full_path, FileMode.Open ) )
+			using ( TextReader tr = new StreamReader( fs ) )
+			{
+				ESolutionFileReadState current_state = ESolutionFileReadState.None;
+				
+				string line = tr.ReadLine();
+				while(line != null)
+				{
+					switch(current_state)
+					{
+						case ESolutionFileReadState.None:
+							Match project_start = Regex.Match(line, @"^Project(^)*) = ""(^""*)"", ""(^""*)"", ""{^}*}""");
+							break;
+
+						case ESolutionFileReadState.InProject:
+							break;
+
+						case ESolutionFileReadState.InProjectDependencies:
+							break;
+					}
+
+					line = tr.ReadLine();	
 				}
 			}
 		}
@@ -117,8 +156,7 @@ namespace IPCodeGen
 					Clean_Output_Files();
 				}
 
-				CCodeGenTaskTracker task_tracker = new CCodeGenTaskTracker();
-				task_tracker.Run();
+				Read_Solution_File();
 
 				DateTime end_time = DateTime.Now;
 				TimeSpan run_time = end_time.Subtract( start_time );
@@ -148,6 +186,7 @@ namespace IPCodeGen
 
 		public static string TopLevelDirectory { get; private set; }
 		public static string OutputDirectory { get; private set; }
+		public static string SolutionName { get; private set; }
 	
 	}
 }

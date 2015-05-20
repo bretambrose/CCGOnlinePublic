@@ -27,7 +27,7 @@ class IProcessMessage
 {
 	public:
 
-		virtual ~IProcessMessage() {}
+		virtual ~IProcessMessage() = default;
 };
 
 #endif // PROCESS_MESSAGE_H

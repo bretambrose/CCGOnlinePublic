@@ -28,7 +28,7 @@
 #include "SlashCommandDefinition.h"
 #include "SlashCommandDataDefinition.h"
 #include "SlashCommandInstance.h"
-#include "IPShared/XML/XMLLoadableTable.h"
+#include "IPShared/Serialization/XML/XMLLoadableTable.h"
 #include "IPPlatform/StringUtils.h"
 #include <regex>
 
@@ -53,7 +53,7 @@ void CSlashCommandManager::Initialize( void )
 **********************************************************************************************************************/
 void CSlashCommandManager::Shutdown( void )
 {
-	for ( auto iter = Definitions.cbegin(); iter != Definitions.cend(); ++iter )
+	for ( auto iter = Definitions.cbegin(), end = Definitions.cend(); iter != end; ++iter )
 	{
 		delete iter->second;
 	}
@@ -80,9 +80,9 @@ void CSlashCommandManager::Load_Command_File( const std::string &file_name )
 	DataDefinitions->Load( file_name );
 
 	// Create command wrappers for all loaded commands
-	for ( auto iter = DataDefinitions->cbegin(); iter != DataDefinitions->cend(); ++iter )
+	for ( auto iter = DataDefinitions->cbegin(), end = DataDefinitions->cend(); iter != end; ++iter )
 	{
-		if ( Definitions.find( iter->first ) != Definitions.end() )
+		if ( Definitions.find( iter->first ) != Definitions.cend() )
 		{
 			continue;
 		}
@@ -92,7 +92,7 @@ void CSlashCommandManager::Load_Command_File( const std::string &file_name )
 	}
 
 	// Create command family placeholder for command families
-	for ( auto iter = DataDefinitions->cbegin(); iter != DataDefinitions->cend(); ++iter )
+	for ( auto iter = DataDefinitions->cbegin(), end = DataDefinitions->cend(); iter != end; ++iter )
 	{
 		const CSlashCommandDataDefinition *data_definition = iter->second;
 
@@ -104,7 +104,7 @@ void CSlashCommandManager::Load_Command_File( const std::string &file_name )
 		std::wstring upper_command;
 		NStringUtils::To_Upper_Case( data_definition->Get_Command(), upper_command );
 
-		if ( Definitions.find( upper_command ) == Definitions.end() )
+		if ( Definitions.find( upper_command ) == Definitions.cend() )
 		{
 			CSlashCommandDefinition *family_data_definition = new CSlashCommandDefinition( nullptr );
 			Definitions[ upper_command ] = family_data_definition;
@@ -162,7 +162,7 @@ bool CSlashCommandManager::Parse_Command( const std::wstring &command_line, CSla
 	std::wstring upper_command;
 	NStringUtils::To_Upper_Case( command, upper_command );
 	auto iter = Definitions.find( upper_command );
-	if ( iter == Definitions.end() )
+	if ( iter == Definitions.cend() )
 	{
 		error_msg = L"No such command exists: " + command;
 		return false;
@@ -259,7 +259,7 @@ void CSlashCommandManager::Register_Command_Handler( const std::wstring &command
 	std::wstring upper_command;
 	NStringUtils::To_Upper_Case( command, upper_command );
 
-	FATAL_ASSERT( CommandHandlers.find( upper_command ) == CommandHandlers.end() );
+	FATAL_ASSERT( CommandHandlers.find( upper_command ) == CommandHandlers.cend() );
 	CommandHandlers[ upper_command ] = handler;
 }
 
@@ -278,6 +278,6 @@ void CSlashCommandManager::Register_Command_Handler( const std::wstring &command
 	std::wstring upper_concat_command;
 	NStringUtils::To_Upper_Case( concat_command, upper_concat_command );
 
-	FATAL_ASSERT( CommandHandlers.find( upper_concat_command ) == CommandHandlers.end() );
+	FATAL_ASSERT( CommandHandlers.find( upper_concat_command ) == CommandHandlers.cend() );
 	CommandHandlers[ upper_concat_command ] = handler;
 }

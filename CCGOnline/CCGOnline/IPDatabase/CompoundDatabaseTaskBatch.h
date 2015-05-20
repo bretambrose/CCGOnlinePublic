@@ -111,7 +111,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				DatabaseTaskIDType::Enum bad_task = DatabaseTaskIDType::INVALID;
 				ExecuteDBTaskListResult::Enum process_child_result = ExecuteDBTaskListResult::SUCCESS;
 
-				for ( auto tt_iter = ChildOrdering.cbegin(); tt_iter != ChildOrdering.cend(); ++tt_iter )
+				for ( auto tt_iter = ChildOrdering.cbegin(), end = ChildOrdering.cend(); tt_iter != end; ++tt_iter )
 				{
 					DBTaskListType child_list;
 					std::for_each( sub_list.cbegin(), sub_list.cend(), [ &tt_iter, &child_list ]( ICompoundDatabaseTask *task ) { task->Get_Child_Tasks_Of_Type( *tt_iter, child_list ); } );

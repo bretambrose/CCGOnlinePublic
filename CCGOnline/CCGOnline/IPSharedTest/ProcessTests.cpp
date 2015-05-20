@@ -460,7 +460,7 @@ TEST_F( ProcessTests, Shutdown_Interface )
 	// verify only pending messages are shutdown acknowledgements
 	frames.clear();
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
-	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
+	for ( auto outer_iter = frames.cbegin(), outer_end = frames.cend(); outer_iter != outer_end; ++outer_iter )
 	{
 		const unique_ptr< CProcessMessageFrame > &frame = *outer_iter;
 		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
@@ -561,7 +561,7 @@ TEST_F( ProcessTests, Shutdown_Soft )
 	frames.clear();
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 
-	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
+	for ( auto outer_iter = frames.cbegin(), outer_end = frames.cend(); outer_iter != outer_end; ++outer_iter )
 	{
 		const unique_ptr< CProcessMessageFrame > &frame = *outer_iter;
 		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );
@@ -650,7 +650,7 @@ TEST_F( ProcessTests, Shutdown_Hard )
 	frames.clear();
 	process_tester.Get_Manager_Proxy()->Get_Readable_Mailbox()->Remove_Frames( frames );
 
-	for ( auto outer_iter = frames.cbegin(); outer_iter != frames.cend(); ++outer_iter )
+	for ( auto outer_iter = frames.cbegin(), outer_end = frames.cend(); outer_iter != outer_end; ++outer_iter )
 	{
 		const unique_ptr< CProcessMessageFrame > &frame = *outer_iter;
 		ASSERT_TRUE( frame->Get_Process_ID() == AI_PROCESS_ID );

@@ -39,39 +39,31 @@ class CTBBConcurrentQueue : public IConcurrentQueue< T >
 		{
 		}
 
-		virtual ~CTBBConcurrentQueue() 
-		{
-		}
+		virtual ~CTBBConcurrentQueue() = default;
+
+		CTBBConcurrentQueue( CTBBConcurrentQueue< T > &&rhs ) = delete;
+		CTBBConcurrentQueue< T > & operator =( CTBBConcurrentQueue< T > &&rhs ) = delete;
+		CTBBConcurrentQueue( const CTBBConcurrentQueue< T > &rhs ) = delete;
+		CTBBConcurrentQueue< T > & operator =( const CTBBConcurrentQueue< T > &rhs ) = delete;
 
 		// Base class public pure virtual interface implementations
-		virtual void Enqueue_Item( T && /*item*/ )
+		virtual void Move_Item( T &&item ) override
 		{
-			 // TBI
+			 Queue.push(std::move(item));
 		}
 
-		virtual void Enqueue_Item( T & /*item*/ )
+		virtual void Remove_Items( std::vector< T > &items ) override
 		{
-			 // TBI
-		}
-
-		virtual void Remove_Items( std::vector< T > & /*items*/ )
-		{
-#ifdef TOFIX
 			items.clear();
 
 			T item;
 			while ( Queue.try_pop( item ) )
 			{
-				items.push_back( item );
+				items.push_back( std::move( item ) );
 			}
-#endif // TOFIX
 		}
 
 	private:
-
-		// Do not define, prevent copy and assignment
-		CTBBConcurrentQueue( const CTBBConcurrentQueue< T > &rhs );
-		CTBBConcurrentQueue< T > & operator =( const CTBBConcurrentQueue< T > &rhs );
 
 		// Private Data
 		tbb::strict_ppl::concurrent_queue< T > Queue;

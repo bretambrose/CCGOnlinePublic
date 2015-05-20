@@ -68,7 +68,7 @@ class CExecuteProcessScheduledTask : public CScheduledTask
 
 		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
-		virtual bool Execute( double current_time_seconds, double & /*reschedule_time_seconds*/ )
+		virtual bool Execute( double current_time_seconds, double & /*reschedule_time_seconds*/ ) override
 		{
 			ExecuteDelegate( ProcessID, current_time_seconds );
 
@@ -95,9 +95,9 @@ class CServiceProcessTBBTask : public tbb::task
 			ElapsedSeconds( elapsed_seconds )
 		{}
 
-		virtual ~CServiceProcessTBBTask() {}
+		virtual ~CServiceProcessTBBTask() = default;
 
-		virtual tbb::task *execute( void )
+		virtual tbb::task *execute( void ) override
 		{
 			CProcessExecutionContext context( this, ElapsedSeconds );
 
@@ -131,9 +131,9 @@ class CServiceLoggingProcessTBBTask : public tbb::task
 			ElapsedSeconds( elapsed_seconds )
 		{}
 
-		virtual ~CServiceLoggingProcessTBBTask() {}
+		virtual ~CServiceLoggingProcessTBBTask() = default;
 
-		virtual tbb::task *execute( void )
+		virtual tbb::task *execute( void ) override
 		{
 			CProcessExecutionContext context( this, ElapsedSeconds );
 
@@ -399,7 +399,7 @@ void CConcurrencyManager::Shutdown( void )
 shared_ptr< CProcessRecord > CConcurrencyManager::Get_Record( EProcessID::Enum process_id ) const
 {
 	auto iter = ProcessRecords.find( process_id );
-	if ( iter != ProcessRecords.end() )
+	if ( iter != ProcessRecords.cend() )
 	{
 		return iter->second;
 	}
@@ -437,7 +437,7 @@ void CConcurrencyManager::Enumerate_Processes( std::vector< shared_ptr< IManaged
 {
 	processes.clear();
 
-	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
+	for ( auto iter = ProcessRecords.cbegin(), end = ProcessRecords.cend(); iter != end; ++iter )
 	{
 		if ( iter->first != EProcessID::CONCURRENCY_MANAGER )
 		{
@@ -505,7 +505,7 @@ void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &proc
 void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &process, EProcessID::Enum id )
 {
 	FATAL_ASSERT( id != EProcessID::CONCURRENCY_MANAGER );
-	FATAL_ASSERT( ProcessRecords.find( id ) == ProcessRecords.end() );
+	FATAL_ASSERT( ProcessRecords.find( id ) == ProcessRecords.cend() );
 	FATAL_ASSERT( process->Get_Properties().Is_Valid() );
 
 	process->Initialize( id );
@@ -548,7 +548,7 @@ void CConcurrencyManager::Handle_Ongoing_Mailbox_Requests( CProcessMailbox *mail
 	FATAL_ASSERT( !Is_Process_Shutting_Down( new_id ) );
 
 	// persistent get requests
-	for ( auto iter = PersistentGetRequests.cbegin(); iter != PersistentGetRequests.cend(); ++iter )
+	for ( auto iter = PersistentGetRequests.cbegin(), end = PersistentGetRequests.cend(); iter != end; ++iter )
 	{
 		EProcessID::Enum requesting_process_id = iter->first;
 		const unique_ptr< const CGetMailboxByPropertiesRequest > &get_request = iter->second;
@@ -571,7 +571,7 @@ void CConcurrencyManager::Handle_Ongoing_Mailbox_Requests( CProcessMailbox *mail
 shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EProcessID::Enum process_id ) const
 {
 	auto iter = ProcessRecords.find( process_id );
-	if ( iter != ProcessRecords.end() )
+	if ( iter != ProcessRecords.cend() )
 	{
 		return iter->second->Get_Mailbox()->Get_Writable_Mailbox();
 	}
@@ -588,7 +588,7 @@ shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EProcessID::En
 shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 {
 	auto iter = ProcessRecords.find( EProcessID::CONCURRENCY_MANAGER );
-	FATAL_ASSERT( iter != ProcessRecords.end() );
+	FATAL_ASSERT( iter != ProcessRecords.cend() );
 
 	return iter->second->Get_Mailbox()->Get_Readable_Mailbox();
 }
@@ -603,7 +603,7 @@ shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 void CConcurrencyManager::Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message )
 {
 	auto iter = PendingOutboundFrames.find( dest_process_id );
-	if ( iter == PendingOutboundFrames.end() )
+	if ( iter == PendingOutboundFrames.cend() )
 	{
 		unique_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
 		frame->Add_Message( message );
@@ -622,7 +622,7 @@ void CConcurrencyManager::Flush_Frames( void )
 {
 	std::vector< EProcessID::Enum > sent_frames;
 
-	for ( auto frame_iterator = PendingOutboundFrames.begin(); frame_iterator != PendingOutboundFrames.end(); ++frame_iterator )
+	for ( auto frame_iterator = PendingOutboundFrames.begin(), end = PendingOutboundFrames.end(); frame_iterator != end; ++frame_iterator )
 	{
 		shared_ptr< CWriteOnlyMailbox > write_interface = Get_Mailbox( frame_iterator->first );
 		if ( write_interface != nullptr )
@@ -668,7 +668,7 @@ void CConcurrencyManager::Service_One_Iteration( void )
 	TimeKeeper->Set_Current_Time( TT_REAL_TIME, STickTime( CPlatformTime::Get_High_Resolution_Time() ) );
 	// TODO game time updates here as needed
 
-	for ( auto iter = TaskSchedulers.cbegin(); iter != TaskSchedulers.cend(); ++iter )
+	for ( auto iter = TaskSchedulers.cbegin(), end = TaskSchedulers.cend(); iter != end; ++iter )
 	{
 		Get_Task_Scheduler( iter->first )->Service( TimeKeeper->Get_Elapsed_Seconds( iter->first ) );	
 	}
@@ -738,7 +738,7 @@ void CConcurrencyManager::Handle_Message( EProcessID::Enum source_process_id, un
 
 	Loki::TypeInfo hash_key( typeid( *msg_base ) );
 	auto iter = MessageHandlers.find( hash_key );
-	FATAL_ASSERT( iter != MessageHandlers.end() );
+	FATAL_ASSERT( iter != MessageHandlers.cend() );
 
 	iter->second->Handle_Message( source_process_id, message );
 }
@@ -770,7 +770,7 @@ void CConcurrencyManager::Register_Handler( const std::type_info &message_type_i
 {
 	Loki::TypeInfo key( message_type_info );
 
-	FATAL_ASSERT( MessageHandlers.find( key ) == MessageHandlers.end() );
+	FATAL_ASSERT( MessageHandlers.find( key ) == MessageHandlers.cend() );
 	MessageHandlers[ key ] = std::move( handler );
 }
 
@@ -829,7 +829,7 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EProcessID::
 	}
 
 	// it's a persistent pattern-matching request, match all existing threads and track against future adds
-	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
+	for ( auto iter = ProcessRecords.cbegin(), end = ProcessRecords.cend(); iter != end; ++iter )
 	{
 		if ( requested_properties.Matches( iter->second->Get_Properties() ) && !Is_Process_Shutting_Down( iter->first ) && source_process_id != iter->first )
 		{
@@ -955,7 +955,7 @@ void CConcurrencyManager::Handle_Release_Mailbox_Response( EProcessID::Enum sour
 void CConcurrencyManager::Handle_Shutdown_Self_Response( EProcessID::Enum source_process_id, unique_ptr< const CShutdownSelfResponse > & /*message*/ )
 {
 	auto iter = ProcessRecords.find( source_process_id );
-	FATAL_ASSERT( iter != ProcessRecords.end() );
+	FATAL_ASSERT( iter != ProcessRecords.cend() );
 	FATAL_ASSERT( iter->second->Get_State() == EIPS_SHUTTING_DOWN_PHASE2 || Is_Manager_Shutting_Down() );
 
 	ProcessRecords.erase( iter );
@@ -978,7 +978,7 @@ void CConcurrencyManager::Handle_Shutdown_Manager_Message( EProcessID::Enum /*so
 	State = ECMS_SHUTTING_DOWN_PHASE1;
 
 	// tell everyone to shut down
-	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
+	for ( auto iter = ProcessRecords.cbegin(), end = ProcessRecords.cend(); iter != end; ++iter )
 	{
 		if ( iter->first == EProcessID::CONCURRENCY_MANAGER || iter->first == EProcessID::LOGGING )
 		{
@@ -1013,7 +1013,7 @@ shared_ptr< CTaskScheduler > CConcurrencyManager::Get_Task_Scheduler( ETimeType 
 void CConcurrencyManager::Execute_Process( EProcessID::Enum process_id, double current_time_seconds )
 {
 	auto iter = ProcessRecords.find( process_id );
-	if ( iter == ProcessRecords.end() )
+	if ( iter == ProcessRecords.cend() )
 	{
 		return;
 	}
@@ -1075,7 +1075,7 @@ void CConcurrencyManager::Initiate_Process_Shutdown( EProcessID::Enum process_id
 	shutdown_record->Set_State( EIPS_SHUTTING_DOWN_PHASE1 );
 
 	// this message can be shared and broadcast
-	for ( auto iter = ProcessRecords.cbegin(); iter != ProcessRecords.cend(); ++iter )
+	for ( auto iter = ProcessRecords.cbegin(), end = ProcessRecords.cend(); iter != end; ++iter )
 	{
 		if ( process_id == iter->first || iter->first == EProcessID::CONCURRENCY_MANAGER || iter->first == EProcessID::LOGGING )
 		{

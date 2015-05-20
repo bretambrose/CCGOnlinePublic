@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	stdafx.h
-		Set of includes that make up the pre-compiled header file
+	SerializationBase.h
+		...
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,42 +20,30 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#ifndef SERIALIZATION_BASE_H
+#define SERIALIZATION_BASE_H
 
-#include "targetver.h"
-
-// std includes
-#include <list>
-#include <vector>
-#include <set>
-#include <unordered_map>
-#include <iterator>
-#include <map>
-#include <memory>
-#include <string>
 #include <functional>
-#include <algorithm>
-#include <assert.h>
 
-// Loki includes
-#include "loki/include/loki/LokiTypeInfo.h"
+using DPrepDestinationForRead = std::function< void *(void *) >;
 
-// Misc includes
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-#include "FastDelegate.h"
-#pragma warning( pop ) 
+template< typename T >
+void *Prep_Vector_For_Read( void *destination )
+{
+	std::vector< T > *dest = reinterpret_cast< std::vector< T > * >( destination );
+	
+	dest->push_back( T() );
+	return static_cast< void * >( &( *dest )[ dest->size() - 1 ] );
+}
 
-// Global using directives; be careful with these
-using namespace fastdelegate;
+template< typename T >
+void *Prep_Pointer_For_Read( void *destination )
+{
+	T **dest = reinterpret_cast< T ** >( destination );
+	
+	*dest = new T;
 
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
-using std::unique_ptr;
+	return static_cast< void * >( *dest );
+}
 
-// self includes
-#include "PlatformTypes.h"
-#include "DebugAssert.h"
-#include "WindowsWrapper.h"
-#include "Universal.h"
-
+#endif // SERIALIZATION_BASE_H

@@ -44,7 +44,7 @@ class IProcess
 	public:
 		
 		IProcess( void ) {}
-		virtual ~IProcess() {}
+		virtual ~IProcess() = default;
 
 		virtual void Initialize( EProcessID::Enum id ) = 0;
 

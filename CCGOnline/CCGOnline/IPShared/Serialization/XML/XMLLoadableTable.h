@@ -23,19 +23,19 @@
 #ifndef XML_LOADABLE_TABLE_H
 #define XML_LOADABLE_TABLE_H
 
-#include "XMLSerializerInterface.h"
+#include "IPShared/Serialization/XML/XMLSerializerInterface.h"
 #include "pugixml/pugixml.h"
-#include "XMLSerializationRegistrar.h"
+#include "IPShared/Serialization/SerializationRegistrar.h"
 
 template< typename K, typename T >
 class CXMLLoadableTable
 {
 	public:
 
-		//typedef FastDelegate1< const T *, const K & > KeyExtractionDelegate;
 		typedef const K & ( T::* KeyExtractorMemberFunction )( void ) const ;
 		typedef void ( T::* PostLoadMemberFunction )( void );
-		typedef typename std::unordered_map< K, const T * >::const_iterator TableIterator;
+		typedef std::unordered_map< K, const T * > TableType;
+		typedef typename TableType::const_iterator TableIterator;
 
 		CXMLLoadableTable( KeyExtractorMemberFunction key_extractor, const wchar_t *top_child = nullptr, IXMLSerializer *serializer = nullptr ) :
 			KeyExtractor( key_extractor ),
@@ -48,18 +48,8 @@ class CXMLLoadableTable
 
 		~CXMLLoadableTable()
 		{
-			for ( auto iter = Loadables.begin(); iter != Loadables.end(); ++iter )
-			{
-				delete iter->second;
-			}
-
+			std::for_each( Loadables.begin(), Loadables.end(), []( const TableType::value_type &val ) { delete val.second; } );
 			Loadables.clear();
-
-			if ( Serializer != nullptr )
-			{
-				delete Serializer;
-				Serializer = nullptr;
-			}
 		}
 
 		void Load( const std::string &file_name ) 
@@ -76,8 +66,10 @@ class CXMLLoadableTable
 			IXMLSerializer *serializer = Serializer;
 			if ( serializer == nullptr )
 			{
-				serializer = CXMLSerializationRegistrar::Create_Serializer( typeid( T * ) );
+				serializer = CSerializationRegistrar::Get_XML_Serializer< T * >();
 			}
+
+			FATAL_ASSERT( serializer != nullptr );
 
 			pugi::xml_node top = xml_doc.child( TopChildName.c_str() );
 			for ( pugi::xml_node iter = top.first_child(); iter; iter = iter.next_sibling() )
@@ -93,7 +85,7 @@ class CXMLLoadableTable
 				FATAL_ASSERT( loadable != nullptr );
 
 				K key = (loadable->*KeyExtractor)();
-				FATAL_ASSERT( Loadables.find( key ) == Loadables.end() );
+				FATAL_ASSERT( Loadables.find( key ) == Loadables.cend() );
 
 				Loadables[ key ] = loadable;
 			}
@@ -107,7 +99,7 @@ class CXMLLoadableTable
 		const T *Get_Object( const K &key ) const
 		{
 			auto iter = Loadables.find( key );
-			if ( iter != Loadables.end() )
+			if ( iter != Loadables.cend() )
 			{
 				return iter->second;
 			}
@@ -118,7 +110,7 @@ class CXMLLoadableTable
 		void Add_Object( T *object )
 		{
 			K key = object->Get_Key();
-			FATAL_ASSERT( Loadables.find( key ) == Loadables.end() );
+			FATAL_ASSERT( Loadables.find( key ) == Loadables.cend() );
 
 			Loadables[ key ] = object;
 		}
@@ -137,7 +129,7 @@ class CXMLLoadableTable
 
 		IXMLSerializer *Serializer;
 
-		std::unordered_map< K, const T * > Loadables;
+		TableType Loadables;
 };
 
 

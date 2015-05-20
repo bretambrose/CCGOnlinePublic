@@ -53,7 +53,7 @@ class CSlashCommandParam
 		CSlashCommandParam( void );
 		~CSlashCommandParam() {}
 
-		static IXMLSerializer *Create_Serializer( void );
+		static void Register_Type_Definition( void );
 
 		// Accessors
 		ESlashCommandParamType Get_Type( void ) const { return Type; }
@@ -92,7 +92,7 @@ class CSlashCommandDataDefinition
 		// Serialization
 		void Post_Load_XML( void );
 
-		static IXMLSerializer *Create_Serializer( void );
+		static void Register_Type_Definition( void );
 
 		// Accessors
 		const std::wstring &Get_Command( void ) const { return Command; }

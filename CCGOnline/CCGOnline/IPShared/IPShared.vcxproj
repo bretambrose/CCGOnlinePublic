@@ -205,6 +205,11 @@
     <ClInclude Include="MessageHandling\ProcessMessageHandlerBase.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="IPShared.h" />
+    <ClInclude Include="Serialization\SerializationBase.h" />
+    <ClInclude Include="Serialization\SerializationRegistrar.h" />
+    <ClInclude Include="Serialization\XML\PrimitiveXMLSerializers.h" />
+    <ClInclude Include="Serialization\XML\XMLLoadableTable.h" />
+    <ClInclude Include="Serialization\XML\XMLSerializerInterface.h" />
     <ClInclude Include="SharedXMLSerializerRegistration.h" />
     <ClInclude Include="SlashCommands\SlashCommandDataDefinition.h" />
     <ClInclude Include="SlashCommands\SlashCommandDefinition.h" />
@@ -221,10 +226,6 @@
     <ClInclude Include="Time\TimeType.h" />
     <ClInclude Include="Time\TimeUtils.h" />
     <ClInclude Include="TypeInfoUtils.h" />
-    <ClInclude Include="XML\PrimitiveXMLSerializers.h" />
-    <ClInclude Include="XML\XMLLoadableTable.h" />
-    <ClInclude Include="XML\XMLSerializationRegistrar.h" />
-    <ClInclude Include="XML\XMLSerializerInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Concurrency\ConcurrencyManager.cpp" />
@@ -245,6 +246,8 @@
     <ClCompile Include="Logging\LoggingProcess.cpp" />
     <ClCompile Include="Logging\LogInterface.cpp" />
     <ClCompile Include="IPShared.cpp" />
+    <ClCompile Include="Serialization\SerializationRegistrar.cpp" />
+    <ClCompile Include="Serialization\XML\PrimitiveXMLSerializers.cpp" />
     <ClCompile Include="SharedXMLSerializerRegistration.cpp" />
     <ClCompile Include="SlashCommands\SlashCommandDataDefinition.cpp" />
     <ClCompile Include="SlashCommands\SlashCommandDefinition.cpp" />
@@ -260,8 +263,6 @@
     <ClCompile Include="TaskScheduler\TaskScheduler.cpp" />
     <ClCompile Include="Time\TimeKeeper.cpp" />
     <ClCompile Include="Time\TimeUtils.cpp" />
-    <ClCompile Include="XML\PrimitiveXMLSerializers.cpp" />
-    <ClCompile Include="XML\XMLSerializationRegistrar.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

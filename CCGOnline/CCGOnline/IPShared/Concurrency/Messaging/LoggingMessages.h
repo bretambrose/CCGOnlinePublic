@@ -41,7 +41,7 @@ class CLogRequestMessage : public IProcessMessage
 
 		CLogRequestMessage( const SProcessProperties &source_properties, std::wstring &&message );
 		CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message );
-		virtual ~CLogRequestMessage() {}
+		virtual ~CLogRequestMessage() = default;
 
 		const SProcessProperties &Get_Source_Properties( void ) const { return SourceProperties; }
 		const std::wstring &Get_Message( void ) const { return Message; }

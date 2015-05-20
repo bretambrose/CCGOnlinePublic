@@ -97,7 +97,8 @@ static void Extract_Batch_Error( IDatabaseCallContext *call_context,
 	if ( bad_row_number >= 0 )
 	{
 		int32 row = 0;
-		for( first_failed_task = sub_list.cbegin(); first_failed_task != sub_list.cend(); ++row, ++first_failed_task )
+		auto end = sub_list.cend();
+		for( first_failed_task = sub_list.cbegin(); first_failed_task != end; ++row, ++first_failed_task )
 		{
 			if ( row == bad_row_number )
 			{
@@ -126,7 +127,7 @@ void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseSt
 	}
 
 	uint32 i = 0;
-	for ( DBTaskListType::const_iterator iter = sub_list.cbegin(); iter != sub_list.cend(); ++iter, ++i )
+	for ( DBTaskListType::const_iterator iter = sub_list.cbegin(), end = sub_list.cend(); iter != end; ++iter, ++i )
 	{
 		( *iter )->Initialize_Parameters( call_context->Get_Param_Row( i ) );
 	}
@@ -177,7 +178,7 @@ void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseSt
 		{
 			if ( !statement->Should_Have_Results() || input_row + 1 == list_size )
 			{
-				for ( ; iter != sub_list.cend(); ++iter, ++input_row )
+				for ( auto end = sub_list.cend(); iter != end; ++iter, ++input_row )
 				{
 					( *iter )->On_Fetch_Results_Finished( call_context->Get_Param_Row( input_row ) );
 				}

@@ -187,6 +187,7 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(CONFIG_PROCESSO
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EnumUtilsTests.cpp" />
     <ClCompile Include="PlatformFileSystemTests.cpp" />
     <ClCompile Include="PlatformProcessTests.cpp" />
     <ClCompile Include="IPPlatformTest.cpp" />

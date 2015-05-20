@@ -45,7 +45,7 @@ class CGetMailboxByPropertiesRequest : public IProcessMessage
 			TargetProperties( target_properties )
 		{}
 
-		virtual ~CGetMailboxByPropertiesRequest() {}
+		virtual ~CGetMailboxByPropertiesRequest() = default;
 
 		const SProcessProperties &Get_Target_Properties( void ) const { return TargetProperties; }
 
@@ -64,7 +64,7 @@ class CGetMailboxByIDRequest : public IProcessMessage
 			TargetProcessID( target_process_id )
 		{}
 
-		virtual ~CGetMailboxByIDRequest() {}
+		virtual ~CGetMailboxByIDRequest() = default;
 
 		EProcessID::Enum Get_Target_Process_ID( void ) const { return TargetProcessID; }
 

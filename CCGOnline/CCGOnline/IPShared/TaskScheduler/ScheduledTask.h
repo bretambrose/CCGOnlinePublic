@@ -33,7 +33,7 @@ class CScheduledTask
 			HeapIndex( 0 )
 		{}
 
-		virtual ~CScheduledTask() {}
+		virtual ~CScheduledTask() = default;
 
 		virtual bool Execute( double current_time_seconds, double &reschedule_time_seconds ) = 0;
 

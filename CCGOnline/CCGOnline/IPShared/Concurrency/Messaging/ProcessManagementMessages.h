@@ -68,7 +68,7 @@ class CRescheduleProcessMessage : public IProcessMessage
 			RescheduleTime( reschedule_time )
 		{}
 
-		virtual ~CRescheduleProcessMessage() {}
+		virtual ~CRescheduleProcessMessage() = default;
 
 		double Get_Reschedule_Time( void ) const { return RescheduleTime; }
 
@@ -89,7 +89,7 @@ class CReleaseMailboxRequest : public IProcessMessage
 			ProcessID( process_id )
 		{}
 
-		virtual ~CReleaseMailboxRequest() {}
+		virtual ~CReleaseMailboxRequest() = default;
 
 		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
@@ -110,7 +110,7 @@ class CReleaseMailboxResponse : public IProcessMessage
 			ShutdownProcessID( shutdown_process_id )
 		{}
 
-		virtual ~CReleaseMailboxResponse() {}
+		virtual ~CReleaseMailboxResponse() = default;
 
 		EProcessID::Enum Get_Shutdown_Process_ID( void ) const { return ShutdownProcessID; }
 
@@ -131,7 +131,7 @@ class CShutdownProcessMessage : public IProcessMessage
 			ProcessID( process_id )
 		{}
 
-		virtual ~CShutdownProcessMessage() {}
+		virtual ~CShutdownProcessMessage() = default;
 
 		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
@@ -152,7 +152,7 @@ class CShutdownSelfRequest : public IProcessMessage
 			IsHardShutdown( is_hard_shutdown )
 		{}
 
-		virtual ~CShutdownSelfRequest() {}
+		virtual ~CShutdownSelfRequest() = default;
 
 		bool Get_Is_Hard_Shutdown( void ) const { return IsHardShutdown; }
 
@@ -171,7 +171,7 @@ class CShutdownSelfResponse : public IProcessMessage
 
 		CShutdownSelfResponse( void ) {}
 
-		virtual ~CShutdownSelfResponse() {}
+		virtual ~CShutdownSelfResponse() = default;
 
 	private:
 
@@ -187,7 +187,7 @@ class CShutdownManagerMessage : public IProcessMessage
 		
 		CShutdownManagerMessage( void ) {}
 
-		virtual ~CShutdownManagerMessage() {}
+		virtual ~CShutdownManagerMessage() = default;
 
 	private:
 

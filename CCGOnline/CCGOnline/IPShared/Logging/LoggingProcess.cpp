@@ -153,7 +153,7 @@ void CLoggingProcess::Run( const CProcessExecutionContext &context )
 **********************************************************************************************************************/
 void CLoggingProcess::Shutdown( void )
 {
-	for ( auto iter = LogFiles.cbegin(); iter != LogFiles.cend(); ++iter )
+	for ( auto iter = LogFiles.cbegin(), end = LogFiles.cend(); iter != end; ++iter )
 	{
 		iter->second->Shutdown();
 	}

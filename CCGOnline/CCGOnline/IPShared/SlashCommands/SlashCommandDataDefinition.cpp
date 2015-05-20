@@ -23,9 +23,10 @@
 #include "stdafx.h"
 
 #include "SlashCommandDataDefinition.h"
-#include "IPShared/XML/PrimitiveXMLSerializers.h"
+#include "IPShared/Serialization/XML/PrimitiveXMLSerializers.h"
 #include "SlashCommandManager.h"
 #include "IPPlatform/StringUtils.h"
+#include "IPShared/Serialization/SerializationRegistrar.h"
 
 /**********************************************************************************************************************
 	CSlashCommandParam::CSlashCommandParam -- default constructor
@@ -45,17 +46,17 @@ CSlashCommandParam::CSlashCommandParam( void ) :
 
 	Returns: an XML serializer for this class		
 **********************************************************************************************************************/
-IXMLSerializer *CSlashCommandParam::Create_Serializer( void )
+void CSlashCommandParam::Register_Type_Definition( void )
 {
-	CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
+	BEGIN_ROOT_DATA_BINDING_SET;
 
-	serializer->Add( L"Type", &CSlashCommandParam::Type );
-	serializer->Add( L"SubType", &CSlashCommandParam::SubType );
-	serializer->Add( L"Default", &CSlashCommandParam::Default );
-	serializer->Add( L"Optional", &CSlashCommandParam::Optional );
-	serializer->Add( L"Capture", &CSlashCommandParam::Capture );
+	REGISTER_MEMBER_BINDING( L"Type", &CSlashCommandParam::Type );
+	REGISTER_MEMBER_BINDING( L"SubType", &CSlashCommandParam::SubType );
+	REGISTER_MEMBER_BINDING( L"Default", &CSlashCommandParam::Default );
+	REGISTER_MEMBER_BINDING( L"Optional", &CSlashCommandParam::Optional );
+	REGISTER_MEMBER_BINDING( L"Capture", &CSlashCommandParam::Capture );
 
-	return serializer;
+	END_DATA_BINDING_SET( CSlashCommandParam );
 }
 
 /**********************************************************************************************************************
@@ -198,18 +199,17 @@ CSlashCommandDataDefinition::CSlashCommandDataDefinition( void ) :
 	Returns: a new XML serializer
 	
 **********************************************************************************************************************/
-IXMLSerializer *CSlashCommandDataDefinition::Create_Serializer( void )
+void CSlashCommandDataDefinition::Register_Type_Definition( void )
 {
-	CCompositeXMLSerializer *serializer = new CCompositeXMLSerializer;
+	BEGIN_ROOT_DATA_BINDING_SET;
 
-	serializer->Add( L"Command", &CSlashCommandDataDefinition::Command );
-	serializer->Add( L"SubCommand", &CSlashCommandDataDefinition::SubCommand );
-	serializer->Add( L"Shortcut", &CSlashCommandDataDefinition::Shortcut );
-	serializer->Add( L"Help", &CSlashCommandDataDefinition::Help );
+	REGISTER_MEMBER_BINDING( L"CommandCommand", &CSlashCommandDataDefinition::Command );
+	REGISTER_MEMBER_BINDING( L"SubCommand", &CSlashCommandDataDefinition::SubCommand );
+	REGISTER_MEMBER_BINDING( L"Shortcut", &CSlashCommandDataDefinition::Shortcut );
+	REGISTER_MEMBER_BINDING( L"Help", &CSlashCommandDataDefinition::Help );
+	REGISTER_MEMBER_BINDING( L"Params", &CSlashCommandDataDefinition::Params );
 
-	serializer->Add( L"Params", &CSlashCommandDataDefinition::Params, new CVectorXMLSerializer< CSlashCommandParam > );
-
-	return serializer;
+	END_DATA_BINDING_SET( CSlashCommandDataDefinition );
 }
 
 /**********************************************************************************************************************

@@ -31,7 +31,7 @@
 #include "IPPlatform/PlatformProcess.h"
 #include "GeneratedCode/RegisterIPSharedEnums.h"
 #include "SharedXMLSerializerRegistration.h"
-#include "XML/XMLSerializationRegistrar.h"
+#include "Serialization/SerializationRegistrar.h"
 #include "SlashCommands/SlashCommandManager.h"
 
 /**********************************************************************************************************************
@@ -59,7 +59,7 @@ void NIPShared::Initialize( void )
 void NIPShared::Shutdown( void )
 {
 	CSlashCommandManager::Shutdown();
-	CXMLSerializationRegistrar::Shutdown();
+	CSerializationRegistrar::Cleanup();
 	CProcessStatics::Shutdown();
 	CLogInterface::Shutdown_Static();
 	CStructuredExceptionHandler::Shutdown();

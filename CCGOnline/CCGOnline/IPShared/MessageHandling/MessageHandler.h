@@ -32,7 +32,7 @@ class IMessageHandler
 	public:
 
 		IMessageHandler( void ) {}
-		virtual ~IMessageHandler() {}
+		virtual ~IMessageHandler() = default;
 
 		virtual void Handle_Message( MessageSourceType source, unique_ptr< const MessageBaseType > &message ) const = 0;
 };

@@ -79,7 +79,7 @@ namespace InterminableProcesses.IPPreBuild
 				psi.RedirectStandardOutput = false;
 				psi.WindowStyle = ProcessWindowStyle.Normal;
 				psi.UseShellExecute = true;
-				psi.Arguments = "NORMAL CCGOnline";
+				psi.Arguments = "NORMAL CCGOnline CCGOnline";
 
 				System.Diagnostics.Process reflect_process = System.Diagnostics.Process.Start(psi);
 				reflect_process.WaitForExit();

@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source\CodeGenTaskTracker.cs" />
+    <Compile Include="Source\CodeGenerator.cs" />
     <Compile Include="Source\IPCodeGen.cs" />
     <Compile Include="Source\LogInterface.cs" />
   </ItemGroup>

@@ -56,5 +56,6 @@ using std::unique_ptr;
 // self includes
 #include "IPPlatform/PlatformTypes.h"
 #include "IPPlatform/DebugAssert.h"
+#include "IPPlatform/Universal.h"
 #include "TypeInfoUtils.h"
 

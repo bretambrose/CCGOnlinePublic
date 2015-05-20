@@ -39,26 +39,22 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 			Lock( NPlatform::Create_Simple_Mutex() )
 		{}
 
-		virtual ~CLockingConcurrentQueue() 
-		{
-		}
+		virtual ~CLockingConcurrentQueue() = default;
+
+		CLockingConcurrentQueue( CLockingConcurrentQueue< T > &&rhs ) = delete;
+		CLockingConcurrentQueue< T > & operator =( CLockingConcurrentQueue< T > &&rhs ) = delete;
+		CLockingConcurrentQueue( const CLockingConcurrentQueue< T > &rhs ) = delete;
+		CLockingConcurrentQueue< T > & operator =( const CLockingConcurrentQueue< T > &rhs ) = delete;
 
 		// Base class public interface implementations
-		virtual void Enqueue_Item( T &&item )
+		virtual void Move_Item( T &&item ) override
 		{
 			CSimplePlatformMutexLocker locker( Lock.get() );
 
 			Items.emplace_back( std::move( item ) );
 		}
 
-		virtual void Enqueue_Item( T &item )
-		{
-			CSimplePlatformMutexLocker locker( Lock.get() );
-
-			Items.emplace_back( std::move( item ) );
-		}
-
-		virtual void Remove_Items( std::vector< T > &items )
+		virtual void Remove_Items( std::vector< T > &items ) override
 		{
 			CSimplePlatformMutexLocker locker( Lock.get() );
 
@@ -69,10 +65,6 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 		}
 
 	private:
-
-		// Do not define, prevent copy and assignment
-		CLockingConcurrentQueue( const CLockingConcurrentQueue< T > &rhs );
-		CLockingConcurrentQueue< T > & operator =( const CLockingConcurrentQueue< T > &rhs );
 
 		// Private data
 		std::vector< T > Items;

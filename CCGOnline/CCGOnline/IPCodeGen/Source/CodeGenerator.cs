@@ -1,8 +1,8 @@
 ﻿/**********************************************************************************************************************
 
-	LogInterface.cs		
- 		A static class used to write out progress, errors, and diagnostics to a text file
- 
+	IPCodeGen.cs
+		Main definition for the IPCodeGen tool.  This tool ...
+
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -20,37 +20,12 @@
  
 **********************************************************************************************************************/
 
-using System;
-using System.Collections.Generic;
-
 namespace IPCodeGen
 {
-	public class CCodeGenTask
-	{
-		public CCodeGenTask()
-		{
-			Finished = false;
-		}
 
-		public bool Finished { get; set; }
+	interface ICodeGenerator
+	{
+		void Clean_Output_Files();
 	}
 
-	public class CEnumCodeGenTask : CCodeGenTask
-	{
-		public CEnumCodeGenTask() {}
-	}
-
-	public class CCodeGenTaskTracker
-	{
-		public CCodeGenTaskTracker()
-		{
-		}
-
-		public void Run() {}
-
-		private List< CCodeGenTask > m_PendingTasks = new List< CCodeGenTask >();
-		private List< CCodeGenTask > m_InProgressTasks = new List< CCodeGenTask >();
-		private List< CCodeGenTask > m_FinishedTasks = new List< CCodeGenTask >();
-	}
 }
-

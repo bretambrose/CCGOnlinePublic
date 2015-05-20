@@ -63,7 +63,7 @@ void CWriteOnlyMailbox::Add_Frame( unique_ptr< CProcessMessageFrame > &frame )
 {
 	FATAL_ASSERT( frame.get() != nullptr );
 
-	WriteQueue->Enqueue_Item( std::move( frame ) );
+	WriteQueue->Move_Item( std::move( frame ) );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

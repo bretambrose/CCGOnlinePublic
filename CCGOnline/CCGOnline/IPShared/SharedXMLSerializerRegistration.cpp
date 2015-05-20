@@ -22,17 +22,18 @@
 
 #include "stdafx.h"
 
-#include "SharedXMLSerializerRegistration.h"
+#include "IPShared/SharedXMLSerializerRegistration.h"
 
-#include "XML/PrimitiveXMLSerializers.h"
-#include "XML/XMLSerializationRegistrar.h"
-#include "SlashCommands/SlashCommandDataDefinition.h"
+#include "IPShared/Serialization/SerializationRegistrar.h"
+#include "IPShared/Serialization/XML/PrimitiveXMLSerializers.h"
+#include "IPShared/SlashCommands/SlashCommandDataDefinition.h"
 
 void NIPShared::Register_Shared_XML_Serializers( void )
 {
 	XMLSerialization::Register_Primitive_Serializers();
 
-	CXMLSerializationRegistrar::Register_Enum_Serializer< ESlashCommandParamType >();
-	CXMLSerializationRegistrar::Register_Serializer< CSlashCommandParam >( CSlashCommandParam::Create_Serializer );
-	CXMLSerializationRegistrar::Register_Serializer< CSlashCommandDataDefinition >( CSlashCommandDataDefinition::Create_Serializer );
+	CSerializationRegistrar::Register_Primitive_XML_Serializer< ESlashCommandParamType >( new CEnumXMLSerializer<ESlashCommandParamType> );
+
+	CSlashCommandParam::Register_Type_Definition();
+	CSlashCommandDataDefinition::Register_Type_Definition();
 }

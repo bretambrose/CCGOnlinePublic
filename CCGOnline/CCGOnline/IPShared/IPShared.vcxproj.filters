@@ -30,14 +30,17 @@
     <Filter Include="Source Files\GeneratedCode">
       <UniqueIdentifier>{7f91654a-0135-4b22-8178-5f5989858a65}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\XML">
-      <UniqueIdentifier>{793d6836-37dc-46fb-b2c0-a49d0fc03a6b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\SlashCommands">
       <UniqueIdentifier>{a94ceaed-e039-4a4a-891e-1cd692dce0ac}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Concurrency\Messaging">
       <UniqueIdentifier>{3e72eefd-12c3-4c6b-8392-6775bd2038d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization">
+      <UniqueIdentifier>{bb893df1-8fe2-4ae1-a27d-d27ee694ea3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization\XML">
+      <UniqueIdentifier>{5c56887e-3cea-4fc5-9224-3676d9a38415}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -100,15 +103,6 @@
     </ClInclude>
     <ClInclude Include="GeneratedCode\RegisterIPSharedEnums.h">
       <Filter>Source Files\GeneratedCode</Filter>
-    </ClInclude>
-    <ClInclude Include="XML\PrimitiveXMLSerializers.h">
-      <Filter>Source Files\XML</Filter>
-    </ClInclude>
-    <ClInclude Include="XML\XMLSerializationRegistrar.h">
-      <Filter>Source Files\XML</Filter>
-    </ClInclude>
-    <ClInclude Include="XML\XMLLoadableTable.h">
-      <Filter>Source Files\XML</Filter>
     </ClInclude>
     <ClInclude Include="SlashCommands\SlashCommandDefinition.h">
       <Filter>Source Files\SlashCommands</Filter>
@@ -200,8 +194,20 @@
     <ClInclude Include="Concurrency\ThreadProcessBase.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>
-    <ClInclude Include="XML\XMLSerializerInterface.h">
-      <Filter>Source Files\XML</Filter>
+    <ClInclude Include="Serialization\XML\PrimitiveXMLSerializers.h">
+      <Filter>Source Files\Serialization\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\XML\XMLLoadableTable.h">
+      <Filter>Source Files\Serialization\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\XML\XMLSerializerInterface.h">
+      <Filter>Source Files\Serialization\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\SerializationBase.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\SerializationRegistrar.h">
+      <Filter>Source Files\Serialization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -237,12 +243,6 @@
     </ClCompile>
     <ClCompile Include="GeneratedCode\RegisterIPSharedEnums.cpp">
       <Filter>Source Files\GeneratedCode</Filter>
-    </ClCompile>
-    <ClCompile Include="XML\PrimitiveXMLSerializers.cpp">
-      <Filter>Source Files\XML</Filter>
-    </ClCompile>
-    <ClCompile Include="XML\XMLSerializationRegistrar.cpp">
-      <Filter>Source Files\XML</Filter>
     </ClCompile>
     <ClCompile Include="SlashCommands\SlashCommandDefinition.cpp">
       <Filter>Source Files\SlashCommands</Filter>
@@ -294,6 +294,12 @@
     </ClCompile>
     <ClCompile Include="Concurrency\ThreadProcessBase.cpp">
       <Filter>Source Files\Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization\XML\PrimitiveXMLSerializers.cpp">
+      <Filter>Source Files\Serialization\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization\SerializationRegistrar.cpp">
+      <Filter>Source Files\Serialization</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

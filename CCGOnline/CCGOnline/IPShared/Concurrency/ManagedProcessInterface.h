@@ -45,7 +45,7 @@ class IManagedProcess : public IProcess
 			BASECLASS()
 		{}
 
-		virtual ~IManagedProcess() {}
+		virtual ~IManagedProcess() = default;
 
 		virtual void Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;
 		virtual void Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;

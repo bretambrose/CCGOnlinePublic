@@ -71,6 +71,12 @@
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Universal.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumUtils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -45,21 +45,21 @@ class CLoggingProcess : public CTaskProcessBase
 		virtual ~CLoggingProcess();
 
 		// CThreadTaskBase public interface
-		virtual void Initialize( EProcessID::Enum id );
+		virtual void Initialize( EProcessID::Enum id ) override;
 
-		virtual void Log( std::wstring &&message );
+		virtual void Log( std::wstring &&message ) override;
 
-		virtual ETimeType Get_Time_Type( void ) const;
-		virtual bool Is_Root_Thread( void ) const { return true; }
+		virtual ETimeType Get_Time_Type( void ) const override;
+		virtual bool Is_Root_Thread( void ) const override { return true; }
 
-		virtual void Run( const CProcessExecutionContext &context );
+		virtual void Run( const CProcessExecutionContext &context ) override;
 
 	protected:
 
 		// CProcessBase protected interface
-		virtual void Register_Message_Handlers( void );
+		virtual void Register_Message_Handlers( void ) override;
 
-		virtual void On_Shutdown_Self_Request( void );
+		virtual void On_Shutdown_Self_Request( void ) override;
 
 	private:
 

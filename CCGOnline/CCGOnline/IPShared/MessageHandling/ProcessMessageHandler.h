@@ -52,7 +52,7 @@ class TProcessMessageHandler : public IProcessMessageHandler
 			MessageHandler( message_handler )
 		{}
 
-		virtual void Handle_Message( EProcessID::Enum source_process_id, unique_ptr< const IProcessMessage > &message ) const
+		virtual void Handle_Message( EProcessID::Enum source_process_id, unique_ptr< const IProcessMessage > &message ) const override
 		{
 			// The handlers are tracked generically so they can go in one big hash table, but our forwarding delegates
 			// have specific type signatures, requiring a down cast that preserves smart pointer reference counting

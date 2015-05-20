@@ -41,6 +41,11 @@ class CWriteOnlyMailbox
 		CWriteOnlyMailbox( EProcessID::Enum process_id, const SProcessProperties &properties, const shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > &write_queue );
 		~CWriteOnlyMailbox();
 
+		CWriteOnlyMailbox( CWriteOnlyMailbox &&rhs ) = delete;
+		CWriteOnlyMailbox & operator =( CWriteOnlyMailbox &&rhs ) = delete;
+		CWriteOnlyMailbox( const CWriteOnlyMailbox &rhs ) = delete;
+		CWriteOnlyMailbox & operator =( const CWriteOnlyMailbox &rhs ) = delete;
+
 		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 		const SProcessProperties &Get_Properties( void ) const { return Properties; }
 
@@ -63,6 +68,11 @@ class CReadOnlyMailbox
 
 		CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > &read_queue );
 		~CReadOnlyMailbox();
+
+		CReadOnlyMailbox( CReadOnlyMailbox &&rhs ) = delete;
+		CReadOnlyMailbox & operator =( CReadOnlyMailbox &&rhs ) = delete;
+		CReadOnlyMailbox( const CReadOnlyMailbox &rhs ) = delete;
+		CReadOnlyMailbox & operator =( const CReadOnlyMailbox &rhs ) = delete;
 
 		void Remove_Frames( std::vector< unique_ptr< CProcessMessageFrame > > &frames );
 

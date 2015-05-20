@@ -1,7 +1,7 @@
 /**********************************************************************************************************************
 
-	stdafx.h
-		Set of includes that make up the pre-compiled header file
+	EnumUtilsTests.cpp
+		Unit tests for enum utility functions
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -20,42 +20,31 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#include "stdafx.h"
 
-#include "targetver.h"
+#include "IPPlatform/EnumUtils.h"
 
-// std includes
-#include <list>
-#include <vector>
-#include <set>
-#include <unordered_map>
-#include <iterator>
-#include <map>
-#include <memory>
-#include <string>
-#include <functional>
-#include <algorithm>
-#include <assert.h>
+enum class EUtilFlagTest
+{
+	None = 0,
+	Flag1 = 1 << 0,
+	Flag2 = 1 << 1,
+	Flag3 = 1 << 2
+};
 
-// Loki includes
-#include "loki/include/loki/LokiTypeInfo.h"
+TEST( EnumUtilsTests, Build_Mask )
+{
+	EUtilFlagTest empty_value = Make_Enum_Mask( EUtilFlagTest::None );
+	ASSERT_TRUE( empty_value == EUtilFlagTest::None );
 
-// Misc includes
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-#include "FastDelegate.h"
-#pragma warning( pop ) 
+	EUtilFlagTest flag1_value = Make_Enum_Mask( EUtilFlagTest::Flag1 );
+	ASSERT_TRUE( flag1_value == EUtilFlagTest::Flag1 );
 
-// Global using directives; be careful with these
-using namespace fastdelegate;
+	EUtilFlagTest mask_value = Make_Enum_Mask( EUtilFlagTest::Flag1, EUtilFlagTest::Flag2 );
+	ASSERT_TRUE( static_cast< uint32 >( mask_value ) == 3 );
 
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
-using std::unique_ptr;
-
-// self includes
-#include "PlatformTypes.h"
-#include "DebugAssert.h"
-#include "WindowsWrapper.h"
-#include "Universal.h"
+	ASSERT_TRUE( Is_An_Enum_Flag_Set( mask_value, flag1_value ) );
+	ASSERT_TRUE( Are_All_Enum_Flags_Set( mask_value, flag1_value ) );
+	ASSERT_FALSE( Are_All_Enum_Flags_Set( flag1_value, mask_value ) );
+}
 
