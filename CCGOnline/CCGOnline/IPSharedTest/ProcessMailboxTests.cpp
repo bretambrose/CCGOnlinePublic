@@ -56,8 +56,8 @@ TEST( VirtualProcessMailboxTests, Add_Remove )
 	shared_ptr< CReadOnlyMailbox > read_interface = mailbox->Get_Readable_Mailbox();
 	read_interface->Remove_Frames( frames );
 
-	uint32 log_index = 0;
-	for ( uint32 i = 0; i < frames.size(); ++i )
+	uint32_t log_index = 0;
+	for ( uint32_t i = 0; i < frames.size(); ++i )
 	{
 		unique_ptr< CProcessMessageFrame > &frame = frames[ i ];
 

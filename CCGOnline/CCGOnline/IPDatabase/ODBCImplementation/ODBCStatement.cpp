@@ -222,7 +222,7 @@ void CODBCStatement::Shutdown( void )
 	State = ODBCSST_SHUTDOWN;
 }
 
-void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size )
+void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32_t param_set_size )
 {
 	FATAL_ASSERT( State == ODBCSST_INITIALIZED );
 
@@ -238,7 +238,7 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 			return;
 		}
 
-		for ( uint32 i = 0; i < parameters.size(); ++i )
+		for ( uint32_t i = 0; i < parameters.size(); ++i )
 		{
 			IDatabaseVariable *parameter = parameters[ i ];
 
@@ -265,7 +265,7 @@ void CODBCStatement::Bind_Input( IDatabaseVariableSet *param_set, uint32 param_s
 	State = ODBCSST_BOUND_INPUT;
 }
 
-void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count )
+void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32_t result_set_size, uint32_t result_set_count )
 {
 	FATAL_ASSERT( result_set_count > 0 );
 	ResultSetRowCount = result_set_count;
@@ -276,7 +276,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 	result_set->Get_Variables( result_columns );
 	if ( result_columns.size() > 0 )
 	{
-		ExpectedResultSetWidth = static_cast< int32 >( result_columns.size() );
+		ExpectedResultSetWidth = static_cast< int32_t >( result_columns.size() );
 
 		SQLRETURN error_code = SQLSetStmtAttr( StatementHandle, SQL_ATTR_ROW_BIND_TYPE, (SQLPOINTER) result_set_size, 0 );
 		Update_Error_Status( ODBCSOT_SET_RESULT_SET_ROW_SIZE, error_code );
@@ -304,7 +304,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 			return;
 		}
 
-		for ( uint32 i = 0; i < result_columns.size(); ++i )
+		for ( uint32_t i = 0; i < result_columns.size(); ++i )
 		{
 			IDatabaseVariable *column = result_columns[ i ];
 			SQLSMALLINT c_value_type = Get_ODBC_C_Value_Type( column->Get_Value_Type() );
@@ -326,7 +326,7 @@ void CODBCStatement::Bind_Output( IDatabaseVariableSet *result_set, uint32 resul
 	State = ODBCSST_READY;
 }
 
-void CODBCStatement::Execute( uint32 batch_size )
+void CODBCStatement::Execute( uint32_t batch_size )
 {
 	if ( State != ODBCSST_READY )
 	{
@@ -373,7 +373,7 @@ void CODBCStatement::Execute( uint32 batch_size )
 	State = ODBCSST_PROCESS_RESULTS;
 }
 
-EFetchResultsStatusType CODBCStatement::Fetch_Results( int64 &rows_fetched )
+EFetchResultsStatusType CODBCStatement::Fetch_Results( int64_t &rows_fetched )
 {
 	rows_fetched = 0;
 

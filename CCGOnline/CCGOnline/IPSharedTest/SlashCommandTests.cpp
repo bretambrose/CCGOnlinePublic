@@ -54,7 +54,7 @@ TEST_F( SlashCommandTests, Commands_Good )
 
 	ASSERT_TRUE( command_instance.Get_Param_Count() == 1 );
 
-	uint32 value_uint32 = 0;
+	uint32_t value_uint32 = 0;
 	ASSERT_TRUE( command_instance.Get_Param( 0, value_uint32 ) );
 	ASSERT_TRUE( value_uint32 == 5 );
 
@@ -63,7 +63,7 @@ TEST_F( SlashCommandTests, Commands_Good )
 
 	ASSERT_TRUE( command_instance.Get_Param_Count() == 2 );
 
-	int32 value_int32 = 0;
+	int32_t value_int32 = 0;
 	ASSERT_TRUE( command_instance.Get_Param( 0, value_int32 ) );
 	ASSERT_TRUE( value_int32 == 5 );
 
@@ -84,7 +84,7 @@ TEST_F( SlashCommandTests, Commands_Good )
 	ASSERT_TRUE( command_instance.Get_Param( 1, value_double ) );
 	ASSERT_TRUE( value_double == 3.0 );
 
-	int64 value_int64 = 0;
+	int64_t value_int64 = 0;
 	ASSERT_TRUE( command_instance.Get_Param( 2, value_int64 ) );
 	ASSERT_TRUE( value_int64 == -5000 );
 

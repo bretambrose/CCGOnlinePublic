@@ -176,7 +176,7 @@ TEST_F( LoggingTests, Direct_Logging )
 	NPlatform::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
 
 	ASSERT_TRUE( file_names.size() == 3 );
-	for ( uint32 i = 0; i < file_names.size(); i++ )
+	for ( uint32_t i = 0; i < file_names.size(); i++ )
 	{
 		Verify_Log_File( file_names[ i ] );
 	}
@@ -237,7 +237,7 @@ TEST_F( LoggingTests, Static_Logging )
 	NPlatform::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
 	ASSERT_TRUE( file_names.size() == 1 );
 
-	for ( uint32 i = 0; i < file_names.size(); i++ )
+	for ( uint32_t i = 0; i < file_names.size(); i++ )
 	{
 		Verify_Log_File( file_names[ i ] );
 	}

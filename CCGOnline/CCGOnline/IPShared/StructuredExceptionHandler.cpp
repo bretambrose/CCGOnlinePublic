@@ -121,7 +121,7 @@ void CStructuredExceptionHandler::Write_Exception_File( const CStructuredExcepti
 	
 	// Iterate the call stack and write out an info line for each frame
 	auto call_stack = shared_exception_info.Get_Call_Stack();
-	for ( uint32 i = 0; i < call_stack.size(); i++ )
+	for ( uint32_t i = 0; i < call_stack.size(); i++ )
 	{
 		const CStackFrame &frame = call_stack[ i ];
 		
@@ -182,7 +182,7 @@ void CStructuredExceptionHandler::Archive_Logs( void )
 	// sort so that the exception file is first
 	std::sort( file_names.begin(), file_names.end(), SLogFileSorter() );
 
-	for ( uint32 i = 0; i < file_names.size(); i++ )
+	for ( uint32_t i = 0; i < file_names.size(); i++ )
 	{
 		std::basic_ifstream< wchar_t > log_file( CLogInterface::Get_Log_Path() + file_names[ i ], std::ios_base::in );
 

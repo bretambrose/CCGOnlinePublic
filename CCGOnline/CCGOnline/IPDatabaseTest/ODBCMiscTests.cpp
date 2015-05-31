@@ -118,9 +118,9 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts1_OK )
 	statement->Execute( 1 );
 	ASSERT_TRUE( statement->Get_Error_State() == DBEST_SUCCESS );
 
-	int64 rows_fetched = 0;
+	int64_t rows_fetched = 0;
 	EFetchResultsStatusType fetch_status = FRST_ONGOING;
-	uint64 expected_account_id = 1;
+	uint64_t expected_account_id = 1;
 	while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
 	{
 		fetch_status = statement->Fetch_Results( rows_fetched );
@@ -131,7 +131,7 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts1_OK )
 			break;
 		}
 
-		uint64 current_account_id = result_set.AccountID.Get_Value();
+		uint64_t current_account_id = result_set.AccountID.Get_Value();
 		ASSERT_TRUE( current_account_id == expected_account_id );
 
 		switch ( current_account_id )
@@ -189,8 +189,8 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 	statement->Bind_Input( &params, sizeof( CEmptyVariableSet ) );
 	ASSERT_TRUE( statement->Get_Error_State() == DBEST_SUCCESS );
 
-	static const uint32 RESULT_SET_SIZE = 2;
-	static const uint32 TOTAL_ROWS = 3;
+	static const uint32_t RESULT_SET_SIZE = 2;
+	static const uint32_t TOTAL_ROWS = 3;
 
 	CGetAccountResultSet result_set[ RESULT_SET_SIZE ];
 	statement->Bind_Output( result_set, sizeof( CGetAccountResultSet ), RESULT_SET_SIZE );
@@ -200,9 +200,9 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 	statement->Execute( 1 );
 	ASSERT_TRUE( statement->Get_Error_State() == DBEST_SUCCESS );
 
-	int64 rows_fetched = 0;
+	int64_t rows_fetched = 0;
 	EFetchResultsStatusType fetch_status = FRST_ONGOING;
-	uint64 expected_account_id = 1;
+	uint64_t expected_account_id = 1;
 	while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )
 	{
 		fetch_status = statement->Fetch_Results( rows_fetched );
@@ -214,9 +214,9 @@ TEST_F( ODBCMiscTests, ReadSeededData_GetAllAccounts2_OK )
 			break;
 		}
 
-		for ( uint32 i = 0; i < rows_fetched; ++i )
+		for ( uint32_t i = 0; i < rows_fetched; ++i )
 		{
-			uint64 current_account_id = result_set[ i ].AccountID.Get_Value();
+			uint64_t current_account_id = result_set[ i ].AccountID.Get_Value();
 			ASSERT_TRUE( current_account_id == expected_account_id );
 
 			switch ( current_account_id )
@@ -403,7 +403,7 @@ class CDummyTask : public CDatabaseTaskBase
 	protected:
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) {}	
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 /*rows_fetched*/ ) {}		
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64_t /*rows_fetched*/ ) {}		
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet * /*input_parameters*/ ) {}
 
 		virtual void On_Rollback( void ) {}

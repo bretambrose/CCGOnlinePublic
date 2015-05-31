@@ -83,17 +83,17 @@ class CTestThreadProcess : public CThreadProcessBase
 		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
-		uint64 Get_Frames_Completed( void ) const { return FramesCompleted; }
+		uint64_t Get_Frames_Completed( void ) const { return FramesCompleted; }
 
 	protected:
 
 		virtual void Per_Frame_Logic_End( void ) { ++FramesCompleted; }
 
-		virtual uint32 Get_Sleep_Interval_In_Milliseconds( void ) const { return 10; }
+		virtual uint32_t Get_Sleep_Interval_In_Milliseconds( void ) const { return 10; }
 
 	private:
 
-		uint64 FramesCompleted;
+		uint64_t FramesCompleted;
 };
 
 

@@ -83,7 +83,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				DBCompoundTaskListType sub_list;
 
 				auto splice_iter = PendingTasks.begin();
-				std::advance( splice_iter, std::min( static_cast< uint32 >( PendingTasks.size() ), T::CompoundTaskBatchSize ) );
+				std::advance( splice_iter, std::min( static_cast< uint32_t >( PendingTasks.size() ), T::CompoundTaskBatchSize ) );
 				sub_list.splice( sub_list.end(), PendingTasks, PendingTasks.begin(), splice_iter );
 
 				Process_Parent_Task_List( connection, sub_list, successful_tasks, failed_tasks );
@@ -223,7 +223,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				DBTaskListType sub_list;
 
 				auto end_of_splice_iter = child_list_copy.begin();
-				std::advance( end_of_splice_iter, std::min( static_cast<uint32>(child_list_copy.size()), call_context->Get_Param_Row_Count() ) );
+				std::advance( end_of_splice_iter, std::min( static_cast<uint32_t>(child_list_copy.size()), call_context->Get_Param_Row_Count() ) );
 				sub_list.splice( sub_list.end(), child_list_copy, child_list_copy.begin(), end_of_splice_iter );
 
 				ExecuteDBTaskListResult::Enum result = ExecuteDBTaskListResult::SUCCESS;

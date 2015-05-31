@@ -35,20 +35,20 @@ namespace NStringUtils
 	void To_Upper_Case( const std::string &source, std::string &dest );
 	void To_Upper_Case( const std::wstring &source, std::wstring &dest );
 
-	bool Convert( const std::wstring &source, int32 &value );
-	bool Convert( const std::wstring &source, uint32 &value );
-	bool Convert( const std::wstring &source, int64 &value );
-	bool Convert( const std::wstring &source, uint64 &value );
+	bool Convert( const std::wstring &source, int32_t &value );
+	bool Convert( const std::wstring &source, uint32_t &value );
+	bool Convert( const std::wstring &source, int64_t &value );
+	bool Convert( const std::wstring &source, uint64_t &value );
 	bool Convert( const std::wstring &source, std::wstring &value );
 	bool Convert( const std::wstring &source, std::string &value );
 	bool Convert( const std::wstring &source, float &value );
 	bool Convert( const std::wstring &source, double &value );
 	bool Convert( const std::wstring &source, bool &value );
 
-	bool Convert_Raw( const wchar_t *source, int32 &value );
-	bool Convert_Raw( const wchar_t *source, uint32 &value );
-	bool Convert_Raw( const wchar_t *source, int64 &value );
-	bool Convert_Raw( const wchar_t *source, uint64 &value );
+	bool Convert_Raw( const wchar_t *source, int32_t &value );
+	bool Convert_Raw( const wchar_t *source, uint32_t &value );
+	bool Convert_Raw( const wchar_t *source, int64_t &value );
+	bool Convert_Raw( const wchar_t *source, uint64_t &value );
 	bool Convert_Raw( const wchar_t *source, std::wstring &value );
 	bool Convert_Raw( const wchar_t *source, std::string &value );
 	bool Convert_Raw( const wchar_t *source, float &value );

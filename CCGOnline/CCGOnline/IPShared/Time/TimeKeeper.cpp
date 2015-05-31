@@ -37,12 +37,12 @@ CTimeKeeper::CTimeKeeper( void ) :
 	BaseTimes()
 {
 	// Reset all time types into a default state
-	for ( uint32 tt = static_cast< uint32 >( TT_FIRST ); tt < static_cast< uint32 >( TT_COUNT ); ++tt )
+	for ( uint32_t tt = static_cast< uint32_t >( TT_FIRST ); tt < static_cast< uint32_t >( TT_COUNT ); ++tt )
 	{
 		ETimeType time_type = static_cast< ETimeType >( tt );
 
-		CurrentTimes[ time_type ] = STickTime( static_cast< uint64 >( 0 ) );
-		BaseTimes[ time_type ] = STickTime( static_cast< uint64 >( 0 ) );
+		CurrentTimes[ time_type ] = STickTime( static_cast< uint64_t >( 0 ) );
+		BaseTimes[ time_type ] = STickTime( static_cast< uint64_t >( 0 ) );
 	}
 }
 

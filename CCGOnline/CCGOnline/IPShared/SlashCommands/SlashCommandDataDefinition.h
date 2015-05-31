@@ -30,10 +30,10 @@ enum ESlashCommandParamType
 {
 	SCPT_INVALID,
 
-	SCPT_INT32,				//:EnumEntry( "int32" )
-	SCPT_UINT32,			//:EnumEntry( "uint32" )
-	SCPT_INT64,				//:EnumEntry( "int64" )
-	SCPT_UINT64,			//:EnumEntry( "uint64" )
+	SCPT_INT32,				//:EnumEntry( "int32_t" )
+	SCPT_UINT32,			//:EnumEntry( "uint32_t" )
+	SCPT_INT64,				//:EnumEntry( "int64_t" )
+	SCPT_UINT64,			//:EnumEntry( "uint64_t" )
 	SCPT_STRING,			//:EnumEntry( "string" )
 	SCPT_WIDE_STRING,		//:EnumEntry( "wstring" )
 	SCPT_FLOAT,				//:EnumEntry( "float" )
@@ -100,12 +100,12 @@ class CSlashCommandDataDefinition
 		const std::wstring &Get_Shortcut( void ) const { return Shortcut; }
 		const std::wstring &Get_Help( void ) const { return Help; }
 
-		uint32 Get_Match_Param_Start_Index( void ) const { return SubCommand.size() == 0 ? 2 : 3; }
-		uint32 Get_Required_Param_Count( void ) const { return RequiredParamCount; }
-		uint32 Get_Total_Capture_Group_Count( void ) const { return TotalCaptureGroupCount; }
+		uint32_t Get_Match_Param_Start_Index( void ) const { return SubCommand.size() == 0 ? 2 : 3; }
+		uint32_t Get_Required_Param_Count( void ) const { return RequiredParamCount; }
+		uint32_t Get_Total_Capture_Group_Count( void ) const { return TotalCaptureGroupCount; }
 
-		uint32 Get_Param_Count( void ) const { return static_cast< uint32 >( Params.size() ); }
-		const CSlashCommandParam *Get_Param( uint32 index ) const;
+		uint32_t Get_Param_Count( void ) const { return static_cast< uint32_t >( Params.size() ); }
+		const CSlashCommandParam *Get_Param( uint32_t index ) const;
 
 		const std::wstring &Get_Key( void ) const { return Key; }
 
@@ -122,8 +122,8 @@ class CSlashCommandDataDefinition
 
 		std::vector< CSlashCommandParam > Params;
 
-		uint32 RequiredParamCount;				// unserialized, derived from Params properties
-		uint32 TotalCaptureGroupCount;		// unserialized, derived from various properties
+		uint32_t RequiredParamCount;				// unserialized, derived from Params properties
+		uint32_t TotalCaptureGroupCount;		// unserialized, derived from various properties
 };
 
 #endif // SLASH_COMMAND_DEFINITION_H

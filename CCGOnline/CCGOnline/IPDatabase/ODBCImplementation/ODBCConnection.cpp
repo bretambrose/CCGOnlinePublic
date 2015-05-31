@@ -262,13 +262,13 @@ void CODBCConnection::Construct_Function_Procedure_Call_Statement_Text( IDatabas
 	std::vector< IDatabaseVariable * > params;
 	input_parameters->Get_Variables( params );
 
-	uint32 start_param = 0;
+	uint32_t start_param = 0;
 	if ( task->Get_Task_Type() == DTT_FUNCTION_CALL )
 	{
 		start_param = 1;
 	}
 
-	for ( uint32 i = start_param; i < params.size(); ++i )
+	for ( uint32_t i = start_param; i < params.size(); ++i )
 	{
 		if ( i + 1 < params.size() )
 		{
@@ -294,7 +294,7 @@ void CODBCConnection::Construct_Select_Statement_Text( IDatabaseTask *task, std:
 	std::vector< const wchar_t * > column_names;
 	task->Build_Column_Name_List( column_names );
 
-	for ( uint32 i = 0; i < column_names.size(); ++i )
+	for ( uint32_t i = 0; i < column_names.size(); ++i )
 	{
 		statement_stream << column_names[ i ];
 		if ( i + 1 < column_names.size() )
@@ -317,7 +317,7 @@ void CODBCConnection::Construct_Table_Valued_Function_Statement_Text( IDatabaseT
 	std::vector< const wchar_t * > column_names;
 	task->Build_Column_Name_List( column_names );
 
-	for ( uint32 i = 0; i < column_names.size(); ++i )
+	for ( uint32_t i = 0; i < column_names.size(); ++i )
 	{
 		statement_stream << column_names[ i ];
 		if ( i + 1 < column_names.size() )
@@ -331,7 +331,7 @@ void CODBCConnection::Construct_Table_Valued_Function_Statement_Text( IDatabaseT
 	std::vector< IDatabaseVariable * > params;
 	input_parameters->Get_Variables( params );
 
-	for ( uint32 i = 0; i < params.size(); ++i )
+	for ( uint32_t i = 0; i < params.size(); ++i )
 	{
 		if ( i + 1 < params.size() )
 		{
@@ -393,7 +393,7 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 				return false;
 			}
 
-			for ( uint32 i = 1; i < input_params.size(); ++i )
+			for ( uint32_t i = 1; i < input_params.size(); ++i )
 			{
 				if ( input_params[ i ]->Get_Parameter_Type() != DVT_INPUT )	// legal to have functions with in/out params?
 				{
@@ -411,7 +411,7 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 
 		case DTT_PROCEDURE_CALL:
 		{
-			for ( uint32 i = 0; i < input_params.size(); ++i )
+			for ( uint32_t i = 0; i < input_params.size(); ++i )
 			{
 				EDatabaseVariableType variable_type = input_params[ i ]->Get_Parameter_Type();
 				if ( variable_type != DVT_INPUT && variable_type != DVT_INPUT_OUTPUT )
@@ -420,7 +420,7 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 				}
 			}
 
-			for ( uint32 i = 0; i < result_set.size(); ++i )
+			for ( uint32_t i = 0; i < result_set.size(); ++i )
 			{
 				if ( result_set[ i ]->Get_Parameter_Type() != DVT_INPUT )
 				{
@@ -451,7 +451,7 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 				return false;
 			}
 
-			for ( uint32 i = 0; i < result_set.size(); ++i )
+			for ( uint32_t i = 0; i < result_set.size(); ++i )
 			{
 				if ( result_set[ i ]->Get_Parameter_Type() != DVT_INPUT )
 				{
@@ -464,7 +464,7 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 
 		case DTT_TABLE_VALUED_FUNCTION_CALL:
 		{
-			for ( uint32 i = 0; i < input_params.size(); ++i )
+			for ( uint32_t i = 0; i < input_params.size(); ++i )
 			{
 				if ( input_params[ i ]->Get_Parameter_Type() != DVT_INPUT )
 				{
@@ -485,7 +485,7 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 				return false;
 			}
 
-			for ( uint32 i = 0; i < result_set.size(); ++i )
+			for ( uint32_t i = 0; i < result_set.size(); ++i )
 			{
 				if ( result_set[ i ]->Get_Parameter_Type() != DVT_INPUT )
 				{

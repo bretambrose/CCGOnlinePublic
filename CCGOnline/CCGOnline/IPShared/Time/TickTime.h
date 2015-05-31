@@ -35,7 +35,7 @@ struct STickTime
 			Ticks( rhs.Ticks )
 		{}
 
-		explicit STickTime( uint64 ticks ) :
+		explicit STickTime( uint64_t ticks ) :
 			Ticks( ticks )
 		{}
 
@@ -71,11 +71,11 @@ struct STickTime
 			return Ticks != rhs.Ticks;
 		}
 
-		uint64 Get_Ticks( void ) const { return Ticks; }
+		uint64_t Get_Ticks( void ) const { return Ticks; }
 
 	private:
 
-		uint64 Ticks;
+		uint64_t Ticks;
 };
 
 inline STickTime operator +( const STickTime &lhs, const STickTime &rhs )

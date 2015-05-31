@@ -25,7 +25,7 @@
 
 #include "Interfaces/DatabaseCallContextInterface.h"
 
-template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
+template < typename I, uint32_t ISIZE, typename O, uint32_t OSIZE >
 class CDatabaseCallContext : public IDatabaseCallContext
 {
 	public:
@@ -42,7 +42,7 @@ class CDatabaseCallContext : public IDatabaseCallContext
 		// IDatabaseCallContext interface
 		// Param accessors
 		virtual IDatabaseVariableSet *Get_Param_Rows( void ) { return &Params[0]; }
-		virtual IDatabaseVariableSet *Get_Param_Row( uint32 index ) {
+		virtual IDatabaseVariableSet *Get_Param_Row( uint32_t index ) {
 			if ( index < ISIZE )
 			{
 				return &Params[ index ];
@@ -50,12 +50,12 @@ class CDatabaseCallContext : public IDatabaseCallContext
 
 			return nullptr;
 		}
-		virtual uint32 Get_Param_Row_Count( void ) const { return ISIZE; }
-		virtual uint32 Get_Sizeof_Param_Type( void ) const { return sizeof(I); }
+		virtual uint32_t Get_Param_Row_Count( void ) const { return ISIZE; }
+		virtual uint32_t Get_Sizeof_Param_Type( void ) const { return sizeof(I); }
 
 		// Result accessors
 		virtual IDatabaseVariableSet *Get_Result_Rows( void ) { return &Results[0]; }
-		virtual IDatabaseVariableSet *Get_Result_Row( uint32 index ) {
+		virtual IDatabaseVariableSet *Get_Result_Row( uint32_t index ) {
 			if ( index < OSIZE )
 			{
 				return &Results[ index ];
@@ -63,8 +63,8 @@ class CDatabaseCallContext : public IDatabaseCallContext
 
 			return nullptr;
 		}
-		virtual uint32 Get_Result_Row_Count( void ) const { return OSIZE; }
-		virtual uint32 Get_Sizeof_Result_Type( void ) const { return sizeof(O); }
+		virtual uint32_t Get_Result_Row_Count( void ) const { return OSIZE; }
+		virtual uint32_t Get_Sizeof_Result_Type( void ) const { return sizeof(O); }
 
 		virtual const std::wstring & Get_Statement_Text( void ) const { return StatementText; }
 		virtual void Set_Statement_Text( const std::wstring &statement_text ) { StatementText = statement_text; }

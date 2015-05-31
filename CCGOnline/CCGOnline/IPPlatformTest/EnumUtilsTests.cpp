@@ -41,7 +41,7 @@ TEST( EnumUtilsTests, Build_Mask )
 	ASSERT_TRUE( flag1_value == EUtilFlagTest::Flag1 );
 
 	EUtilFlagTest mask_value = Make_Enum_Mask( EUtilFlagTest::Flag1, EUtilFlagTest::Flag2 );
-	ASSERT_TRUE( static_cast< uint32 >( mask_value ) == 3 );
+	ASSERT_TRUE( static_cast< uint32_t >( mask_value ) == 3 );
 
 	ASSERT_TRUE( Is_An_Enum_Flag_Set( mask_value, flag1_value ) );
 	ASSERT_TRUE( Are_All_Enum_Flags_Set( mask_value, flag1_value ) );

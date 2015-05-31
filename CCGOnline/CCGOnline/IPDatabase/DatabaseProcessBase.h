@@ -58,7 +58,7 @@ class CDatabaseProcessBase : public CThreadProcessBase
 		virtual void Register_Message_Handlers( void );
 
 		// CThreadProcessBase interface
-		virtual uint32 Get_Sleep_Interval_In_Milliseconds( void ) const;
+		virtual uint32_t Get_Sleep_Interval_In_Milliseconds( void ) const;
 
 		void Add_Batch( IDatabaseTaskBatch *batch );
 

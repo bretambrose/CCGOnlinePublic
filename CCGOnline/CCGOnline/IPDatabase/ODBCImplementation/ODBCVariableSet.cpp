@@ -42,28 +42,28 @@ void CODBCVariableSet::Convert_Variable_To_String( IDatabaseVariable *variable, 
 		{
 			case DVVT_INT32:
 			{
-				TODBCScalarVariableBase< int32 > *scalar_variable = static_cast< TODBCScalarVariableBase< int32 > * >( variable );
+				TODBCScalarVariableBase< int32_t > *scalar_variable = static_cast< TODBCScalarVariableBase< int32_t > * >( variable );
 				varstream << scalar_variable->Get_Value();
 				break;
 			}
 
 			case DVVT_UINT32:
 			{
-				TODBCScalarVariableBase< uint32 > *scalar_variable = static_cast< TODBCScalarVariableBase< uint32 > * >( variable );
+				TODBCScalarVariableBase< uint32_t > *scalar_variable = static_cast< TODBCScalarVariableBase< uint32_t > * >( variable );
 				varstream << scalar_variable->Get_Value();
 				break;
 			}
 
 			case DVVT_INT64:
 			{
-				TODBCScalarVariableBase< int64 > *scalar_variable = static_cast< TODBCScalarVariableBase< int64 > * >( variable );
+				TODBCScalarVariableBase< int64_t > *scalar_variable = static_cast< TODBCScalarVariableBase< int64_t > * >( variable );
 				varstream << scalar_variable->Get_Value();
 				break;
 			}
 
 			case DVVT_UINT64:
 			{
-				TODBCScalarVariableBase< uint64 > *scalar_variable = static_cast< TODBCScalarVariableBase< uint64 > * >( variable );
+				TODBCScalarVariableBase< uint64_t > *scalar_variable = static_cast< TODBCScalarVariableBase< uint64_t > * >( variable );
 				varstream << scalar_variable->Get_Value();
 				break;
 			}

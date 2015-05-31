@@ -43,21 +43,21 @@ class CSlashCommandInstance
 		const std::wstring &Get_Command( void ) const { return Command; }
 		const std::wstring &Get_Sub_Command( void ) const { return SubCommand; }
 
-		uint32 Get_Param_Count( void ) { return static_cast< uint32 >( Params.size() ); }
+		uint32_t Get_Param_Count( void ) { return static_cast< uint32_t >( Params.size() ); }
 
-		bool Get_Param( uint32 index, int32 &value ) const;
-		bool Get_Param( uint32 index, uint32 &value ) const;
-		bool Get_Param( uint32 index, int64 &value ) const;
-		bool Get_Param( uint32 index, uint64 &value ) const;
-		bool Get_Param( uint32 index, std::wstring &value ) const;
-		bool Get_Param( uint32 index, std::string &value ) const;
-		bool Get_Param( uint32 index, float &value ) const;
-		bool Get_Param( uint32 index, double &value ) const;
-		bool Get_Param( uint32 index, bool &value ) const;
+		bool Get_Param( uint32_t index, int32_t &value ) const;
+		bool Get_Param( uint32_t index, uint32_t &value ) const;
+		bool Get_Param( uint32_t index, int64_t &value ) const;
+		bool Get_Param( uint32_t index, uint64_t &value ) const;
+		bool Get_Param( uint32_t index, std::wstring &value ) const;
+		bool Get_Param( uint32_t index, std::string &value ) const;
+		bool Get_Param( uint32_t index, float &value ) const;
+		bool Get_Param( uint32_t index, double &value ) const;
+		bool Get_Param( uint32_t index, bool &value ) const;
 
 		// Todo: put an IsEnum compile-time restriction on this, compile-time assert on other path
 		template< typename T >
-		bool Get_Param( uint32 index, T &value ) const
+		bool Get_Param( uint32_t index, T &value ) const
 		{
 			if ( index >= Params.size() )
 			{

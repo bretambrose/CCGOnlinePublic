@@ -44,8 +44,8 @@ class CProcessStatics
 	private:
 
 		// Thread Local storage indices
-		static uint32 ProcessHandle;
-		static uint32 ConcurrencyManagerHandle;
+		static uint32_t ProcessHandle;
+		static uint32_t ConcurrencyManagerHandle;
 
 		static bool Initialized;
 };

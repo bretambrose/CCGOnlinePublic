@@ -52,14 +52,14 @@ class CEnumConverter
 		template < typename T >
 		static void Register_Enum_Entry( const std::string &entry_name, T entry_value )
 		{
-			Register_Enum_Entry_Internal( Loki::TypeInfo( typeid( T ) ), entry_name, static_cast< uint64 >( entry_value ) );
+			Register_Enum_Entry_Internal( Loki::TypeInfo( typeid( T ) ), entry_name, static_cast< uint64_t >( entry_value ) );
 		}
 
 		// Conversion
 		template < typename T >
 		static bool Convert( const std::string &entry_name, T &output_value )
 		{
-			uint64 converted_value = 0;
+			uint64_t converted_value = 0;
 			bool success = Convert_Internal( Loki::TypeInfo( typeid( T ) ), entry_name, converted_value );
 			output_value = static_cast< T >( converted_value );
 
@@ -78,19 +78,19 @@ class CEnumConverter
 		template < typename T >
 		static bool Convert( T output_value, std::string &entry_name )
 		{
-			uint64 converted_value = static_cast< uint64 >( output_value );
+			uint64_t converted_value = static_cast< uint64_t >( output_value );
 			return Convert_Internal( Loki::TypeInfo( typeid( T ) ), converted_value, entry_name );
 		}
 
 		template < typename T >
 		static bool Convert( T output_value, std::wstring &entry_name )
 		{
-			uint64 converted_value = static_cast< uint64 >( output_value );
+			uint64_t converted_value = static_cast< uint64_t >( output_value );
 			return Convert_Internal( Loki::TypeInfo( typeid( T ) ), converted_value, entry_name );
 		}
 
-		static bool Convert( const std::string &enum_name, const std::wstring &entry_name, uint64 &output_value );
-		static bool Convert( const Loki::TypeInfo &enum_type_info, const std::wstring &entry_name, uint64 &output_value );
+		static bool Convert( const std::string &enum_name, const std::wstring &entry_name, uint64_t &output_value );
+		static bool Convert( const Loki::TypeInfo &enum_type_info, const std::wstring &entry_name, uint64_t &output_value );
 
 	private:
 
@@ -98,11 +98,11 @@ class CEnumConverter
 		static CConvertibleEnum *Find_Enum( const std::string &enum_name );
 
 		static void Register_Enum_Internal( const Loki::TypeInfo &enum_type_info, const std::string &upper_enum_name, EConvertibleEnumProperties properties );
-		static void Register_Enum_Entry_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64 entry_value );
+		static void Register_Enum_Entry_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64_t entry_value );
 
-		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64 value, std::string &entry_name );
-		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64 value, std::wstring &entry_name );
-		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64 &output_value );
+		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64_t value, std::string &entry_name );
+		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64_t value, std::wstring &entry_name );
+		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64_t &output_value );
 
 		typedef std::unordered_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > EnumTableType;
 

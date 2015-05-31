@@ -34,7 +34,7 @@ namespace XMLSerialization
 	void Register_Primitive_Serializers( void );
 }
 
-typedef std::pair< uint64, IXMLSerializer * > XMLMemberRecordType;
+typedef std::pair< uint64_t, IXMLSerializer * > XMLMemberRecordType;
 
 // The base class for the serializer for compound types: classes and structs
 class CCompositeXMLSerializer : public IXMLSerializer
@@ -52,7 +52,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 
 		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
 		{
-			uint8 *byte_base_ptr = reinterpret_cast< uint8 * >( destination );
+			uint8_t *byte_base_ptr = reinterpret_cast< uint8_t * >( destination );
 
 			for ( pugi::xml_node iter = xml_node.first_child(); iter; iter = iter.next_sibling() )
 			{
@@ -64,7 +64,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 				FATAL_ASSERT( member_iter != MemberRecords.cend() );
 
 				IXMLSerializer *serializer = member_iter->second.second;
-				uint8 *member_ptr = byte_base_ptr + member_iter->second.first;
+				uint8_t *member_ptr = byte_base_ptr + member_iter->second.first;
 
 				serializer->Load_From_XML( iter, member_ptr );
 			}
@@ -87,7 +87,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 				}
 
 				IXMLSerializer *serializer = record_iter->second.second;
-				uint8 *member_ptr = byte_base_ptr + record_iter->second.first;
+				uint8_t *member_ptr = byte_base_ptr + record_iter->second.first;
 
 				serializer->Load_From_String( att_iter.value(), member_ptr );
 			}
@@ -224,7 +224,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 		{
 			pugi::xml_attribute attrib = xml_node.attribute( L"Type" );
 
-			uint64 type_value;
+			uint64_t type_value;
 			std::string attribute_value;
 
 			if ( !CEnumConverter::Convert( EnumTypeInfo, std::wstring( attrib.value() ), type_value ) )
@@ -237,7 +237,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 			serializer->Load_From_XML( xml_node, destination );
 		}
 
-		void Add( uint64 key, IXMLSerializer *serializer )
+		void Add( uint64_t key, IXMLSerializer *serializer )
 		{
 			FATAL_ASSERT( Serializers.find( key ) == Serializers.cend() );
 
@@ -246,7 +246,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 
 	private:
 
-		typedef std::unordered_map< uint64, IXMLSerializer * > SerializerTableType;
+		typedef std::unordered_map< uint64_t, IXMLSerializer * > SerializerTableType;
 		
 		Loki::TypeInfo EnumTypeInfo;
 

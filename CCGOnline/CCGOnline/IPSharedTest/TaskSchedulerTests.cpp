@@ -88,13 +88,13 @@ TEST( TaskSchedulerTests, Remove )
 	CTaskScheduler scheduler;
 
 	shared_ptr< CMockScheduledTask > tasks[ 5 ];
-	for ( uint32 i = 0; i < 5; i++ )
+	for ( uint32_t i = 0; i < 5; i++ )
 	{
 		tasks[ i ].reset( new CMockScheduledTask( static_cast< double >( i + 1 ) ) );
 		scheduler.Submit_Task( tasks[ i ] );
 	}
 
-	for ( uint32 i = 0; i < 5; i++ )
+	for ( uint32_t i = 0; i < 5; i++ )
 	{
 		ASSERT_TRUE( tasks[ i ]->Is_Scheduled() );
 	}
@@ -108,7 +108,7 @@ TEST( TaskSchedulerTests, Remove )
 	ASSERT_FALSE( tasks[ 3 ]->Get_Executed() );
 
 	scheduler.Service( 10.0 );
-	for ( uint32 i = 0; i < 5; i++ )
+	for ( uint32_t i = 0; i < 5; i++ )
 	{
 		if ( i == 0 || i == 3 )
 		{
@@ -208,11 +208,11 @@ class CMockRescheduledTask : public CScheduledTask
 			return true;
 		}
 
-		uint32 Get_Count( void ) const { return Count; }
+		uint32_t Get_Count( void ) const { return Count; }
 
 	private:
 
-		uint32 Count;
+		uint32_t Count;
 };
 
 

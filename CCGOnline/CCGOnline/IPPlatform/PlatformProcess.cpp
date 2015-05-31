@@ -34,7 +34,7 @@
 		Returns: a 32 bit process id
 
 **********************************************************************************************************************/
-uint32 NPlatform::Get_Self_PID( void )
+uint32_t NPlatform::Get_Self_PID( void )
 {
 	return ::GetCurrentProcessId();
 }
@@ -95,7 +95,7 @@ std::wstring NPlatform::Get_Service_Name( void )
 		milliseconds -- time to sleep for, in milliseconds
 
 **********************************************************************************************************************/
-void NPlatform::Sleep( uint32 milliseconds )
+void NPlatform::Sleep( uint32_t milliseconds )
 {
 	::Sleep( milliseconds );
 }

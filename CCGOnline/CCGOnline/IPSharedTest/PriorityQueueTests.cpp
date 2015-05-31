@@ -24,7 +24,7 @@
 
 #include "IPShared/PriorityQueue.h"
 
-void Verify_Sorted( TPriorityQueue< int32 > &int_heap )
+void Verify_Sorted( TPriorityQueue< int32_t > &int_heap )
 {
 	if ( int_heap.Empty() )
 	{
@@ -46,7 +46,7 @@ void Verify_Sorted( TPriorityQueue< int32 > &int_heap )
 
 TEST( PriorityQueueTests, Constructors )
 {
-	TPriorityQueue< int32 > int_heap;
+	TPriorityQueue< int32_t > int_heap;
 
 	ASSERT_TRUE( int_heap.Count() == 0 );
 	ASSERT_TRUE( int_heap.Empty() );
@@ -59,7 +59,7 @@ TEST( PriorityQueueTests, Constructors )
 
 TEST( PriorityQueueTests, Insert_Pop )
 {
-	TPriorityQueue< int32 > int_heap;
+	TPriorityQueue< int32_t > int_heap;
 
 	int_heap.Insert( 2 );
 	int_heap.Insert( 10 );
@@ -68,7 +68,7 @@ TEST( PriorityQueueTests, Insert_Pop )
 	int_heap.Insert( 1 );
 	int_heap.Insert( 12 );
 
-	int32 min = 0;
+	int32_t min = 0;
 
 	ASSERT_TRUE( int_heap.Peek_Top( min ) );
 	ASSERT_TRUE( min == 1 );
@@ -100,7 +100,7 @@ TEST( PriorityQueueTests, Insert_Pop )
 
 TEST( PriorityQueueTests, Insert_Extract_Top )
 {
-	TPriorityQueue< int32 > int_heap;
+	TPriorityQueue< int32_t > int_heap;
 
 	int_heap.Insert( 2 );
 	int_heap.Insert( 10 );
@@ -109,7 +109,7 @@ TEST( PriorityQueueTests, Insert_Extract_Top )
 	int_heap.Insert( 1 );
 	int_heap.Insert( 12 );
 
-	int32 min = 0;
+	int32_t min = 0;
 
 	ASSERT_TRUE( int_heap.Extract_Top( min ) );
 	ASSERT_TRUE( min == 1 );
@@ -135,7 +135,7 @@ TEST( PriorityQueueTests, Insert_Extract_Top )
 
 TEST( PriorityQueueTests, Clear )
 {
-	TPriorityQueue< int32 > int_heap;
+	TPriorityQueue< int32_t > int_heap;
 
 	int_heap.Insert( 3 );
 	int_heap.Insert( -5 );
@@ -154,7 +154,7 @@ TEST( PriorityQueueTests, Clear )
 
 TEST( PriorityQueueTests, Remove_By_Index )
 {
-	TPriorityQueue< int32 > int_heap;
+	TPriorityQueue< int32_t > int_heap;
 
 	int_heap.Insert( 1 );
 	int_heap.Insert( 10 );

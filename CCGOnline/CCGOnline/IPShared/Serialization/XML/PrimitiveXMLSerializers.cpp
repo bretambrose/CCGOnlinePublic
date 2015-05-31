@@ -47,7 +47,7 @@ class CXMLIntegerSerializer : public CPrimitiveXMLSerializer
 
 		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
-			int64 node_value = 0;
+			int64_t node_value = 0;
 			bool result = NStringUtils::Convert_Raw( value, node_value );
 			FATAL_ASSERT( result );
 
@@ -67,7 +67,7 @@ class CXMLUnsignedIntegerSerializer : public CPrimitiveXMLSerializer
 
 		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
-			uint64 node_value = 0;
+			uint64_t node_value = 0;
 			bool result = NStringUtils::Convert_Raw( value, node_value );
 			FATAL_ASSERT( result );
 
@@ -155,14 +155,14 @@ namespace XMLSerialization
 
 	void Register_Primitive_Serializers( void )
 	{
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int8, new CXMLIntegerSerializer< int8 > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint8, new CXMLIntegerSerializer< uint8 > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int16, new CXMLIntegerSerializer< int16 > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint16, new CXMLIntegerSerializer< uint16 > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int32, new CXMLIntegerSerializer< int32 > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint32, new CXMLIntegerSerializer< uint32 > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int64, new CXMLIntegerSerializer< int64 > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint64, new CXMLIntegerSerializer< uint64 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int8_t, new CXMLIntegerSerializer< int8_t > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint8_t, new CXMLIntegerSerializer< uint8_t > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int16_t, new CXMLIntegerSerializer< int16_t > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint16_t, new CXMLIntegerSerializer< uint16_t > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int32_t, new CXMLIntegerSerializer< int32_t > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint32_t, new CXMLIntegerSerializer< uint32_t > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int64_t, new CXMLIntegerSerializer< int64_t > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint64_t, new CXMLIntegerSerializer< uint64_t > );
 		REGISTER_PRIMITIVE_XML_SERIALIZER( std::wstring, new CXMLWideStringSerializer );
 		REGISTER_PRIMITIVE_XML_SERIALIZER( std::string, new CXMLStringSerializer );
 		REGISTER_PRIMITIVE_XML_SERIALIZER( double, new CXMLDoubleSerializer< double > );

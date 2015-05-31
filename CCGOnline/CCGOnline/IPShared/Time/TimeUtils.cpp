@@ -122,7 +122,7 @@ double NTimeUtils::Convert_Game_Ticks_To_Seconds( const STickTime &game_time )
 **********************************************************************************************************************/
 STickTime NTimeUtils::Convert_Seconds_To_Game_Ticks( double seconds )
 {
-	return STickTime( static_cast< uint64 >( seconds * GAME_TICKS_PER_SECOND ) );
+	return STickTime( static_cast< uint64_t >( seconds * GAME_TICKS_PER_SECOND ) );
 }
 
 

@@ -633,7 +633,7 @@ void CConcurrencyManager::Flush_Frames( void )
 	}
 
 	// only erase frames that were actually sent
-	for ( uint32 i = 0; i < sent_frames.size(); i++ )
+	for ( uint32_t i = 0; i < sent_frames.size(); i++ )
 	{
 		PendingOutboundFrames.erase( sent_frames[ i ] );
 	}
@@ -712,7 +712,7 @@ void CConcurrencyManager::Service_Incoming_Frames( void )
 	Get_My_Mailbox()->Remove_Frames( control_frames );
 
 	// iterate all frames
-	for ( uint32 i = 0; i < control_frames.size(); ++i )
+	for ( uint32_t i = 0; i < control_frames.size(); ++i )
 	{
 		unique_ptr< CProcessMessageFrame > &frame = control_frames[ i ];
 		EProcessID::Enum source_process_id = frame->Get_Process_ID();

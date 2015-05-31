@@ -99,7 +99,7 @@ void CTaskScheduler::Submit_Task( const shared_ptr< CScheduledTask > &task )
 	{
 		// Round the desired execution time to the nearest granule
 		double fractional_granules = task->Get_Execute_Time() / TimeGranularity;
-		double granules = static_cast< double >( static_cast< uint64 >( fractional_granules ) );
+		double granules = static_cast< double >( static_cast< uint64_t >( fractional_granules ) );
 		if ( fractional_granules - granules > TIME_GRANULARITY_FRACTION_CUTOFF )
 		{
 			double new_time = ( granules + 1 ) * TimeGranularity;

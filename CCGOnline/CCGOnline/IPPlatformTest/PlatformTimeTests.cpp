@@ -48,11 +48,11 @@ class PlatformTimeTests : public testing::Test
 
 TEST_F( PlatformTimeTests, Raw_Time_Comparisons )
 {
-	uint64 time1 = CPlatformTime::Get_Raw_Time();
+	uint64_t time1 = CPlatformTime::Get_Raw_Time();
 
 	NPlatform::Sleep( 1500 );
 
-	uint64 time2 = CPlatformTime::Get_Raw_Time();
+	uint64_t time2 = CPlatformTime::Get_Raw_Time();
 
 	ASSERT_TRUE( CPlatformTime::Is_Raw_Time_Less_Than_Seconds( time1, time2, 0 ) );
 	ASSERT_TRUE( CPlatformTime::Is_Raw_Time_Less_Than_Seconds( time1, time2, 1 ) );

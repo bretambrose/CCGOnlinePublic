@@ -132,15 +132,15 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 			break;
 		}
 
-		uint64 address = stack_frame.AddrPC.Offset;
+		uint64_t address = stack_frame.AddrPC.Offset;
 		if ( address == 0 )
 		{
 			break;
 		}
 
 		// get the function name for the current stack frame
-		static const uint32 MAX_SYMBOL_NAME_LENGTH = 512;
-		static const uint32 SYMBOL_INFO_EXTENDED_LENGTH = sizeof( SYMBOL_INFOW ) + MAX_SYMBOL_NAME_LENGTH * sizeof( TCHAR );
+		static const uint32_t MAX_SYMBOL_NAME_LENGTH = 512;
+		static const uint32_t SYMBOL_INFO_EXTENDED_LENGTH = sizeof( SYMBOL_INFOW ) + MAX_SYMBOL_NAME_LENGTH * sizeof( TCHAR );
 
 		char buffer[ SYMBOL_INFO_EXTENDED_LENGTH ];
 		::ZeroMemory( buffer, SYMBOL_INFO_EXTENDED_LENGTH );
@@ -205,7 +205,7 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 		Returns: string describing the exception
 
 **********************************************************************************************************************/
-static std::wstring Convert_Exception_Code_To_Message( uint32 exception_code )
+static std::wstring Convert_Exception_Code_To_Message( uint32_t exception_code )
 {
 	switch ( exception_code )
 	{
@@ -260,7 +260,7 @@ static LONG WINAPI WindowsExceptionHandler( struct _EXCEPTION_POINTERS *windows_
 {
 	CSimplePlatformMutexLocker exception_lock( CPlatformExceptionHandler::Get_Lock() );
 		
-	uint32 exception_code = windows_exception_info->ExceptionRecord->ExceptionCode;
+	uint32_t exception_code = windows_exception_info->ExceptionRecord->ExceptionCode;
 	CStructuredExceptionInfo shared_exception_info( exception_code == 1 );
 	shared_exception_info.Set_Exception_Message( ::Convert_Exception_Code_To_Message( exception_code ) );
 
@@ -363,7 +363,7 @@ bool CPlatformExceptionHandler::Load_Symbols( std::wstring &error_message )
 		return true;
 	}
 
-	uint32 symbol_options = ::SymGetOptions();
+	uint32_t symbol_options = ::SymGetOptions();
 	symbol_options |= SYMOPT_LOAD_LINES;
 	::SymSetOptions( symbol_options );
 

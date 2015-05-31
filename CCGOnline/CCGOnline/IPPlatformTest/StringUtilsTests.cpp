@@ -57,7 +57,7 @@ TEST( StringUtilsTests, String_To_WideString )
 	String_To_WideString( "Testing a string", target );
 	ASSERT_TRUE( target == std::wstring( L"Testing a string" ) );
 
-	for ( uint32 i = 10; i < 200; ++i )
+	for ( uint32_t i = 10; i < 200; ++i )
 	{
 		std::string input( i, 'A' );
 		String_To_WideString( input, target );
@@ -96,7 +96,7 @@ TEST( StringUtilsTests, WideString_To_String )
 	WideString_To_String( L"Testing a string", target );
 	ASSERT_TRUE( target == std::string( "Testing a string" ) );
 
-	for ( uint32 i = 10; i < 200; ++i )
+	for ( uint32_t i = 10; i < 200; ++i )
 	{
 		std::wstring input( i, 'A' );
 		WideString_To_String( input, target );

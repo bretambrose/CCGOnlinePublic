@@ -39,7 +39,7 @@ TEST( VirtualProcessMessageFrameTests, Add_Remove )
 	message_frame.Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
 	message_frame.Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
 
-	uint32 i = 0;
+	uint32_t i = 0;
 	for ( auto iter = message_frame.cbegin(), end = message_frame.cend(); iter != end; ++iter, ++i )
 	{
 		const CLogRequestMessage *log_message = static_cast< const CLogRequestMessage * >( iter->get() );

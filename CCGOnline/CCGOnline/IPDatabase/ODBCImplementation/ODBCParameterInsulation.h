@@ -41,8 +41,8 @@ typedef SQLHANDLE               SQLHDESC;
 
 */
 
-static const int32 IP_SQL_NULL_DATA = -1;
-static const int32 IP_SQL_NTS = -3;
+static const int32_t IP_SQL_NULL_DATA = -1;
+static const int32_t IP_SQL_NTS = -3;
 
 #ifdef X64
 #define IP_SQLLEN long long
@@ -57,7 +57,7 @@ static const int32 IP_SQL_NTS = -3;
 #include <sqlext.h>
 #include <sqltypes.h>
 
-static const int32 IP_SQL_NULL_DATA = SQL_NULL_DATA;
+static const int32_t IP_SQL_NULL_DATA = SQL_NULL_DATA;
 #define IP_SQLLEN SQLLEN
 #define IP_SQL_NTS SQL_NTS
 

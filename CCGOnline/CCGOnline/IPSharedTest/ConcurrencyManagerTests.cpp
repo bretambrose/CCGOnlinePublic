@@ -125,7 +125,7 @@ class CConcurrencyManagerTester
 			read_interface->Remove_Frames( frames );
 
 			// go through all frames, looking for reschedule messages
-			for ( uint32 i = 0; i < frames.size(); ++i )
+			for ( uint32_t i = 0; i < frames.size(); ++i )
 			{
 				unique_ptr< CProcessMessageFrame > &frame = frames[ i ];
 				EProcessID::Enum process_id = frame->Get_Process_ID();
@@ -145,7 +145,7 @@ class CConcurrencyManagerTester
 
 			// restore all the frames in the manager mailbox
 			shared_ptr< CWriteOnlyMailbox > write_interface = Manager->Get_Mailbox( MANAGER_PROCESS_ID );
-			for ( uint32 i = 0; i < frames.size(); ++i )
+			for ( uint32_t i = 0; i < frames.size(); ++i )
 			{
 				write_interface->Add_Frame( frames[ i ] );
 			}
@@ -163,7 +163,7 @@ class CConcurrencyManagerTester
 		shared_ptr< IManagedProcess > Get_Virtual_Process_By_Property_Match( const SProcessProperties &properties ) const { 
 			std::vector< shared_ptr< IManagedProcess > > processes;
 			Manager->Enumerate_Processes( processes );
-			for ( uint32 i = 0; i < processes.size(); ++i )
+			for ( uint32_t i = 0; i < processes.size(); ++i )
 			{
 				if ( properties.Matches( processes[ i ]->Get_Properties() ) )
 				{
@@ -234,11 +234,11 @@ class CDoNothingProcess : public CTaskProcessBase
 			ServiceCount++;
 		}
 
-		uint32 Get_Service_Count( void ) const { return ServiceCount; }
+		uint32_t Get_Service_Count( void ) const { return ServiceCount; }
 
 	private:
 
-		uint32 ServiceCount;
+		uint32_t ServiceCount;
 };
 
 static const EProcessID::Enum AI_PROCESS_ID( EProcessID::FIRST_FREE_ID );
@@ -514,7 +514,7 @@ TEST_F( ConcurrencyManagerTests, Run_Once_And_Shutdown_Self )
 
 TEST_F( ConcurrencyManagerTests, Stress )
 {
-	for ( uint32 i = 0; i < 50; ++i )
+	for ( uint32_t i = 0; i < 50; ++i )
 	{
 		CConcurrencyManagerTester manager_tester;
 

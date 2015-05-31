@@ -20,9 +20,6 @@
     <ClInclude Include="MemoryAllocation.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlatformTypes.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="WindowsWrapper.h">
       <Filter>Source Files</Filter>
     </ClInclude>

@@ -65,7 +65,7 @@ class IDatabaseTask : public IDatabaseTaskBase
 		friend void DBUtils::Execute_Task_List( IDatabaseCallContext *, IDatabaseStatement *, const DBTaskListType &, ExecuteDBTaskListResult::Enum &, DBTaskListType::const_iterator & );
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) = 0;		
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) = 0;			
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) = 0;			
 		virtual void On_Fetch_Results_Finished( IDatabaseVariableSet *input_parameters ) = 0;	
 
 		virtual void On_Rollback( void ) = 0;			

@@ -61,7 +61,7 @@ class TPriorityQueue {
 	public:
 
 		// Constructor
-		TPriorityQueue( uint32 reserve_size = 0 ) :
+		TPriorityQueue( uint32_t reserve_size = 0 ) :
 			Elements(),
 			Comparator()
 		{			

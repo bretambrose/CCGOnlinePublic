@@ -33,14 +33,14 @@ class IDatabaseCallContext
 		virtual ~IDatabaseCallContext() {}
 
 		virtual IDatabaseVariableSet *Get_Param_Rows( void ) = 0;
-		virtual IDatabaseVariableSet *Get_Param_Row( uint32 index ) = 0;
-		virtual uint32 Get_Param_Row_Count( void ) const = 0;
-		virtual uint32 Get_Sizeof_Param_Type( void ) const = 0;
+		virtual IDatabaseVariableSet *Get_Param_Row( uint32_t index ) = 0;
+		virtual uint32_t Get_Param_Row_Count( void ) const = 0;
+		virtual uint32_t Get_Sizeof_Param_Type( void ) const = 0;
 
 		virtual IDatabaseVariableSet *Get_Result_Rows( void ) = 0;
-		virtual IDatabaseVariableSet *Get_Result_Row( uint32 index ) = 0;
-		virtual uint32 Get_Result_Row_Count( void ) const = 0;
-		virtual uint32 Get_Sizeof_Result_Type( void ) const = 0;
+		virtual IDatabaseVariableSet *Get_Result_Row( uint32_t index ) = 0;
+		virtual uint32_t Get_Result_Row_Count( void ) const = 0;
+		virtual uint32_t Get_Sizeof_Result_Type( void ) const = 0;
 
 		virtual const std::wstring & Get_Statement_Text( void ) const = 0;
 		virtual void Set_Statement_Text( const std::wstring &statement_text ) = 0;

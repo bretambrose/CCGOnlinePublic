@@ -44,10 +44,10 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		virtual DBStatementIDType Get_ID( void ) const { return ID; }
 		virtual const std::wstring &Get_Statement_Text( void ) const { return StatementText; }
 
-		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size );
-		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count );
-		virtual void Execute( uint32 batch_size );
-		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched );
+		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32_t param_set_size );
+		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32_t result_set_size, uint32_t result_set_count );
+		virtual void Execute( uint32_t batch_size );
+		virtual EFetchResultsStatusType Fetch_Results( int64_t &rows_fetched );
 		virtual void Return_To_Ready( void );
 
 		virtual bool Needs_Binding( void ) const;
@@ -57,7 +57,7 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 		virtual IDatabaseConnection *Get_Connection( void ) const { return Connection; }
 
 		virtual DBErrorStateType Get_Error_State( void ) const { return Get_Error_State_Base(); }
-		virtual int32 Get_Bad_Row_Number( void ) const { return Get_Bad_Row_Number_Base(); }
+		virtual int32_t Get_Bad_Row_Number( void ) const { return Get_Bad_Row_Number_Base(); }
 		virtual void Log_Error_State( void ) const;
 
 	private:
@@ -75,14 +75,14 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 
 		std::wstring StatementText;
 
-		uint32 ResultSetRowCount;
+		uint32_t ResultSetRowCount;
 
 		SQLSMALLINT *RowStatuses;
-		int64 RowsFetched;
+		int64_t RowsFetched;
 
-		int32 ExpectedResultSetWidth;
-		int32 CurrentResultSetWidth;
-		int32 CurrentResultSet;
+		int32_t ExpectedResultSetWidth;
+		int32_t CurrentResultSetWidth;
+		int32_t CurrentResultSet;
 
 };
 

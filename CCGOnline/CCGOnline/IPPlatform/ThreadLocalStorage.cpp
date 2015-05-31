@@ -32,9 +32,9 @@
 		Returns: integer handle to the allocated storage
 
 **********************************************************************************************************************/
-uint32 CThreadLocalStorage::Allocate_Thread_Local_Storage( void )
+uint32_t CThreadLocalStorage::Allocate_Thread_Local_Storage( void )
 {
-	uint32 tls_handle = TlsAlloc();
+	uint32_t tls_handle = TlsAlloc();
 	TlsSetValue( tls_handle, nullptr );
 
 	return tls_handle;
@@ -45,7 +45,7 @@ uint32 CThreadLocalStorage::Allocate_Thread_Local_Storage( void )
 		storage
 
 **********************************************************************************************************************/
-void CThreadLocalStorage::Deallocate_Thread_Local_Storage( uint32 tls_handle )
+void CThreadLocalStorage::Deallocate_Thread_Local_Storage( uint32_t tls_handle )
 {
 	TlsFree( tls_handle );
 }		
@@ -58,7 +58,7 @@ void CThreadLocalStorage::Deallocate_Thread_Local_Storage( uint32 tls_handle )
 		Returns: pointer-wide value held in the tls slot
 
 **********************************************************************************************************************/
-void *CThreadLocalStorage::Get_Raw_TLS_Value( uint32 tls_handle )
+void *CThreadLocalStorage::Get_Raw_TLS_Value( uint32_t tls_handle )
 {
 	return TlsGetValue( tls_handle );
 }
@@ -70,7 +70,7 @@ void *CThreadLocalStorage::Get_Raw_TLS_Value( uint32 tls_handle )
 		handle -- new value for the slot to hold
 
 **********************************************************************************************************************/
-void CThreadLocalStorage::Set_Raw_TLS_Value( uint32 tls_handle, void *handle )
+void CThreadLocalStorage::Set_Raw_TLS_Value( uint32_t tls_handle, void *handle )
 {
 	TlsSetValue( tls_handle, handle );
 }

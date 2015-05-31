@@ -42,10 +42,10 @@ class IDatabaseStatement
 		virtual DBStatementIDType Get_ID( void ) const = 0;
 		virtual const std::wstring &Get_Statement_Text( void ) const = 0;
 
-		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32 param_set_size ) = 0;
-		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32 result_set_size, uint32 result_set_count ) = 0;
-		virtual void Execute( uint32 batch_size ) = 0;
-		virtual EFetchResultsStatusType Fetch_Results( int64 &rows_fetched ) = 0;
+		virtual void Bind_Input( IDatabaseVariableSet *param_set, uint32_t param_set_size ) = 0;
+		virtual void Bind_Output( IDatabaseVariableSet *result_set, uint32_t result_set_size, uint32_t result_set_count ) = 0;
+		virtual void Execute( uint32_t batch_size ) = 0;
+		virtual EFetchResultsStatusType Fetch_Results( int64_t &rows_fetched ) = 0;
 		virtual void Return_To_Ready( void ) = 0;
 
 		virtual bool Needs_Binding( void ) const = 0;
@@ -55,7 +55,7 @@ class IDatabaseStatement
 		virtual IDatabaseConnection *Get_Connection( void ) const = 0;
 
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;
-		virtual int32 Get_Bad_Row_Number( void ) const = 0;
+		virtual int32_t Get_Bad_Row_Number( void ) const = 0;
 		virtual void Log_Error_State( void ) const = 0;
 };
 

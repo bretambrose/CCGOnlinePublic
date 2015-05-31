@@ -34,7 +34,7 @@
 		fourth32 -- output parameter for the fourth 32 bits
 
 **********************************************************************************************************************/
-static void Convert_GUID_To_Numeric( const GUID &guid, uint32 &first32, uint32 &second32, uint32 &third32, uint32 &fourth32 )
+static void Convert_GUID_To_Numeric( const GUID &guid, uint32_t &first32, uint32_t &second32, uint32_t &third32, uint32_t &fourth32 )
 {
 	first32 = guid.Data1;
 	
@@ -43,14 +43,14 @@ static void Convert_GUID_To_Numeric( const GUID &guid, uint32 &first32, uint32 &
 	second32 |= guid.Data3;
 
 	third32 = 0;
-	for ( uint32 i = 0; i < 4; i++ )
+	for ( uint32_t i = 0; i < 4; i++ )
 	{
 		third32 |= guid.Data4[ i ];
 		third32 <<= 8;
 	}
 
 	fourth32 = 0;
-	for ( uint32 i = 4; i < 8; i++ )
+	for ( uint32_t i = 4; i < 8; i++ )
 	{
 		fourth32 |= guid.Data4[ i ];
 		fourth32 <<= 8;
@@ -63,12 +63,12 @@ static void Convert_GUID_To_Numeric( const GUID &guid, uint32 &first32, uint32 &
 		Returns: a 32 bit unique key, used in non-critical hashing situations
 
 **********************************************************************************************************************/
-uint32 NPlatform::Get_Semi_Unique_ID( void )
+uint32_t NPlatform::Get_Semi_Unique_ID( void )
 {
 	GUID guid;
 	::CoCreateGuid( &guid ); 
 
-	uint32 part1, part2, part3, part4;
+	uint32_t part1, part2, part3, part4;
 	::Convert_GUID_To_Numeric( guid, part1, part2, part3, part4 );
 
 	return part1 ^ part2 ^ part3 ^ part4;
@@ -82,7 +82,7 @@ uint32 NPlatform::Get_Semi_Unique_ID( void )
 		Returns: a description of the error
 
 **********************************************************************************************************************/
-std::wstring NPlatform::Format_OS_Error_Message( uint32 error_code )
+std::wstring NPlatform::Format_OS_Error_Message( uint32_t error_code )
 {
 	wchar_t msg_buffer[ 1024 ];
 

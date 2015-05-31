@@ -115,8 +115,8 @@ TEST_F( TimeTests, TimeKeeper_GameTime )
 
 TEST_F( TimeTests, TimeKeeper_RealTime )
 {
-	static const uint64 TEST_HR_TICKS1 = 10000;
-	static const uint64 TEST_HR_TICKS2 = 1000000;
+	static const uint64_t TEST_HR_TICKS1 = 10000;
+	static const uint64_t TEST_HR_TICKS2 = 1000000;
 
 	CTimeKeeper time_keeper;
 

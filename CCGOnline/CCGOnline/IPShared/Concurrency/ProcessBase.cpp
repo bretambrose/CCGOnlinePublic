@@ -370,7 +370,7 @@ void CProcessBase::Service_Message_Frames( void )
 	MyMailbox->Remove_Frames( frames );
 
 	// iterate each frame
-	for ( uint32 i = 0; i < frames.size(); ++i )
+	for ( uint32_t i = 0; i < frames.size(); ++i )
 	{
 		unique_ptr< CProcessMessageFrame > &frame = frames[ i ];
 		EProcessID::Enum source_process_id = frame->Get_Process_ID();

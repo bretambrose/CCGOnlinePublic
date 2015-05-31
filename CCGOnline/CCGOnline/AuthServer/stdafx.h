@@ -24,6 +24,8 @@
 
 #include "targetver.h"
 
+#include "IPPlatform/Universal.h"
+
 // std includes
 #include <list>
 #include <vector>
@@ -56,8 +58,6 @@ using std::tr1::static_pointer_cast;
 using std::unique_ptr;
 
 // self includes
-#include "IPPlatform/PlatformTypes.h"
 #include "IPPlatform/DebugAssert.h"
-#include "IPPlatform/Universal.h"
 #include "IPShared/TypeInfoUtils.h"
 

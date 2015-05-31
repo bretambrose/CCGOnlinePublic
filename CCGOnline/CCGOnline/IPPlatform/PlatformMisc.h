@@ -25,9 +25,9 @@
 
 namespace NPlatform
 {
-	uint32 Get_Semi_Unique_ID( void );
+	uint32_t Get_Semi_Unique_ID( void );
 
-	std::wstring Format_OS_Error_Message( uint32 error_code );
+	std::wstring Format_OS_Error_Message( uint32_t error_code );
 }
 
 #endif // PLATFORM_MISC_H

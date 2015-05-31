@@ -36,7 +36,7 @@ class CAssertSystem
 		static void Shutdown( void );
 
 		// all forms of condition checking go here on failure
-		static bool Assert_Handler( const char *expression_string, const char *file_name, uint32 line_number, bool force_crash );
+		static bool Assert_Handler( const char *expression_string, const char *file_name, uint32_t line_number, bool force_crash );
 
 	private:
 

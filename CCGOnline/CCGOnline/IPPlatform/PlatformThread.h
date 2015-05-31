@@ -35,7 +35,7 @@ class CPlatformThread
 		CPlatformThread( void );
 		~CPlatformThread();
 
-		void Create_And_Run( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
+		void Create_And_Run( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
 		void Shutdown( void );
 
 		bool Is_Running( void ) const;

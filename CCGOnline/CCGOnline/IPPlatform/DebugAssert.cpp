@@ -39,7 +39,7 @@
 		output_string -- output parameter for the descriptive error string
 		
 **********************************************************************************************************************/
-static void Build_Assertion_String( const char *expression_string, const char *file_name, uint32 line_number, bool is_fatal, std::wstring &output_string )
+static void Build_Assertion_String( const char *expression_string, const char *file_name, uint32_t line_number, bool is_fatal, std::wstring &output_string )
 {
 	std::basic_ostringstream< wchar_t > assert_description;
 	
@@ -105,7 +105,7 @@ void CAssertSystem::Shutdown( void )
 		Returns: always returns true in order to support FAIL_IF conditional evaluation
 		
 ********************************************************************************************/
-bool CAssertSystem::Assert_Handler( const char *expression_string, const char *file_name, uint32 line_number, bool force_crash )
+bool CAssertSystem::Assert_Handler( const char *expression_string, const char *file_name, uint32_t line_number, bool force_crash )
 {
 	if ( !Initialized )
 	{
@@ -128,7 +128,7 @@ bool CAssertSystem::Assert_Handler( const char *expression_string, const char *f
 	if ( force_crash )
 	{
 		::MessageBox( nullptr, assert_string.c_str(), L"FATAL ASSERT!", MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3 );
-		int32 *null_dereference = nullptr;
+		int32_t *null_dereference = nullptr;
 		*null_dereference = 5;
 		return false;
 	}

@@ -38,7 +38,7 @@ class CCompoundInsertCountParams : public CODBCVariableSet
 			ID()
 		{}
 
-		CCompoundInsertCountParams( uint64 id ) :
+		CCompoundInsertCountParams( uint64_t id ) :
 			BASECLASS(),
 			ID( id )
 		{}
@@ -74,14 +74,14 @@ class CCompoundInsertCountResultSet : public CODBCVariableSet
 		DBUInt32In InsertCount;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32_t ISIZE, uint32_t OSIZE >
 class CCompoundInsertCountProcedureCall : public TDatabaseProcedureCall< CCompoundInsertCountParams, ISIZE, CCompoundInsertCountResultSet, OSIZE >
 {
 	public:
 
 		typedef TDatabaseProcedureCall< CCompoundInsertCountParams, ISIZE, CCompoundInsertCountResultSet, OSIZE > BASECLASS;
 
-		CCompoundInsertCountProcedureCall( uint64 id, uint32 expected_count ) : 
+		CCompoundInsertCountProcedureCall( uint64_t id, uint32_t expected_count ) : 
 			BASECLASS(),
 			ID( id ),
 			Count( 0 ),
@@ -97,7 +97,7 @@ class CCompoundInsertCountProcedureCall : public TDatabaseProcedureCall< CCompou
 			ASSERT_TRUE( Count == ExpectedCount );
 		}
 
-		uint32 Get_Insert_Count( void ) const { return Count; }
+		uint32_t Get_Insert_Count( void ) const { return Count; }
 
 	protected:
 
@@ -108,7 +108,7 @@ class CCompoundInsertCountProcedureCall : public TDatabaseProcedureCall< CCompou
 			 *params = CCompoundInsertCountParams( ID );
 	   }	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) 
 		{
 			ASSERT_TRUE( rows_fetched == 1 );
 
@@ -124,9 +124,9 @@ class CCompoundInsertCountProcedureCall : public TDatabaseProcedureCall< CCompou
 
 	private:
 
-		uint64 ID;
-		uint32 Count;
-		uint32 ExpectedCount;
+		uint64_t ID;
+		uint32_t Count;
+		uint32_t ExpectedCount;
 
 };
 

@@ -28,7 +28,7 @@
 #include <iostream>
 #include <iomanip>
 
-uint64 CPlatformTime::HighResolutionFrequency = 0;
+uint64_t CPlatformTime::HighResolutionFrequency = 0;
 bool CPlatformTime::Initialized = false;
 
 #ifdef WIN32
@@ -61,7 +61,7 @@ void CPlatformTime::Initialize( void )
 		Returns: the current time in high-resolution units
 
 **********************************************************************************************************************/
-uint64 CPlatformTime::Get_High_Resolution_Time( void )
+uint64_t CPlatformTime::Get_High_Resolution_Time( void )
 {
   LARGE_INTEGER count;
   ::QueryPerformanceCounter( &count );
@@ -77,7 +77,7 @@ uint64 CPlatformTime::Get_High_Resolution_Time( void )
 		Returns: time in seconds the supplied tick count represents
 
 **********************************************************************************************************************/
-double CPlatformTime::Convert_High_Resolution_Time_To_Seconds( uint64 ticks )
+double CPlatformTime::Convert_High_Resolution_Time_To_Seconds( uint64_t ticks )
 {
 	FATAL_ASSERT( Initialized );
 
@@ -92,11 +92,11 @@ double CPlatformTime::Convert_High_Resolution_Time_To_Seconds( uint64 ticks )
 		Returns: high-resolution ticks represented by that supplied time value
 
 **********************************************************************************************************************/
-uint64 CPlatformTime::Convert_Seconds_To_High_Resolution_Ticks( double seconds )
+uint64_t CPlatformTime::Convert_Seconds_To_High_Resolution_Ticks( double seconds )
 {
 	FATAL_ASSERT( Initialized );
 
-	return static_cast< uint64 >( seconds *  static_cast< double >( HighResolutionFrequency ) );
+	return static_cast< uint64_t >( seconds *  static_cast< double >( HighResolutionFrequency ) );
 }
 
 /**********************************************************************************************************************
@@ -105,12 +105,12 @@ uint64 CPlatformTime::Convert_Seconds_To_High_Resolution_Ticks( double seconds )
 		Returns: the current time in os-specific units
 
 **********************************************************************************************************************/
-uint64 CPlatformTime::Get_Raw_Time( void )
+uint64_t CPlatformTime::Get_Raw_Time( void )
 {
 	FILETIME file_time;
 	::GetSystemTimeAsFileTime( &file_time );
 
-	return static_cast< uint64 >( file_time.dwLowDateTime ) | ( static_cast< uint64 >( file_time.dwHighDateTime ) << 32 );
+	return static_cast< uint64_t >( file_time.dwLowDateTime ) | ( static_cast< uint64_t >( file_time.dwHighDateTime ) << 32 );
 }
 
 /**********************************************************************************************************************
@@ -121,7 +121,7 @@ uint64 CPlatformTime::Get_Raw_Time( void )
 		Returns: the last-written time of the file in os-specific units
 
 **********************************************************************************************************************/
-uint64 CPlatformTime::Get_File_Write_Raw_Time( const std::wstring &file_name )
+uint64_t CPlatformTime::Get_File_Write_Raw_Time( const std::wstring &file_name )
 {
 	FILETIME write_time;
 	HANDLE file_handle = ::CreateFileW( file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,  OPEN_EXISTING, 0, nullptr );
@@ -131,7 +131,7 @@ uint64 CPlatformTime::Get_File_Write_Raw_Time( const std::wstring &file_name )
 
 	::CloseHandle( file_handle );
 
-	return static_cast< uint64 >( write_time.dwLowDateTime ) | ( static_cast< uint64 >( write_time.dwHighDateTime ) << 32 );
+	return static_cast< uint64_t >( write_time.dwLowDateTime ) | ( static_cast< uint64_t >( write_time.dwHighDateTime ) << 32 );
 }
 
 /**********************************************************************************************************************
@@ -144,9 +144,9 @@ uint64 CPlatformTime::Get_File_Write_Raw_Time( const std::wstring &file_name )
 		Returns: true if time1_in_seconds + seconds < time2_in_seconds
 
 **********************************************************************************************************************/
-bool CPlatformTime::Is_Raw_Time_Less_Than_Seconds( uint64 time1, uint64 time2, uint64 seconds )
+bool CPlatformTime::Is_Raw_Time_Less_Than_Seconds( uint64_t time1, uint64_t time2, uint64_t seconds )
 {
-	static const uint64 HUNDRED_NANOSECONDS_IN_A_SECOND = 10000000;
+	static const uint64_t HUNDRED_NANOSECONDS_IN_A_SECOND = 10000000;
 
 	return time1 + seconds * HUNDRED_NANOSECONDS_IN_A_SECOND < time2;
 }
@@ -161,9 +161,9 @@ bool CPlatformTime::Is_Raw_Time_Less_Than_Seconds( uint64 time1, uint64 time2, u
 		Returns: true if time1_in_seconds + seconds > time2_in_seconds
 
 **********************************************************************************************************************/
-bool CPlatformTime::Is_Raw_Time_Greater_Than_Seconds( uint64 time1, uint64 time2, uint64 seconds )
+bool CPlatformTime::Is_Raw_Time_Greater_Than_Seconds( uint64_t time1, uint64_t time2, uint64_t seconds )
 {
-	static const uint64 HUNDRED_NANOSECONDS_IN_A_SECOND = 10000000;
+	static const uint64_t HUNDRED_NANOSECONDS_IN_A_SECOND = 10000000;
 
 	return time1 + seconds * HUNDRED_NANOSECONDS_IN_A_SECOND > time2;
 }
@@ -176,11 +176,11 @@ bool CPlatformTime::Is_Raw_Time_Greater_Than_Seconds( uint64 time1, uint64 time2
 		Returns: formatted time string
 
 **********************************************************************************************************************/
-std::wstring CPlatformTime::Format_Raw_Time( uint64 raw_time )
+std::wstring CPlatformTime::Format_Raw_Time( uint64_t raw_time )
 {
 	FILETIME file_time;
-	file_time.dwHighDateTime = static_cast< uint32 >( ( raw_time >> 32 ) & 0xFFFFFFFF );
-	file_time.dwLowDateTime = static_cast< uint32 >( raw_time & 0xFFFFFFFF );
+	file_time.dwHighDateTime = static_cast< uint32_t >( ( raw_time >> 32 ) & 0xFFFFFFFF );
+	file_time.dwLowDateTime = static_cast< uint32_t >( raw_time & 0xFFFFFFFF );
 
 	SYSTEMTIME system_time;
 	::FileTimeToSystemTime( &file_time, &system_time );

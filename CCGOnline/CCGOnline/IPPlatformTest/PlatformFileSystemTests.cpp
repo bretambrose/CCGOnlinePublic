@@ -98,7 +98,7 @@ TEST_F( PlatformFileSystemTests, File_Ops )
 	NPlatform::Enumerate_Matching_Files( TEST_FILE_PATTERN, file_names );
 	ASSERT_TRUE( file_names.size() == 2 );
 
-	for ( uint32 i = 0; i < file_names.size(); i++ )
+	for ( uint32_t i = 0; i < file_names.size(); i++ )
 	{
 		NPlatform::Delete_File( file_names[ i ] );
 	}

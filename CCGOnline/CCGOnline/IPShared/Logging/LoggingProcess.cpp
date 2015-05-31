@@ -193,7 +193,7 @@ void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_proces
 		message -- the text to be written to the log file
 		
 **********************************************************************************************************************/
-void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64 system_time )
+void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64_t system_time )
 {
 	if ( IsShuttingDown )
 	{
@@ -263,12 +263,12 @@ CLogFile *CLoggingProcess::Get_Log_File( EProcessSubject::Enum subject ) const
 		Returns: string containing the fully formatted line of text that should be written to the log file
 		
 **********************************************************************************************************************/
-std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64 system_time ) const
+std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64_t system_time ) const
 {
-	uint16 subject_part = source_properties.Get_Subject();
-	uint16 major_part = source_properties.Get_Major_Part();
-	uint16 minor_part = source_properties.Get_Minor_Part();
-	uint16 mode_part = source_properties.Get_Mode_Part();
+	uint16_t subject_part = source_properties.Get_Subject();
+	uint16_t major_part = source_properties.Get_Major_Part();
+	uint16_t minor_part = source_properties.Get_Minor_Part();
+	uint16_t mode_part = source_properties.Get_Mode_Part();
 
 	std::wstring subject_string;
 	CEnumConverter::Convert( subject_part, subject_string );

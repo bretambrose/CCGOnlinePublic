@@ -72,25 +72,25 @@ bool CSlashCommandParam::Is_Value_Valid( const std::wstring &value ) const
 	{
 		case SCPT_INT32:
 		{
-			int32 converted_value = 0;
+			int32_t converted_value = 0;
 			return NStringUtils::Convert( value, converted_value );
 		}
 
 		case SCPT_UINT32:
 		{
-			uint32 converted_value = 0;
+			uint32_t converted_value = 0;
 			return NStringUtils::Convert( value, converted_value );
 		}
 
 		case SCPT_INT64:
 		{
-			int64 converted_value = 0;
+			int64_t converted_value = 0;
 			return NStringUtils::Convert( value, converted_value );
 		}
 
 		case SCPT_UINT64:
 		{
-			uint64 converted_value = 0;
+			uint64_t converted_value = 0;
 			return NStringUtils::Convert( value, converted_value );
 		}
 
@@ -126,7 +126,7 @@ bool CSlashCommandParam::Is_Value_Valid( const std::wstring &value ) const
 
 		case SCPT_ENUM:
 		{
-			uint64 converted_value = 0;
+			uint64_t converted_value = 0;
 			return CEnumConverter::Convert( SubType, value, converted_value );
 		}
 
@@ -220,7 +220,7 @@ void CSlashCommandDataDefinition::Register_Type_Definition( void )
 	Returns: pointer to the parameter's data, or NULL if out of bounds
 	
 **********************************************************************************************************************/
-const CSlashCommandParam *CSlashCommandDataDefinition::Get_Param( uint32 index ) const
+const CSlashCommandParam *CSlashCommandDataDefinition::Get_Param( uint32_t index ) const
 {
 	if ( index < Params.size() )
 	{
@@ -244,7 +244,7 @@ void CSlashCommandDataDefinition::Post_Load_XML( void )
 
 	// Validate default value, optional, and capture remaining
 	bool optional_encountered = false;
-	for ( uint32 i = 0; i < Params.size(); ++i )
+	for ( uint32_t i = 0; i < Params.size(); ++i )
 	{
 		CSlashCommandParam &param = Params[ i ];
 		bool is_optional = param.Is_Optional();
@@ -292,7 +292,7 @@ std::wstring CSlashCommandDataDefinition::Build_Command_Matcher( void ) const
 		match_string = L"^/(\\w+)\\s+(\\w+)";
 	}
 
-	for ( uint32 i = 0; i < Params.size(); ++i )
+	for ( uint32_t i = 0; i < Params.size(); ++i )
 	{
 		const CSlashCommandParam &param = Params[ i ];
 		bool is_required = !param.Is_Optional();

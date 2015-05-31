@@ -92,7 +92,7 @@ class CGetAccountProcedureResultSet : public CODBCVariableSet
 		DBUInt32In NicknameSequenceID;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32_t ISIZE, uint32_t OSIZE >
 class CGetAllAccountsProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CGetAccountProcedureResultSet, OSIZE >
 {
 	public:
@@ -116,9 +116,9 @@ class CGetAllAccountsProcedureCall : public TDatabaseProcedureCall< CEmptyVariab
 			ASSERT_TRUE( InitializeCalls == 1 );
 			ASSERT_TRUE( Accounts.size() == 3 );
 
-			for ( uint32 i = 0; i < Accounts.size(); ++i )
+			for ( uint32_t i = 0; i < Accounts.size(); ++i )
 			{
-				uint64 current_account_id = Accounts[ i ].AccountID.Get_Value();
+				uint64_t current_account_id = Accounts[ i ].AccountID.Get_Value();
 				ASSERT_TRUE( current_account_id == i + 1 );
 
 				switch ( current_account_id )
@@ -153,9 +153,9 @@ class CGetAllAccountsProcedureCall : public TDatabaseProcedureCall< CEmptyVariab
 		// WIP: signatures in flux
 		virtual void Initialize_Parameters( IDatabaseVariableSet * /*input_parameters*/ ) { InitializeCalls++; }	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) {
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) {
 			CGetAccountProcedureResultSet *results = static_cast< CGetAccountProcedureResultSet * >( result_set );
-			for ( uint32 i = 0; i < rows_fetched; ++i )
+			for ( uint32_t i = 0; i < rows_fetched; ++i )
 			{
 				Accounts.push_back( results[ i ] );
 			}
@@ -171,19 +171,19 @@ class CGetAllAccountsProcedureCall : public TDatabaseProcedureCall< CEmptyVariab
 
 		std::vector< CGetAccountProcedureResultSet > Accounts;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-void Run_ReadSeedData_GetAllAccounts_OK_Test( uint32 task_count )
+template< uint32_t ISIZE, uint32_t OSIZE >
+void Run_ReadSeedData_GetAllAccounts_OK_Test( uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CGetAllAccountsProcedureCall< ISIZE, OSIZE > > db_task_batch;
 	std::vector< CGetAllAccountsProcedureCall< ISIZE, OSIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CGetAllAccountsProcedureCall< ISIZE, OSIZE > *db_task = new CGetAllAccountsProcedureCall< ISIZE, OSIZE >;
 		tasks.push_back( db_task );
@@ -197,7 +197,7 @@ void Run_ReadSeedData_GetAllAccounts_OK_Test( uint32 task_count )
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -242,17 +242,17 @@ TEST_F( ODBCSuccessTests, ReadSeededData_GetAllAccounts_2_2_5_OK )
 	Run_ReadSeedData_GetAllAccounts_OK_Test< 2, 2 >( 5 );
 }
 
-template< uint32 ISIZE, uint32 OSIZE >
-void Run_ReadSeedData_GetAllAccounts_OK_ReuseStatement_Test( uint32 task_count, uint32 reuse_loops )
+template< uint32_t ISIZE, uint32_t OSIZE >
+void Run_ReadSeedData_GetAllAccounts_OK_ReuseStatement_Test( uint32_t task_count, uint32_t reuse_loops )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", true );
 	ASSERT_TRUE( connection != nullptr );
 
-	for ( uint32 j = 0; j < reuse_loops; ++j )
+	for ( uint32_t j = 0; j < reuse_loops; ++j )
 	{
 		TDatabaseTaskBatch< CGetAllAccountsProcedureCall< ISIZE, OSIZE > > db_task_batch;
 		std::vector< CGetAllAccountsProcedureCall< ISIZE, OSIZE > * > tasks;
-		for ( uint32 i = 0; i < task_count; ++i )
+		for ( uint32_t i = 0; i < task_count; ++i )
 		{
 			CGetAllAccountsProcedureCall< ISIZE, OSIZE > *db_task = new CGetAllAccountsProcedureCall< ISIZE, OSIZE >;
 			tasks.push_back( db_task );
@@ -266,7 +266,7 @@ void Run_ReadSeedData_GetAllAccounts_OK_ReuseStatement_Test( uint32 task_count, 
 		ASSERT_TRUE( failed_tasks.size() == 0 );
 		ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-		for ( uint32 i = 0; i < tasks.size(); ++i )
+		for ( uint32_t i = 0; i < tasks.size(); ++i )
 		{
 			tasks[ i ]->Verify_Results();
 			delete tasks[ i ];
@@ -316,7 +316,7 @@ class CGetAllAccountsInOutParams : public CODBCVariableSet
 			OutTest( rhs.OutTest )
 		{}
 
-		CGetAllAccountsInOutParams( const std::string &filtered_nickname, uint64 in_test, uint64 out_test ) :
+		CGetAllAccountsInOutParams( const std::string &filtered_nickname, uint64_t in_test, uint64_t out_test ) :
 			BASECLASS(),
 			FilteredNickname( filtered_nickname ),
 			InTest( in_test ),
@@ -340,14 +340,14 @@ class CGetAllAccountsInOutParams : public CODBCVariableSet
 		DBUInt64InOut OutTest;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32_t ISIZE, uint32_t OSIZE >
 class CGetAllAccountsInOutProcedureCall : public TDatabaseProcedureCall< CGetAllAccountsInOutParams, ISIZE, CGetAccountProcedureResultSet, OSIZE >
 {
 	public:
 
 		typedef TDatabaseProcedureCall< CGetAllAccountsInOutParams, ISIZE, CGetAccountProcedureResultSet, OSIZE > BASECLASS;
 
-		CGetAllAccountsInOutProcedureCall( const std::string &filter_nickname, uint64 in_test, uint64 out_test ) : 
+		CGetAllAccountsInOutProcedureCall( const std::string &filter_nickname, uint64_t in_test, uint64_t out_test ) : 
 			BASECLASS(),
 			FilterNickname( filter_nickname ),
 			InTest( in_test ),
@@ -370,9 +370,9 @@ class CGetAllAccountsInOutProcedureCall : public TDatabaseProcedureCall< CGetAll
 			ASSERT_TRUE( InitializeCalls == 1 );
 			ASSERT_TRUE( FinalCount == 3 );
 
-			for ( uint32 i = 0; i < Accounts.size(); ++i )
+			for ( uint32_t i = 0; i < Accounts.size(); ++i )
 			{
-				uint64 current_account_id = Accounts[ i ].AccountID.Get_Value();
+				uint64_t current_account_id = Accounts[ i ].AccountID.Get_Value();
 
 				ASSERT_TRUE( _stricmp( Accounts[ i ].Nickname.Get_Buffer(), FilterNickname.c_str() ) != 0 );
 
@@ -416,9 +416,9 @@ class CGetAllAccountsInOutProcedureCall : public TDatabaseProcedureCall< CGetAll
 			InitializeCalls++; 
 		}	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) {
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) {
 			CGetAccountProcedureResultSet *results = static_cast< CGetAccountProcedureResultSet * >( result_set );
-			for ( uint32 i = 0; i < rows_fetched; ++i )
+			for ( uint32_t i = 0; i < rows_fetched; ++i )
 			{
 				Accounts.push_back( results[ i ] );
 			}
@@ -445,26 +445,26 @@ class CGetAllAccountsInOutProcedureCall : public TDatabaseProcedureCall< CGetAll
 
 		std::string FilterNickname;
 
-		uint64 InTest;
-		uint64 OutTest;
+		uint64_t InTest;
+		uint64_t OutTest;
 
-		uint64 FinalInTest;
-		uint64 FinalOutTest;
-		uint64 FinalCount;
+		uint64_t FinalInTest;
+		uint64_t FinalOutTest;
+		uint64_t FinalCount;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-void Run_ReadSeedData_GetAllAccountsWithInOut_OK_Test( const std::string &filtered_name, uint32 task_count )
+template< uint32_t ISIZE, uint32_t OSIZE >
+void Run_ReadSeedData_GetAllAccountsWithInOut_OK_Test( const std::string &filtered_name, uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CGetAllAccountsInOutProcedureCall< ISIZE, OSIZE > > db_task_batch;
 	std::vector< CGetAllAccountsInOutProcedureCall< ISIZE, OSIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CGetAllAccountsInOutProcedureCall< ISIZE, OSIZE > *db_task = new CGetAllAccountsInOutProcedureCall< ISIZE, OSIZE >( filtered_name, 666, 5 );
 		tasks.push_back( db_task );
@@ -478,7 +478,7 @@ void Run_ReadSeedData_GetAllAccountsWithInOut_OK_Test( const std::string &filter
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -537,7 +537,7 @@ class CGetAccountCountParams : public CODBCVariableSet
 		DBStringIn< 32 > FilteredNickname;
 };
 
-template< uint32 ISIZE >
+template< uint32_t ISIZE >
 class CGetAccountCountFunctionCall : public TDatabaseFunctionCall< CGetAccountCountParams, ISIZE >
 {
 	public:
@@ -598,21 +598,21 @@ class CGetAccountCountFunctionCall : public TDatabaseFunctionCall< CGetAccountCo
 
 		std::string FilterNickname;
 
-		uint64 FinalCount;
+		uint64_t FinalCount;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE >
-void Run_ReadSeedData_GetAccountCount_OK_Test( const std::string &filtered_name, uint32 task_count )
+template< uint32_t ISIZE >
+void Run_ReadSeedData_GetAccountCount_OK_Test( const std::string &filtered_name, uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CGetAccountCountFunctionCall< ISIZE > > db_task_batch;
 	std::vector< CGetAccountCountFunctionCall< ISIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CGetAccountCountFunctionCall< ISIZE > *db_task = new CGetAccountCountFunctionCall< ISIZE >( filtered_name );
 		tasks.push_back( db_task );
@@ -626,7 +626,7 @@ void Run_ReadSeedData_GetAccountCount_OK_Test( const std::string &filtered_name,
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -671,7 +671,7 @@ class CGetAccountEmailFunctionParams : public CODBCVariableSet
 			AccountID( rhs.AccountID )
 		{}
 
-		CGetAccountEmailFunctionParams( uint64 account_id ) :
+		CGetAccountEmailFunctionParams( uint64_t account_id ) :
 			BASECLASS(),
 			AccountEmail(),
 			AccountID( account_id )
@@ -689,14 +689,14 @@ class CGetAccountEmailFunctionParams : public CODBCVariableSet
 		DBUInt64In AccountID;
 };
 
-template< uint32 ISIZE >
+template< uint32_t ISIZE >
 class CGetAccountEmailFunctionCall : public TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE >
 {
 	public:
 
 		typedef TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE > BASECLASS;
 
-		CGetAccountEmailFunctionCall( uint64 account_id ) : 
+		CGetAccountEmailFunctionCall( uint64_t account_id ) : 
 			BASECLASS(),
 			AccountID( account_id ),
 			FinalEmail( "" ),
@@ -758,23 +758,23 @@ class CGetAccountEmailFunctionCall : public TDatabaseFunctionCall< CGetAccountEm
 
 	private:
 
-		uint64 AccountID;
+		uint64_t AccountID;
 
 		std::string FinalEmail;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE >
-void Run_ReadSeedData_GetAccountEmail_OK_Test( uint64 account_id, uint32 task_count )
+template< uint32_t ISIZE >
+void Run_ReadSeedData_GetAccountEmail_OK_Test( uint64_t account_id, uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CGetAccountEmailFunctionCall< ISIZE > > db_task_batch;
 	std::vector< CGetAccountEmailFunctionCall< ISIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CGetAccountEmailFunctionCall< ISIZE > *db_task = new CGetAccountEmailFunctionCall< ISIZE >( account_id );
 		tasks.push_back( db_task );
@@ -788,7 +788,7 @@ void Run_ReadSeedData_GetAccountEmail_OK_Test( uint64 account_id, uint32 task_co
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -816,7 +816,7 @@ TEST_F( ODBCSuccessTests, ReadSeedData_GetAccountEmail_OK_Test_BadID_3_7 )
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Procedure with no input, no results
 
-template< uint32 ISIZE >
+template< uint32_t ISIZE >
 class CDoNothingProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CEmptyVariableSet, 1 >
 {
 	public:
@@ -846,7 +846,7 @@ class CDoNothingProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet
 			InitializeCalls++; 
 		}	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 rows_fetched ) {
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64_t rows_fetched ) {
 			ASSERT_TRUE( rows_fetched == 0 );
 		}
 					
@@ -861,19 +861,19 @@ class CDoNothingProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet
 
 	private:
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE >
-void Run_DoNothing_OK_Test( uint32 task_count )
+template< uint32_t ISIZE >
+void Run_DoNothing_OK_Test( uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CDoNothingProcedureCall< ISIZE > > db_task_batch;
 	std::vector< CDoNothingProcedureCall< ISIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CDoNothingProcedureCall< ISIZE > *db_task = new CDoNothingProcedureCall< ISIZE >();
 		tasks.push_back( db_task );
@@ -887,7 +887,7 @@ void Run_DoNothing_OK_Test( uint32 task_count )
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -978,7 +978,7 @@ class CTestBooleanDataResultSet : public CODBCVariableSet
 		DBBoolIn Test;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32_t ISIZE, uint32_t OSIZE >
 class CTestBooleanDataProcedureCall : public TDatabaseProcedureCall< CTestBooleanDataParams, ISIZE, CTestBooleanDataResultSet, OSIZE >
 {
 	public:
@@ -1006,7 +1006,7 @@ class CTestBooleanDataProcedureCall : public TDatabaseProcedureCall< CTestBoolea
 			ASSERT_TRUE( FinalInOut == ( InOut ^ In ) );
 			
 			ASSERT_TRUE( Results.size() == 3 );
-			for ( uint32 i = 0; i < 3; ++i )
+			for ( uint32_t i = 0; i < 3; ++i )
 			{
 				ASSERT_TRUE( Results[ i ].Test.Get_Value() == ( i == 0 ) );
 			}
@@ -1022,11 +1022,11 @@ class CTestBooleanDataProcedureCall : public TDatabaseProcedureCall< CTestBoolea
 			InitializeCalls++; 
 		}	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) 
 		{
 			CTestBooleanDataResultSet *results = static_cast< CTestBooleanDataResultSet * >( result_set );
 
-			for ( uint32 i = 0; i < rows_fetched; ++i )
+			for ( uint32_t i = 0; i < rows_fetched; ++i )
 			{
 				Results.push_back( results[ i ] );
 			}
@@ -1054,19 +1054,19 @@ class CTestBooleanDataProcedureCall : public TDatabaseProcedureCall< CTestBoolea
 
 		std::vector< CTestBooleanDataResultSet > Results;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-void Run_ReadSeedData_TestBooleanData_OK_Test( bool in, bool in_out, uint32 task_count )
+template< uint32_t ISIZE, uint32_t OSIZE >
+void Run_ReadSeedData_TestBooleanData_OK_Test( bool in, bool in_out, uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CTestBooleanDataProcedureCall< ISIZE, OSIZE > > db_task_batch;
 	std::vector< CTestBooleanDataProcedureCall< ISIZE, OSIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CTestBooleanDataProcedureCall< ISIZE, OSIZE > *db_task = new CTestBooleanDataProcedureCall< ISIZE, OSIZE >( in, in_out );
 		tasks.push_back( db_task );
@@ -1080,7 +1080,7 @@ void Run_ReadSeedData_TestBooleanData_OK_Test( bool in, bool in_out, uint32 task
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -1194,7 +1194,7 @@ class CTestFPDataResultSet : public CODBCVariableSet
 		DBDoubleIn DoubleTest;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32_t ISIZE, uint32_t OSIZE >
 class CTestFPDataProcedureCall : public TDatabaseProcedureCall< CTestFPDataParams, ISIZE, CTestFPDataResultSet, OSIZE >
 {
 	public:
@@ -1226,7 +1226,7 @@ class CTestFPDataProcedureCall : public TDatabaseProcedureCall< CTestFPDataParam
 			ASSERT_DOUBLE_EQ( FinalDoubleInOut, DoubleIn + DoubleInOut );
 			
 			ASSERT_TRUE( Results.size() == 3 );
-			for ( uint32 i = 0; i < 3; ++i )
+			for ( uint32_t i = 0; i < 3; ++i )
 			{
 				ASSERT_FLOAT_EQ( Results[ i ].FloatTest.Get_Value(), static_cast< float >( sqrt( static_cast< float >( i + 1 ) ) ) );
 				ASSERT_DOUBLE_EQ( Results[ i ].DoubleTest.Get_Value(), sqrt( static_cast< double >( i + 2 ) ) );
@@ -1243,11 +1243,11 @@ class CTestFPDataProcedureCall : public TDatabaseProcedureCall< CTestFPDataParam
 			InitializeCalls++; 
 		}	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) 
 		{
 			CTestFPDataResultSet *results = static_cast< CTestFPDataResultSet * >( result_set );
 
-			for ( uint32 i = 0; i < rows_fetched; ++i )
+			for ( uint32_t i = 0; i < rows_fetched; ++i )
 			{
 				Results.push_back( results[ i ] );
 			}
@@ -1279,19 +1279,19 @@ class CTestFPDataProcedureCall : public TDatabaseProcedureCall< CTestFPDataParam
 
 		std::vector< CTestFPDataResultSet > Results;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-void Run_ReadSeedData_TestFPData_OK_Test( float float_in, double double_in, float float_in_out, double double_in_out, uint32 task_count )
+template< uint32_t ISIZE, uint32_t OSIZE >
+void Run_ReadSeedData_TestFPData_OK_Test( float float_in, double double_in, float float_in_out, double double_in_out, uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CTestFPDataProcedureCall< ISIZE, OSIZE > > db_task_batch;
 	std::vector< CTestFPDataProcedureCall< ISIZE, OSIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CTestFPDataProcedureCall< ISIZE, OSIZE > *db_task = new CTestFPDataProcedureCall< ISIZE, OSIZE >( float_in, double_in, float_in_out, double_in_out );
 		tasks.push_back( db_task );
@@ -1305,7 +1305,7 @@ void Run_ReadSeedData_TestFPData_OK_Test( float float_in, double double_in, floa
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -1363,7 +1363,7 @@ class CNullableFunctionParams : public CODBCVariableSet
 		DBWStringIn< 64 > Nickname;
 };
 
-template< uint32 ISIZE >
+template< uint32_t ISIZE >
 class CNullableFunctionCall : public TDatabaseFunctionCall< CNullableFunctionParams, ISIZE >
 {
 	public:
@@ -1449,22 +1449,22 @@ class CNullableFunctionCall : public TDatabaseFunctionCall< CNullableFunctionPar
 
 		std::wstring Nickname;
 
-		int64 FinalAccountID;
+		int64_t FinalAccountID;
 		bool AccountIDIsNull;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE >
-void Run_ReadSeedData_NullableFunction_OK_Test( uint32 task_count, const std::wstring &non_null_nickname, uint32 null_index )
+template< uint32_t ISIZE >
+void Run_ReadSeedData_NullableFunction_OK_Test( uint32_t task_count, const std::wstring &non_null_nickname, uint32_t null_index )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CNullableFunctionCall< ISIZE > > db_task_batch;
 	std::vector< CNullableFunctionCall< ISIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CNullableFunctionCall< ISIZE > *db_task = new CNullableFunctionCall< ISIZE >( ( i == null_index ) ? L"dsfhjkfsjk" : non_null_nickname );
 		tasks.push_back( db_task );
@@ -1478,7 +1478,7 @@ void Run_ReadSeedData_NullableFunction_OK_Test( uint32 task_count, const std::ws
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -1530,7 +1530,7 @@ class CNullableProcedureParams : public CODBCVariableSet
 			WStringInOut( rhs.WStringInOut )
 		{}
 
-		CNullableProcedureParams( uint64 account_id, bool string_null, bool wstring_null ) :
+		CNullableProcedureParams( uint64_t account_id, bool string_null, bool wstring_null ) :
 			BASECLASS(),
 			NullAccountID( account_id ),
 			StringInOut(),
@@ -1591,14 +1591,14 @@ class CNullableProcedureResultSet : public CODBCVariableSet
 		DBStringIn< 255 > Email;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32_t ISIZE, uint32_t OSIZE >
 class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedureParams, ISIZE, CNullableProcedureResultSet, OSIZE >
 {
 	public:
 
 		typedef TDatabaseProcedureCall< CNullableProcedureParams, ISIZE, CNullableProcedureResultSet, OSIZE > BASECLASS;
 
-		CNullableProcedureCall( uint64 null_account_id, bool string_null, bool wstring_null ) : 
+		CNullableProcedureCall( uint64_t null_account_id, bool string_null, bool wstring_null ) : 
 			BASECLASS(),
 			NullAccountID( null_account_id ),
 			StringNull( string_null ),
@@ -1623,7 +1623,7 @@ class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedure
 			ASSERT_TRUE( StringOut.Is_Null() == WStringNull );
 			
 			ASSERT_TRUE( Results.size() == 3 );
-			for ( uint32 i = 0; i < Results.size(); ++i )
+			for ( uint32_t i = 0; i < Results.size(); ++i )
 			{
 				if ( i + 1 == NullAccountID )
 				{
@@ -1647,11 +1647,11 @@ class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedure
 			InitializeCalls++; 
 		}	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) 
 		{
 			CNullableProcedureResultSet *results = static_cast< CNullableProcedureResultSet * >( result_set );
 
-			for ( uint32 i = 0; i < rows_fetched; ++i )
+			for ( uint32_t i = 0; i < rows_fetched; ++i )
 			{
 				Results.push_back( results[ i ] );
 			}
@@ -1673,7 +1673,7 @@ class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedure
 
 	private:
 
-		uint64 NullAccountID;
+		uint64_t NullAccountID;
 		bool StringNull;
 		bool WStringNull;
 
@@ -1682,19 +1682,19 @@ class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedure
 
 		std::vector< CNullableProcedureResultSet > Results;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-void Run_ReadSeedData_NullableProcedure_Test( uint32 task_count, uint64 null_account_id, bool string_null, bool wstring_null )
+template< uint32_t ISIZE, uint32_t OSIZE >
+void Run_ReadSeedData_NullableProcedure_Test( uint32_t task_count, uint64_t null_account_id, bool string_null, bool wstring_null )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CNullableProcedureCall< ISIZE, OSIZE > > db_task_batch;
 	std::vector< CNullableProcedureCall< ISIZE, OSIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CNullableProcedureCall< ISIZE, OSIZE > *db_task = new CNullableProcedureCall< ISIZE, OSIZE >( null_account_id, string_null, wstring_null );
 		tasks.push_back( db_task );
@@ -1708,7 +1708,7 @@ void Run_ReadSeedData_NullableProcedure_Test( uint32 task_count, uint64 null_acc
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -1793,7 +1793,7 @@ class CSelectAccountDetailsResultSet : public CODBCVariableSet
 		DBInt32In NicknameSequenceID;
 };
 
-template< uint32 OSIZE >
+template< uint32_t OSIZE >
 class CSelectAccountDetailsTask : public TDatabaseSelect< CSelectAccountDetailsResultSet, OSIZE >
 {
 	public:
@@ -1824,7 +1824,7 @@ class CSelectAccountDetailsTask : public TDatabaseSelect< CSelectAccountDetailsR
 			ASSERT_TRUE( InitializeCalls == 1 );
 						
 			ASSERT_TRUE( Results.size() == 3 );
-			for ( uint32 i = 0; i < Results.size(); ++i )
+			for ( uint32_t i = 0; i < Results.size(); ++i )
 			{
 				ASSERT_TRUE( Results[ i ].AccountID.Get_Value() == i + 1 );
 				ASSERT_TRUE( Results[ i ].NicknameSequenceID.Get_Value() == 1 );
@@ -1866,11 +1866,11 @@ class CSelectAccountDetailsTask : public TDatabaseSelect< CSelectAccountDetailsR
 			InitializeCalls++; 
 		}	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) 
 		{
 			CSelectAccountDetailsResultSet *results = static_cast< CSelectAccountDetailsResultSet * >( result_set );
 
-			for ( uint32 i = 0; i < rows_fetched; ++i )
+			for ( uint32_t i = 0; i < rows_fetched; ++i )
 			{
 				Results.push_back( results[ i ] );
 			}
@@ -1889,19 +1889,19 @@ class CSelectAccountDetailsTask : public TDatabaseSelect< CSelectAccountDetailsR
 
 		std::vector< CSelectAccountDetailsResultSet > Results;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 OSIZE >
-void Run_ReadSeedData_SelectAccountDetails_Test( uint32 task_count )
+template< uint32_t OSIZE >
+void Run_ReadSeedData_SelectAccountDetails_Test( uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CSelectAccountDetailsTask< OSIZE > > db_task_batch;
 	std::vector< CSelectAccountDetailsTask< OSIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CSelectAccountDetailsTask< OSIZE > *db_task = new CSelectAccountDetailsTask< OSIZE >;
 		tasks.push_back( db_task );
@@ -1915,7 +1915,7 @@ void Run_ReadSeedData_SelectAccountDetails_Test( uint32 task_count )
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -1963,7 +1963,7 @@ class CTestTVFParams : public CODBCVariableSet
 			AccountID()
 		{}
 
-		CTestTVFParams( uint64 account_id ) :
+		CTestTVFParams( uint64_t account_id ) :
 			BASECLASS(),
 			AccountID( account_id )
 		{}
@@ -2002,14 +2002,14 @@ class CTestTVFResultSet : public CODBCVariableSet
 		DBStringIn< 36 > ProductKeyDesc;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
+template< uint32_t ISIZE, uint32_t OSIZE >
 class CTableValuedFunctionTask : public TDatabaseTableValuedFunctionCall< CTestTVFParams, ISIZE, CTestTVFResultSet, OSIZE >
 {
 	public:
 
 		typedef TDatabaseTableValuedFunctionCall< CTestTVFParams, ISIZE, CTestTVFResultSet, OSIZE > BASECLASS;
 
-		CTableValuedFunctionTask( uint64 account_id ) : 
+		CTableValuedFunctionTask( uint64_t account_id ) : 
 			BASECLASS(),
 			AccountID( account_id ),
 			Results(),
@@ -2034,7 +2034,7 @@ class CTableValuedFunctionTask : public TDatabaseTableValuedFunctionCall< CTestT
 			if ( AccountID == 1 )
 			{			
 				ASSERT_TRUE( Results.size() == 3 );
-				for ( uint32 i = 0; i < Results.size(); ++i )
+				for ( uint32_t i = 0; i < Results.size(); ++i )
 				{		
 					std::string product_desc;
 					Results[ i ].ProductDesc.Copy_Into( product_desc );
@@ -2060,11 +2060,11 @@ class CTableValuedFunctionTask : public TDatabaseTableValuedFunctionCall< CTestT
 			InitializeCalls++; 
 		}	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64 rows_fetched ) 
+		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) 
 		{
 			CTestTVFResultSet *results = static_cast< CTestTVFResultSet * >( result_set );
 
-			for ( uint32 i = 0; i < rows_fetched; ++i )
+			for ( uint32_t i = 0; i < rows_fetched; ++i )
 			{
 				Results.push_back( results[ i ] );
 			}
@@ -2081,23 +2081,23 @@ class CTableValuedFunctionTask : public TDatabaseTableValuedFunctionCall< CTestT
 
 	private:
 
-		uint64 AccountID;
+		uint64_t AccountID;
 
 		std::vector< CTestTVFResultSet > Results;
 
-		uint32 FinishedCalls;
-		uint32 InitializeCalls;
+		uint32_t FinishedCalls;
+		uint32_t InitializeCalls;
 };
 
-template< uint32 ISIZE, uint32 OSIZE >
-void Run_ReadSeedData_TableValueFunctionTest( uint32 task_count, uint64 account_id )
+template< uint32_t ISIZE, uint32_t OSIZE >
+void Run_ReadSeedData_TableValueFunctionTest( uint32_t task_count, uint64_t account_id )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TDatabaseTaskBatch< CTableValuedFunctionTask< ISIZE, OSIZE > > db_task_batch;
 	std::vector< CTableValuedFunctionTask< ISIZE, OSIZE > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		CTableValuedFunctionTask< ISIZE, OSIZE > *db_task = new CTableValuedFunctionTask< ISIZE, OSIZE >( account_id );
 		tasks.push_back( db_task );
@@ -2111,7 +2111,7 @@ void Run_ReadSeedData_TableValueFunctionTest( uint32 task_count, uint64 account_
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -2173,7 +2173,7 @@ class ODBCCompoundSuccessTests : public testing::Test
 
 };
 
-template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 OSIZE1 >
+template< uint32_t BATCH_SIZE, uint32_t ISIZE1, uint32_t OSIZE1 >
 class CTrivialCompoundTask : public TCompoundDatabaseTask< BATCH_SIZE >
 {
 	public:
@@ -2214,15 +2214,15 @@ class CTrivialCompoundTask : public TCompoundDatabaseTask< BATCH_SIZE >
 	private:
 };
 
-template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 OSIZE1 >
-void Run_TrivialCompoundTask_Test( uint32 task_count )
+template< uint32_t BATCH_SIZE, uint32_t ISIZE1, uint32_t OSIZE1 >
+void Run_TrivialCompoundTask_Test( uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
 	TCompoundDatabaseTaskBatch< CTrivialCompoundTask< BATCH_SIZE, ISIZE1, OSIZE1 > > db_compound_task_batch;
 	std::vector< CTrivialCompoundTask< BATCH_SIZE, ISIZE1, OSIZE1 > * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		auto db_task = new CTrivialCompoundTask< BATCH_SIZE, ISIZE1, OSIZE1 >;
 		db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( i + 1 ) );
@@ -2237,7 +2237,7 @@ void Run_TrivialCompoundTask_Test( uint32 task_count )
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];
@@ -2276,7 +2276,7 @@ class CCompoundInsertParams : public CODBCVariableSet
 			UserData()
 		{}
 
-		CCompoundInsertParams( uint64 id, uint64 user_data ) :
+		CCompoundInsertParams( uint64_t id, uint64_t user_data ) :
 			BASECLASS(),
 			ID( id ),
 			UserData( user_data )
@@ -2294,14 +2294,14 @@ class CCompoundInsertParams : public CODBCVariableSet
 		DBUInt64In UserData;
 };
 
-template< uint32 ISIZE >
+template< uint32_t ISIZE >
 class CCompoundInsertProcedureCall : public TDatabaseProcedureCall< CCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 >
 {
 	public:
 
 		typedef TDatabaseProcedureCall< CCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 > BASECLASS;
 
-		CCompoundInsertProcedureCall( uint64 id, uint64 index ) : 
+		CCompoundInsertProcedureCall( uint64_t id, uint64_t index ) : 
 			BASECLASS(),
 			ID( id ),
 			Index( index )
@@ -2322,7 +2322,7 @@ class CCompoundInsertProcedureCall : public TDatabaseProcedureCall< CCompoundIns
 			 *params = CCompoundInsertParams( ID, Index );
 	   }	
 			
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 rows_fetched ) 
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64_t rows_fetched ) 
 		{
 			ASSERT_TRUE( rows_fetched == 0 );
 		}
@@ -2335,13 +2335,13 @@ class CCompoundInsertProcedureCall : public TDatabaseProcedureCall< CCompoundIns
 
 	private:
 
-		uint64 ID;
-		uint64 Index;
+		uint64_t ID;
+		uint64_t Index;
 
 };
 
 
-template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 ISIZE2, uint32 OSIZE2 >
+template< uint32_t BATCH_SIZE, uint32_t ISIZE1, uint32_t ISIZE2, uint32_t OSIZE2 >
 class CCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
 {
 	public:
@@ -2351,7 +2351,7 @@ class CCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
 		typedef CCompoundInsertProcedureCall< ISIZE1 > Child1Type;
 		typedef CCompoundInsertCountProcedureCall< ISIZE2, OSIZE2 > Child2Type;
 
-		CCompoundInsertTask( uint64 id, uint32 insert_count ) :
+		CCompoundInsertTask( uint64_t id, uint32_t insert_count ) :
 			BASECLASS(),
 			ID( id ),
 			InsertCount( insert_count )
@@ -2393,7 +2393,7 @@ class CCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
 
 		virtual void Seed_Child_Tasks( void )
 		{
-			for( uint32 i = 0; i < InsertCount; ++i )
+			for( uint32_t i = 0; i < InsertCount; ++i )
 			{
 				Add_Child_Task( new Child1Type( ID, i + 1 ) );
 			}
@@ -2406,13 +2406,13 @@ class CCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
 			Add_Child_Task( new Child2Type( ID, InsertCount ) );
 		}
 
-		uint64 ID;
-		uint32 InsertCount;
+		uint64_t ID;
+		uint32_t InsertCount;
 };
 
 
-template< uint32 BATCH_SIZE, uint32 ISIZE1, uint32 ISIZE2, uint32 INSERT_COUNT >
-void Run_CompoundInsertTask_Test( uint32 task_count )
+template< uint32_t BATCH_SIZE, uint32_t ISIZE1, uint32_t ISIZE2, uint32_t INSERT_COUNT >
+void Run_CompoundInsertTask_Test( uint32_t task_count )
 {
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
@@ -2420,7 +2420,7 @@ void Run_CompoundInsertTask_Test( uint32 task_count )
 	typedef CCompoundInsertTask< BATCH_SIZE, ISIZE1, ISIZE2, 1 > CompoundTaskType;
 	TCompoundDatabaseTaskBatch< CompoundTaskType > db_compound_task_batch;
 	std::vector< CompoundTaskType * > tasks;
-	for ( uint32 i = 0; i < task_count; ++i )
+	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		auto db_task = new CompoundTaskType( i + 1, INSERT_COUNT );
 		db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( i + 1 ) );
@@ -2435,7 +2435,7 @@ void Run_CompoundInsertTask_Test( uint32 task_count )
 	ASSERT_TRUE( failed_tasks.size() == 0 );
 	ASSERT_TRUE( successful_tasks.size() == task_count );
 	
-	for ( uint32 i = 0; i < tasks.size(); ++i )
+	for ( uint32_t i = 0; i < tasks.size(); ++i )
 	{
 		tasks[ i ]->Verify_Results();
 		delete tasks[ i ];

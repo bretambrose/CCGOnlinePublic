@@ -174,7 +174,6 @@
     <ClInclude Include="PlatformProcess.h" />
     <ClInclude Include="PlatformThread.h" />
     <ClInclude Include="PlatformTime.h" />
-    <ClInclude Include="PlatformTypes.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="StructuredExceptionInfo.h" />

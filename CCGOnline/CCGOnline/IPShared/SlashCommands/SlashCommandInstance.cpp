@@ -56,9 +56,9 @@ bool CSlashCommandInstance::Parse( const std::wstring &command_line, const CSlas
 	std::tr1::regex_search( command_line.c_str(), param_match_results, param_matcher );
 
 	const CSlashCommandDataDefinition *data_def = definition->Get_Data_Definition();
-	uint32 required_param_count = data_def->Get_Required_Param_Count();
-	uint32 total_param_count = data_def->Get_Param_Count();
-	uint32 param_start = data_def->Get_Match_Param_Start_Index();
+	uint32_t required_param_count = data_def->Get_Required_Param_Count();
+	uint32_t total_param_count = data_def->Get_Param_Count();
+	uint32_t param_start = data_def->Get_Match_Param_Start_Index();
 
 	Command = param_match_results[ 1 ];
 	if ( param_start > 2 )
@@ -66,12 +66,12 @@ bool CSlashCommandInstance::Parse( const std::wstring &command_line, const CSlas
 		SubCommand = param_match_results[ 2 ];
 	}
 
-	for ( uint32 i = 0; i < total_param_count; ++i )
+	for ( uint32_t i = 0; i < total_param_count; ++i )
 	{
 		bool capture_remaining = data_def->Get_Param( i )->Should_Capture();
 
 		std::wstring param;
-		uint32 param_capture_index = 2 * i + param_start;
+		uint32_t param_capture_index = 2 * i + param_start;
 		if ( param_match_results.length( param_capture_index ) > 0 )
 		{
 			param = param_match_results.str( param_capture_index );
@@ -114,7 +114,7 @@ void CSlashCommandInstance::Reset( void )
 }
 
 /**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an int32
+	CSlashCommandInstance::Get_Param -- queries a parameter value as an int32_t
 
 		index -- which parameter to query
 		value -- output variable for the parameter value
@@ -122,7 +122,7 @@ void CSlashCommandInstance::Reset( void )
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, int32 &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, int32_t &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -133,7 +133,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, int32 &value ) const
 }
 
 /**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an uint32
+	CSlashCommandInstance::Get_Param -- queries a parameter value as an uint32_t
 
 		index -- which parameter to query
 		value -- output variable for the parameter value
@@ -141,7 +141,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, int32 &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, uint32 &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, uint32_t &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -152,7 +152,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, uint32 &value ) const
 }
 
 /**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an int64
+	CSlashCommandInstance::Get_Param -- queries a parameter value as an int64_t
 
 		index -- which parameter to query
 		value -- output variable for the parameter value
@@ -160,7 +160,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, uint32 &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, int64 &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, int64_t &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -171,7 +171,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, int64 &value ) const
 }
 
 /**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an uint64
+	CSlashCommandInstance::Get_Param -- queries a parameter value as an uint64_t
 
 		index -- which parameter to query
 		value -- output variable for the parameter value
@@ -179,7 +179,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, int64 &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, uint64 &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, uint64_t &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -198,7 +198,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, uint64 &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, std::wstring &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, std::wstring &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -217,7 +217,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, std::wstring &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, std::string &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, std::string &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -236,7 +236,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, std::string &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, float &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, float &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -255,7 +255,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, float &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, double &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, double &value ) const
 {
 	if ( index >= Params.size() )
 	{
@@ -274,7 +274,7 @@ bool CSlashCommandInstance::Get_Param( uint32 index, double &value ) const
 	Returns: success/failure
 	
 **********************************************************************************************************************/
-bool CSlashCommandInstance::Get_Param( uint32 index, bool &value ) const
+bool CSlashCommandInstance::Get_Param( uint32_t index, bool &value ) const
 {
 	if ( index >= Params.size() )
 	{

@@ -34,10 +34,10 @@ EDatabaseVariableValueType Get_ODBC_Value_Type( const T & /*dummy*/ )
 	return DVVT_INVALID;
 }
 
-inline EDatabaseVariableValueType Get_ODBC_Value_Type( const int32 & /*dummy*/ ) { return DVVT_INT32; }
-inline EDatabaseVariableValueType Get_ODBC_Value_Type( const uint32 & /*dummy*/ ) { return DVVT_UINT32; }
-inline EDatabaseVariableValueType Get_ODBC_Value_Type( const int64 & /*dummy*/ ) { return DVVT_INT64; }
-inline EDatabaseVariableValueType Get_ODBC_Value_Type( const uint64 & /*dummy*/ ) { return DVVT_UINT64; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const int32_t & /*dummy*/ ) { return DVVT_INT32; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const uint32_t & /*dummy*/ ) { return DVVT_UINT32; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const int64_t & /*dummy*/ ) { return DVVT_INT64; }
+inline EDatabaseVariableValueType Get_ODBC_Value_Type( const uint64_t & /*dummy*/ ) { return DVVT_UINT64; }
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const float & /*dummy*/ ) { return DVVT_FLOAT; }
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const double & /*dummy*/ ) { return DVVT_DOUBLE; }
 inline EDatabaseVariableValueType Get_ODBC_Value_Type( const bool & /*dummy*/ ) { return DVVT_BOOLEAN; }
@@ -79,11 +79,11 @@ class TODBCScalarVariableBase : public IDatabaseVariable
 
 		// Baseclass interface
 		virtual EDatabaseVariableValueType Get_Value_Type( void ) const { return Get_ODBC_Value_Type( Value ); }
-		virtual uint32 Get_Decimals( void ) const { return 0; }
+		virtual uint32_t Get_Decimals( void ) const { return 0; }
 		virtual void *Get_Value_Address( void ) { return &Value; }
 		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
-		virtual uint32 Get_Value_Size( void ) const { return 0; }
-		virtual uint32 Get_Value_Buffer_Size( void ) const { return 0; }
+		virtual uint32_t Get_Value_Size( void ) const { return 0; }
+		virtual uint32_t Get_Value_Buffer_Size( void ) const { return 0; }
 		virtual bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
 		// Additional interface
@@ -126,21 +126,21 @@ class TODBCScalarVariable : public TODBCScalarVariableBase< T >
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef TODBCScalarVariable< int32, DVT_INPUT >					DBInt32In;
-typedef TODBCScalarVariable< int32, DVT_INPUT_OUTPUT >		DBInt32InOut;
-typedef TODBCScalarVariable< int32, DVT_OUTPUT >				DBInt32Out;
+typedef TODBCScalarVariable< int32_t, DVT_INPUT >					DBInt32In;
+typedef TODBCScalarVariable< int32_t, DVT_INPUT_OUTPUT >		DBInt32InOut;
+typedef TODBCScalarVariable< int32_t, DVT_OUTPUT >				DBInt32Out;
 
-typedef TODBCScalarVariable< uint32, DVT_INPUT >				DBUInt32In;
-typedef TODBCScalarVariable< uint32, DVT_INPUT_OUTPUT >		DBUInt32InOut;
-typedef TODBCScalarVariable< uint32, DVT_OUTPUT >				DBUInt32Out;
+typedef TODBCScalarVariable< uint32_t, DVT_INPUT >				DBUInt32In;
+typedef TODBCScalarVariable< uint32_t, DVT_INPUT_OUTPUT >		DBUInt32InOut;
+typedef TODBCScalarVariable< uint32_t, DVT_OUTPUT >				DBUInt32Out;
 
-typedef TODBCScalarVariable< int64, DVT_INPUT >					DBInt64In;
-typedef TODBCScalarVariable< int64, DVT_INPUT_OUTPUT >		DBInt64InOut;
-typedef TODBCScalarVariable< int64, DVT_OUTPUT >				DBInt64Out;
+typedef TODBCScalarVariable< int64_t, DVT_INPUT >					DBInt64In;
+typedef TODBCScalarVariable< int64_t, DVT_INPUT_OUTPUT >		DBInt64InOut;
+typedef TODBCScalarVariable< int64_t, DVT_OUTPUT >				DBInt64Out;
 
-typedef TODBCScalarVariable< uint64, DVT_INPUT >				DBUInt64In;
-typedef TODBCScalarVariable< uint64, DVT_INPUT_OUTPUT >		DBUInt64InOut;
-typedef TODBCScalarVariable< uint64, DVT_OUTPUT >				DBUInt64Out;
+typedef TODBCScalarVariable< uint64_t, DVT_INPUT >				DBUInt64In;
+typedef TODBCScalarVariable< uint64_t, DVT_INPUT_OUTPUT >		DBUInt64InOut;
+typedef TODBCScalarVariable< uint64_t, DVT_OUTPUT >				DBUInt64Out;
 
 typedef TODBCScalarVariable< float, DVT_INPUT >					DBFloatIn;
 typedef TODBCScalarVariable< float, DVT_INPUT_OUTPUT >		DBFloatInOut;
@@ -173,7 +173,7 @@ class IDatabaseString : public IDatabaseVariable
 
 };
 
-template < typename C, uint32 BUFFER_LENGTH >
+template < typename C, uint32_t BUFFER_LENGTH >
 class DBStringBase : public IDatabaseString
 {
 	public:
@@ -207,11 +207,11 @@ class DBStringBase : public IDatabaseString
 		}
 
 		// Baseclass interface
-		virtual uint32 Get_Decimals( void ) const { return 0; }
+		virtual uint32_t Get_Decimals( void ) const { return 0; }
 		virtual void *Get_Value_Address( void ) { return static_cast< void * >( Buffer ); }
 		virtual void *Get_Auxiliary_Address( void ) { return &Indicator; }
-		virtual uint32 Get_Value_Size( void ) const { return BUFFER_LENGTH + 1; }
-		virtual uint32 Get_Value_Buffer_Size( void ) const { return BUFFER_LENGTH + 1; }
+		virtual uint32_t Get_Value_Size( void ) const { return BUFFER_LENGTH + 1; }
+		virtual uint32_t Get_Value_Buffer_Size( void ) const { return BUFFER_LENGTH + 1; }
 		virtual bool Is_Null( void ) const { return Indicator == IP_SQL_NULL_DATA; }
 
 		// Additional interface
@@ -244,7 +244,7 @@ class DBStringBase : public IDatabaseString
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template < uint32 BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
+template < uint32_t BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
 class DBString : public DBStringBase< char, BUFFER_LENGTH >
 {
 	public:
@@ -318,7 +318,7 @@ class DBString : public DBStringBase< char, BUFFER_LENGTH >
 		}
 };
 
-template < uint32 BUFFER_LENGTH >
+template < uint32_t BUFFER_LENGTH >
 class DBStringIn : public DBString< BUFFER_LENGTH, DVT_INPUT >
 {
 	public:
@@ -348,7 +348,7 @@ class DBStringIn : public DBString< BUFFER_LENGTH, DVT_INPUT >
 		virtual ~DBStringIn() {}
 };
 
-template < uint32 BUFFER_LENGTH >
+template < uint32_t BUFFER_LENGTH >
 class DBStringInOut : public DBString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
 {
 	public:
@@ -378,7 +378,7 @@ class DBStringInOut : public DBString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
 		virtual ~DBStringInOut() {}
 };
 
-template < uint32 BUFFER_LENGTH >
+template < uint32_t BUFFER_LENGTH >
 class DBStringOut : public DBString< BUFFER_LENGTH, DVT_OUTPUT >
 {
 	public:
@@ -402,7 +402,7 @@ class DBStringOut : public DBString< BUFFER_LENGTH, DVT_OUTPUT >
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-template < uint32 BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
+template < uint32_t BUFFER_LENGTH, EDatabaseVariableType PT = DVT_INPUT >
 class DBWString : public DBStringBase< wchar_t, BUFFER_LENGTH >
 {
 	public:
@@ -477,7 +477,7 @@ class DBWString : public DBStringBase< wchar_t, BUFFER_LENGTH >
 		}
 };
 
-template < uint32 BUFFER_LENGTH >
+template < uint32_t BUFFER_LENGTH >
 class DBWStringIn : public DBWString< BUFFER_LENGTH, DVT_INPUT >
 {
 	public:
@@ -507,7 +507,7 @@ class DBWStringIn : public DBWString< BUFFER_LENGTH, DVT_INPUT >
 		virtual ~DBWStringIn() {}
 };
 
-template < uint32 BUFFER_LENGTH >
+template < uint32_t BUFFER_LENGTH >
 class DBWStringInOut : public DBWString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
 {
 	public:
@@ -537,7 +537,7 @@ class DBWStringInOut : public DBWString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
 		virtual ~DBWStringInOut() {}
 };
 
-template < uint32 BUFFER_LENGTH >
+template < uint32_t BUFFER_LENGTH >
 class DBWStringOut : public DBWString< BUFFER_LENGTH, DVT_OUTPUT >
 {
 	public:

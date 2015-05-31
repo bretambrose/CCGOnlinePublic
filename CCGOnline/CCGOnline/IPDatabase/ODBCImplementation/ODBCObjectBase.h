@@ -33,9 +33,9 @@ struct SODBCError
 {
 	SODBCError( void );
 	SODBCError( const SODBCError &rhs );
-	SODBCError( int32 sql_error_code, wchar_t sql_state[ 6 ], const std::wstring &error_description );
+	SODBCError( int32_t sql_error_code, wchar_t sql_state[ 6 ], const std::wstring &error_description );
 
-	int32 SQLErrorCode;
+	int32_t SQLErrorCode;
 
 	std::wstring SQLState;
 	std::wstring ErrorDescription;
@@ -58,8 +58,8 @@ class CODBCObjectBase
 		void Set_Error_State_Base( DBErrorStateType error_state ) { ErrorState = error_state; }
 		void Push_User_Error( DBErrorStateType error_state, const std::wstring &error_description );
 
-		int32 Get_Bad_Row_Number_Base( void ) const { return BadRowNumber; }
-		void Set_Bad_Row_Number_Base( int32 bad_row_number ) { BadRowNumber = bad_row_number; }
+		int32_t Get_Bad_Row_Number_Base( void ) const { return BadRowNumber; }
+		void Set_Bad_Row_Number_Base( int32_t bad_row_number ) { BadRowNumber = bad_row_number; }
 
 		const std::vector< SODBCError > &Get_Errors( void ) const { return Errors; }
 
@@ -72,7 +72,7 @@ class CODBCObjectBase
 	private:
 
 		DBErrorStateType ErrorState;
-		int32 BadRowNumber;
+		int32_t BadRowNumber;
 
 		std::vector< SODBCError > Errors;
 };

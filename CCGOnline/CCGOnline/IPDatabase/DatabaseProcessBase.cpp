@@ -150,7 +150,7 @@ void CDatabaseProcessBase::Register_Message_Handlers( void )
 	REGISTER_THIS_HANDLER( CRunDatabaseTaskRequest, CDatabaseProcessBase, Handle_Run_Database_Task_Request )
 }
 
-uint32 CDatabaseProcessBase::Get_Sleep_Interval_In_Milliseconds( void ) const
+uint32_t CDatabaseProcessBase::Get_Sleep_Interval_In_Milliseconds( void ) const
 {
 	return 1;
 }

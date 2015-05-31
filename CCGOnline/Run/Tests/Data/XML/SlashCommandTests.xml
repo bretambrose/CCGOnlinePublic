@@ -3,7 +3,7 @@
 		<Command>Test1</Command>
 
 		<Params>
-			<Param type="uint32"/>
+			<Param type="uint32_t"/>
 		</Params>
 	</SlashCommand>
 
@@ -12,7 +12,7 @@
 		<SubCommand>Subtest</SubCommand>
 
 		<Params>
-			<Param type="int32"/>
+			<Param type="int32_t"/>
 			<Param type="string"/>
 		</Params>
 	</SlashCommand>
@@ -24,7 +24,7 @@
 		<Params>
 			<Param type="bool"/>
 			<Param type="double"/>
-			<Param type="int64" optional="true" default="666"/>
+			<Param type="int64_t" optional="true" default="666"/>
 		</Params>
 	</SlashCommand>
 

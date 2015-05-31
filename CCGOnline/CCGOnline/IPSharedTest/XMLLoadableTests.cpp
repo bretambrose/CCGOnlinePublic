@@ -62,8 +62,8 @@ struct SUnorderedCompositeXMLTest
 			END_TYPE_DEFINITION( SUnorderedCompositeXMLTest );
 		}
 
-		uint16 UShort;
-		uint64 *Bigint;
+		uint16_t UShort;
+		uint64_t *Bigint;
 		std::string String;
 		float Float;
 		bool Bool;
@@ -118,8 +118,8 @@ struct SInnerCompositeXMLTest1
 			END_TYPE_DEFINITION( SInnerCompositeXMLTest1 );
 		}
 
-		uint16 UShort;
-		uint64 Bigint;
+		uint16_t UShort;
+		uint64_t Bigint;
 };
 
 struct SInnerCompositeXMLTest2
@@ -207,12 +207,12 @@ class CBaseXMLTest
 		}
 
 		const std::string &Get_Base_String( void ) const { return BaseString; }
-		int32 Get_Base_Int32( void ) const { return BaseInt32; }
+		int32_t Get_Base_Int32( void ) const { return BaseInt32; }
 
 	private:
 
 		std::string BaseString;
-		int32 BaseInt32;
+		int32_t BaseInt32;
 };
 
 class CDerivedXMLTest : public CBaseXMLTest
@@ -238,12 +238,12 @@ class CDerivedXMLTest : public CBaseXMLTest
 		}
 
 		const std::string &Get_Derived_String( void ) const { return DerivedString; }
-		int32 Get_Derived_Int32( void ) const { return DerivedInt32; }
+		int32_t Get_Derived_Int32( void ) const { return DerivedInt32; }
 
 	private:
 
 		std::string DerivedString;
-		int32 DerivedInt32;
+		int32_t DerivedInt32;
 };
 
 TEST_F( XMLLoadableTests, Derived_Serializer )
@@ -287,12 +287,12 @@ class CPrimitiveVectorXMLTest
 		}
 
 		const std::vector< std::string > &Get_Strings( void ) const { return Strings; }
-		const std::vector< int32 * > &Get_Integers( void ) const { return Integers; }
+		const std::vector< int32_t * > &Get_Integers( void ) const { return Integers; }
 
 	private:
 
 		std::vector< std::string > Strings;
-		std::vector< int32 * > Integers;
+		std::vector< int32_t * > Integers;
 };
 
 TEST_F( XMLLoadableTests, Primitive_Vector_Serializers )
@@ -340,12 +340,12 @@ class CVectorEntry
 		}
 
 		const std::string &Get_String( void ) const { return String; }
-		int32 Get_Integer( void ) const { return Integer; }
+		int32_t Get_Integer( void ) const { return Integer; }
 
 	private:
 
 		std::string String;
-		int32 Integer;
+		int32_t Integer;
 };
 
 class CDerivedVectorEntry : public CVectorEntry
@@ -511,11 +511,11 @@ class CPolyDerived2 : public CPolyBase
 			REGISTER_POLYMORPHIC_ENUM_ENTRY( PSTT_CLASS2, CPolyDerived2 );
 		}
 
-		int32 Get_Integer( void ) const { return Integer; }
+		int32_t Get_Integer( void ) const { return Integer; }
 
 	private:
 
-		int32 Integer;
+		int32_t Integer;
 };
 
 class CPolyVectorTest
@@ -596,14 +596,14 @@ class CTableTest
 		}
 
 		const std::string &Get_Name( void ) const { return Name; }
-		uint32 Get_Hit_Points( void ) const { return HitPoints; }
+		uint32_t Get_Hit_Points( void ) const { return HitPoints; }
 		ETableTestClass Get_Class( void ) const { return Class; }
 
 	private:
 
 		std::string Name;
 
-		uint32 HitPoints;
+		uint32_t HitPoints;
 
 		ETableTestClass Class;
 };

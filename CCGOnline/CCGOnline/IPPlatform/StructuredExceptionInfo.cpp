@@ -61,7 +61,7 @@ CStackFrame::CStackFrame( const CStackFrame &rhs ) :
 		module_name -- module the function is located in
 
 **********************************************************************************************************************/
-CStackFrame::CStackFrame( uint64 address, const std::wstring &function_name, const std::wstring &module_name ) :
+CStackFrame::CStackFrame( uint64_t address, const std::wstring &function_name, const std::wstring &module_name ) :
 	Address( address ),
 	FunctionName( function_name ),
 	ModuleName( module_name ),
@@ -80,7 +80,7 @@ CStackFrame::CStackFrame( uint64 address, const std::wstring &function_name, con
 		line_number -- line number the exception occurred at
 
 **********************************************************************************************************************/
-CStackFrame::CStackFrame( uint64 address, const std::wstring &function_name, const std::wstring &module_name, const std::wstring &file_name, uint64 line_number ) :
+CStackFrame::CStackFrame( uint64_t address, const std::wstring &function_name, const std::wstring &module_name, const std::wstring &file_name, uint64_t line_number ) :
 	Address( address ),
 	FunctionName( function_name ),
 	ModuleName( module_name ),

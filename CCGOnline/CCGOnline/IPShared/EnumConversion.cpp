@@ -39,27 +39,27 @@ class CConvertibleEnum
 		EConvertibleEnumProperties Get_Properties( void ) const { return Properties; }
 
 		// Conversion registration
-		void Register_Entry( const std::string &entry_name, uint64 value );
+		void Register_Entry( const std::string &entry_name, uint64_t value );
 
 		// Conversion
-		bool Convert( const std::string &entry_name, uint64 &output_value ) const;
-		bool Convert( uint64 output_value, std::string &entry_name ) const;
+		bool Convert( const std::string &entry_name, uint64_t &output_value ) const;
+		bool Convert( uint64_t output_value, std::string &entry_name ) const;
 
 	private:
 
-		bool Convert_Internal( const std::string &entry_name, uint64 &output_value ) const;
-		bool Convert_Internal( uint64 value, std::string &entry_name ) const;
+		bool Convert_Internal( const std::string &entry_name, uint64_t &output_value ) const;
+		bool Convert_Internal( uint64_t value, std::string &entry_name ) const;
 
-		bool Convert_Bitfield_Internal( const std::string &mask_name, uint64 &output_value ) const;
-		bool Convert_Bitfield_Internal( uint64 value, std::string &mask_name ) const;
+		bool Convert_Bitfield_Internal( const std::string &mask_name, uint64_t &output_value ) const;
+		bool Convert_Bitfield_Internal( uint64_t value, std::string &mask_name ) const;
 
 		// Data
 		std::string Name;
 
 		EConvertibleEnumProperties Properties;
 
-		std::unordered_map< std::string, uint64 > NameToValueTable;
-		std::unordered_map< uint64, std::string > ValueToNameTable;
+		std::unordered_map< std::string, uint64_t > NameToValueTable;
+		std::unordered_map< uint64_t, std::string > ValueToNameTable;
 };
 
 /**********************************************************************************************************************
@@ -86,7 +86,7 @@ CConvertibleEnum::CConvertibleEnum( const std::string &name, EConvertibleEnumPro
 		Returns: success/failure
 
 **********************************************************************************************************************/
-bool CConvertibleEnum::Convert( const std::string &entry_name, uint64 &output_value ) const
+bool CConvertibleEnum::Convert( const std::string &entry_name, uint64_t &output_value ) const
 {
 	if ( ( Properties & CEP_BITFIELD ) != 0 )
 	{
@@ -107,7 +107,7 @@ bool CConvertibleEnum::Convert( const std::string &entry_name, uint64 &output_va
 		Returns: success/failure
 
 **********************************************************************************************************************/
-bool CConvertibleEnum::Convert( uint64 value, std::string &entry_name ) const
+bool CConvertibleEnum::Convert( uint64_t value, std::string &entry_name ) const
 {
 	if ( ( Properties & CEP_BITFIELD ) != 0 )
 	{
@@ -126,7 +126,7 @@ bool CConvertibleEnum::Convert( uint64 value, std::string &entry_name ) const
 		value -- integer to convert to/from
 
 **********************************************************************************************************************/
-void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64 value )
+void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64_t value )
 {
 	std::string upper_entry_name;
 	NStringUtils::To_Upper_Case( entry_name, upper_entry_name );
@@ -150,7 +150,7 @@ void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64 val
 		Returns: success/failure
 
 **********************************************************************************************************************/
-bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64 &output_value ) const
+bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64_t &output_value ) const
 {
 	std::string upper_entry_name;
 	NStringUtils::To_Upper_Case( entry_name, upper_entry_name );
@@ -174,7 +174,7 @@ bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64 &
 		Returns: success/failure
 
 **********************************************************************************************************************/
-bool CConvertibleEnum::Convert_Internal( uint64 value, std::string &entry_name ) const
+bool CConvertibleEnum::Convert_Internal( uint64_t value, std::string &entry_name ) const
 {
 	auto iter = ValueToNameTable.find( value );
 	if ( iter == ValueToNameTable.cend() )
@@ -196,7 +196,7 @@ bool CConvertibleEnum::Convert_Internal( uint64 value, std::string &entry_name )
 		Returns: position of the first non-separator character or the end of the string
 
 **********************************************************************************************************************/
-static uint32 Skip_Separators( const char *string_buffer, uint32 index )
+static uint32_t Skip_Separators( const char *string_buffer, uint32_t index )
 {
 	char current_char = *( string_buffer + index );
 	while ( current_char != 0 && ( current_char == ' ' || current_char == '\t' || current_char == '|' ) )
@@ -217,7 +217,7 @@ static uint32 Skip_Separators( const char *string_buffer, uint32 index )
 		Returns: position of the first separator character or the end of the string
 
 **********************************************************************************************************************/
-static uint32 Skip_Non_Separators( const char *string_buffer, uint32 index )
+static uint32_t Skip_Non_Separators( const char *string_buffer, uint32_t index )
 {
 	char current_char = *( string_buffer + index );
 	while ( current_char != 0 && ( current_char != ' ' && current_char != '\t' && current_char != '|' ) )
@@ -237,18 +237,18 @@ static uint32 Skip_Non_Separators( const char *string_buffer, uint32 index )
 		Returns: success/failure
 
 **********************************************************************************************************************/
-bool CConvertibleEnum::Convert_Bitfield_Internal( const std::string &mask_name, uint64 &output_value ) const
+bool CConvertibleEnum::Convert_Bitfield_Internal( const std::string &mask_name, uint64_t &output_value ) const
 {
 	const char *raw_characters = mask_name.c_str();
 	output_value = 0;
 
-	uint32 entry_start = Skip_Separators( raw_characters, 0 );
+	uint32_t entry_start = Skip_Separators( raw_characters, 0 );
 	while ( entry_start < mask_name.size() )
 	{
-		uint32 entry_end = Skip_Non_Separators( raw_characters, entry_start );
+		uint32_t entry_end = Skip_Non_Separators( raw_characters, entry_start );
 
 		std::string entry( raw_characters + entry_start, raw_characters + entry_end );
-		uint64 entry_value = 0;
+		uint64_t entry_value = 0;
 
 		if ( !Convert_Internal( entry, entry_value ) )
 		{
@@ -272,7 +272,7 @@ bool CConvertibleEnum::Convert_Bitfield_Internal( const std::string &mask_name, 
 		Returns: success/failure
 
 **********************************************************************************************************************/
-bool CConvertibleEnum::Convert_Bitfield_Internal( uint64 value, std::string &mask_name ) const
+bool CConvertibleEnum::Convert_Bitfield_Internal( uint64_t value, std::string &mask_name ) const
 {
 	if ( value == 0 )
 	{
@@ -280,14 +280,14 @@ bool CConvertibleEnum::Convert_Bitfield_Internal( uint64 value, std::string &mas
 	}
 
 	mask_name = "";
-	uint64 value_iterator = value;
+	uint64_t value_iterator = value;
 	bool first_entry = true;
 
-	for ( uint32 bit_index = 0; value_iterator > 0; bit_index++, value_iterator >>= 1 )
+	for ( uint32_t bit_index = 0; value_iterator > 0; bit_index++, value_iterator >>= 1 )
 	{
 		if ( ( value_iterator & 0x01 ) != 0 )
 		{
-			uint64 bit_value = 1UL << bit_index;
+			uint64_t bit_value = 1UL << bit_index;
 
 			std::string entry_name;
 			if ( !Convert_Internal( bit_value, entry_name ) )
@@ -356,7 +356,7 @@ void CEnumConverter::Register_Enum_Internal( const Loki::TypeInfo &enum_type_inf
 		entry_value -- integer value of the enum entry
 
 **********************************************************************************************************************/		
-void CEnumConverter::Register_Enum_Entry_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64 entry_value )
+void CEnumConverter::Register_Enum_Entry_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64_t entry_value )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	FATAL_ASSERT( enum_object != nullptr );
@@ -413,7 +413,7 @@ CConvertibleEnum *CEnumConverter::Find_Enum( const std::string &enum_name )
 		output_value -- output parameter for the corresponding integer value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert( const Loki::TypeInfo &enum_type_info, const std::wstring &entry_name, uint64 &output_value )
+bool CEnumConverter::Convert( const Loki::TypeInfo &enum_type_info, const std::wstring &entry_name, uint64_t &output_value )
 {
 	std::string usable_entry_name;
 	NStringUtils::WideString_To_String( entry_name, usable_entry_name );
@@ -429,7 +429,7 @@ bool CEnumConverter::Convert( const Loki::TypeInfo &enum_type_info, const std::w
 		output_value -- output parameter for the corresponding integer value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64 &output_value )
+bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64_t &output_value )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	if ( enum_object == nullptr )
@@ -448,7 +448,7 @@ bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, con
 		entry_name -- output parameter for the corresponding string value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64 value, std::string &entry_name )
+bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64_t value, std::string &entry_name )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	if ( enum_object == nullptr )
@@ -467,7 +467,7 @@ bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uin
 		entry_name -- output parameter for the corresponding string value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64 value, std::wstring &entry_name )
+bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64_t value, std::wstring &entry_name )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	if ( enum_object == nullptr )
@@ -493,7 +493,7 @@ bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uin
 		output_value -- output parameter for the corresponding integer value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert( const std::string &enum_name, const std::wstring &entry_name, uint64 &output_value )
+bool CEnumConverter::Convert( const std::string &enum_name, const std::wstring &entry_name, uint64_t &output_value )
 {
 	CConvertibleEnum *enum_object = Find_Enum( enum_name );
 	if ( enum_object == nullptr )

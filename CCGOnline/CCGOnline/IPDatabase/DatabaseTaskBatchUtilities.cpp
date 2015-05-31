@@ -51,7 +51,7 @@ static void Log_DB_Error( IDatabaseStatement *statement, IDatabaseVariableSet *i
 		if ( !params.empty() )
 		{
 			LOG( LL_LOW, "\tDumping Parameters:" );
-			for ( uint32 i = 0; i < params.size(); ++i )
+			for ( uint32_t i = 0; i < params.size(); ++i )
 			{
 				std::string value_string;
 				input_params->Convert_Variable_To_String( params[ i ], value_string );
@@ -93,10 +93,10 @@ static void Extract_Batch_Error( IDatabaseCallContext *call_context,
 		return;
 	}
 
-	int32 bad_row_number = statement->Get_Bad_Row_Number();
+	int32_t bad_row_number = statement->Get_Bad_Row_Number();
 	if ( bad_row_number >= 0 )
 	{
-		int32 row = 0;
+		int32_t row = 0;
 		auto end = sub_list.cend();
 		for( first_failed_task = sub_list.cbegin(); first_failed_task != end; ++row, ++first_failed_task )
 		{
@@ -126,7 +126,7 @@ void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseSt
 		return;
 	}
 
-	uint32 i = 0;
+	uint32_t i = 0;
 	for ( DBTaskListType::const_iterator iter = sub_list.cbegin(), end = sub_list.cend(); iter != end; ++iter, ++i )
 	{
 		( *iter )->Initialize_Parameters( call_context->Get_Param_Row( i ) );
@@ -135,7 +135,7 @@ void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseSt
 	FATAL_ASSERT( !statement->Is_In_Error_State() );
 	size_t list_size = sub_list.size();
 
-	statement->Execute( static_cast< uint32 >( sub_list.size() ) );
+	statement->Execute( static_cast< uint32_t >( sub_list.size() ) );
 	if ( statement->Is_In_Error_State() )
 	{
 		Extract_Batch_Error( call_context, statement, NULL, sub_list, result, first_failed_task );
@@ -144,8 +144,8 @@ void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseSt
 
 	DBTaskListType::const_iterator iter = sub_list.cbegin();
 
-	int64 rows_fetched = 0;
-	uint32 input_row = 0;
+	int64_t rows_fetched = 0;
+	uint32_t input_row = 0;
 	EFetchResultsStatusType fetch_status = FRST_ONGOING;
 	const wchar_t *additional_error_context = NULL;		// error logging is somewhat removed from error recognition, so use this awkward way of forwarding user-level information
 	while ( fetch_status != FRST_ERROR && fetch_status != FRST_FINISHED_ALL )

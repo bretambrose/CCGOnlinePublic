@@ -35,7 +35,7 @@
 void NStringUtils::String_To_WideString( const std::string &source, std::wstring &target )
 {
 	size_t buffer_length = source.size() * 2 + 2;
-	size_t buffer_word_length = buffer_length * sizeof( wchar_t ) / sizeof( uint32 );
+	size_t buffer_word_length = buffer_length * sizeof( wchar_t ) / sizeof( uint32_t );
 	wchar_t *target_buffer = new wchar_t[ buffer_length ];
 	size_t bytes_written = 0;
 
@@ -134,7 +134,7 @@ void NStringUtils::To_Upper_Case( const std::wstring &source, std::wstring &dest
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert( const std::wstring &source, int32 &value ) 
+bool NStringUtils::Convert( const std::wstring &source, int32_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
@@ -147,7 +147,7 @@ bool NStringUtils::Convert( const std::wstring &source, int32 &value )
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert( const std::wstring &source, uint32 &value ) 
+bool NStringUtils::Convert( const std::wstring &source, uint32_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
@@ -160,7 +160,7 @@ bool NStringUtils::Convert( const std::wstring &source, uint32 &value )
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert( const std::wstring &source, int64 &value ) 
+bool NStringUtils::Convert( const std::wstring &source, int64_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
@@ -173,7 +173,7 @@ bool NStringUtils::Convert( const std::wstring &source, int64 &value )
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert( const std::wstring &source, uint64 &value ) 
+bool NStringUtils::Convert( const std::wstring &source, uint64_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
@@ -251,7 +251,7 @@ bool NStringUtils::Convert( const std::wstring &source, bool &value )
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert_Raw( const wchar_t *source, int32 &value ) 
+bool NStringUtils::Convert_Raw( const wchar_t *source, int32_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = wcstol( source, &end_ptr, 10 );
@@ -267,7 +267,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, int32 &value )
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert_Raw( const wchar_t *source, uint32 &value ) 
+bool NStringUtils::Convert_Raw( const wchar_t *source, uint32_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = wcstoul( source, &end_ptr, 10 );
@@ -283,7 +283,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, uint32 &value )
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert_Raw( const wchar_t *source, int64 &value ) 
+bool NStringUtils::Convert_Raw( const wchar_t *source, int64_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = _wcstoi64( source, &end_ptr, 10 );
@@ -299,7 +299,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, int64 &value )
 
 	Returns: conversion success/failure
 **********************************************************************************************************************/
-bool NStringUtils::Convert_Raw( const wchar_t *source, uint64 &value ) 
+bool NStringUtils::Convert_Raw( const wchar_t *source, uint64_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = _wcstoui64( source, &end_ptr, 10 );

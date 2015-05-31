@@ -45,13 +45,13 @@ class CLogRequestMessage : public IProcessMessage
 
 		const SProcessProperties &Get_Source_Properties( void ) const { return SourceProperties; }
 		const std::wstring &Get_Message( void ) const { return Message; }
-		uint64 Get_Time( void ) const { return Time; }
+		uint64_t Get_Time( void ) const { return Time; }
 
 	private:
 
 		SProcessProperties SourceProperties;
 		std::wstring Message;
-		uint64 Time;
+		uint64_t Time;
 };
 
 #endif // LOGGING_MESSAGES_H

@@ -43,7 +43,7 @@ SODBCError::SODBCError( const SODBCError &rhs ) :
 {
 }
 
-SODBCError::SODBCError( int32 sql_error_code, wchar_t sql_state[ 6 ], const std::wstring &error_description ) :
+SODBCError::SODBCError( int32_t sql_error_code, wchar_t sql_state[ 6 ], const std::wstring &error_description ) :
 	SQLErrorCode( sql_error_code ),
 	SQLState( sql_state, sql_state + 6 ),	// sketchy
 	ErrorDescription( error_description )
@@ -121,7 +121,7 @@ bool CODBCObjectBase::Refresh_Error_Status( SQLRETURN error_code )
 
 			if ( bad_row >= 1 )
 			{
-				BadRowNumber = static_cast< int32 >( bad_row - 1 );
+				BadRowNumber = static_cast< int32_t >( bad_row - 1 );
 			}
 		}
 	}
@@ -154,7 +154,7 @@ void CODBCObjectBase::Log_Error_State_Base( void ) const
 	if ( Errors.size() > 0 )
 	{
 		LOG( LL_LOW, "\tODBC Error Records:" );
-		for ( uint32 i = 0; i < Errors.size(); ++i )
+		for ( uint32_t i = 0; i < Errors.size(); ++i )
 		{
 			const SODBCError &error_record = Errors[ i ]; 
 			WLOG( LL_LOW, L"\t\t" << i << L" - EC: " << error_record.SQLErrorCode << L", SQLState: " << error_record.SQLState << L", Desc: " << error_record.ErrorDescription );

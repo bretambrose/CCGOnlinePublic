@@ -45,7 +45,7 @@ class CThreadProcessBase : public CProcessBase
 
 		virtual double Get_Current_Process_Time( void ) const override;
 
-		virtual uint32 Get_Sleep_Interval_In_Milliseconds( void ) const = 0;
+		virtual uint32_t Get_Sleep_Interval_In_Milliseconds( void ) const = 0;
 
 	private:
 

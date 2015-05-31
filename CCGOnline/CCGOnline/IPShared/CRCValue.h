@@ -23,7 +23,7 @@
 #ifndef CRC_VALUE_H
 #define CRC_VALUE_H
 
-typedef uint32 CRCValue;
+typedef uint32_t CRCValue;
 
 #endif // CRC_VALUE_H
 

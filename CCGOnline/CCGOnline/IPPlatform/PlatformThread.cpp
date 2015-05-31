@@ -57,7 +57,7 @@ class IPlatformThread
 
 		virtual ~IPlatformThread() {}
 
-		virtual void Launch_Thread( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context ) = 0;
+		virtual void Launch_Thread( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context ) = 0;
 		virtual void Shutdown_Thread( void ) = 0;
 		virtual bool Is_Valid( void ) const = 0;
 		virtual bool Is_Running( void ) const = 0;
@@ -77,14 +77,14 @@ class CPlatformThreadImpl : public IPlatformThread
 
 		CPlatformThreadImpl( void );
 
-		virtual void Launch_Thread( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
+		virtual void Launch_Thread( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
 		virtual void Shutdown_Thread( void );
 		virtual bool Is_Valid( void ) const { return ThreadHandle != nullptr; }
 		virtual bool Is_Running( void ) const;
 
 	private:
 
-		static uint32 WINAPI Run_Thread( LPVOID thread_param );
+		static uint32_t WINAPI Run_Thread( LPVOID thread_param );
 
 		HANDLE ThreadHandle;
 
@@ -109,14 +109,14 @@ CPlatformThreadImpl::CPlatformThreadImpl( void ) :
 		run_context -- parameter to the execution function
 
 **********************************************************************************************************************/
-void CPlatformThreadImpl::Launch_Thread( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context )
+void CPlatformThreadImpl::Launch_Thread( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context )
 {
 	FATAL_ASSERT( ThreadHandle == nullptr );
 
 	TranslationContext.Initialize( execution_function, run_context );
 
 	ThreadHandle = reinterpret_cast< HANDLE >( 
-		::_beginthreadex( NULL, static_cast< uint32 >( stack_size ), CPlatformThreadImpl::Run_Thread, &TranslationContext, 0, NULL ) );
+		::_beginthreadex( NULL, static_cast< uint32_t >( stack_size ), CPlatformThreadImpl::Run_Thread, &TranslationContext, 0, NULL ) );
 
 	FATAL_ASSERT( ThreadHandle != nullptr );
 }
@@ -172,7 +172,7 @@ bool CPlatformThreadImpl::Is_Running( void ) const
 		Returns: 0
 
 **********************************************************************************************************************/
-uint32 WINAPI CPlatformThreadImpl::Run_Thread( LPVOID thread_param )
+uint32_t WINAPI CPlatformThreadImpl::Run_Thread( LPVOID thread_param )
 {
 	STrueThreadExecutionContext *translation_context = static_cast< STrueThreadExecutionContext * >( thread_param );
 
@@ -211,7 +211,7 @@ CPlatformThread::~CPlatformThread()
 		run_context -- parameter to the execution function
 
 **********************************************************************************************************************/
-void CPlatformThread::Create_And_Run( uint64 stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context )
+void CPlatformThread::Create_And_Run( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context )
 {
 	FATAL_ASSERT( !ThreadImpl->Is_Valid() );
 

@@ -297,7 +297,7 @@ void CSerializationRegistrar::Register_Polymorphic_Enum_Entry( T enum_entry, con
 	auto enum_table = iter->second;
 	FATAL_ASSERT( enum_table != nullptr );
 
-	( *enum_table )[ static_cast< uint64 >( enum_entry ) ] = type_info;
+	( *enum_table )[ static_cast< uint64_t >( enum_entry ) ] = type_info;
 }
 
 #endif // SERIALIZATION_REGISTRAR_H

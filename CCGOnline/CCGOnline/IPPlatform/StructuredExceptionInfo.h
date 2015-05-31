@@ -32,27 +32,27 @@ struct CStackFrame
 		// Construction
 		CStackFrame( void );
 		CStackFrame( const CStackFrame &rhs );
-		CStackFrame( uint64 address, const std::wstring &function_name, const std::wstring &module_name );
-		CStackFrame( uint64 address, const std::wstring &function_name, const std::wstring &module_name, const std::wstring &file_name, uint64 line_number );
+		CStackFrame( uint64_t address, const std::wstring &function_name, const std::wstring &module_name );
+		CStackFrame( uint64_t address, const std::wstring &function_name, const std::wstring &module_name, const std::wstring &file_name, uint64_t line_number );
 
 		// Public interface
 		// Accessors
-		uint64 Get_Address( void ) const { return Address; }
+		uint64_t Get_Address( void ) const { return Address; }
 		const std::wstring &Get_Function_Name( void ) const { return FunctionName; }
 		const std::wstring &Get_Module_Name( void ) const { return ModuleName; }
 		const std::wstring &Get_File_Name( void ) const { return FileName; }
-		uint64 Get_Line_Number( void ) const { return LineNumber; }
+		uint64_t Get_Line_Number( void ) const { return LineNumber; }
 
 	private:
 
 		// Private data
-		uint64 Address;
+		uint64_t Address;
 		
 		std::wstring FunctionName;
 		std::wstring ModuleName;
 		std::wstring FileName;
 
-		uint64 LineNumber;
+		uint64_t LineNumber;
 
 };
 
@@ -66,8 +66,8 @@ class CStructuredExceptionInfo
 
 		// Public interface
 		// Accessors
-		uint64 Get_Process_ID( void ) const { return ProcessID; }
-		void Set_Process_ID( uint64 process_id ) { ProcessID = process_id; }
+		uint64_t Get_Process_ID( void ) const { return ProcessID; }
+		void Set_Process_ID( uint64_t process_id ) { ProcessID = process_id; }
 
 		void Add_Frame( const CStackFrame &frame ) { CallStack.push_back( frame ); }
 		const std::vector< CStackFrame > &Get_Call_Stack( void ) const { return CallStack; }
@@ -84,7 +84,7 @@ class CStructuredExceptionInfo
 	private:
 
 		// Private Data
-		uint64 ProcessID;
+		uint64_t ProcessID;
 
 		std::vector< CStackFrame > CallStack;
 

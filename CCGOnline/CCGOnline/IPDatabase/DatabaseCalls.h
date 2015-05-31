@@ -58,7 +58,7 @@ class CDatabaseTaskBase : public IDatabaseTask
 		DatabaseTaskIDType::Enum ID;
 };
 
-template < typename I, uint32 ISIZE >
+template < typename I, uint32_t ISIZE >
 class TDatabaseFunctionCall : public CDatabaseTaskBase
 {
 	public:
@@ -77,17 +77,17 @@ class TDatabaseFunctionCall : public CDatabaseTaskBase
 		typedef I InputParametersType;
 		typedef CEmptyVariableSet ResultSetType;
 
-		static const uint32 InputParameterBatchSize = ISIZE;
-		static const uint32 ResultSetBatchSize = 1;
+		static const uint32_t InputParameterBatchSize = ISIZE;
+		static const uint32_t ResultSetBatchSize = 1;
 
 	protected:
 
-		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64 rows_fetched ) {
+		virtual void On_Fetch_Results( IDatabaseVariableSet * /*result_set*/, int64_t rows_fetched ) {
 			ASSERT_TRUE( rows_fetched == 0 );
 		}
 };
 
-template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
+template < typename I, uint32_t ISIZE, typename O, uint32_t OSIZE >
 class TDatabaseProcedureCall : public CDatabaseTaskBase
 {
 	public:
@@ -106,11 +106,11 @@ class TDatabaseProcedureCall : public CDatabaseTaskBase
 		typedef I InputParametersType;
 		typedef O ResultSetType;
 
-		static const uint32 InputParameterBatchSize = ISIZE;
-		static const uint32 ResultSetBatchSize = OSIZE;
+		static const uint32_t InputParameterBatchSize = ISIZE;
+		static const uint32_t ResultSetBatchSize = OSIZE;
 };
 
-template < typename O, uint32 OSIZE >
+template < typename O, uint32_t OSIZE >
 class TDatabaseSelect : public CDatabaseTaskBase
 {
 	public:
@@ -128,11 +128,11 @@ class TDatabaseSelect : public CDatabaseTaskBase
 		typedef CEmptyVariableSet InputParametersType;
 		typedef O ResultSetType;
 
-		static const uint32 InputParameterBatchSize = 1;
-		static const uint32 ResultSetBatchSize = OSIZE;
+		static const uint32_t InputParameterBatchSize = 1;
+		static const uint32_t ResultSetBatchSize = OSIZE;
 };
 
-template < typename I, uint32 ISIZE, typename O, uint32 OSIZE >
+template < typename I, uint32_t ISIZE, typename O, uint32_t OSIZE >
 class TDatabaseTableValuedFunctionCall : public CDatabaseTaskBase
 {
 	public:
@@ -150,8 +150,8 @@ class TDatabaseTableValuedFunctionCall : public CDatabaseTaskBase
 		typedef I InputParametersType;
 		typedef O ResultSetType;
 
-		static const uint32 InputParameterBatchSize = ISIZE;
-		static const uint32 ResultSetBatchSize = OSIZE;
+		static const uint32_t InputParameterBatchSize = ISIZE;
+		static const uint32_t ResultSetBatchSize = OSIZE;
 };
 
 // Compound
@@ -204,7 +204,7 @@ class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
 		ChildTypeCallbackTableType SuccessCallbacks;
 };
 
-template < uint32 BATCH_SIZE >
+template < uint32_t BATCH_SIZE >
 class TCompoundDatabaseTask : public CCompoundDatabaseTaskBase {
 	public:
 
@@ -216,7 +216,7 @@ class TCompoundDatabaseTask : public CCompoundDatabaseTaskBase {
 
 		virtual ~TCompoundDatabaseTask() {}
 
-		static const uint32 CompoundTaskBatchSize = BATCH_SIZE;
+		static const uint32_t CompoundTaskBatchSize = BATCH_SIZE;
 
 	private:
 };

@@ -34,10 +34,10 @@ class IDatabaseVariable
 
 		virtual EDatabaseVariableType Get_Parameter_Type( void ) const = 0;			// Input only
 		virtual EDatabaseVariableValueType Get_Value_Type( void ) const = 0;
-		virtual uint32 Get_Value_Size( void ) const = 0;									// Input only
-		virtual uint32 Get_Decimals( void ) const = 0;										// Input only
+		virtual uint32_t Get_Value_Size( void ) const = 0;									// Input only
+		virtual uint32_t Get_Decimals( void ) const = 0;										// Input only
 		virtual void *Get_Value_Address( void ) = 0;
-		virtual uint32 Get_Value_Buffer_Size( void ) const = 0;
+		virtual uint32_t Get_Value_Buffer_Size( void ) const = 0;
 		virtual void *Get_Auxiliary_Address( void ) = 0;
 		virtual bool Is_Null( void ) const = 0;
 

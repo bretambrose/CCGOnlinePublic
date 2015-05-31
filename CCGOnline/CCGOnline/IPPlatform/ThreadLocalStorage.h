@@ -25,7 +25,7 @@
 
 #ifdef WIN32
 
-#define THREAD_LOCAL_INVALID_HANDLE ( ( uint32 ) 0xFFFFFFFF )
+#define THREAD_LOCAL_INVALID_HANDLE ( ( uint32_t ) 0xFFFFFFFF )
 
 #else
 
@@ -38,25 +38,25 @@ class CThreadLocalStorage
 {
 	public:
 
-		static uint32 Allocate_Thread_Local_Storage( void );
-		static void Deallocate_Thread_Local_Storage( uint32 tls_handle );
+		static uint32_t Allocate_Thread_Local_Storage( void );
+		static void Deallocate_Thread_Local_Storage( uint32_t tls_handle );
 		
 		template< class T >
-		static void Set_TLS_Value( uint32 tls_handle, T *value )
+		static void Set_TLS_Value( uint32_t tls_handle, T *value )
 		{
 			Set_Raw_TLS_Value( tls_handle, static_cast< void * >( value ) );
 		}
 
 		template< class T >
-		static T *Get_TLS_Value( uint32 tls_handle )
+		static T *Get_TLS_Value( uint32_t tls_handle )
 		{
 			return static_cast< T * >( Get_Raw_TLS_Value( tls_handle ) );
 		}
 
 	private:
 
-		static void *Get_Raw_TLS_Value( uint32 tls_handle );
-		static void Set_Raw_TLS_Value( uint32 tls_handle, void *handle );
+		static void *Get_Raw_TLS_Value( uint32_t tls_handle );
+		static void Set_Raw_TLS_Value( uint32_t tls_handle, void *handle );
 
 };
 

@@ -24,9 +24,20 @@
 #ifndef UNIVERSAL_H
 #define UNIVERSAL_H
 
+#include <cstdint>
+
+#ifdef _DEBUG
+
+#define TBB_USE_DEBUG 1
+
+#endif
+
 #define SAFE_DELETE(x) if((x) != nullptr) { delete (x); }
 #define SAFE_DELETE_ARRAY(x) if((x) != nullptr) { delete [](x); }
 
 #define IP_UNREFERENCED_PARAM( x ) ( &reinterpret_cast< const int& >( x ) )
+
+using StringCRC64 = uint64_t;
+using StringCRC32 = uint32_t;
 
 #endif // UNIVERSAL_H

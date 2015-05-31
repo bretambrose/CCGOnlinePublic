@@ -30,8 +30,8 @@
 #include "IPPlatform/ThreadLocalStorage.h"
 
 // Static member data definitions
-uint32 CProcessStatics::ProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
-uint32 CProcessStatics::ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
+uint32_t CProcessStatics::ProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
+uint32_t CProcessStatics::ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
 bool CProcessStatics::Initialized = false;
 
 /**********************************************************************************************************************

@@ -115,7 +115,7 @@ void CLogInterface::Shutdown_Static( void )
 **********************************************************************************************************************/
 void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 {
-	static const uint64 SECONDS_PER_HOUR = 3600;
+	static const uint64_t SECONDS_PER_HOUR = 3600;
 
 	FATAL_ASSERT( StaticInitialized == true );
 
@@ -130,12 +130,12 @@ void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 	std::vector< std::wstring > matching_file_names;
 	NPlatform::Enumerate_Matching_Files( file_pattern_string.rdbuf()->str(), matching_file_names );
 
-	uint64 current_time = CPlatformTime::Get_Raw_Time();
+	uint64_t current_time = CPlatformTime::Get_Raw_Time();
 
 	// Try to remove all matching log files that are older than an hour
-	for ( uint32 i = 0; i < matching_file_names.size(); ++i )
+	for ( uint32_t i = 0; i < matching_file_names.size(); ++i )
 	{
-		uint64 file_time = CPlatformTime::Get_File_Write_Raw_Time( LogPath + matching_file_names[ i ] );
+		uint64_t file_time = CPlatformTime::Get_File_Write_Raw_Time( LogPath + matching_file_names[ i ] );
 
 		if ( delete_all_logs || CPlatformTime::Is_Raw_Time_Less_Than_Seconds( file_time, current_time, SECONDS_PER_HOUR ) )
 		{

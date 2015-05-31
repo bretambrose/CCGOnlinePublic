@@ -41,7 +41,7 @@ struct SProcessProperties
 			Value( rhs.Value )
 		{}
 
-		explicit SProcessProperties( uint16 subject_part, uint16 major_part = 1, uint16 minor_part = 1, uint16 mode_part = 1 ) :
+		explicit SProcessProperties( uint16_t subject_part, uint16_t major_part = 1, uint16_t minor_part = 1, uint16_t mode_part = 1 ) :
 			Value()
 		{
 			Value.Parts.Subject = subject_part;
@@ -51,18 +51,18 @@ struct SProcessProperties
 		}
 
 		// Accessors
-		uint64 Get_Raw_Value( void ) const { return Value.RawValue; }
+		uint64_t Get_Raw_Value( void ) const { return Value.RawValue; }
 
-		uint16 Get_Subject( void ) const { return Value.Parts.Subject; }
+		uint16_t Get_Subject( void ) const { return Value.Parts.Subject; }
 
 		template< typename T >
 		T Get_Subject_As( void ) const { return static_cast< T >( Value.Parts.Subject ); }
 
-		uint16 Get_Major_Part( void ) const { return Value.Parts.Major; }
-		uint16 Get_Minor_Part( void ) const { return Value.Parts.Minor; }
-		uint16 Get_Mode_Part( void ) const { return Value.Parts.Mode; }
+		uint16_t Get_Major_Part( void ) const { return Value.Parts.Major; }
+		uint16_t Get_Minor_Part( void ) const { return Value.Parts.Minor; }
+		uint16_t Get_Mode_Part( void ) const { return Value.Parts.Mode; }
 
-		void Get_Parts( uint16 &subject, uint16 &major_part, uint16 &minor_part, uint16 &mode_part )
+		void Get_Parts( uint16_t &subject, uint16_t &major_part, uint16_t &minor_part, uint16_t &mode_part )
 		{
 			subject = Value.Parts.Subject;
 			major_part = Value.Parts.Major;
@@ -71,7 +71,7 @@ struct SProcessProperties
 		}
 
 		template< typename T >
-		void Get_Parts_As( T &subject, uint16 &major_part, uint16 &minor_part, uint16 &mode_part )
+		void Get_Parts_As( T &subject, uint16_t &major_part, uint16_t &minor_part, uint16_t &mode_part )
 		{
 			subject = static_cast< T >( Value.Parts.Subject );
 			major_part = Value.Parts.Major;
@@ -103,7 +103,7 @@ struct SProcessProperties
 				RawValue( 0 )
 			{}
 
-			uint64 RawValue;
+			uint64_t RawValue;
 			SPropertyParts Parts;
 		};
 
@@ -136,7 +136,7 @@ struct SProcessPropertiesContainerHelper
 		}
 #else
 		size_t operator()( const SProcessProperties &prop_value ) const {
-			uint64 value = prop_value.Get_Raw_Value();
+			uint64_t value = prop_value.Get_Raw_Value();
 
 			return static_cast< size_t >( ( value & 0xFFFFFFFF ) ^ ( value >> 32 ) ); 
 		}
