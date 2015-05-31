@@ -48,7 +48,7 @@ CSlashCommandParam::CSlashCommandParam( void ) :
 **********************************************************************************************************************/
 void CSlashCommandParam::Register_Type_Definition( void )
 {
-	BEGIN_ROOT_DATA_BINDING_SET;
+	BEGIN_ROOT_TYPE_DEFINITION( CSlashCommandParam );
 
 	REGISTER_MEMBER_BINDING( L"Type", &CSlashCommandParam::Type );
 	REGISTER_MEMBER_BINDING( L"SubType", &CSlashCommandParam::SubType );
@@ -56,7 +56,7 @@ void CSlashCommandParam::Register_Type_Definition( void )
 	REGISTER_MEMBER_BINDING( L"Optional", &CSlashCommandParam::Optional );
 	REGISTER_MEMBER_BINDING( L"Capture", &CSlashCommandParam::Capture );
 
-	END_DATA_BINDING_SET( CSlashCommandParam );
+	END_TYPE_DEFINITION( CSlashCommandParam );
 }
 
 /**********************************************************************************************************************
@@ -201,15 +201,15 @@ CSlashCommandDataDefinition::CSlashCommandDataDefinition( void ) :
 **********************************************************************************************************************/
 void CSlashCommandDataDefinition::Register_Type_Definition( void )
 {
-	BEGIN_ROOT_DATA_BINDING_SET;
+	BEGIN_ROOT_TYPE_DEFINITION( CSlashCommandDataDefinition );
 
-	REGISTER_MEMBER_BINDING( L"CommandCommand", &CSlashCommandDataDefinition::Command );
+	REGISTER_MEMBER_BINDING( L"Command", &CSlashCommandDataDefinition::Command );
 	REGISTER_MEMBER_BINDING( L"SubCommand", &CSlashCommandDataDefinition::SubCommand );
 	REGISTER_MEMBER_BINDING( L"Shortcut", &CSlashCommandDataDefinition::Shortcut );
 	REGISTER_MEMBER_BINDING( L"Help", &CSlashCommandDataDefinition::Help );
 	REGISTER_MEMBER_BINDING( L"Params", &CSlashCommandDataDefinition::Params );
 
-	END_DATA_BINDING_SET( CSlashCommandDataDefinition );
+	END_TYPE_DEFINITION( CSlashCommandDataDefinition );
 }
 
 /**********************************************************************************************************************

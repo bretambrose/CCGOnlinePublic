@@ -24,8 +24,7 @@
 
 #include "IPShared/SlashCommands/SlashCommandManager.h"
 #include "IPShared/SlashCommands/SlashCommandInstance.h"
-
-#ifdef NEVER
+#include "IPShared/Serialization/SerializationRegistrar.h"
 
 class SlashCommandTests : public testing::Test 
 {
@@ -34,6 +33,7 @@ class SlashCommandTests : public testing::Test
 		virtual void SetUp( void )
 		{
 			CSlashCommandManager::Initialize();
+			CSerializationRegistrar::Finalize();
 			CSlashCommandManager::Load_Command_File( "Data/XML/SlashCommandTests.xml" );
 		}
 
@@ -127,5 +127,3 @@ TEST_F( SlashCommandTests, Commands_Bad )
 	ASSERT_FALSE( CSlashCommandManager::Parse_Command( L"/test subby false", command_instance, error_msg ) );
 	ASSERT_FALSE( CSlashCommandManager::Parse_Command( L"/test subby false notanumber", command_instance, error_msg ) );
 }
-
-#endif

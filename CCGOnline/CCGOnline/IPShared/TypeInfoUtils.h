@@ -42,24 +42,4 @@ struct STypeInfoContainerHelper
 		}
 };
 
-using TypeInfoPair = std::pair< Loki::TypeInfo, Loki::TypeInfo >;
-
-struct STypeInfoPairContainerHelper
-{
-	public:
-		enum {
-			bucket_size = 4,  
-			min_buckets = 8
-		}; 
-
-		size_t operator()( const TypeInfoPair &key_value ) const {
-			return reinterpret_cast< size_t >( reinterpret_cast< const void * >( &key_value.first.Get() ) ) ^
-					 reinterpret_cast< size_t >( reinterpret_cast< const void * >( &key_value.second.Get() ) ); 
-		}
-
-		bool operator()( const TypeInfoPair &left, const TypeInfoPair &right ) const {
-			return left.first.before( right.first ) || ( left.first == right.first  && left.second.before( right.second ) );
-		}
-};
-
 #endif // TYPE_INFO_UTILS_H

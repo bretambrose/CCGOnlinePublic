@@ -209,6 +209,9 @@
     <ClInclude Include="Serialization\SerializationRegistrar.h">
       <Filter>Source Files\Serialization</Filter>
     </ClInclude>
+    <ClInclude Include="Serialization\SerializationBinding.h">
+      <Filter>Source Files\Serialization</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -299,6 +302,9 @@
       <Filter>Source Files\Serialization\XML</Filter>
     </ClCompile>
     <ClCompile Include="Serialization\SerializationRegistrar.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization\SerializationBinding.cpp">
       <Filter>Source Files\Serialization</Filter>
     </ClCompile>
   </ItemGroup>

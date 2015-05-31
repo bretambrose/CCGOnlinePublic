@@ -27,4 +27,6 @@
 #define SAFE_DELETE(x) if((x) != nullptr) { delete (x); }
 #define SAFE_DELETE_ARRAY(x) if((x) != nullptr) { delete [](x); }
 
+#define IP_UNREFERENCED_PARAM( x ) ( &reinterpret_cast< const int& >( x ) )
+
 #endif // UNIVERSAL_H

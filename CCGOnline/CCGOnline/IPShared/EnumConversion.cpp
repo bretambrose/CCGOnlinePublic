@@ -322,7 +322,7 @@ std::unordered_map< std::string, CConvertibleEnum * > CEnumConverter::EnumsByNam
 **********************************************************************************************************************/
 void CEnumConverter::Cleanup( void )
 {
-	std::for_each(Enums.begin(), Enums.end(), []( const EnumTableType::value_type &val ){ SAFE_DELETE( val.second ); } );
+	std::for_each( Enums.begin(), Enums.end(), []( const EnumTableType::value_type &val ){ SAFE_DELETE( val.second ); } );
 	Enums.clear();
 	EnumsByName.clear();
 }
@@ -335,9 +335,8 @@ void CEnumConverter::Cleanup( void )
 		properties -- any special properties that the enum has (bitfield)
 
 **********************************************************************************************************************/
-void CEnumConverter::Register_Enum_Internal( const std::type_info &enum_type_id, const std::string &enum_name, EConvertibleEnumProperties properties )
+void CEnumConverter::Register_Enum_Internal( const Loki::TypeInfo &enum_type_info, const std::string &enum_name, EConvertibleEnumProperties properties )
 {
-	Loki::TypeInfo enum_type_info( enum_type_id );
 	FATAL_ASSERT( Enums.find( enum_type_info ) == Enums.cend() );
 
 	std::string upper_enum_name;
@@ -357,9 +356,9 @@ void CEnumConverter::Register_Enum_Internal( const std::type_info &enum_type_id,
 		entry_value -- integer value of the enum entry
 
 **********************************************************************************************************************/		
-void CEnumConverter::Register_Enum_Entry_Internal( const std::type_info &enum_type_id, const std::string &entry_name, uint64 entry_value )
+void CEnumConverter::Register_Enum_Entry_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64 entry_value )
 {
-	CConvertibleEnum *enum_object = Find_Enum( enum_type_id );
+	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	FATAL_ASSERT( enum_object != nullptr );
 
 	enum_object->Register_Entry( entry_name, entry_value );
@@ -373,10 +372,8 @@ void CEnumConverter::Register_Enum_Entry_Internal( const std::type_info &enum_ty
 		Returns: the conversion object for the name enum, or null
 
 **********************************************************************************************************************/	
-CConvertibleEnum *CEnumConverter::Find_Enum( const std::type_info &enum_type_id )
+CConvertibleEnum *CEnumConverter::Find_Enum( const Loki::TypeInfo &enum_type_info )
 {
-	Loki::TypeInfo enum_type_info( enum_type_id );
-
 	auto iter = Enums.find( enum_type_info );
 	if ( iter == Enums.end() )
 	{
@@ -409,16 +406,32 @@ CConvertibleEnum *CEnumConverter::Find_Enum( const std::string &enum_name )
 }
 
 /**********************************************************************************************************************
-	CEnumConverter::Convert_Internal -- converts from a string to an integer for the supplied enum
+	CEnumConverter::Convert -- converts from a string to an integer for the supplied enum
 
 		enum_type_id -- type info for the enum this is a conversion operation for
 		entry_name -- string value to convert from
 		output_value -- output parameter for the corresponding integer value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, const std::string &entry_name, uint64 &output_value )
+bool CEnumConverter::Convert( const Loki::TypeInfo &enum_type_info, const std::wstring &entry_name, uint64 &output_value )
 {
-	CConvertibleEnum *enum_object = Find_Enum( enum_type_id );
+	std::string usable_entry_name;
+	NStringUtils::WideString_To_String( entry_name, usable_entry_name );
+
+	return Convert_Internal( enum_type_info, usable_entry_name, output_value );
+}
+
+/**********************************************************************************************************************
+	CEnumConverter::Convert -- converts from a string to an integer for the supplied enum
+
+		enum_type_id -- type info for the enum this is a conversion operation for
+		entry_name -- string value to convert from
+		output_value -- output parameter for the corresponding integer value
+
+**********************************************************************************************************************/	
+bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64 &output_value )
+{
+	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	if ( enum_object == nullptr )
 	{
 		return false;
@@ -435,9 +448,9 @@ bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, const
 		entry_name -- output parameter for the corresponding string value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::string &entry_name )
+bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64 value, std::string &entry_name )
 {
-	CConvertibleEnum *enum_object = Find_Enum( enum_type_id );
+	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	if ( enum_object == nullptr )
 	{
 		return false;
@@ -454,9 +467,9 @@ bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, uint6
 		entry_name -- output parameter for the corresponding string value
 
 **********************************************************************************************************************/	
-bool CEnumConverter::Convert_Internal( const std::type_info &enum_type_id, uint64 value, std::wstring &entry_name )
+bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64 value, std::wstring &entry_name )
 {
-	CConvertibleEnum *enum_object = Find_Enum( enum_type_id );
+	CConvertibleEnum *enum_object = Find_Enum( enum_type_info );
 	if ( enum_object == nullptr )
 	{
 		return false;

@@ -155,18 +155,18 @@ namespace XMLSerialization
 
 	void Register_Primitive_Serializers( void )
 	{
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< int8 >( new CXMLIntegerSerializer< int8 > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< uint8 >( new CXMLUnsignedIntegerSerializer< uint8 > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< int16 >( new CXMLIntegerSerializer< int16 > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< uint16 >( new CXMLUnsignedIntegerSerializer< uint16 > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< int32 >( new CXMLIntegerSerializer< int32 > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< uint32 >( new CXMLUnsignedIntegerSerializer< uint32 > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< int64 >( new CXMLIntegerSerializer< int64 > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< uint64 >( new CXMLUnsignedIntegerSerializer< uint64 > );	
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< std::wstring >( new CXMLWideStringSerializer );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< std::string >( new CXMLStringSerializer );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< double >( new CXMLDoubleSerializer< double > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< float >( new CXMLDoubleSerializer< float > );
-		CSerializationRegistrar::Register_Primitive_XML_Serializer< bool >( new CXMLBoolSerializer );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int8, new CXMLIntegerSerializer< int8 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint8, new CXMLIntegerSerializer< uint8 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int16, new CXMLIntegerSerializer< int16 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint16, new CXMLIntegerSerializer< uint16 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int32, new CXMLIntegerSerializer< int32 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint32, new CXMLIntegerSerializer< uint32 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( int64, new CXMLIntegerSerializer< int64 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( uint64, new CXMLIntegerSerializer< uint64 > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( std::wstring, new CXMLWideStringSerializer );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( std::string, new CXMLStringSerializer );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( double, new CXMLDoubleSerializer< double > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( float, new CXMLDoubleSerializer< float > );
+		REGISTER_PRIMITIVE_XML_SERIALIZER( bool, new CXMLBoolSerializer );
 	}
 }

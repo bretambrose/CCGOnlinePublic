@@ -32,7 +32,7 @@ void NIPShared::Register_Shared_XML_Serializers( void )
 {
 	XMLSerialization::Register_Primitive_Serializers();
 
-	CSerializationRegistrar::Register_Primitive_XML_Serializer< ESlashCommandParamType >( new CEnumXMLSerializer<ESlashCommandParamType> );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( ESlashCommandParamType, new CEnumXMLSerializer< ESlashCommandParamType > );
 
 	CSlashCommandParam::Register_Type_Definition();
 	CSlashCommandDataDefinition::Register_Type_Definition();

@@ -207,40 +207,13 @@ class CEnumXMLSerializer : public IXMLSerializer
 		}
 };
 
-// A serializer for a pointer to an enum
-template< typename T >
-class CEnumPointerXMLSerializer : public IXMLSerializer
-{
-	public:
-
-		CEnumPointerXMLSerializer( void ) {}
-
-		virtual ~CEnumPointerXMLSerializer() = default;
-
-		virtual void Load_From_XML( const pugi::xml_node &xml_node, void *destination ) const override
-		{
-			Load_From_XML( xml_node.child_value(), destination );
-		}
-
-		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
-		{
-			T **dest = reinterpret_cast< T ** >( destination );
-			*dest = new T;
-
-			if ( !CEnumConverter::Convert( value, **dest ) )
-			{
-				FATAL_ASSERT( false );
-			}
-		}
-};
-
 // A serializer for the base class of a class hierarchy, where all leaves of the hierarchy have a corresponding enum entry
-template< typename T >
 class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 {
 	public:
 
-		CEnumPolymorphicXMLSerializer( void ) :
+		CEnumPolymorphicXMLSerializer( const Loki::TypeInfo &enum_type_info ) :
+			EnumTypeInfo( enum_type_info ),
 			Serializers()
 		{
 		}
@@ -251,11 +224,10 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 		{
 			pugi::xml_attribute attrib = xml_node.attribute( L"Type" );
 
-			T type_value;
+			uint64 type_value;
 			std::string attribute_value;
-			NStringUtils::WideString_To_String( attrib.value(), attribute_value );
 
-			if ( !CEnumConverter::Convert( attribute_value, type_value ) )
+			if ( !CEnumConverter::Convert( EnumTypeInfo, std::wstring( attrib.value() ), type_value ) )
 			{
 				FATAL_ASSERT( false );
 			}
@@ -265,7 +237,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 			serializer->Load_From_XML( xml_node, destination );
 		}
 
-		void Add( T key, IXMLSerializer *serializer )
+		void Add( uint64 key, IXMLSerializer *serializer )
 		{
 			FATAL_ASSERT( Serializers.find( key ) == Serializers.cend() );
 
@@ -274,7 +246,9 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 
 	private:
 
-		typedef std::unordered_map< T, IXMLSerializer * > SerializerTableType;
+		typedef std::unordered_map< uint64, IXMLSerializer * > SerializerTableType;
+		
+		Loki::TypeInfo EnumTypeInfo;
 
 		SerializerTableType Serializers;
 };
