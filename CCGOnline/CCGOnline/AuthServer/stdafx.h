@@ -34,6 +34,11 @@
 #include <string>
 #include <functional>
 #include <algorithm>
+#include <mutex>
+#include <atomic>
+#include <thread>
+#include <chrono>
+#include <type_traits>
 #include <assert.h>
 
 #include "IPPlatform/MemoryAllocation.h"

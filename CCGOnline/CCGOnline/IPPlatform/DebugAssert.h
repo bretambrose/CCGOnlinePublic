@@ -20,8 +20,6 @@
 #ifndef DEBUG_ASSERT_H
 #define DEBUG_ASSERT_H
 
-class ISimplePlatformMutex;
-
 typedef FastDelegate1< std::wstring &, void > DLogFunctionType;
 
 // A static class to handle all assertion failures.  Multi-threaded safe via a mutex.
@@ -37,11 +35,11 @@ class CAssertSystem
 
 	private:
 
-		static ISimplePlatformMutex *AssertLock;
+		static std::mutex AssertLock;
 
 		static DLogFunctionType LogFunction;
 
-		static bool Initialized;
+		static std::atomic< bool > Initialized;
 };
 
 // Macros

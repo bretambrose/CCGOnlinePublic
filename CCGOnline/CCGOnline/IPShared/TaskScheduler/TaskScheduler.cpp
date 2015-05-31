@@ -30,14 +30,14 @@ static const double TIME_GRANULARITY_FRACTION_CUTOFF = .00001;
 
 
 CTaskScheduler::CTaskScheduler( void ) :
-	TaskQueue( new TPriorityQueue< shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator >() ),
+	TaskQueue( new TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator >() ),
 	TimeGranularity( 0.0 )
 {
 }
 
 
 CTaskScheduler::CTaskScheduler( double time_granularity ) :
-	TaskQueue( new TPriorityQueue< shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator >() ),
+	TaskQueue( new TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator >() ),
 	TimeGranularity( time_granularity )
 {
 }
@@ -50,7 +50,7 @@ CTaskScheduler::~CTaskScheduler()
 
 double CTaskScheduler::Get_Next_Task_Time( void ) const
 {
-	shared_ptr< CScheduledTask > task;
+	std::shared_ptr< CScheduledTask > task;
 	TaskQueue->Peek_Top( task );
 	if ( task != nullptr )
 	{
@@ -63,7 +63,7 @@ double CTaskScheduler::Get_Next_Task_Time( void ) const
 }
 
 
-void CTaskScheduler::Submit_Task( const shared_ptr< CScheduledTask > &task )
+void CTaskScheduler::Submit_Task( const std::shared_ptr< CScheduledTask > &task )
 {
 	FATAL_ASSERT( !task->Is_Scheduled() );
 
@@ -83,7 +83,7 @@ void CTaskScheduler::Submit_Task( const shared_ptr< CScheduledTask > &task )
 }
 
 
-void CTaskScheduler::Remove_Task( const shared_ptr< CScheduledTask > &task )
+void CTaskScheduler::Remove_Task( const std::shared_ptr< CScheduledTask > &task )
 {
 	TaskQueue->Remove_By_Index( task->Get_Heap_Index() );
 }
@@ -91,7 +91,7 @@ void CTaskScheduler::Remove_Task( const shared_ptr< CScheduledTask > &task )
 
 void CTaskScheduler::Service( double current_time_seconds )
 {
-	shared_ptr< CScheduledTask > task;
+	std::shared_ptr< CScheduledTask > task;
 	while ( TaskQueue->Peek_Top( task ) && task != nullptr && task->Get_Execute_Time() <= current_time_seconds )
 	{
 		TaskQueue->Pop();

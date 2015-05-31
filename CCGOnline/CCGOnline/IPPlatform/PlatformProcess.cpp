@@ -69,9 +69,3 @@ std::wstring NPlatform::Get_Service_Name( void )
 
 	return exe_name;
 }
-
-
-void NPlatform::Sleep( uint32_t milliseconds )
-{
-	::Sleep( milliseconds );
-}

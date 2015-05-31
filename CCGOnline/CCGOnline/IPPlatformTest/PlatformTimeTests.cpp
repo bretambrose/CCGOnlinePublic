@@ -47,7 +47,7 @@ TEST_F( PlatformTimeTests, Raw_Time_Comparisons )
 {
 	uint64_t time1 = CPlatformTime::Get_Raw_Time();
 
-	NPlatform::Sleep( 1500 );
+	std::this_thread::sleep_for( std::chrono::milliseconds( 1500 ) );
 
 	uint64_t time2 = CPlatformTime::Get_Raw_Time();
 

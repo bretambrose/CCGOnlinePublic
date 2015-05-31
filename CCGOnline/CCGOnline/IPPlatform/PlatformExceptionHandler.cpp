@@ -26,7 +26,6 @@
 #include "PlatformExceptionHandler.h"
 #include "PlatformMisc.h"
 #include "StructuredExceptionInfo.h"
-#include "SynchronizationPrimitives/PlatformMutex.h"
 
 #ifdef WIN32
 
@@ -240,7 +239,7 @@ static std::wstring Convert_Exception_Code_To_Message( uint32_t exception_code )
 
 static LONG WINAPI WindowsExceptionHandler( struct _EXCEPTION_POINTERS *windows_exception_info )
 {
-	CSimplePlatformMutexLocker exception_lock( CPlatformExceptionHandler::Get_Lock() );
+	std::lock_guard< std::mutex > exception_lock( CPlatformExceptionHandler::Get_Lock() );
 		
 	uint32_t exception_code = windows_exception_info->ExceptionRecord->ExceptionCode;
 	CStructuredExceptionInfo shared_exception_info( exception_code == 1 );
@@ -266,7 +265,7 @@ static LONG WINAPI WindowsExceptionHandler( struct _EXCEPTION_POINTERS *windows_
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 DExceptionHandler CPlatformExceptionHandler::Handler;
-ISimplePlatformMutex *CPlatformExceptionHandler::ExceptionLock = nullptr;
+std::mutex CPlatformExceptionHandler::ExceptionLock;
 bool CPlatformExceptionHandler::SymbolsLoaded = false;
 bool CPlatformExceptionHandler::Initialized = false;
 
@@ -274,8 +273,6 @@ bool CPlatformExceptionHandler::Initialized = false;
 void CPlatformExceptionHandler::Initialize( const DExceptionHandler &handler )
 {
 	FATAL_ASSERT( !Initialized );
-
-	ExceptionLock = NPlatform::Create_Simple_Mutex();
 
 	Handler = handler;
 	::AddVectoredExceptionHandler( 1, WindowsExceptionHandler );
@@ -293,9 +290,6 @@ void CPlatformExceptionHandler::Shutdown( void )
 
 	Handler = DExceptionHandler();
 	::RemoveVectoredExceptionHandler( WindowsExceptionHandler );
-
-	delete ExceptionLock;
-	ExceptionLock = nullptr;
 
 	if ( SymbolsLoaded )
 	{

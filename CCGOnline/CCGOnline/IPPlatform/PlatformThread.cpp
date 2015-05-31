@@ -165,7 +165,7 @@ CPlatformThread::CPlatformThread( void ) :
 
 CPlatformThread::~CPlatformThread()
 {
-	Shutdown();
+	//Shutdown();
 }
 
 
@@ -176,12 +176,12 @@ void CPlatformThread::Create_And_Run( uint64_t stack_size, const ThreadExecution
 	ThreadImpl->Launch_Thread( stack_size, execution_function, run_context );
 }
 
-
+/*
 void CPlatformThread::Shutdown( void )
 {
 	ThreadImpl->Shutdown_Thread();
 }
-
+*/
 
 bool CPlatformThread::Is_Running( void ) const
 {

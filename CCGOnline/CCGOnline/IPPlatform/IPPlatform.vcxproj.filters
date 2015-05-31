@@ -5,9 +5,6 @@
       <UniqueIdentifier>{86A75593-7B3C-40C7-BAB6-E80DEE4B3799}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\SynchronizationPrimitives">
-      <UniqueIdentifier>{36E7056A-5B39-4BEA-AA33-430A78BFEC91}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Resource Files">
       <UniqueIdentifier>{6A05605B-E5D8-4E3A-B2BC-DF79F9CB3DAB}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -49,9 +46,6 @@
     </ClInclude>
     <ClInclude Include="PlatformExceptionHandler.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SynchronizationPrimitives\PlatformMutex.h">
-      <Filter>Source Files\SynchronizationPrimitives</Filter>
     </ClInclude>
     <ClInclude Include="PlatformProcess.h">
       <Filter>Source Files</Filter>
@@ -99,9 +93,6 @@
     </ClCompile>
     <ClCompile Include="PlatformExceptionHandler.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SynchronizationPrimitives\PlatformMutex.cpp">
-      <Filter>Source Files\SynchronizationPrimitives</Filter>
     </ClCompile>
     <ClCompile Include="PlatformProcess.cpp">
       <Filter>Source Files</Filter>

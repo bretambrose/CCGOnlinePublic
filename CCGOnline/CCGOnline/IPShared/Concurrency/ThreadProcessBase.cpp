@@ -73,7 +73,7 @@ void CThreadProcessBase::Thread_Function( void *thread_data )
 		CProcessStatics::Set_Current_Process( nullptr );
 		Flush_System_Messages();
 
-		NPlatform::Sleep( Get_Sleep_Interval_In_Milliseconds() );
+		std::this_thread::sleep_for( std::chrono::milliseconds( Get_Sleep_Interval_In_Milliseconds() ) );
 	}
 }
 

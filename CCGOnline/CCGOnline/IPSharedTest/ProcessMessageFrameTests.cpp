@@ -33,8 +33,8 @@ TEST( VirtualProcessMessageFrameTests, Add_Remove )
 {
 	CProcessMessageFrame message_frame( EProcessID::LOGGING );
 
-	message_frame.Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
-	message_frame.Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
+	message_frame.Add_Message( std::unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 0 ] ) ) );
+	message_frame.Add_Message( std::unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGES[ 1 ] ) ) );
 
 	uint32_t i = 0;
 	for ( auto iter = message_frame.cbegin(), end = message_frame.cend(); iter != end; ++iter, ++i )

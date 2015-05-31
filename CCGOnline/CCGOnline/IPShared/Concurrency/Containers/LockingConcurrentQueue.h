@@ -22,8 +22,6 @@
 
 #include "ConcurrentQueueInterface.h"
 
-#include "IPPlatform/SynchronizationPrimitives/PlatformMutex.h"
-
 // A concurrent queue that uses a system mutex to guard add and remove operations
 template< typename T >
 class CLockingConcurrentQueue : public IConcurrentQueue< T >
@@ -33,7 +31,7 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 		// Construction/Destruction
 		CLockingConcurrentQueue( void ) :
 			Items(),
-			Lock( NPlatform::Create_Simple_Mutex() )
+			Lock()
 		{}
 
 		virtual ~CLockingConcurrentQueue() = default;
@@ -46,14 +44,14 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 		// Base class public interface implementations
 		virtual void Move_Item( T &&item ) override
 		{
-			CSimplePlatformMutexLocker locker( Lock.get() );
+			std::lock_guard< std::mutex > lock( Lock );
 
 			Items.emplace_back( std::move( item ) );
 		}
 
 		virtual void Remove_Items( std::vector< T > &items ) override
 		{
-			CSimplePlatformMutexLocker locker( Lock.get() );
+			std::lock_guard< std::mutex > lock( Lock );
 
 			items.reserve( items.size() + Items.size() );
 			std::move( Items.begin(), Items.end(), std::back_inserter( items ) );
@@ -66,7 +64,7 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 		// Private data
 		std::vector< T > Items;
 
-		unique_ptr< ISimplePlatformMutex > Lock;
+		std::mutex Lock;
 
 };
 

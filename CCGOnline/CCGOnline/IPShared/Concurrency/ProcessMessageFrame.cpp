@@ -43,13 +43,13 @@ CProcessMessageFrame::~CProcessMessageFrame()
 }
 
 
-void CProcessMessageFrame::Add_Message( unique_ptr< const IProcessMessage > &message )
+void CProcessMessageFrame::Add_Message( std::unique_ptr< const IProcessMessage > &message )
 {
 	Messages.emplace_back( std::move( message ) );
 }
 
 
-void CProcessMessageFrame::Add_Message( unique_ptr< const IProcessMessage > &&message )
+void CProcessMessageFrame::Add_Message( std::unique_ptr< const IProcessMessage > &&message )
 {
 	Messages.emplace_back( std::move( message ) );
 }

@@ -31,12 +31,11 @@
 #include "IPShared/Concurrency/ProcessSubject.h"
 #include "IPPlatform/PlatformTime.h"
 #include "IPPlatform/PlatformFileSystem.h"
-#include "IPPlatform/SynchronizationPrimitives/PlatformMutex.h"
 #include "IPPlatform/StringUtils.h"
 
 // Static class data member definitions
-ISimplePlatformMutex *CLogInterface::LogLock( nullptr );
-shared_ptr< IManagedProcess > CLogInterface::LogProcess( nullptr );
+std::mutex CLogInterface::LogLock;
+std::shared_ptr< IManagedProcess > CLogInterface::LogProcess( nullptr );
 
 ELogLevel CLogInterface::LogLevel( LL_LOW );
 std::wstring CLogInterface::ServiceName( L"" );
@@ -54,8 +53,6 @@ bool CLogInterface::DynamicInitialized = false;
 void CLogInterface::Initialize_Static( const std::wstring &service_name, ELogLevel log_level )
 {
 	FATAL_ASSERT( StaticInitialized == false );
-
-	LogLock = NPlatform::Create_Simple_Mutex();
 
 	ServiceName = service_name;
 	LogLevel = log_level;
@@ -85,9 +82,6 @@ void CLogInterface::Shutdown_Static( void )
 
 	Shutdown_Dynamic();
 
-	delete LogLock;
-	LogLock = nullptr;
-
 	StaticInitialized = false;
 }
 
@@ -98,7 +92,7 @@ void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 
 	FATAL_ASSERT( StaticInitialized == true );
 
-	CSimplePlatformMutexLocker lock( LogLock );
+	std::lock_guard< std::mutex > lock( LogLock );
 
 	FATAL_ASSERT( DynamicInitialized == false );
 
@@ -134,7 +128,7 @@ void CLogInterface::Shutdown_Dynamic( void )
 
 	if ( DynamicInitialized )
 	{
-		CSimplePlatformMutexLocker lock( LogLock );
+		std::lock_guard< std::mutex > lock( LogLock );
 
 		LogProcess = nullptr;
 
@@ -145,7 +139,7 @@ void CLogInterface::Shutdown_Dynamic( void )
 
 void CLogInterface::Service_Logging( const CProcessExecutionContext &context )
 {
-	CSimplePlatformMutexLocker lock( LogLock );
+	std::lock_guard< std::mutex > lock( LogLock );
 
 	if ( LogProcess.get() != nullptr )
 	{

@@ -29,7 +29,7 @@ class TProcessMessageHandler : public IProcessMessageHandler
 	public:
 
 		// signature of the actual handling function for a specific message type
-		typedef FastDelegate2< EProcessID::Enum, unique_ptr< const MessageType > &, void > HandlerFunctorType;
+		typedef FastDelegate2< EProcessID::Enum, std::unique_ptr< const MessageType > &, void > HandlerFunctorType;
 
 		typedef IProcessMessageHandler BASECLASS;
 
@@ -48,13 +48,13 @@ class TProcessMessageHandler : public IProcessMessageHandler
 			MessageHandler( message_handler )
 		{}
 
-		virtual void Handle_Message( EProcessID::Enum source_process_id, unique_ptr< const IProcessMessage > &message ) const override
+		virtual void Handle_Message( EProcessID::Enum source_process_id, std::unique_ptr< const IProcessMessage > &message ) const override
 		{
 			// The handlers are tracked generically so they can go in one big hash table, but our forwarding delegates
 			// have specific type signatures, requiring a down cast that preserves smart pointer reference counting
 			const MessageType *raw_msg = static_cast< const MessageType * >( message.release() );
 
-			unique_ptr< const MessageType > down_cast_message( raw_msg );
+			std::unique_ptr< const MessageType > down_cast_message( raw_msg );
 			MessageHandler( source_process_id, down_cast_message );
 		}
 
@@ -64,9 +64,9 @@ class TProcessMessageHandler : public IProcessMessageHandler
 };
 
 template < typename T, typename U >
-void Register_This_Handler( U* registry, void (U::*handler_function)( EProcessID::Enum, unique_ptr< const T > & ) )
+void Register_This_Handler( U* registry, void (U::*handler_function)( EProcessID::Enum, std::unique_ptr< const T > & ) )
 {
-	unique_ptr< IProcessMessageHandler > handler( new TProcessMessageHandler< T >( TProcessMessageHandler< T >::HandlerFunctorType( registry, handler_function ) ) );
+	std::unique_ptr< IProcessMessageHandler > handler( new TProcessMessageHandler< T >( TProcessMessageHandler< T >::HandlerFunctorType( registry, handler_function ) ) );
 	registry->Register_Handler( typeid( T ), handler );
 }
 

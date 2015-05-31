@@ -24,7 +24,7 @@
 #include "IPShared/Concurrency/ProcessInterface.h"
 
 
-CAddNewProcessMessage::CAddNewProcessMessage( const shared_ptr< IProcess > &process, bool return_mailbox, bool forward_creator_mailbox ) :
+CAddNewProcessMessage::CAddNewProcessMessage( const std::shared_ptr< IProcess > &process, bool return_mailbox, bool forward_creator_mailbox ) :
 	Process( process ),
 	ReturnMailbox( return_mailbox ),
 	ForwardCreatorMailbox( forward_creator_mailbox )

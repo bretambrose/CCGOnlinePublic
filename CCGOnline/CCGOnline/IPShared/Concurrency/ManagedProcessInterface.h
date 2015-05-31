@@ -41,9 +41,9 @@ class IManagedProcess : public IProcess
 
 		virtual ~IManagedProcess() = default;
 
-		virtual void Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;
-		virtual void Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;
-		virtual void Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &read_interface ) = 0;
+		virtual void Set_Manager_Mailbox( const std::shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;
+		virtual void Set_Logging_Mailbox( const std::shared_ptr< CWriteOnlyMailbox > &mailbox ) = 0;
+		virtual void Set_My_Mailbox( const std::shared_ptr< CReadOnlyMailbox > &read_interface ) = 0;
 
 		virtual void Cleanup( void ) = 0;
 

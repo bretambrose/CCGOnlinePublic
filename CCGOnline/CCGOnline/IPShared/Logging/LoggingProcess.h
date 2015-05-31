@@ -67,12 +67,12 @@ class CLoggingProcess : public CTaskProcessBase
 		std::wstring Build_File_Name( EProcessSubject::Enum subject ) const;
 		std::wstring Build_Log_Message( EProcessID::Enum process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64_t system_time ) const;
 
-		void Handle_Log_Request_Message( EProcessID::Enum source_process_id, unique_ptr< const CLogRequestMessage > &message );
+		void Handle_Log_Request_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CLogRequestMessage > &message );
 
 		void Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64_t system_time );
 
 		// Private Data
-		typedef std::unordered_map< EProcessSubject::Enum, unique_ptr< CLogFile > > LogFileTableType; 
+		typedef std::unordered_map< EProcessSubject::Enum, std::unique_ptr< CLogFile > > LogFileTableType; 
 		LogFileTableType LogFiles;
 
 		uint32_t PID;

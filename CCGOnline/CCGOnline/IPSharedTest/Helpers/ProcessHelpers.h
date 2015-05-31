@@ -40,25 +40,25 @@ class CProcessBaseTester
 
 		void Log( const std::wstring &log_string );
 
-		shared_ptr< CProcessMailbox > Get_Manager_Proxy( void ) const { return ManagerProxy; }
-		shared_ptr< CProcessMailbox > Get_Self_Proxy( void ) const { return SelfProxy; }
+		std::shared_ptr< CProcessMailbox > Get_Manager_Proxy( void ) const { return ManagerProxy; }
+		std::shared_ptr< CProcessMailbox > Get_Self_Proxy( void ) const { return SelfProxy; }
 
 		static void Set_Has_Process_Service_Executed( void ) { HasProcessServiceExecuted = true; }
 		static bool Get_Has_Process_Service_Executed( void ) { return HasProcessServiceExecuted; }
 
 		bool Has_Frame( EProcessID::Enum id ) const;
-		const unique_ptr< CProcessMessageFrame > &Get_Frame( EProcessID::Enum id ) const;
+		const std::unique_ptr< CProcessMessageFrame > &Get_Frame( EProcessID::Enum id ) const;
 
 		CProcessBase::FrameTableType &Get_Frame_Table( void ) const;
 		const CProcessBase::MailboxTableType &Get_Mailbox_Table( void ) const;
 
-		shared_ptr< CWriteOnlyMailbox > Get_Logging_Mailbox( void ) const;
-		void Set_Logging_Mailbox( shared_ptr< CWriteOnlyMailbox > mailbox );
+		std::shared_ptr< CWriteOnlyMailbox > Get_Logging_Mailbox( void ) const;
+		void Set_Logging_Mailbox( std::shared_ptr< CWriteOnlyMailbox > mailbox );
 
-		shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const;
+		std::shared_ptr< CWriteOnlyMailbox > Get_Manager_Mailbox( void ) const;
 
-		const unique_ptr< CProcessMessageFrame > &Get_Log_Frame( void ) const;
-		const unique_ptr< CProcessMessageFrame > &Get_Manager_Frame( void ) const;
+		const std::unique_ptr< CProcessMessageFrame > &Get_Log_Frame( void ) const;
+		const std::unique_ptr< CProcessMessageFrame > &Get_Manager_Frame( void ) const;
 
 		virtual CProcessBase *Get_Process( void ) const = 0;
 
@@ -66,8 +66,8 @@ class CProcessBaseTester
 
 		static bool HasProcessServiceExecuted;
 
-		shared_ptr< CProcessMailbox > ManagerProxy;
-		shared_ptr< CProcessMailbox > SelfProxy;
+		std::shared_ptr< CProcessMailbox > ManagerProxy;
+		std::shared_ptr< CProcessMailbox > SelfProxy;
 };
 
 class CTaskProcessBaseTester : public CProcessBaseTester
@@ -79,7 +79,7 @@ class CTaskProcessBaseTester : public CProcessBaseTester
 		CTaskProcessBaseTester( CTaskProcessBase *process );
 		virtual ~CTaskProcessBaseTester();
 
-		shared_ptr< CTaskProcessBase > Get_Task_Process( void ) const;
+		std::shared_ptr< CTaskProcessBase > Get_Task_Process( void ) const;
 
 		double Get_Reschedule_Interval( void ) const;
 
@@ -87,7 +87,7 @@ class CTaskProcessBaseTester : public CProcessBaseTester
 
 	private:
 
-		shared_ptr< CTaskProcessBase > TaskProcess;
+		std::shared_ptr< CTaskProcessBase > TaskProcess;
 
 };
 
@@ -100,13 +100,13 @@ class CThreadProcessBaseTester : public CProcessBaseTester
 		CThreadProcessBaseTester( CThreadProcessBase *process );
 		virtual ~CThreadProcessBaseTester();
 
-		shared_ptr< CThreadProcessBase > Get_Thread_Process( void ) const;
+		std::shared_ptr< CThreadProcessBase > Get_Thread_Process( void ) const;
 
 		virtual CProcessBase *Get_Process( void ) const;
 
 	private:
 
-		shared_ptr< CThreadProcessBase > ThreadProcess;
+		std::shared_ptr< CThreadProcessBase > ThreadProcess;
 
 };
 

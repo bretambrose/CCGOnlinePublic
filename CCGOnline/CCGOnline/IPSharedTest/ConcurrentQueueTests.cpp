@@ -65,15 +65,15 @@ static const std::wstring LOG_MESSAGE_2( L"Log Message 2" );
 
 TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr_Locking )
 {
-	IConcurrentQueue< unique_ptr< const CLogRequestMessage > > *message_queue = new CLockingConcurrentQueue< unique_ptr< const CLogRequestMessage > >();
+	IConcurrentQueue< std::unique_ptr< const CLogRequestMessage > > *message_queue = new CLockingConcurrentQueue< std::unique_ptr< const CLogRequestMessage > >();
 
-	unique_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
+	std::unique_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
 	message_queue->Move_Item( std::move( message1 ) );
 
-	unique_ptr< const CLogRequestMessage > message2( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_2 ) );
+	std::unique_ptr< const CLogRequestMessage > message2( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_2 ) );
 	message_queue->Move_Item( std::move( message2 ) );
 
-	std::vector< unique_ptr< const CLogRequestMessage > > items;
+	std::vector< std::unique_ptr< const CLogRequestMessage > > items;
 	message_queue->Remove_Items( items );
 
 	ASSERT_TRUE( items[ 0 ]->Get_Message() == LOG_MESSAGE_1 );
@@ -87,15 +87,15 @@ TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr_Locking )
 
 TEST( ConcurrentQueueTests, Add_Remove_Shared_Ptr_Lockless )
 {
-	IConcurrentQueue< unique_ptr< const CLogRequestMessage > > *message_queue = new CTBBConcurrentQueue< unique_ptr< const CLogRequestMessage > >();
+	IConcurrentQueue< std::unique_ptr< const CLogRequestMessage > > *message_queue = new CTBBConcurrentQueue< std::unique_ptr< const CLogRequestMessage > >();
 
-	unique_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
+	std::unique_ptr< const CLogRequestMessage > message1( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_1 ) );
 	message_queue->Move_Item( std::move( message1 ) );
 
-	unique_ptr< const CLogRequestMessage > message2( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_2 ) );
+	std::unique_ptr< const CLogRequestMessage > message2( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_MESSAGE_2 ) );
 	message_queue->Move_Item( std::move( message2 ) );
 
-	std::vector< unique_ptr< const CLogRequestMessage > > items;
+	std::vector< std::unique_ptr< const CLogRequestMessage > > items;
 	message_queue->Remove_Items( items );
 
 	ASSERT_TRUE( items[ 0 ]->Get_Message() == LOG_MESSAGE_1 );

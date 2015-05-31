@@ -82,7 +82,7 @@ void CTaskProcessBase::Service_Reschedule( void )
 {
 	if ( Should_Reschedule() )
 	{
-		unique_ptr< const IProcessMessage > reschedule_msg( new CRescheduleProcessMessage( Get_Reschedule_Time() ) );
+		std::unique_ptr< const IProcessMessage > reschedule_msg( new CRescheduleProcessMessage( Get_Reschedule_Time() ) );
 		Send_Manager_Message( reschedule_msg );
 	}
 }

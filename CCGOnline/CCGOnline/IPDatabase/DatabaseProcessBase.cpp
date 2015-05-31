@@ -113,7 +113,7 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 		}
 		else
 		{
-			unique_ptr< const IProcessMessage > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, true ) );
+			std::unique_ptr< const IProcessMessage > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, true ) );
 			Send_Process_Message( pending_request_iter->second.first, response );
 		}
 
@@ -132,7 +132,7 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 		}
 		else
 		{
-			unique_ptr< const IProcessMessage > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, false ) );
+			std::unique_ptr< const IProcessMessage > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, false ) );
 			Send_Process_Message( pending_request_iter->second.first, response );
 		}
 
@@ -163,7 +163,7 @@ void CDatabaseProcessBase::Add_Batch( IDatabaseTaskBatch *batch )
 	BatchOrdering.push_back( type_info );
 }
 
-void CDatabaseProcessBase::Handle_Run_Database_Task_Request( EProcessID::Enum process_id, unique_ptr< const CRunDatabaseTaskRequest > &message )
+void CDatabaseProcessBase::Handle_Run_Database_Task_Request( EProcessID::Enum process_id, std::unique_ptr< const CRunDatabaseTaskRequest > &message )
 {
 	IDatabaseTask *task = message->Get_Task();
 

@@ -87,7 +87,7 @@ class CServiceProcessTBBTask : public tbb::task
 
 		typedef tbb::task BASECLASS;
 
-		CServiceProcessTBBTask( const shared_ptr< IManagedProcess > &process, double elapsed_seconds ) :
+		CServiceProcessTBBTask( const std::shared_ptr< IManagedProcess > &process, double elapsed_seconds ) :
 			Process( process ),
 			ElapsedSeconds( elapsed_seconds )
 		{}
@@ -110,7 +110,7 @@ class CServiceProcessTBBTask : public tbb::task
 
 	private:
 
-		shared_ptr< IManagedProcess > Process;
+		std::shared_ptr< IManagedProcess > Process;
 
 		double ElapsedSeconds;
 };
@@ -162,7 +162,7 @@ class CProcessRecord
 	public:
 
 		// Construction/destruction
-		CProcessRecord( const shared_ptr< IManagedProcess > &process, const ExecuteProcessDelegateType &execute_delegate );
+		CProcessRecord( const std::shared_ptr< IManagedProcess > &process, const ExecuteProcessDelegateType &execute_delegate );
 		CProcessRecord( EProcessID::Enum process_id );
 		~CProcessRecord();
 
@@ -179,7 +179,7 @@ class CProcessRecord
 			}
 		}
 
-		shared_ptr< IManagedProcess > Get_Process( void ) const { return Process; }
+		std::shared_ptr< IManagedProcess > Get_Process( void ) const { return Process; }
 
 		EInternalProcessState Get_State( void ) const { return State; }
 		void Set_State( EInternalProcessState state ) { State = state; }
@@ -189,8 +189,8 @@ class CProcessRecord
 		CPlatformThread *Get_Platform_Thread( void ) const { return PlatformThread.get(); }
 
 		// Operations
-		void Add_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler, double execution_time );
-		void Remove_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler );
+		void Add_Execute_Task( const std::shared_ptr< CTaskScheduler > &task_scheduler, double execution_time );
+		void Remove_Execute_Task( const std::shared_ptr< CTaskScheduler > &task_scheduler );
 
 		void Add_Pending_Shutdown_PID( EProcessID::Enum process_id ) { PendingShutdownIDs.insert( process_id ); }
 		void Remove_Pending_Shutdown_PID( EProcessID::Enum process_id ) { PendingShutdownIDs.erase( process_id ); }
@@ -204,13 +204,13 @@ class CProcessRecord
 
 		EProcessID::Enum ProcessID;
 
-		shared_ptr< IManagedProcess > Process;
+		std::shared_ptr< IManagedProcess > Process;
 
-		unique_ptr< CProcessMailbox > Mailbox;
+		std::unique_ptr< CProcessMailbox > Mailbox;
 
-		shared_ptr< CExecuteProcessScheduledTask > ExecuteTask;
+		std::shared_ptr< CExecuteProcessScheduledTask > ExecuteTask;
 
-		unique_ptr< CPlatformThread > PlatformThread;
+		std::unique_ptr< CPlatformThread > PlatformThread;
 
 		ExecuteProcessDelegateType ExecuteDelegate;
 
@@ -220,7 +220,7 @@ class CProcessRecord
 };
 
 
-CProcessRecord::CProcessRecord( const shared_ptr< IManagedProcess > &process, const ExecuteProcessDelegateType &execute_delegate ) :
+CProcessRecord::CProcessRecord( const std::shared_ptr< IManagedProcess > &process, const ExecuteProcessDelegateType &execute_delegate ) :
 	ProcessID( process->Get_ID() ),
 	Process( process ),
 	Mailbox( new CProcessMailbox( process->Get_ID(), process->Get_Properties() ) ),
@@ -256,7 +256,7 @@ CProcessRecord::~CProcessRecord()
 }
 
 
-void CProcessRecord::Add_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler, double execution_time )
+void CProcessRecord::Add_Execute_Task( const std::shared_ptr< CTaskScheduler > &task_scheduler, double execution_time )
 {
 	if ( ExecuteTask == nullptr )
 	{
@@ -273,7 +273,7 @@ void CProcessRecord::Add_Execute_Task( const shared_ptr< CTaskScheduler > &task_
 }
 
 
-void CProcessRecord::Remove_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler )
+void CProcessRecord::Remove_Execute_Task( const std::shared_ptr< CTaskScheduler > &task_scheduler )
 {
 	if ( ExecuteTask != nullptr && ExecuteTask->Is_Scheduled() )
 	{
@@ -347,7 +347,7 @@ void CConcurrencyManager::Shutdown( void )
 }
 
 
-shared_ptr< CProcessRecord > CConcurrencyManager::Get_Record( EProcessID::Enum process_id ) const
+std::shared_ptr< CProcessRecord > CConcurrencyManager::Get_Record( EProcessID::Enum process_id ) const
 {
 	auto iter = ProcessRecords.find( process_id );
 	if ( iter != ProcessRecords.cend() )
@@ -359,19 +359,19 @@ shared_ptr< CProcessRecord > CConcurrencyManager::Get_Record( EProcessID::Enum p
 }
 
 
-shared_ptr< IManagedProcess > CConcurrencyManager::Get_Process( EProcessID::Enum process_id ) const
+std::shared_ptr< IManagedProcess > CConcurrencyManager::Get_Process( EProcessID::Enum process_id ) const
 {
-	shared_ptr< CProcessRecord > record = Get_Record( process_id );
+	std::shared_ptr< CProcessRecord > record = Get_Record( process_id );
 	if ( record != nullptr )
 	{
 		return record->Get_Process();
 	}
 
-	return shared_ptr< IManagedProcess >( nullptr );
+	return std::shared_ptr< IManagedProcess >( nullptr );
 }
 
 
-void CConcurrencyManager::Enumerate_Processes( std::vector< shared_ptr< IManagedProcess > > &processes ) const
+void CConcurrencyManager::Enumerate_Processes( std::vector< std::shared_ptr< IManagedProcess > > &processes ) const
 {
 	processes.clear();
 
@@ -385,7 +385,7 @@ void CConcurrencyManager::Enumerate_Processes( std::vector< shared_ptr< IManaged
 }
 
 
-void CConcurrencyManager::Run( const shared_ptr< IManagedProcess > &starting_process )
+void CConcurrencyManager::Run( const std::shared_ptr< IManagedProcess > &starting_process )
 {
 	Setup_For_Run( starting_process );
 
@@ -393,7 +393,7 @@ void CConcurrencyManager::Run( const shared_ptr< IManagedProcess > &starting_pro
 }
 
 
-void CConcurrencyManager::Setup_For_Run( const shared_ptr< IManagedProcess > &starting_process )
+void CConcurrencyManager::Setup_For_Run( const std::shared_ptr< IManagedProcess > &starting_process )
 {
 	FATAL_ASSERT( State == ECMS_INITIALIZED );
 	FATAL_ASSERT( ProcessRecords.size() == 0 );
@@ -413,13 +413,13 @@ void CConcurrencyManager::Setup_For_Run( const shared_ptr< IManagedProcess > &st
 }
 
 
-void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &process )
+void CConcurrencyManager::Add_Process( const std::shared_ptr< IManagedProcess > &process )
 {
 	Add_Process( process, Allocate_Process_ID() );
 }
 
 
-void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &process, EProcessID::Enum id )
+void CConcurrencyManager::Add_Process( const std::shared_ptr< IManagedProcess > &process, EProcessID::Enum id )
 {
 	FATAL_ASSERT( id != EProcessID::CONCURRENCY_MANAGER );
 	FATAL_ASSERT( ProcessRecords.find( id ) == ProcessRecords.cend() );
@@ -432,7 +432,7 @@ void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &proc
 	}
 
 	// track the thread task in a task record
-	shared_ptr< CProcessRecord > process_record = std::make_shared< CProcessRecord >( process, ExecuteProcessDelegateType( this, &CConcurrencyManager::Execute_Process ) );
+	std::shared_ptr< CProcessRecord > process_record = std::make_shared< CProcessRecord >( process, ExecuteProcessDelegateType( this, &CConcurrencyManager::Execute_Process ) );
 	ProcessRecords[ id ] = process_record;
 
 	// Interface setup
@@ -461,17 +461,17 @@ void CConcurrencyManager::Handle_Ongoing_Mailbox_Requests( CProcessMailbox *mail
 	for ( auto iter = PersistentGetRequests.cbegin(), end = PersistentGetRequests.cend(); iter != end; ++iter )
 	{
 		EProcessID::Enum requesting_process_id = iter->first;
-		const unique_ptr< const CGetMailboxByPropertiesRequest > &get_request = iter->second;
+		const std::unique_ptr< const CGetMailboxByPropertiesRequest > &get_request = iter->second;
 		if ( get_request->Get_Target_Properties().Matches( new_properties ) && requesting_process_id != new_id && !Is_Process_Shutting_Down( requesting_process_id ) )
 		{
-			unique_ptr< const IProcessMessage > message( new CAddMailboxMessage( Get_Mailbox( new_id ) ) );
+			std::unique_ptr< const IProcessMessage > message( new CAddMailboxMessage( Get_Mailbox( new_id ) ) );
 			Send_Process_Message( requesting_process_id, message );
 		}
 	}
 }
 
 
-shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EProcessID::Enum process_id ) const
+std::shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EProcessID::Enum process_id ) const
 {
 	auto iter = ProcessRecords.find( process_id );
 	if ( iter != ProcessRecords.cend() )
@@ -479,11 +479,11 @@ shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EProcessID::En
 		return iter->second->Get_Mailbox()->Get_Writable_Mailbox();
 	}
 
-	return shared_ptr< CWriteOnlyMailbox >( nullptr );
+	return std::shared_ptr< CWriteOnlyMailbox >( nullptr );
 }
 
 
-shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
+std::shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 {
 	auto iter = ProcessRecords.find( EProcessID::CONCURRENCY_MANAGER );
 	FATAL_ASSERT( iter != ProcessRecords.cend() );
@@ -492,12 +492,12 @@ shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 }
 
 
-void CConcurrencyManager::Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message )
+void CConcurrencyManager::Send_Process_Message( EProcessID::Enum dest_process_id, std::unique_ptr< const IProcessMessage > &message )
 {
 	auto iter = PendingOutboundFrames.find( dest_process_id );
 	if ( iter == PendingOutboundFrames.cend() )
 	{
-		unique_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+		std::unique_ptr< CProcessMessageFrame > frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
 		frame->Add_Message( message );
 		PendingOutboundFrames.insert( FrameTableType::value_type( dest_process_id, std::move( frame ) ) );
 		return;
@@ -513,7 +513,7 @@ void CConcurrencyManager::Flush_Frames( void )
 
 	for ( auto frame_iterator = PendingOutboundFrames.begin(), end = PendingOutboundFrames.end(); frame_iterator != end; ++frame_iterator )
 	{
-		shared_ptr< CWriteOnlyMailbox > write_interface = Get_Mailbox( frame_iterator->first );
+		std::shared_ptr< CWriteOnlyMailbox > write_interface = Get_Mailbox( frame_iterator->first );
 		if ( write_interface != nullptr )
 		{
 			write_interface->Add_Frame( frame_iterator->second );
@@ -538,7 +538,7 @@ void CConcurrencyManager::Service( void )
 	{
 		Service_One_Iteration();
 
-		NPlatform::Sleep( 0 );	// make this adjustable later depending on the service's needs
+		std::this_thread::sleep_for( std::chrono::milliseconds( 0 ) );	// make this adjustable later depending on the service's needs
 	}
 }
 
@@ -569,7 +569,7 @@ void CConcurrencyManager::Service_Shutdown( void )
 
 		State = ECMS_SHUTTING_DOWN_PHASE2;
 
-		unique_ptr< const IProcessMessage > message( new CShutdownSelfRequest( true ) );
+		std::unique_ptr< const IProcessMessage > message( new CShutdownSelfRequest( true ) );
 		Send_Process_Message( EProcessID::LOGGING, message );
 	}
 	else if ( ProcessRecords.size() == 1 )
@@ -584,13 +584,13 @@ void CConcurrencyManager::Service_Shutdown( void )
 
 void CConcurrencyManager::Service_Incoming_Frames( void )
 {
-	std::vector< unique_ptr< CProcessMessageFrame > > control_frames;
+	std::vector< std::unique_ptr< CProcessMessageFrame > > control_frames;
 	Get_My_Mailbox()->Remove_Frames( control_frames );
 
 	// iterate all frames
 	for ( uint32_t i = 0; i < control_frames.size(); ++i )
 	{
-		unique_ptr< CProcessMessageFrame > &frame = control_frames[ i ];
+		std::unique_ptr< CProcessMessageFrame > &frame = control_frames[ i ];
 		EProcessID::Enum source_process_id = frame->Get_Process_ID();
 
 		// iterate all messages in the frame
@@ -602,7 +602,7 @@ void CConcurrencyManager::Service_Incoming_Frames( void )
 }
 
 
-void CConcurrencyManager::Handle_Message( EProcessID::Enum source_process_id, unique_ptr< const IProcessMessage > &message )
+void CConcurrencyManager::Handle_Message( EProcessID::Enum source_process_id, std::unique_ptr< const IProcessMessage > &message )
 {
 	const IProcessMessage *msg_base = message.get();
 
@@ -627,7 +627,7 @@ void CConcurrencyManager::Register_Message_Handlers( void )
 } 
 
 
-void CConcurrencyManager::Register_Handler( const std::type_info &message_type_info, unique_ptr< IProcessMessageHandler > &handler )
+void CConcurrencyManager::Register_Handler( const std::type_info &message_type_info, std::unique_ptr< IProcessMessageHandler > &handler )
 {
 	Loki::TypeInfo key( message_type_info );
 
@@ -636,7 +636,7 @@ void CConcurrencyManager::Register_Handler( const std::type_info &message_type_i
 }
 
 
-void CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request( EProcessID::Enum source_process_id, unique_ptr< const CGetMailboxByIDRequest > &message )
+void CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request( EProcessID::Enum source_process_id, std::unique_ptr< const CGetMailboxByIDRequest > &message )
 {
 	// don't handle messages while shutting down
 	if ( Is_Manager_Shutting_Down() )
@@ -652,17 +652,17 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request( EProcessID::Enum sou
 	}
 
 	// it's a single-targeted request
-	shared_ptr< CProcessRecord > record = Get_Record( requested_process_id );
+	std::shared_ptr< CProcessRecord > record = Get_Record( requested_process_id );
 	if ( record != nullptr && !record->Is_Shutting_Down() && source_process_id != requested_process_id )
 	{
 		// fulfill the request
-		unique_ptr< const IProcessMessage > message( new CAddMailboxMessage( record->Get_Mailbox()->Get_Writable_Mailbox() ) );
+		std::unique_ptr< const IProcessMessage > message( new CAddMailboxMessage( record->Get_Mailbox()->Get_Writable_Mailbox() ) );
 		Send_Process_Message( source_process_id, message );
 	}
 }
 
 
-void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EProcessID::Enum source_process_id, unique_ptr< const CGetMailboxByPropertiesRequest > &message )
+void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EProcessID::Enum source_process_id, std::unique_ptr< const CGetMailboxByPropertiesRequest > &message )
 {
 	// don't handle messages while shutting down
 	if ( Is_Manager_Shutting_Down() )
@@ -682,7 +682,7 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EProcessID::
 	{
 		if ( requested_properties.Matches( iter->second->Get_Properties() ) && !Is_Process_Shutting_Down( iter->first ) && source_process_id != iter->first )
 		{
-			unique_ptr< const IProcessMessage > message( new CAddMailboxMessage( Get_Mailbox( iter->first ) ) );
+			std::unique_ptr< const IProcessMessage > message( new CAddMailboxMessage( Get_Mailbox( iter->first ) ) );
 			Send_Process_Message( source_process_id, message );
 		}
 	}
@@ -691,34 +691,34 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EProcessID::
 }
 
 
-void CConcurrencyManager::Handle_Add_New_Process_Message( EProcessID::Enum source_process_id, unique_ptr< const CAddNewProcessMessage > &message )
+void CConcurrencyManager::Handle_Add_New_Process_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CAddNewProcessMessage > &message )
 {
 	if ( Is_Manager_Shutting_Down() )
 	{
 		return;
 	}
 
-	Add_Process( static_pointer_cast< IManagedProcess >( message->Get_Process() ) );
+	Add_Process( std::static_pointer_cast< IManagedProcess >( message->Get_Process() ) );
 
 	// return mailbox, push mailbox options
 	if ( !Is_Process_Shutting_Down( source_process_id ) )
 	{
 		if ( message->Should_Return_Mailbox() )
 		{
-			unique_ptr< const IProcessMessage > response_message( new CAddMailboxMessage( Get_Mailbox( message->Get_Process()->Get_ID() ) ) );
+			std::unique_ptr< const IProcessMessage > response_message( new CAddMailboxMessage( Get_Mailbox( message->Get_Process()->Get_ID() ) ) );
 			Send_Process_Message( source_process_id, response_message );
 		}
 
 		if ( message->Should_Forward_Creator_Mailbox() )
 		{
-			unique_ptr< const IProcessMessage > response_message( new CAddMailboxMessage( Get_Mailbox( source_process_id ) ) );
+			std::unique_ptr< const IProcessMessage > response_message( new CAddMailboxMessage( Get_Mailbox( source_process_id ) ) );
 			Send_Process_Message( message->Get_Process()->Get_ID(), response_message );
 		}
 	}
 }
 
 
-void CConcurrencyManager::Handle_Shutdown_Process_Message( EProcessID::Enum /*source_process_id*/, unique_ptr< const CShutdownProcessMessage > &message )
+void CConcurrencyManager::Handle_Shutdown_Process_Message( EProcessID::Enum /*source_process_id*/, std::unique_ptr< const CShutdownProcessMessage > &message )
 {
 	if ( Is_Manager_Shutting_Down() )
 	{
@@ -729,9 +729,9 @@ void CConcurrencyManager::Handle_Shutdown_Process_Message( EProcessID::Enum /*so
 }
 
 
-void CConcurrencyManager::Handle_Reschedule_Process_Message( EProcessID::Enum source_process_id, unique_ptr< const CRescheduleProcessMessage > &message )
+void CConcurrencyManager::Handle_Reschedule_Process_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CRescheduleProcessMessage > &message )
 {
-	shared_ptr< CProcessRecord > record = Get_Record( source_process_id );
+	std::shared_ptr< CProcessRecord > record = Get_Record( source_process_id );
 	if ( record == nullptr )
 	{
 		return;
@@ -743,7 +743,7 @@ void CConcurrencyManager::Handle_Reschedule_Process_Message( EProcessID::Enum so
 }
 
 
-void CConcurrencyManager::Handle_Release_Mailbox_Response( EProcessID::Enum source_process_id, unique_ptr< const CReleaseMailboxResponse > &response )
+void CConcurrencyManager::Handle_Release_Mailbox_Response( EProcessID::Enum source_process_id, std::unique_ptr< const CReleaseMailboxResponse > &response )
 {
 	if ( Is_Manager_Shutting_Down() )
 	{
@@ -751,7 +751,7 @@ void CConcurrencyManager::Handle_Release_Mailbox_Response( EProcessID::Enum sour
 	}
 
 	EProcessID::Enum shutdown_process_id = response->Get_Shutdown_Process_ID();
-	shared_ptr< CProcessRecord > record = Get_Record( shutdown_process_id );
+	std::shared_ptr< CProcessRecord > record = Get_Record( shutdown_process_id );
 	if ( record == nullptr )
 	{
 		return;
@@ -765,13 +765,13 @@ void CConcurrencyManager::Handle_Release_Mailbox_Response( EProcessID::Enum sour
 		// we've heard back from everyone; no one has a handle to this thread anymore, so we can tell it to shut down
 		record->Set_State( EIPS_SHUTTING_DOWN_PHASE2 );
 
-		unique_ptr< const IProcessMessage > shutdown_request( new CShutdownSelfRequest( false ) );
+		std::unique_ptr< const IProcessMessage > shutdown_request( new CShutdownSelfRequest( false ) );
 		Send_Process_Message( shutdown_process_id, shutdown_request );
 	}
 }
 
 
-void CConcurrencyManager::Handle_Shutdown_Self_Response( EProcessID::Enum source_process_id, unique_ptr< const CShutdownSelfResponse > & /*message*/ )
+void CConcurrencyManager::Handle_Shutdown_Self_Response( EProcessID::Enum source_process_id, std::unique_ptr< const CShutdownSelfResponse > & /*message*/ )
 {
 	auto iter = ProcessRecords.find( source_process_id );
 	FATAL_ASSERT( iter != ProcessRecords.cend() );
@@ -781,7 +781,7 @@ void CConcurrencyManager::Handle_Shutdown_Self_Response( EProcessID::Enum source
 }
 
 
-void CConcurrencyManager::Handle_Shutdown_Manager_Message( EProcessID::Enum /*source_process_id*/, unique_ptr< const CShutdownManagerMessage > & /*message*/ )
+void CConcurrencyManager::Handle_Shutdown_Manager_Message( EProcessID::Enum /*source_process_id*/, std::unique_ptr< const CShutdownManagerMessage > & /*message*/ )
 {
 	if ( Is_Manager_Shutting_Down() )
 	{
@@ -798,13 +798,13 @@ void CConcurrencyManager::Handle_Shutdown_Manager_Message( EProcessID::Enum /*so
 			continue;
 		}
 
-		unique_ptr< const IProcessMessage > shutdown_thread_msg( new CShutdownSelfRequest( true ) );
+		std::unique_ptr< const IProcessMessage > shutdown_thread_msg( new CShutdownSelfRequest( true ) );
 		Send_Process_Message( iter->first, shutdown_thread_msg );
 	}
 }
 
 
-shared_ptr< CTaskScheduler > CConcurrencyManager::Get_Task_Scheduler( ETimeType time_type ) const
+std::shared_ptr< CTaskScheduler > CConcurrencyManager::Get_Task_Scheduler( ETimeType time_type ) const
 {
 	return TaskSchedulers.find( time_type )->second;
 }
@@ -818,13 +818,13 @@ void CConcurrencyManager::Execute_Process( EProcessID::Enum process_id, double c
 		return;
 	}
 
-	shared_ptr< CProcessRecord > record = iter->second;
+	std::shared_ptr< CProcessRecord > record = iter->second;
 	if ( record->Get_State() == EIPS_INITIALIZING )
 	{
 		record->Set_State( EIPS_RUNNING );
 	}
 
-	shared_ptr< IManagedProcess > thread_task_base = record->Get_Process();
+	std::shared_ptr< IManagedProcess > thread_task_base = record->Get_Process();
 
 	switch ( thread_task_base->Get_Execution_Mode() )
 	{
@@ -861,7 +861,7 @@ void CConcurrencyManager::Initiate_Process_Shutdown( EProcessID::Enum process_id
 {
 	FATAL_ASSERT( process_id != EProcessID::CONCURRENCY_MANAGER && process_id != EProcessID::LOGGING );
 
-	shared_ptr< CProcessRecord > shutdown_record = Get_Record( process_id );
+	std::shared_ptr< CProcessRecord > shutdown_record = Get_Record( process_id );
 	if ( shutdown_record == nullptr || shutdown_record->Is_Shutting_Down() )
 	{
 		return;
@@ -879,7 +879,7 @@ void CConcurrencyManager::Initiate_Process_Shutdown( EProcessID::Enum process_id
 
 		shutdown_record->Add_Pending_Shutdown_PID( iter->first );
 
-		unique_ptr< const IProcessMessage > release_mailbox_msg( new CReleaseMailboxRequest( process_id ) );
+		std::unique_ptr< const IProcessMessage > release_mailbox_msg( new CReleaseMailboxRequest( process_id ) );
 		Send_Process_Message( iter->first, release_mailbox_msg );
 	}
 
@@ -891,7 +891,7 @@ void CConcurrencyManager::Initiate_Process_Shutdown( EProcessID::Enum process_id
 	{
 		shutdown_record->Set_State( EIPS_SHUTTING_DOWN_PHASE2 );
 
-		unique_ptr< const IProcessMessage > shutdown_request( new CShutdownSelfRequest( false ) );
+		std::unique_ptr< const IProcessMessage > shutdown_request( new CShutdownSelfRequest( false ) );
 		Send_Process_Message( process_id, shutdown_request );
 	}
 }
@@ -905,7 +905,7 @@ void CConcurrencyManager::Clear_Related_Mailbox_Requests( EProcessID::Enum proce
 
 bool CConcurrencyManager::Is_Process_Shutting_Down( EProcessID::Enum process_id ) const
 {
-	shared_ptr< CProcessRecord > record = Get_Record( process_id );
+	std::shared_ptr< CProcessRecord > record = Get_Record( process_id );
 	if ( record == nullptr )
 	{
 		return false;
@@ -925,7 +925,7 @@ void CConcurrencyManager::Log( std::wstring &&message )
 {
 	if ( State != ECMS_SHUTTING_DOWN_PHASE2 )
 	{
-		unique_ptr< const IProcessMessage > log_request( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, std::move( message ) ) );
+		std::unique_ptr< const IProcessMessage > log_request( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, std::move( message ) ) );
 		Send_Process_Message( EProcessID::LOGGING, log_request );
 	}
 }

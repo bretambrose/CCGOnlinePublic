@@ -24,8 +24,6 @@
 #include <sstream>
 #include <iostream>
 
-#include "SynchronizationPrimitives/PlatformMutex.h"
-
 static void Build_Assertion_String( const char *expression_string, const char *file_name, uint32_t line_number, bool is_fatal, std::wstring &output_string )
 {
 	std::basic_ostringstream< wchar_t > assert_description;
@@ -47,16 +45,15 @@ static void Build_Assertion_String( const char *expression_string, const char *f
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Static members
-ISimplePlatformMutex *CAssertSystem::AssertLock = nullptr;
+std::mutex CAssertSystem::AssertLock;
 DLogFunctionType CAssertSystem::LogFunction;
-bool CAssertSystem::Initialized = false;
+std::atomic< bool > CAssertSystem::Initialized( false );
 
 void CAssertSystem::Initialize( const DLogFunctionType &log_function )
 {
 	FATAL_ASSERT( !Initialized );
 
 	LogFunction = log_function;
-	AssertLock = NPlatform::Create_Simple_Mutex();
 	Initialized = true;
 }
 
@@ -64,8 +61,6 @@ void CAssertSystem::Shutdown( void )
 {
 	if ( Initialized )
 	{
-		delete AssertLock;
-		AssertLock = nullptr;
 		Initialized = false;
 	}
 }
@@ -77,7 +72,7 @@ bool CAssertSystem::Assert_Handler( const char *expression_string, const char *f
 		return true;
 	}
 
-	CSimplePlatformMutexLocker assert_locker( AssertLock );
+	std::lock_guard<std::mutex> locker( AssertLock );
 
 	// Build a descriptive error message
 	std::wstring assert_string;

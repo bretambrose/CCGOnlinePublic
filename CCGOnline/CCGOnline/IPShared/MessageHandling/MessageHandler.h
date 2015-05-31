@@ -29,7 +29,7 @@ class IMessageHandler
 		IMessageHandler( void ) {}
 		virtual ~IMessageHandler() = default;
 
-		virtual void Handle_Message( MessageSourceType source, unique_ptr< const MessageBaseType > &message ) const = 0;
+		virtual void Handle_Message( MessageSourceType source, std::unique_ptr< const MessageBaseType > &message ) const = 0;
 };
 
 #endif // MESSAGE_HANDLER_H

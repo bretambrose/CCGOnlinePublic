@@ -41,7 +41,7 @@ class CRunDatabaseTaskRequest : public IProcessMessage
 
 	private:
 
-		unique_ptr< IDatabaseTask > Task;
+		std::unique_ptr< IDatabaseTask > Task;
 };
 
 class CRunDatabaseTaskResponse : public IProcessMessage
@@ -50,19 +50,19 @@ class CRunDatabaseTaskResponse : public IProcessMessage
 
 		typedef IProcessMessage BASECLASS;
 		
-		CRunDatabaseTaskResponse( unique_ptr< const CRunDatabaseTaskRequest > &request, bool success ) :
+		CRunDatabaseTaskResponse( std::unique_ptr< const CRunDatabaseTaskRequest > &request, bool success ) :
 			Request( std::move( request ) ),
 			Success( success )
 		{}
 
 		virtual ~CRunDatabaseTaskResponse();
 
-		const unique_ptr< const CRunDatabaseTaskRequest > &Get_Request( void ) const { return Request; }
+		const std::unique_ptr< const CRunDatabaseTaskRequest > &Get_Request( void ) const { return Request; }
 		bool Was_Successful( void ) const { return Success; }
 
 	private:
 
-		unique_ptr< const CRunDatabaseTaskRequest > Request;
+		std::unique_ptr< const CRunDatabaseTaskRequest > Request;
 		bool Success;
 };
 

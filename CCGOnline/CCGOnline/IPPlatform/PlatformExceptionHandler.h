@@ -23,7 +23,6 @@
 #include "StructuredExceptionTypes.h"
 
 class CStructuredExceptionInfo;
-class ISimplePlatformMutex;
 
 // Static class that performs OS-specific structured exception handling logic
 class CPlatformExceptionHandler
@@ -37,13 +36,13 @@ class CPlatformExceptionHandler
 
 		static void On_Exception( CStructuredExceptionInfo &shared_exception_info );
 
-		static ISimplePlatformMutex *Get_Lock( void ) { return ExceptionLock; }
+		static std::mutex &Get_Lock( void ) { return ExceptionLock; }
 
 	private:
 
 		static DExceptionHandler Handler;
 
-		static ISimplePlatformMutex *ExceptionLock;
+		static std::mutex ExceptionLock;
 
 		static bool SymbolsLoaded;
 		static bool Initialized;

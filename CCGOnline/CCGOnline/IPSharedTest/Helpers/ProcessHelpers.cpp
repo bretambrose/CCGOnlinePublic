@@ -73,27 +73,27 @@ const CProcessBase::MailboxTableType &CProcessBaseTester::Get_Mailbox_Table( voi
 	return Get_Process()->Mailboxes; 
 }
 
-shared_ptr< CWriteOnlyMailbox > CProcessBaseTester::Get_Logging_Mailbox( void ) const 
+std::shared_ptr< CWriteOnlyMailbox > CProcessBaseTester::Get_Logging_Mailbox( void ) const 
 { 
 	return Get_Process()->LoggingMailbox; 
 }
 
-void CProcessBaseTester::Set_Logging_Mailbox( shared_ptr< CWriteOnlyMailbox > mailbox ) 
+void CProcessBaseTester::Set_Logging_Mailbox( std::shared_ptr< CWriteOnlyMailbox > mailbox ) 
 { 
 	Get_Process()->LoggingMailbox = mailbox; 
 }
 
-shared_ptr< CWriteOnlyMailbox > CProcessBaseTester::Get_Manager_Mailbox( void ) const 
+std::shared_ptr< CWriteOnlyMailbox > CProcessBaseTester::Get_Manager_Mailbox( void ) const 
 { 
 	return Get_Process()->ManagerMailbox; 
 }
 
-const unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Log_Frame( void ) const 
+const std::unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Log_Frame( void ) const 
 { 
 	return Get_Process()->LogFrame; 
 }
 
-const unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Manager_Frame( void ) const 
+const std::unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Manager_Frame( void ) const 
 { 
 	return Get_Process()->ManagerFrame; 
 }
@@ -103,7 +103,7 @@ bool CProcessBaseTester::Has_Frame( EProcessID::Enum id ) const
 	return Get_Process()->PendingOutboundFrames.find( id ) != Get_Process()->PendingOutboundFrames.end();
 }
 
-const unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Frame( EProcessID::Enum id ) const
+const std::unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Frame( EProcessID::Enum id ) const
 {
 	return Get_Process()->PendingOutboundFrames.find( id )->second;
 }
@@ -120,7 +120,7 @@ CTaskProcessBaseTester::~CTaskProcessBaseTester()
 {
 }
 
-shared_ptr< CTaskProcessBase > CTaskProcessBaseTester::Get_Task_Process( void ) const 
+std::shared_ptr< CTaskProcessBase > CTaskProcessBaseTester::Get_Task_Process( void ) const 
 { 
 	return TaskProcess; 
 }
@@ -147,7 +147,7 @@ CThreadProcessBaseTester::~CThreadProcessBaseTester()
 {
 }
 
-shared_ptr< CThreadProcessBase > CThreadProcessBaseTester::Get_Thread_Process( void ) const 
+std::shared_ptr< CThreadProcessBase > CThreadProcessBaseTester::Get_Thread_Process( void ) const 
 { 
 	return ThreadProcess; 
 }

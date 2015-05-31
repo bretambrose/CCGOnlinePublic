@@ -24,6 +24,8 @@
 template < typename T >
 bool Are_All_Enum_Flags_Set( T value, T mask )
 {
+	static_assert( std::is_enum< T >::value, "Type T must be an enum" );
+
 	using BaseEnumType = std::underlying_type< T >::type;
 
 	return ( static_cast< BaseEnumType >( value ) & static_cast< BaseEnumType >( mask ) ) == static_cast< BaseEnumType >( mask );
@@ -32,6 +34,8 @@ bool Are_All_Enum_Flags_Set( T value, T mask )
 template < typename T >
 bool Is_An_Enum_Flag_Set( T value, T mask )
 {
+	static_assert( std::is_enum< T >::value, "Type T must be an enum" );
+
 	using BaseEnumType = std::underlying_type< T >::type;
 
 	return ( static_cast< BaseEnumType >( value ) & static_cast< BaseEnumType >( mask ) ) != 0;
@@ -40,12 +44,16 @@ bool Is_An_Enum_Flag_Set( T value, T mask )
 template < typename T >
 T Make_Enum_Mask( T flag )
 {
+	static_assert( std::is_enum< T >::value, "Type T must be an enum" );
+
 	return flag;
 }
 
 template < typename T, typename... Args >
 T Make_Enum_Mask( T first, Args... rest )
 {
+	static_assert( std::is_enum< T >::value, "Type T must be an enum" );
+
 	using BaseEnumType = std::underlying_type< T >::type;
 
 	BaseEnumType rest_value = static_cast< BaseEnumType >( Make_Enum_Mask( rest... ) );

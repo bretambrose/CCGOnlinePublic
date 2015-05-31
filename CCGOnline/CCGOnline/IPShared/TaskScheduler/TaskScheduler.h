@@ -36,8 +36,8 @@ class CTaskScheduler
 		CTaskScheduler( double time_granularity );
 		~CTaskScheduler();
 
-		void Submit_Task( const shared_ptr< CScheduledTask > &task );
-		void Remove_Task( const shared_ptr< CScheduledTask > &task );
+		void Submit_Task( const std::shared_ptr< CScheduledTask > &task );
+		void Remove_Task( const std::shared_ptr< CScheduledTask > &task );
 
 		void Service( double current_time_seconds );
 
@@ -47,7 +47,7 @@ class CTaskScheduler
 
 	private:
 
-		unique_ptr< TPriorityQueue< shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator > > TaskQueue;
+		std::unique_ptr< TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator > > TaskQueue;
 
 		double TimeGranularity;
 };

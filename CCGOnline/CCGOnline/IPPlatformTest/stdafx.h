@@ -34,6 +34,11 @@
 #include <string>
 #include <functional>
 #include <algorithm>
+#include <mutex>
+#include <atomic>
+#include <thread>
+#include <chrono>
+#include <type_traits>
 #include <assert.h>
 
 // Loki includes
@@ -47,9 +52,6 @@
 
 // Global using directives; be careful with these
 using namespace fastdelegate;
-
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
 
 // self includes
 #include "IPPlatform/DebugAssert.h"

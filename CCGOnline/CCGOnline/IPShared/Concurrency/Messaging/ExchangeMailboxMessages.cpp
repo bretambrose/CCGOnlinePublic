@@ -24,7 +24,7 @@
 #include "IPShared/Concurrency/MailboxInterfaces.h"
 
 
-CAddMailboxMessage::CAddMailboxMessage( const shared_ptr< CWriteOnlyMailbox > &mailbox ) :
+CAddMailboxMessage::CAddMailboxMessage( const std::shared_ptr< CWriteOnlyMailbox > &mailbox ) :
 	Mailbox( mailbox )
 {
 }

@@ -50,14 +50,14 @@ TEST( TaskSchedulerTests, Submit )
 {
 	CTaskScheduler scheduler;
 
-	shared_ptr< CMockScheduledTask > task1( new CMockScheduledTask( 1.0 ) );
+	std::shared_ptr< CMockScheduledTask > task1( new CMockScheduledTask( 1.0 ) );
 	scheduler.Submit_Task( task1 );
 
 	ASSERT_TRUE( task1->Is_Scheduled() );
 	ASSERT_TRUE( task1->Get_Heap_Index() == 1 );
 	ASSERT_TRUE( scheduler.Get_Next_Task_Time() == 1.0 );
 
-	shared_ptr< CMockScheduledTask > task2( new CMockScheduledTask( 0.5 ) );
+	std::shared_ptr< CMockScheduledTask > task2( new CMockScheduledTask( 0.5 ) );
 	scheduler.Submit_Task( task2 );
 
 	ASSERT_TRUE( task2->Is_Scheduled() );
@@ -84,7 +84,7 @@ TEST( TaskSchedulerTests, Remove )
 {
 	CTaskScheduler scheduler;
 
-	shared_ptr< CMockScheduledTask > tasks[ 5 ];
+	std::shared_ptr< CMockScheduledTask > tasks[ 5 ];
 	for ( uint32_t i = 0; i < 5; i++ )
 	{
 		tasks[ i ].reset( new CMockScheduledTask( static_cast< double >( i + 1 ) ) );
@@ -124,7 +124,7 @@ TEST( TaskSchedulerTests, Destruction )
 {
 	CTaskScheduler *scheduler = new CTaskScheduler;
 
-	shared_ptr< CMockScheduledTask > task1( new CMockScheduledTask( 1.0 ) );
+	std::shared_ptr< CMockScheduledTask > task1( new CMockScheduledTask( 1.0 ) );
 	scheduler->Submit_Task( task1 );
 
 	ASSERT_TRUE( task1->Is_Scheduled() );
@@ -138,35 +138,35 @@ TEST( TaskSchedulerTests, Granularity )
 {
 	CTaskScheduler scheduler( 1.0 );
 
-	shared_ptr< CMockScheduledTask > task1( new CMockScheduledTask( 0.0 ) );
+	std::shared_ptr< CMockScheduledTask > task1( new CMockScheduledTask( 0.0 ) );
 	scheduler.Submit_Task( task1 );
 	ASSERT_TRUE( task1->Get_Execute_Time() == 0.0 );
 
-	shared_ptr< CMockScheduledTask > task2( new CMockScheduledTask( 0.01 ) );
+	std::shared_ptr< CMockScheduledTask > task2( new CMockScheduledTask( 0.01 ) );
 	scheduler.Submit_Task( task2 );
 	ASSERT_TRUE( task2->Get_Execute_Time() == 1.0 );
 
-	shared_ptr< CMockScheduledTask > task3( new CMockScheduledTask( 0.999 ) );
+	std::shared_ptr< CMockScheduledTask > task3( new CMockScheduledTask( 0.999 ) );
 	scheduler.Submit_Task( task3 );
 	ASSERT_TRUE( task3->Get_Execute_Time() == 1.0 );
 
-	shared_ptr< CMockScheduledTask > task4( new CMockScheduledTask( 1.0 ) );
+	std::shared_ptr< CMockScheduledTask > task4( new CMockScheduledTask( 1.0 ) );
 	scheduler.Submit_Task( task4 );
 	ASSERT_TRUE( task4->Get_Execute_Time() == 1.0 );
 
-	shared_ptr< CMockScheduledTask > task5( new CMockScheduledTask( 1.1 ) );
+	std::shared_ptr< CMockScheduledTask > task5( new CMockScheduledTask( 1.1 ) );
 	scheduler.Submit_Task( task5 );
 	ASSERT_TRUE( task5->Get_Execute_Time() == 2.0 );
 
-	shared_ptr< CMockScheduledTask > task6( new CMockScheduledTask( 1.99 ) );
+	std::shared_ptr< CMockScheduledTask > task6( new CMockScheduledTask( 1.99 ) );
 	scheduler.Submit_Task( task6 );
 	ASSERT_TRUE( task6->Get_Execute_Time() == 2.0 );
 
-	shared_ptr< CMockScheduledTask > task7( new CMockScheduledTask( 2.0 ) );
+	std::shared_ptr< CMockScheduledTask > task7( new CMockScheduledTask( 2.0 ) );
 	scheduler.Submit_Task( task7 );
 	ASSERT_TRUE( task7->Get_Execute_Time() == 2.0 );
 
-	shared_ptr< CMockScheduledTask > task8( new CMockScheduledTask( 2.5 ) );
+	std::shared_ptr< CMockScheduledTask > task8( new CMockScheduledTask( 2.5 ) );
 	scheduler.Submit_Task( task8 );
 	ASSERT_TRUE( task8->Get_Execute_Time() == 3.0 );
 
@@ -217,7 +217,7 @@ TEST( TaskSchedulerTests, Reschedule )
 {
 	CTaskScheduler scheduler;
 
-	shared_ptr< CMockRescheduledTask > task( new CMockRescheduledTask( 1.0 ) );
+	std::shared_ptr< CMockRescheduledTask > task( new CMockRescheduledTask( 1.0 ) );
 	scheduler.Submit_Task( task );
 
 	ASSERT_TRUE( task->Get_Count() == 0 );

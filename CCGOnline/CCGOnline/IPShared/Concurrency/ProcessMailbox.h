@@ -35,8 +35,8 @@ namespace EProcessID
 }
 
 // Controls which concurrent queue implementation we use
-//typedef CTBBConcurrentQueue< unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
-typedef CLockingConcurrentQueue< unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
+//typedef CTBBConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
+typedef CLockingConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
 
 // A class that holds both the read and write interfaces of a thread task
 class CProcessMailbox
@@ -46,8 +46,8 @@ class CProcessMailbox
 		CProcessMailbox( EProcessID::Enum process_id, const SProcessProperties &properties );
 		~CProcessMailbox();
 
-		const shared_ptr< CWriteOnlyMailbox > &Get_Writable_Mailbox( void ) const { return WriteOnlyMailbox; }
-		const shared_ptr< CReadOnlyMailbox > &Get_Readable_Mailbox( void ) const { return ReadOnlyMailbox; }
+		const std::shared_ptr< CWriteOnlyMailbox > &Get_Writable_Mailbox( void ) const { return WriteOnlyMailbox; }
+		const std::shared_ptr< CReadOnlyMailbox > &Get_Readable_Mailbox( void ) const { return ReadOnlyMailbox; }
 
 		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 		const SProcessProperties &Get_Properties( void ) const { return Properties; }
@@ -58,8 +58,8 @@ class CProcessMailbox
 
 		SProcessProperties Properties;
 
-		shared_ptr< CWriteOnlyMailbox > WriteOnlyMailbox;
-		shared_ptr< CReadOnlyMailbox > ReadOnlyMailbox;
+		std::shared_ptr< CWriteOnlyMailbox > WriteOnlyMailbox;
+		std::shared_ptr< CReadOnlyMailbox > ReadOnlyMailbox;
 };
 
 #endif // PROCESS_MAILBOX_H

@@ -51,10 +51,10 @@ class CProcessBase : public IManagedProcess
 		virtual const SProcessProperties &Get_Properties( void ) const override { return Properties; }
 		virtual EProcessID::Enum Get_ID( void ) const override { return ID; }
 
-		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message ) override;
-		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &&message ) override;
-		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &message ) override;
-		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &&message ) override;
+		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, std::unique_ptr< const IProcessMessage > &message ) override;
+		virtual void Send_Process_Message( EProcessID::Enum dest_process_id, std::unique_ptr< const IProcessMessage > &&message ) override;
+		virtual void Send_Manager_Message( std::unique_ptr< const IProcessMessage > &message ) override;
+		virtual void Send_Manager_Message( std::unique_ptr< const IProcessMessage > &&message ) override;
 		virtual void Log( std::wstring &&message ) override;
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const override { return TaskScheduler.get(); }
@@ -62,15 +62,15 @@ class CProcessBase : public IManagedProcess
 		virtual void Flush_System_Messages( void ) override;
 
 		// IManagerThreadTask interface
-		virtual void Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) override;
-		virtual void Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox ) override;
-		virtual void Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &mailbox ) override;
+		virtual void Set_Manager_Mailbox( const std::shared_ptr< CWriteOnlyMailbox > &mailbox ) override;
+		virtual void Set_Logging_Mailbox( const std::shared_ptr< CWriteOnlyMailbox > &mailbox ) override;
+		virtual void Set_My_Mailbox( const std::shared_ptr< CReadOnlyMailbox > &mailbox ) override;
 
 		virtual void Cleanup( void ) override;
 
 		virtual void Run( const CProcessExecutionContext &context ) override;
 
-		void Register_Handler( const std::type_info &message_type_info, unique_ptr< IProcessMessageHandler > &handler );
+		void Register_Handler( const std::type_info &message_type_info, std::unique_ptr< IProcessMessageHandler > &handler );
 
 	protected:
 
@@ -99,17 +99,17 @@ class CProcessBase : public IManagedProcess
 		friend class CTaskProcessBaseExaminer;
 
 		// private accessors
-		shared_ptr< CWriteOnlyMailbox > Get_Mailbox( EProcessID::Enum process_id ) const;
+		std::shared_ptr< CWriteOnlyMailbox > Get_Mailbox( EProcessID::Enum process_id ) const;
 
 		// Private message handling
 		void Flush_Regular_Messages( void );
 
 		void Service_Message_Frames( void );
-		void Handle_Message( EProcessID::Enum process_id, unique_ptr< const IProcessMessage > &message );
+		void Handle_Message( EProcessID::Enum process_id, std::unique_ptr< const IProcessMessage > &message );
 
-		void Handle_Add_Mailbox_Message( EProcessID::Enum process_id, unique_ptr< const CAddMailboxMessage > &message );
-		void Handle_Release_Mailbox_Request( EProcessID::Enum process_id, unique_ptr< const CReleaseMailboxRequest > &request );
-		void Handle_Shutdown_Self_Request( EProcessID::Enum process_id, unique_ptr< const CShutdownSelfRequest > &message );
+		void Handle_Add_Mailbox_Message( EProcessID::Enum process_id, std::unique_ptr< const CAddMailboxMessage > &message );
+		void Handle_Release_Mailbox_Request( EProcessID::Enum process_id, std::unique_ptr< const CReleaseMailboxRequest > &request );
+		void Handle_Shutdown_Self_Request( EProcessID::Enum process_id, std::unique_ptr< const CShutdownSelfRequest > &message );
 
 		void Handle_Shutdown_Mailboxes( void );
 
@@ -117,11 +117,11 @@ class CProcessBase : public IManagedProcess
 		void Remove_Process_ID_From_Tables( EProcessID::Enum process_id );
 
 		// Type definitions
-		typedef std::unordered_map< EProcessID::Enum, shared_ptr< CWriteOnlyMailbox > > MailboxTableType;
+		typedef std::unordered_map< EProcessID::Enum, std::shared_ptr< CWriteOnlyMailbox > > MailboxTableType;
 		typedef std::unordered_map< EProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
 		typedef std::unordered_multimap< SProcessProperties, EProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
-		typedef std::unordered_map< Loki::TypeInfo, unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
-		typedef std::unordered_map< EProcessID::Enum, unique_ptr< CProcessMessageFrame > > FrameTableType;
+		typedef std::unordered_map< Loki::TypeInfo, std::unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
+		typedef std::unordered_map< EProcessID::Enum, std::unique_ptr< CProcessMessageFrame > > FrameTableType;
 
 		// Private Data
 		// Simple state
@@ -132,18 +132,18 @@ class CProcessBase : public IManagedProcess
 
 		// Message frames
 		FrameTableType PendingOutboundFrames;
-		unique_ptr< CProcessMessageFrame > ManagerFrame;
-		unique_ptr< CProcessMessageFrame > LogFrame;
+		std::unique_ptr< CProcessMessageFrame > ManagerFrame;
+		std::unique_ptr< CProcessMessageFrame > LogFrame;
 
 		// Process interfaces
 		IDToProcessPropertiesTableType IDToPropertiesTable;
 		ProcessPropertiesToIDTableType PropertiesToIDTable;
 
 		MailboxTableType Mailboxes;
-		shared_ptr< CWriteOnlyMailbox > ManagerMailbox;
-		shared_ptr< CWriteOnlyMailbox > LoggingMailbox;
+		std::shared_ptr< CWriteOnlyMailbox > ManagerMailbox;
+		std::shared_ptr< CWriteOnlyMailbox > LoggingMailbox;
 
-		shared_ptr< CReadOnlyMailbox > MyMailbox;
+		std::shared_ptr< CReadOnlyMailbox > MyMailbox;
 
 		std::set< EProcessID::Enum > ShutdownMailboxes;
 
@@ -154,7 +154,7 @@ class CProcessBase : public IManagedProcess
 		// Misc
 		ProcessMessageHandlerTableType MessageHandlers;
 
-		unique_ptr< CTaskScheduler > TaskScheduler;
+		std::unique_ptr< CTaskScheduler > TaskScheduler;
 };
 
 #endif // PROCESS_BASE_H

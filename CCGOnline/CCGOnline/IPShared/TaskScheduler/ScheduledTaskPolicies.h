@@ -28,11 +28,11 @@ class CScheduledTaskMovementPolicy
 {
 	public:
 
-		static void Swap( shared_ptr< CScheduledTask > &lhs, shared_ptr< CScheduledTask > &rhs )
+		static void Swap( std::shared_ptr< CScheduledTask > &lhs, std::shared_ptr< CScheduledTask > &rhs )
 		{
 			if ( lhs.get() != rhs.get() )
 			{
-				shared_ptr< CScheduledTask > temp( lhs );
+				std::shared_ptr< CScheduledTask > temp( lhs );
 				lhs = rhs;
 				rhs = temp;
 
@@ -42,7 +42,7 @@ class CScheduledTaskMovementPolicy
 			}
 		}
 
-		static void Set_Index( const shared_ptr< CScheduledTask > &task, size_t index )
+		static void Set_Index( const std::shared_ptr< CScheduledTask > &task, size_t index )
 		{
 			task->Set_Heap_Index( index );
 		}
@@ -53,7 +53,7 @@ class CScheduledTaskComparator
 {
 	public:
 
-		bool operator ()( const shared_ptr< CScheduledTask > &task1, const shared_ptr< CScheduledTask > &task2 ) const
+		bool operator ()( const std::shared_ptr< CScheduledTask > &task1, const std::shared_ptr< CScheduledTask > &task2 ) const
 		{
 			return task1->Get_Execute_Time() < task2->Get_Execute_Time();
 		}

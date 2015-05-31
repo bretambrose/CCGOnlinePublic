@@ -76,15 +76,15 @@ class CAddMailboxMessage : public IProcessMessage
 		
 		typedef IProcessMessage BASECLASS;
 
-		CAddMailboxMessage( const shared_ptr< CWriteOnlyMailbox > &mailbox );
+		CAddMailboxMessage( const std::shared_ptr< CWriteOnlyMailbox > &mailbox );
 
 		virtual ~CAddMailboxMessage();
 
-		const shared_ptr< CWriteOnlyMailbox > &Get_Mailbox( void ) const { return Mailbox; }
+		const std::shared_ptr< CWriteOnlyMailbox > &Get_Mailbox( void ) const { return Mailbox; }
 
 	private:
 
-		shared_ptr< CWriteOnlyMailbox > Mailbox;
+		std::shared_ptr< CWriteOnlyMailbox > Mailbox;
 };
 
 

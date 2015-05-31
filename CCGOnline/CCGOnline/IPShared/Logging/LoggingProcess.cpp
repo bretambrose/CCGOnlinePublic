@@ -148,7 +148,7 @@ void CLoggingProcess::Register_Message_Handlers( void )
 }
 
 
-void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_process_id, unique_ptr< const CLogRequestMessage > &message )
+void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CLogRequestMessage > &message )
 {
 	Handle_Log_Request_Message_Aux( source_process_id, message->Get_Source_Properties(), message->Get_Message(), message->Get_Time() );
 }
@@ -166,7 +166,7 @@ void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_pr
 	CLogFile *log_file = Get_Log_File( subject );
 	if ( log_file == nullptr )
 	{
-		unique_ptr< CLogFile > file( new CLogFile( subject, Build_File_Name( subject ) ) );
+		std::unique_ptr< CLogFile > file( new CLogFile( subject, Build_File_Name( subject ) ) );
 		file->Initialize();
 		log_file = file.get();
 		LogFiles.insert( LogFileTableType::value_type( subject, std::move( file ) ) );

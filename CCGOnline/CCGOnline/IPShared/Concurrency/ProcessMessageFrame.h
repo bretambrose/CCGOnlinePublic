@@ -32,7 +32,7 @@ class CProcessMessageFrame
 {
 	public:
 
-		typedef std::vector< unique_ptr< const IProcessMessage > > MessageFrameContainerType;
+		typedef std::vector< std::unique_ptr< const IProcessMessage > > MessageFrameContainerType;
 
 		CProcessMessageFrame( EProcessID::Enum process_id );
 		CProcessMessageFrame( CProcessMessageFrame &&rhs );
@@ -41,8 +41,8 @@ class CProcessMessageFrame
 
 		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
 
-		void Add_Message( unique_ptr< const IProcessMessage > &message );
-		void Add_Message( unique_ptr< const IProcessMessage > &&message );
+		void Add_Message( std::unique_ptr< const IProcessMessage > &message );
+		void Add_Message( std::unique_ptr< const IProcessMessage > &&message );
 
 		MessageFrameContainerType::iterator begin( void ) { return Messages.begin(); }
 		MessageFrameContainerType::iterator end( void ) { return Messages.end(); }
@@ -54,7 +54,7 @@ class CProcessMessageFrame
 
 		EProcessID::Enum ProcessID;
 
-		std::vector< unique_ptr< const IProcessMessage > > Messages;
+		std::vector< std::unique_ptr< const IProcessMessage > > Messages;
 
 };
 

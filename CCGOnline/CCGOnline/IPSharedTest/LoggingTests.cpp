@@ -46,7 +46,7 @@ class CLoggingVirtualProcessTester
 			LoggingProcess( nullptr ),
 			LoggingMailbox( nullptr )
 		{
-			LoggingProcess = static_pointer_cast< CLoggingProcess >( CLogInterface::Get_Logging_Process() );
+			LoggingProcess = std::static_pointer_cast< CLoggingProcess >( CLogInterface::Get_Logging_Process() );
 		}
 
 		~CLoggingVirtualProcessTester()
@@ -68,15 +68,15 @@ class CLoggingVirtualProcessTester
 			CLogInterface::Service_Logging( context );
 		}
 
-		shared_ptr< CWriteOnlyMailbox > Get_Writable_Mailbox( void ) const { return LoggingMailbox->Get_Writable_Mailbox(); }
+		std::shared_ptr< CWriteOnlyMailbox > Get_Writable_Mailbox( void ) const { return LoggingMailbox->Get_Writable_Mailbox(); }
 
-		shared_ptr< CLoggingProcess > Get_Logging_Virtual_Process( void ) const { return LoggingProcess; }
+		std::shared_ptr< CLoggingProcess > Get_Logging_Virtual_Process( void ) const { return LoggingProcess; }
 
 	private:
 
-		shared_ptr< CLoggingProcess > LoggingProcess;
+		std::shared_ptr< CLoggingProcess > LoggingProcess;
 
-		shared_ptr< CProcessMailbox > LoggingMailbox;
+		std::shared_ptr< CProcessMailbox > LoggingMailbox;
 };
 
 static const std::wstring LOG_FILE_PATTERN( L"Logs\\*.txt" );
@@ -151,21 +151,21 @@ TEST_F( LoggingTests, Direct_Logging )
 	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
 
-	unique_ptr< CProcessMessageFrame > ai_frame( new CProcessMessageFrame( TEST_KEY1 ) );
-	ai_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
-	ai_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
+	std::unique_ptr< CProcessMessageFrame > ai_frame( new CProcessMessageFrame( TEST_KEY1 ) );
+	ai_frame->Add_Message( std::unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
+	ai_frame->Add_Message( std::unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS1, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( ai_frame );
 
-	unique_ptr< CProcessMessageFrame > manager_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	manager_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_TEST_MESSAGE ) ) );
+	std::unique_ptr< CProcessMessageFrame > manager_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	manager_frame->Add_Message( std::unique_ptr< const IProcessMessage >( new CLogRequestMessage( MANAGER_PROCESS_PROPERTIES, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( manager_frame );
 
-	unique_ptr< CProcessMessageFrame > db_frame( new CProcessMessageFrame( TEST_KEY2 ) );
-	db_frame->Add_Message( unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS2, LOG_TEST_MESSAGE ) ) );
+	std::unique_ptr< CProcessMessageFrame > db_frame( new CProcessMessageFrame( TEST_KEY2 ) );
+	db_frame->Add_Message( std::unique_ptr< const IProcessMessage >( new CLogRequestMessage( TEST_PROPS2, LOG_TEST_MESSAGE ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( db_frame );
 
-	unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	shutdown_frame->Add_Message( unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	std::unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	shutdown_frame->Add_Message( std::unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	log_tester.Service();
@@ -206,10 +206,10 @@ TEST_F( LoggingTests, Static_Logging )
 	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
 
-	shared_ptr< CDummyProcess > dummy_process( new CDummyProcess( TEST_PROPS1 ) );
+	std::shared_ptr< CDummyProcess > dummy_process( new CDummyProcess( TEST_PROPS1 ) );
 	dummy_process->Initialize( EProcessID::FIRST_FREE_ID );
 
-	shared_ptr< CProcessMailbox > dummy_mailbox( new CProcessMailbox( EProcessID::FIRST_FREE_ID, TEST_PROPS1 ) );
+	std::shared_ptr< CProcessMailbox > dummy_mailbox( new CProcessMailbox( EProcessID::FIRST_FREE_ID, TEST_PROPS1 ) );
 	dummy_process->Set_My_Mailbox( dummy_mailbox->Get_Readable_Mailbox() );
 	dummy_process->Set_Logging_Mailbox( log_tester.Get_Writable_Mailbox() );
 
@@ -225,8 +225,8 @@ TEST_F( LoggingTests, Static_Logging )
 
 	dummy_process->Flush_System_Messages();
 
-	unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
-	shutdown_frame->Add_Message( unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
+	std::unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( EProcessID::CONCURRENCY_MANAGER ) );
+	shutdown_frame->Add_Message( std::unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
 	log_tester.Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
 	log_tester.Service();

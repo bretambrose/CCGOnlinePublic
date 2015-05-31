@@ -33,13 +33,13 @@ class CPlatformThread
 		~CPlatformThread();
 
 		void Create_And_Run( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context );
-		void Shutdown( void );
+		// void Shutdown( void );
 
 		bool Is_Running( void ) const;
 
 	private:
 
-		unique_ptr< IPlatformThread > ThreadImpl;
+		std::unique_ptr< IPlatformThread > ThreadImpl;
 };
 
 #endif // PLATFORM_THREAD_H

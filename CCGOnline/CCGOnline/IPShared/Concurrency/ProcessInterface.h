@@ -49,10 +49,10 @@ class IProcess
 		virtual EProcessID::Enum Get_ID( void ) const = 0;
 		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const = 0;
 
-		virtual void Send_Process_Message( EProcessID::Enum destination_id, unique_ptr< const IProcessMessage > &message ) = 0;
-		virtual void Send_Process_Message( EProcessID::Enum destination_id, unique_ptr< const IProcessMessage > &&message ) = 0;
-		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &message ) = 0;
-		virtual void Send_Manager_Message( unique_ptr< const IProcessMessage > &&message ) = 0;
+		virtual void Send_Process_Message( EProcessID::Enum destination_id, std::unique_ptr< const IProcessMessage > &message ) = 0;
+		virtual void Send_Process_Message( EProcessID::Enum destination_id, std::unique_ptr< const IProcessMessage > &&message ) = 0;
+		virtual void Send_Manager_Message( std::unique_ptr< const IProcessMessage > &message ) = 0;
+		virtual void Send_Manager_Message( std::unique_ptr< const IProcessMessage > &&message ) = 0;
 		virtual void Log( std::wstring &&message ) = 0;
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const = 0;

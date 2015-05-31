@@ -33,7 +33,7 @@ CProcessMailbox::CProcessMailbox( EProcessID::Enum process_id, const SProcessPro
 	WriteOnlyMailbox( nullptr ),
 	ReadOnlyMailbox( nullptr )
 {
-	shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > queue = static_pointer_cast< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > >( std::make_shared< ProcessToProcessQueueType >() );
+	std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > queue = std::static_pointer_cast< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > >( std::make_shared< ProcessToProcessQueueType >() );
 
 	WriteOnlyMailbox.reset( new CWriteOnlyMailbox( process_id, properties, queue ) );
 	ReadOnlyMailbox.reset( new CReadOnlyMailbox( queue ) );

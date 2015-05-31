@@ -27,7 +27,7 @@
 
 CWriteOnlyMailbox::CWriteOnlyMailbox( EProcessID::Enum process_id, 
 												  const SProcessProperties &properties, 
-												  const shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > &write_queue ) :
+												  const std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &write_queue ) :
 	ProcessID( process_id ),
 	Properties( properties ),
 	WriteQueue( write_queue )
@@ -41,7 +41,7 @@ CWriteOnlyMailbox::~CWriteOnlyMailbox()
 }
 
 
-void CWriteOnlyMailbox::Add_Frame( unique_ptr< CProcessMessageFrame > &frame )
+void CWriteOnlyMailbox::Add_Frame( std::unique_ptr< CProcessMessageFrame > &frame )
 {
 	FATAL_ASSERT( frame.get() != nullptr );
 
@@ -51,7 +51,7 @@ void CWriteOnlyMailbox::Add_Frame( unique_ptr< CProcessMessageFrame > &frame )
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-CReadOnlyMailbox::CReadOnlyMailbox( const shared_ptr< IConcurrentQueue< unique_ptr< CProcessMessageFrame > > > &read_queue ) :
+CReadOnlyMailbox::CReadOnlyMailbox( const std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &read_queue ) :
 	ReadQueue( read_queue )
 {
 	FATAL_ASSERT( ReadQueue.get() != nullptr );
@@ -63,7 +63,7 @@ CReadOnlyMailbox::~CReadOnlyMailbox()
 }
 
 
-void CReadOnlyMailbox::Remove_Frames( std::vector< unique_ptr< CProcessMessageFrame > > &frames )
+void CReadOnlyMailbox::Remove_Frames( std::vector< std::unique_ptr< CProcessMessageFrame > > &frames )
 {
 	ReadQueue->Remove_Items( frames );
 }

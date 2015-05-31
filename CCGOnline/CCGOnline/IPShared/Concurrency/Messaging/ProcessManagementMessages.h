@@ -38,16 +38,16 @@ class CAddNewProcessMessage : public IProcessMessage
 
 		typedef IProcessMessage BASECLASS;
 		
-		CAddNewProcessMessage( const shared_ptr< IProcess > &process, bool return_mailbox, bool forward_creator_mailbox );
+		CAddNewProcessMessage( const std::shared_ptr< IProcess > &process, bool return_mailbox, bool forward_creator_mailbox );
 		virtual ~CAddNewProcessMessage();
 
-		const shared_ptr< IProcess > &Get_Process( void ) const { return Process; }
+		const std::shared_ptr< IProcess > &Get_Process( void ) const { return Process; }
 		bool Should_Return_Mailbox( void ) const { return ReturnMailbox; }
 		bool Should_Forward_Creator_Mailbox( void ) const { return ForwardCreatorMailbox; }
 
 	private:
 
-		shared_ptr< IProcess > Process;
+		std::shared_ptr< IProcess > Process;
 
 		bool ReturnMailbox;
 		bool ForwardCreatorMailbox;

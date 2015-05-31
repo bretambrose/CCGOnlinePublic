@@ -23,7 +23,6 @@
 #define ENABLE_LOGGING
 
 class IManagedProcess;
-class ISimplePlatformMutex;
 class CProcessExecutionContext;
 
 // A type enumerating the different levels of logging.  This level can be changed on the fly so that the process
@@ -72,15 +71,15 @@ class CLogInterface
 		static void Log( const std::string &message );
 		static void Log( const char *message );
 
-		static shared_ptr< IManagedProcess > Get_Logging_Process( void ) { return LogProcess; }
+		static std::shared_ptr< IManagedProcess > Get_Logging_Process( void ) { return LogProcess; }
 
 	private:
 		
 		static std::wstring ServiceName;
 
-		static ISimplePlatformMutex *LogLock;
+		static std::mutex LogLock;
 
-		static shared_ptr< IManagedProcess > LogProcess;
+		static std::shared_ptr< IManagedProcess > LogProcess;
 
 		static std::wstring LogPath;
 		static std::wstring LogSubdirectory;
