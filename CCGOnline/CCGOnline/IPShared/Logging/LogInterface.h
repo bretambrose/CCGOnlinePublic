@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	LogInterface.h
-		A component defining the static interface to the logging system.  This system provides services to record
-		arbitrary information to files split by thread key function in a thread-safe manner.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

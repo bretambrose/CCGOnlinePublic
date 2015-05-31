@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	TimeKeeper.cpp
-		A component defining a class that tracks tick times for multiple time scales
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -28,10 +25,7 @@
 #include "TickTime.h"
 #include "TimeUtils.h"
 
-/**********************************************************************************************************************
-	CTimeKeeper::CTimeKeeper -- default constructor
-		
-**********************************************************************************************************************/
+
 CTimeKeeper::CTimeKeeper( void ) :
 	CurrentTimes(),
 	BaseTimes()
@@ -46,27 +40,14 @@ CTimeKeeper::CTimeKeeper( void ) :
 	}
 }
 
-/**********************************************************************************************************************
-	CTimeKeeper::Get_Current_Time -- gets the current tick time for a time type
 
-		time_type -- time type to get the current time for
-
-		Returns: current time in ticks for the supplied time type
-		
-**********************************************************************************************************************/
 const STickTime &CTimeKeeper::Get_Current_Time( ETimeType time_type ) const
 {
 	auto iter = CurrentTimes.find( time_type );
 	return iter->second;
 }
 
-/**********************************************************************************************************************
-	CTimeKeeper::Set_Current_Time -- sets the current tick time for a time type
 
-		time_type -- time type to set the current time for
-		current_time -- new current time for that time type
-		
-**********************************************************************************************************************/
 void CTimeKeeper::Set_Current_Time( ETimeType time_type, const STickTime &current_time )
 {
 	auto iter = CurrentTimes.find( time_type );
@@ -75,27 +56,14 @@ void CTimeKeeper::Set_Current_Time( ETimeType time_type, const STickTime &curren
 	iter->second = current_time;
 }
 
-/**********************************************************************************************************************
-	CTimeKeeper::Get_Base_Time -- gets the base/starting tick time for a time type; used to calculate elapsed time
 
-		time_type -- time type to get the base/starting time for
-
-		Returns: base time in ticks for the supplied time type
-		
-**********************************************************************************************************************/
 const STickTime &CTimeKeeper::Get_Base_Time( ETimeType time_type ) const
 {
 	auto iter = BaseTimes.find( time_type );
 	return iter->second;
 }
 
-/**********************************************************************************************************************
-	CTimeKeeper::Set_Base_Time -- sets the base/starting tick time for a time type; used to calculate elapsed time
 
-		time_type -- time type to set the base/starting time for
-		base_time -- new base time in ticks for the supplied time type
-		
-**********************************************************************************************************************/
 void CTimeKeeper::Set_Base_Time( ETimeType time_type, const STickTime &base_time )
 {
 	auto iter = BaseTimes.find( time_type );
@@ -106,27 +74,13 @@ void CTimeKeeper::Set_Base_Time( ETimeType time_type, const STickTime &base_time
 	Set_Current_Time( time_type, base_time );
 }
 
-/**********************************************************************************************************************
-	CTimeKeeper::Get_Elapsed_Ticks -- gets the elapsed time in ticks for a time type
 
-		time_type -- time type to get the elapsed time for
-
-		Returns: elapsed time in ticks for the supplied time type
-		
-**********************************************************************************************************************/
 STickTime CTimeKeeper::Get_Elapsed_Ticks( ETimeType time_type ) const
 {
 	return Get_Current_Time( time_type ) - Get_Base_Time( time_type );
 }
 
-/**********************************************************************************************************************
-	CTimeKeeper::Get_Elapsed_Seconds -- gets the elapsed time in seconds for a time type
 
-		time_type -- time type to get the elapsed time for
-
-		Returns: elapsed time in seconds for the supplied time type
-		
-**********************************************************************************************************************/
 double CTimeKeeper::Get_Elapsed_Seconds( ETimeType time_type ) const
 {
 	return NTimeUtils::Convert_Ticks_To_Seconds( time_type, Get_Current_Time( time_type ) - Get_Base_Time( time_type ) );

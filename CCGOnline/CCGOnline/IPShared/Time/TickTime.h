@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	TickTime.h
-		A component defining a simple wrapper class for a scalar time value.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

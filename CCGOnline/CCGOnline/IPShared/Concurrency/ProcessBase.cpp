@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessBase.cpp
-		A component containing the logic shared by all processes.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -44,12 +41,7 @@ enum EProcessState
 	EPS_SHUTTING_DOWN_HARD
 };
 
-/**********************************************************************************************************************
-	CProcessBase::CProcessBase -- constructor
-	
-		properties -- the properties of this process
-				
-**********************************************************************************************************************/
+
 CProcessBase::CProcessBase( const SProcessProperties &properties ) :
 	BASECLASS(),
 	ID( EProcessID::INVALID ),
@@ -72,42 +64,26 @@ CProcessBase::CProcessBase( const SProcessProperties &properties ) :
 {
 }
 
-/**********************************************************************************************************************
-	CProcessBase::~CProcessBase -- destructor
-					
-**********************************************************************************************************************/
+
 CProcessBase::~CProcessBase()
 {
 	Cleanup();
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Initialize -- initializes the virtual process
 
-		id -- assigned id of this process
-					
-**********************************************************************************************************************/
 void CProcessBase::Initialize( EProcessID::Enum id )
 {
 	ID = id;
 	Register_Message_Handlers();
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Cleanup -- cleans up the process
-					
-**********************************************************************************************************************/
+
 void CProcessBase::Cleanup( void )
 {
 	MessageHandlers.clear();	// not really necessary
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Log -- requests a message be written to the log file for this virtual process
 
-		message -- message to output to the log file
-					
-**********************************************************************************************************************/
 void CProcessBase::Log( std::wstring &&message )
 {
 	// actual logging thread should override this function and never call the baseclass
@@ -117,12 +93,7 @@ void CProcessBase::Log( std::wstring &&message )
 	Send_Process_Message( EProcessID::LOGGING, log_request );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Get_Mailbox -- gets the mailbox for a process, if we have it
 
-		process_id -- id of the process to get a mailbox for
-					
-**********************************************************************************************************************/
 shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID::Enum process_id ) const
 {
 	auto interface_iter = Mailboxes.find( process_id );
@@ -134,25 +105,13 @@ shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID::Enum proc
 	return shared_ptr< CWriteOnlyMailbox >( nullptr );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Send_Process_Message -- sends a message to another process
 
-		dest_process_id -- id of the process to send to
-		message -- message to send
-					
-**********************************************************************************************************************/
 void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message )
 {
 	Send_Process_Message( dest_process_id, std::move( message ) );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Send_Process_Message -- sends a message to another process
 
-		dest_process_id -- id of the process to send to
-		message -- message to send
-					
-**********************************************************************************************************************/
 void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &&message )
 {
 	// manager and logging threads are special-cased in order to avoid race conditions related to rescheduling
@@ -190,33 +149,19 @@ void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, uniqu
 	}
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Send_Manager_Message -- sends a message to the concurrency manager
 
-		message -- message to send
-					
-**********************************************************************************************************************/
 void CProcessBase::Send_Manager_Message( unique_ptr< const IProcessMessage > &message )
 {
 	Send_Process_Message( EProcessID::CONCURRENCY_MANAGER, message );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Send_Manager_Message -- sends a message to the concurrency manager
 
-		message -- message to send
-					
-**********************************************************************************************************************/
 void CProcessBase::Send_Manager_Message( unique_ptr< const IProcessMessage > &&message )
 {
 	Send_Process_Message( EProcessID::CONCURRENCY_MANAGER, message );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Flush_Regular_Messages -- sends all pending messages to their destination process; does not include
-		manager or logging processes
-					
-**********************************************************************************************************************/
+
 void CProcessBase::Flush_Regular_Messages( void )
 {
 	if ( !Is_Shutting_Down() )
@@ -261,12 +206,7 @@ void CProcessBase::Flush_Regular_Messages( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Set_Manager_Mailbox -- sets the write-only interface to the concurrency manager
 
-		mailbox -- the manager's write interface
-					
-**********************************************************************************************************************/
 void CProcessBase::Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox )
 {
 	FATAL_ASSERT( ManagerMailbox.get() == nullptr );
@@ -274,12 +214,7 @@ void CProcessBase::Set_Manager_Mailbox( const shared_ptr< CWriteOnlyMailbox > &m
 	ManagerMailbox = mailbox;
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Set_Logging_Mailbox -- sets the write-only interface to the logging process
 
-		mailbox -- the logging process's write interface
-					
-**********************************************************************************************************************/
 void CProcessBase::Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &mailbox )
 {
 	FATAL_ASSERT( LoggingMailbox.get() == nullptr );
@@ -287,34 +222,19 @@ void CProcessBase::Set_Logging_Mailbox( const shared_ptr< CWriteOnlyMailbox > &m
 	LoggingMailbox = mailbox;
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Set_My_Mailbox -- sets the read-only mailbox you own
 
-		mailbox -- our read-only mailbox
-					
-**********************************************************************************************************************/
 void CProcessBase::Set_My_Mailbox( const shared_ptr< CReadOnlyMailbox > &mailbox )
 {
 	MyMailbox = mailbox;
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Get_Next_Task_Time -- gets the next time in the future when a scheduled task should execute
 
-		Returns: next scheduled task time
-					
-**********************************************************************************************************************/
 double CProcessBase::Get_Next_Task_Time( void ) const
 {
 	return TaskScheduler->Get_Next_Task_Time();
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Run -- base execution logic
 
-		context -- the tbb context that this process is being run under
-					
-**********************************************************************************************************************/
 void CProcessBase::Run( const CProcessExecutionContext & /*context*/ )
 {
 	if ( State == EPS_INITIALIZING )
@@ -354,10 +274,7 @@ void CProcessBase::Run( const CProcessExecutionContext & /*context*/ )
 	}
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Service_Message_Frames -- handles all incoming process messages
-					
-**********************************************************************************************************************/
+
 void CProcessBase::Service_Message_Frames( void )
 {
 	if ( MyMailbox.get() == nullptr )
@@ -383,12 +300,7 @@ void CProcessBase::Service_Message_Frames( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Handle_Shutdown_Mailboxes -- services all mailboxes that are pending shutdown, either erasing
-		an associated outbound frame if we don't have the mailbox, or erasing the mailbox.  Notifies the manager
-		that each mailbox has been released.
-					
-**********************************************************************************************************************/
+
 void CProcessBase::Handle_Shutdown_Mailboxes( void )
 {
 	for ( auto iter = ShutdownMailboxes.cbegin(), end = ShutdownMailboxes.cend(); iter != end; ++iter )
@@ -422,24 +334,13 @@ void CProcessBase::Handle_Shutdown_Mailboxes( void )
 	ShutdownMailboxes.clear();
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Should_Reschedule -- should this task be rescheduled
 
-		Returns: true if it should be rescheduled, otherwise false
-					
-**********************************************************************************************************************/
 bool CProcessBase::Should_Reschedule( void ) const
 {
 	return State == EPS_RUNNING && Get_Execution_Mode() == EProcessExecutionMode::TASK;
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Handle_Message -- central message handling dispatcher
 
-		key -- message sender
-		message -- the process message to handle
-					
-**********************************************************************************************************************/
 void CProcessBase::Handle_Message( EProcessID::Enum process_id, unique_ptr< const IProcessMessage > &message )
 {
 	const IProcessMessage *msg_base = message.get();
@@ -451,10 +352,7 @@ void CProcessBase::Handle_Message( EProcessID::Enum process_id, unique_ptr< cons
 	iter->second->Handle_Message( process_id, message );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Register_Message_Handlers -- creates message handlers for each message that we want to receive
-					
-**********************************************************************************************************************/
+
 void CProcessBase::Register_Message_Handlers( void )
 {
 	REGISTER_THIS_HANDLER( CAddMailboxMessage, CProcessBase, Handle_Add_Mailbox_Message )
@@ -462,13 +360,7 @@ void CProcessBase::Register_Message_Handlers( void )
 	REGISTER_THIS_HANDLER( CShutdownSelfRequest, CProcessBase, Handle_Shutdown_Self_Request )
 } 
 
-/**********************************************************************************************************************
-	CProcessBase::Register_Handler -- registers a message handlers for a process message
 
-		message_type_info -- the C++ type of the message class
-		handler -- message handling delegate
-					
-**********************************************************************************************************************/
 void CProcessBase::Register_Handler( const std::type_info &message_type_info, unique_ptr< IProcessMessageHandler > &handler )
 {
 	Loki::TypeInfo key( message_type_info );
@@ -478,13 +370,7 @@ void CProcessBase::Register_Handler( const std::type_info &message_type_info, un
 	MessageHandlers[ key ] = std::move( handler );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Handle_Add_Mailbox_Message -- handles the AddMailboxMessage message
 
-		source_process_id -- id of the process source of the message
-		message -- the AddMailboxMessage message
-					
-**********************************************************************************************************************/
 void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process_id*/, unique_ptr< const CAddMailboxMessage > &message )
 {
 	EProcessID::Enum add_id = message->Get_Mailbox()->Get_Process_ID();
@@ -500,13 +386,7 @@ void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process
 	}
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Handle_Release_Mailbox_Request -- handles the ReleaseMailboxRequest message
 
-		source_process_id -- id of the process source of the message
-		message -- message to handle
-					
-**********************************************************************************************************************/
 void CProcessBase::Handle_Release_Mailbox_Request( EProcessID::Enum source_process_id, unique_ptr< const CReleaseMailboxRequest > &request )
 {
 	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
@@ -517,13 +397,7 @@ void CProcessBase::Handle_Release_Mailbox_Request( EProcessID::Enum source_proce
 	ShutdownMailboxes.insert( shutdown_process_id );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Handle_Shutdown_Self_Request -- handles the ShutdownSelf request
 
-		source_process_id -- id of the process source of the message
-		message -- the ShutdownThread request
-					
-**********************************************************************************************************************/
 void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, unique_ptr< const CShutdownSelfRequest > &message )
 {
 	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
@@ -544,24 +418,13 @@ void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process
 	Send_Manager_Message( shutdown_self_msg );	
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Is_Shutting_Down -- is this process in the process of shutting down?
 
-		Returns: true if shutting down, false otherwise
-					
-**********************************************************************************************************************/
 bool CProcessBase::Is_Shutting_Down( void ) const
 {
 	return State == EPS_SHUTTING_DOWN_SOFT || State == EPS_SHUTTING_DOWN_HARD;
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Flush_System_Messages -- Manager and log messages get sent separately from other messages.
-		This function must be the last function called in this thread's execution context/tbb-execute.  The instant a reschedule
-		message is pushed to the manager, this thread may end up getting reexecuted which would cause data corruption
-		if the current execution is still ongoing.
-					
-**********************************************************************************************************************/
+
 void CProcessBase::Flush_System_Messages( void )
 {
 	bool is_shutting_down = Is_Shutting_Down();
@@ -597,13 +460,7 @@ void CProcessBase::Flush_System_Messages( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Remove_Process_ID_From_Tables -- removes a process id from the pair of tables mapping
-		process properties to/from process ids
 
-		process_id -- id of the process to remove all references to
-					
-**********************************************************************************************************************/
 void CProcessBase::Remove_Process_ID_From_Tables( EProcessID::Enum process_id )
 {
 	auto iter1 = IDToPropertiesTable.find( process_id );
@@ -625,14 +482,7 @@ void CProcessBase::Remove_Process_ID_From_Tables( EProcessID::Enum process_id )
 	IDToPropertiesTable.erase( iter1 );
 }
 
-/**********************************************************************************************************************
-	CProcessBase::Build_Process_ID_List_By_Properties -- builds a list of all known processes that match
-		a property set
 
-		properties -- properties to match against
-		process_ids -- output vector of matching process ids
-					
-**********************************************************************************************************************/
 void CProcessBase::Build_Process_ID_List_By_Properties( const SProcessProperties &properties, std::vector< EProcessID::Enum > &process_ids ) const
 {
 	process_ids.clear();

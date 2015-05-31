@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	SlashCommandDefinition.cpp
-		A component containing the definition of a slash command
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -25,12 +22,7 @@
 #include "SlashCommandDefinition.h"
 #include "SlashCommandDataDefinition.h"
 
-/**********************************************************************************************************************
-	CSlashCommandDefinition::CSlashCommandDefinition -- constructor
 
-		data_definition -- the previously loaded static data for this command
-	
-**********************************************************************************************************************/
 CSlashCommandDefinition::CSlashCommandDefinition( const CSlashCommandDataDefinition *data_definition ) :
 	DataDefinition( data_definition ),
 	ParamMatchExpression( data_definition != nullptr ? data_definition->Build_Command_Matcher() : L"" )

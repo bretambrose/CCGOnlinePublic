@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	DebugAssert.cpp
-		Implementation of a static class to catch and log asserts with.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -29,16 +26,6 @@
 
 #include "SynchronizationPrimitives/PlatformMutex.h"
 
-/**********************************************************************************************************************
-	CAssertSystem::Build_Assertion_String -- builds a descriptive error string from information supplied by the assert
-	
-		expression_string -- the conditional expression that failed
-		file_name -- file where this check was located
-		line_number -- line number where this check was located
-		is_fatal -- is this assertion a fatal one?
-		output_string -- output parameter for the descriptive error string
-		
-**********************************************************************************************************************/
 static void Build_Assertion_String( const char *expression_string, const char *file_name, uint32_t line_number, bool is_fatal, std::wstring &output_string )
 {
 	std::basic_ostringstream< wchar_t > assert_description;
@@ -64,12 +51,6 @@ ISimplePlatformMutex *CAssertSystem::AssertLock = nullptr;
 DLogFunctionType CAssertSystem::LogFunction;
 bool CAssertSystem::Initialized = false;
 
-/**********************************************************************************************************************
-	CAssertSystem::Initialize -- initializes the assert handling system
-
-		log_function -- a callback that will log the assert
-
-**********************************************************************************************************************/
 void CAssertSystem::Initialize( const DLogFunctionType &log_function )
 {
 	FATAL_ASSERT( !Initialized );
@@ -79,10 +60,6 @@ void CAssertSystem::Initialize( const DLogFunctionType &log_function )
 	Initialized = true;
 }
 
-/**********************************************************************************************************************
-	CAssertSystem::Shutdown -- shuts down and cleans up the assert handling system
-
-**********************************************************************************************************************/
 void CAssertSystem::Shutdown( void )
 {
 	if ( Initialized )
@@ -93,18 +70,6 @@ void CAssertSystem::Shutdown( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CAssertSystem::Assert_Handler -- handles an assert by building a descriptive message and displaying a dialog
-		to the user with the option of debugging/continuing if this is a non-fatal assert
-	
-		expression_string -- the conditional expression that failed
-		file_name -- file where this check was located
-		line_number -- line number where this check was located
-		force_crash -- is this a fatal assert?
-
-		Returns: always returns true in order to support FAIL_IF conditional evaluation
-		
-********************************************************************************************/
 bool CAssertSystem::Assert_Handler( const char *expression_string, const char *file_name, uint32_t line_number, bool force_crash )
 {
 	if ( !Initialized )

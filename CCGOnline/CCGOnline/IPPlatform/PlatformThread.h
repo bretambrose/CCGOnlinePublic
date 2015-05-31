@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	PlatformThread.h
-		A simple component that wraps OS threads
-
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

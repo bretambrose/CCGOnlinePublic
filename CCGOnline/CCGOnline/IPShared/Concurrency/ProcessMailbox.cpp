@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessMailbox.cpp
-		A component definining the class that holds both the read and write interfaces of a process mailbox.  Only the
-		manager has access to this.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -30,13 +26,7 @@
 #include "Containers/LockingConcurrentQueue.h"
 #include "ProcessMessageFrame.h"
 
-/**********************************************************************************************************************
-	CProcessMailbox::CProcessMailbox -- constructor
 
-		process_id -- id of the process these interfaces correspond to
-		properties -- properties of the owning process
-					
-**********************************************************************************************************************/
 CProcessMailbox::CProcessMailbox( EProcessID::Enum process_id, const SProcessProperties &properties ) :
 	ProcessID( process_id ),
 	Properties( properties ),
@@ -49,10 +39,7 @@ CProcessMailbox::CProcessMailbox( EProcessID::Enum process_id, const SProcessPro
 	ReadOnlyMailbox.reset( new CReadOnlyMailbox( queue ) );
 }
 
-/**********************************************************************************************************************
-	CProcessMailbox::~CProcessMailbox -- destructor
-					
-**********************************************************************************************************************/
+
 CProcessMailbox::~CProcessMailbox()
 {
 }

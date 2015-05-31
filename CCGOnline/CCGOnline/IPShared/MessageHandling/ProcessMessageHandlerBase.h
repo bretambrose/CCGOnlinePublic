@@ -1,10 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessMessageHandlerBase.h
-		A component defining a bare base class for objects that handle process messages.  In practice these objects
-		are simple trampolines that forward handling to a delegate while retaining type safety and
-		generic behavior.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

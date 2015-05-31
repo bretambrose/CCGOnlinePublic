@@ -1,10 +1,5 @@
 /**********************************************************************************************************************
 
-	CRC.h
-		A component defining several utility functions for calculating the CRC of a block of memory.  Primarily
-		used to create unique integer keys for strings.  Will eventually be removed in favor of an external
-		library with better hashing implementations.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -65,15 +60,6 @@ static uint32_t CRCTable[ 256 ] = {
 };
 
 
-/**********************************************************************************************************************
-	CRCClass::CRC_Memory -- computes a CRC value from a block of memory
-	
-		memory -- start of the memory block to CRC
-		length -- length of the block to CRC
-
-		Returns: the CRC code value for the block of memory
-		
-**********************************************************************************************************************/
 CRCValue NCRCUtils::CRC_Memory( const void *memory, size_t length )
 {
 	const char *mem = reinterpret_cast< const char * >( memory );
@@ -88,14 +74,7 @@ CRCValue NCRCUtils::CRC_Memory( const void *memory, size_t length )
 	return ~crc;
 }
 
-/**********************************************************************************************************************
-	NCRCUtils::String_To_CRC -- computes a CRC value from a string
-	
-		value -- string to calculate a CRC code for
-		
-		Returns: the CRC code value for the supplied string
-		
-**********************************************************************************************************************/
+
 CRCValue NCRCUtils::String_To_CRC( const std::string &value )
 {
 	CRCValue crc = CRC_Memory( static_cast< const void * >( value.c_str() ), value.size() );
@@ -103,14 +82,7 @@ CRCValue NCRCUtils::String_To_CRC( const std::string &value )
 	return crc;
 }
 
-/**********************************************************************************************************************
-	NCRCUtils::String_To_CRC_Case_Insensitive -- computes a CRC value from a string that is converted to uppercase first
-	
-		value -- string to calculate a CRC code for
-		
-		Returns: the CRC code value for the supplied string
-		
-**********************************************************************************************************************/
+
 CRCValue NCRCUtils::String_To_CRC_Case_Insensitive( const std::string &value )
 {
 	std::string upper_string;
@@ -119,14 +91,7 @@ CRCValue NCRCUtils::String_To_CRC_Case_Insensitive( const std::string &value )
 	return String_To_CRC( upper_string );
 }
 
-/**********************************************************************************************************************
-	NCRCUtils::String_To_CRC -- computes a CRC value from a string
-	
-		value -- string to calculate a CRC code for
-		
-		Returns: the CRC code value for the supplied string
-		
-**********************************************************************************************************************/
+
 CRCValue NCRCUtils::String_To_CRC( const std::wstring &value )
 {
 	CRCValue crc = CRC_Memory( static_cast< const void * >( value.c_str() ), value.size() * sizeof( wchar_t ) );
@@ -134,14 +99,7 @@ CRCValue NCRCUtils::String_To_CRC( const std::wstring &value )
 	return crc;
 }
 
-/**********************************************************************************************************************
-	NCRCUtils::String_To_CRC_Case_Insensitive -- computes a CRC value from a string that is converted to uppercase first
-	
-		value -- string to calculate a CRC code for
-		
-		Returns: the CRC code value for the supplied string
-		
-**********************************************************************************************************************/
+
 CRCValue NCRCUtils::String_To_CRC_Case_Insensitive( const std::wstring &value )
 {
 	std::wstring upper_string;

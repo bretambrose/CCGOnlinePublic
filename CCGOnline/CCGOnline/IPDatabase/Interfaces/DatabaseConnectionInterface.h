@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	DatabaseConnectionInterface.h
-		A component defining the abstract interface to a database connection.  This is a wrapper of the ODBC connection handle.
-
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessProperties.cpp
-		A component definining a struct describing the matchable properties of a process
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -24,14 +21,7 @@
 
 #include "ProcessProperties.h"
 
-/**********************************************************************************************************************
-	SProcessProperties::Matches -- does the supplied property set match our implicit pattern?
 
-		properties -- properties to check for a match against
-
-		Returns: true if the properties matches our pattern, false otherwise
-					
-**********************************************************************************************************************/
 bool SProcessProperties::Matches( const SProcessProperties &properties ) const
 {
 	// if the subjects don't match and our pattern does not include a subject wildcard then there is no match

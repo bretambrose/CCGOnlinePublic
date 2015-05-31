@@ -205,8 +205,7 @@
     <ClInclude Include="MessageHandling\ProcessMessageHandlerBase.h" />
     <ClInclude Include="PriorityQueue.h" />
     <ClInclude Include="IPShared.h" />
-    <ClInclude Include="Serialization\SerializationBase.h" />
-    <ClInclude Include="Serialization\SerializationBinding.h" />
+    <ClInclude Include="Serialization\SerializationHelpers.h" />
     <ClInclude Include="Serialization\SerializationRegistrar.h" />
     <ClInclude Include="Serialization\XML\PrimitiveXMLSerializers.h" />
     <ClInclude Include="Serialization\XML\XMLLoadableTable.h" />
@@ -247,7 +246,7 @@
     <ClCompile Include="Logging\LoggingProcess.cpp" />
     <ClCompile Include="Logging\LogInterface.cpp" />
     <ClCompile Include="IPShared.cpp" />
-    <ClCompile Include="Serialization\SerializationBinding.cpp" />
+    <ClCompile Include="Serialization\SerializationHelpers.cpp" />
     <ClCompile Include="Serialization\SerializationRegistrar.cpp" />
     <ClCompile Include="Serialization\XML\PrimitiveXMLSerializers.cpp" />
     <ClCompile Include="SharedXMLSerializerRegistration.cpp" />

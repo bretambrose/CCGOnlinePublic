@@ -1,10 +1,5 @@
 /**********************************************************************************************************************
 
-	ConcurrentQueueInterface.h
-		A component defining an pure virtual interface for concurrent queues.  Several implementations are derived from this
-		base class, one using Intel's concurrent queue implementation (semi-lockless, uses a spin lock), one using
-		a simple mutex to wrap add and remove.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

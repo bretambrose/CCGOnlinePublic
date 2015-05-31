@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	Shared.cpp
-		Component containing initialization and shutdown entry points for the IP_Database library
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -24,18 +21,12 @@
 
 #include "IPDatabase.h"
 
-/**********************************************************************************************************************
-	NIPDatabase::Initialize -- Initializes all the static process-wide systems in the IP_Database library
 
-**********************************************************************************************************************/
 void NIPDatabase::Initialize( void )
 {
 }
 
-/**********************************************************************************************************************
-	NIPDatabase::Shutdown -- Shuts down and cleans up all the static process-wide systems in the IP_Database library
 
-**********************************************************************************************************************/
 void NIPDatabase::Shutdown( void )
 {
 }

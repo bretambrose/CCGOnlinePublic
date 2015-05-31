@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessStatics.h
-		A component containing a static class that manages the thread-local variables that hold handles to
-		the executing process and the concurrency manager.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

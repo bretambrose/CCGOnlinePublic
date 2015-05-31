@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	StructuredExceptionHandler.cpp
-		A component that does platform-agnostic exception handling
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -39,45 +36,25 @@
 #include "IPPlatform/PlatformMisc.h"
 #include "IPPlatform/PlatformProcess.h"
 
-/**********************************************************************************************************************
-	CStructuredExceptionHandler::Initialize -- Initializes the platform-agnostic exception handling mechanism with
-		the default exception handler
 
-**********************************************************************************************************************/
 void CStructuredExceptionHandler::Initialize( void )
 {
 	CPlatformExceptionHandler::Initialize( DExceptionHandler( CStructuredExceptionHandler::On_Structured_Exception_Callback ) );
 }
 
-/**********************************************************************************************************************
-	CStructuredExceptionHandler::Initialize -- Initializes the platform-agnostic exception handling mechanism with a
-		custom exception handler
 
-		handler -- a platform-agnostic exception handler the the platform-specific handler should call once all 
-			information has been gathered
-
-**********************************************************************************************************************/
 void CStructuredExceptionHandler::Initialize( const DExceptionHandler &handler )
 {
 	CPlatformExceptionHandler::Initialize( handler );
 }
 
-/**********************************************************************************************************************
-	CStructuredExceptionHandler::Shutdown -- Shuts down and turns off structured exception handling
 
-**********************************************************************************************************************/
 void CStructuredExceptionHandler::Shutdown( void )
 {
 	CPlatformExceptionHandler::Shutdown();
 }
 
-/**********************************************************************************************************************
-	CStructuredExceptionHandler::On_Structured_Exception_Callback -- The default platform-agnostic exception handler
-		callback
 
-		shared_exception_info -- platform-agnostic exception information
-
-**********************************************************************************************************************/
 void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredExceptionInfo &shared_exception_info )
 {
 	// If the exception is in the scope of a thread task, record that fact
@@ -101,13 +78,7 @@ void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredE
 	Archive_Logs();
 }
 
-/**********************************************************************************************************************
-	CStructuredExceptionHandler::Write_Exception_File -- writes out a file containing all the details about the
-		exception
 
-		shared_exception_info -- platform-agnostic exception information
-
-**********************************************************************************************************************/
 void CStructuredExceptionHandler::Write_Exception_File( const CStructuredExceptionInfo &shared_exception_info )
 {
 	std::wstring file_name = Get_Log_File_Prefix() + L"Exception.txt";
@@ -160,10 +131,7 @@ struct SLogFileSorter
 		}
 };
 
-/**********************************************************************************************************************
-	CStructuredExceptionHandler::Archive_Logs -- Creates an archive of all log files belonging to this process
 
-**********************************************************************************************************************/
 void CStructuredExceptionHandler::Archive_Logs( void )
 {
 	std::basic_ostringstream< wchar_t > archive_name_string;
@@ -201,10 +169,7 @@ void CStructuredExceptionHandler::Archive_Logs( void )
 	archive_file.close();
 }
 
-/**********************************************************************************************************************
-	CStructuredExceptionHandler::Get_Log_File_Prefix -- computes the prefix of all log files for this process
 
-**********************************************************************************************************************/
 std::wstring CStructuredExceptionHandler::Get_Log_File_Prefix( void )
 {
 	std::basic_ostringstream< wchar_t > prefix_string;

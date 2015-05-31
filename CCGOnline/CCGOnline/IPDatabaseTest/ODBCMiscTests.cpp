@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ODBCMiscTests.cpp
-		defines some miscellaneous unit tests for ODBC wrapper functionality
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

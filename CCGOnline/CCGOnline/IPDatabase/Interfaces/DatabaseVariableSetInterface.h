@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	DatabaseVariableSetInterface.h
-		A component defining the abstract interface to a set of application variables.
-
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

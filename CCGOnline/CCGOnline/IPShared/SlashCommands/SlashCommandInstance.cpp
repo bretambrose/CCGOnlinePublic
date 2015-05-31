@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	SlashCommandInstance.cpp
-		A component containing the definition for an instance of a slash command
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -27,10 +24,7 @@
 #include "SlashCommandInstance.h"
 #include "IPPlatform/StringUtils.h"
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::CSlashCommandInstance -- default constructor
-	
-**********************************************************************************************************************/
+
 CSlashCommandInstance::CSlashCommandInstance( void ) :
 	Command( L"" ),
 	SubCommand( L"" ),
@@ -38,16 +32,7 @@ CSlashCommandInstance::CSlashCommandInstance( void ) :
 {
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Parse -- extracts all the parameters to a command
 
-		command_line -- string to parse parameters from
-		definition -- slash command this should be an instance of
-		error_msg -- output parameter for what went wrong if an error occurred
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Parse( const std::wstring &command_line, const CSlashCommandDefinition *definition, std::wstring &error_msg )
 {
 	const std::tr1::wregex &param_matcher = definition->Get_Param_Match_Expression();
@@ -102,10 +87,7 @@ bool CSlashCommandInstance::Parse( const std::wstring &command_line, const CSlas
 	return true;
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Reset -- clears all command state from the instance
-	
-**********************************************************************************************************************/
+
 void CSlashCommandInstance::Reset( void )
 {
 	Command = L"";
@@ -113,15 +95,7 @@ void CSlashCommandInstance::Reset( void )
 	Params.clear();
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an int32_t
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, int32_t &value ) const
 {
 	if ( index >= Params.size() )
@@ -132,15 +106,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, int32_t &value ) const
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an uint32_t
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, uint32_t &value ) const
 {
 	if ( index >= Params.size() )
@@ -151,15 +117,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, uint32_t &value ) const
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an int64_t
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, int64_t &value ) const
 {
 	if ( index >= Params.size() )
@@ -170,15 +128,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, int64_t &value ) const
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as an uint64_t
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, uint64_t &value ) const
 {
 	if ( index >= Params.size() )
@@ -189,15 +139,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, uint64_t &value ) const
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as a std::wstring
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, std::wstring &value ) const
 {
 	if ( index >= Params.size() )
@@ -208,15 +150,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, std::wstring &value ) con
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as a std::string
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, std::string &value ) const
 {
 	if ( index >= Params.size() )
@@ -227,15 +161,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, std::string &value ) cons
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as a float
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, float &value ) const
 {
 	if ( index >= Params.size() )
@@ -246,15 +172,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, float &value ) const
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as a double
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, double &value ) const
 {
 	if ( index >= Params.size() )
@@ -265,15 +183,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, double &value ) const
 	return NStringUtils::Convert( Params[ index ], value );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandInstance::Get_Param -- queries a parameter value as a bool
 
-		index -- which parameter to query
-		value -- output variable for the parameter value
-
-	Returns: success/failure
-	
-**********************************************************************************************************************/
 bool CSlashCommandInstance::Get_Param( uint32_t index, bool &value ) const
 {
 	if ( index >= Params.size() )

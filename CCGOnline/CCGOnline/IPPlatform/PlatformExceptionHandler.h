@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	PlatformExceptionHandler.h
-		A component that wraps OS-specific exception handling logic, including generating a stack trace
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

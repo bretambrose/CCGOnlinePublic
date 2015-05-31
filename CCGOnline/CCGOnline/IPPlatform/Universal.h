@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	Universal.h
-		A component that contains miscellaneous functionality that should be available anywhere in the solution.  All
-		precompiled headers should include this file.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

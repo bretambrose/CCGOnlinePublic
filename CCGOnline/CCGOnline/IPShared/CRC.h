@@ -1,10 +1,5 @@
 /**********************************************************************************************************************
 
-	CRC.h
-		A component defining several utility functions for calculating the CRC of a block of memory.  Primarily
-		used to create unique integer keys for strings.  Will eventually be removed in favor of an external
-		library with better hashing implementations.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

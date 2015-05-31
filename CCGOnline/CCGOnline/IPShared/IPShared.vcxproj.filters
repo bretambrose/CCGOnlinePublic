@@ -203,13 +203,10 @@
     <ClInclude Include="Serialization\XML\XMLSerializerInterface.h">
       <Filter>Source Files\Serialization\XML</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\SerializationBase.h">
-      <Filter>Source Files\Serialization</Filter>
-    </ClInclude>
     <ClInclude Include="Serialization\SerializationRegistrar.h">
       <Filter>Source Files\Serialization</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization\SerializationBinding.h">
+    <ClInclude Include="Serialization\SerializationHelpers.h">
       <Filter>Source Files\Serialization</Filter>
     </ClInclude>
   </ItemGroup>
@@ -304,7 +301,7 @@
     <ClCompile Include="Serialization\SerializationRegistrar.cpp">
       <Filter>Source Files\Serialization</Filter>
     </ClCompile>
-    <ClCompile Include="Serialization\SerializationBinding.cpp">
+    <ClCompile Include="Serialization\SerializationHelpers.cpp">
       <Filter>Source Files\Serialization</Filter>
     </ClCompile>
   </ItemGroup>

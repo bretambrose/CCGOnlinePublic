@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ExchangeInterfaceMessages.cpp
-		A component containing definitions for messages that are needed to exchange mailboxes
-		between processes
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -27,21 +23,13 @@
 
 #include "IPShared/Concurrency/MailboxInterfaces.h"
 
-/**********************************************************************************************************************
-	CAddMailboxMessage::CAddMailboxMessage -- constructor
-	
-		write_interface -- a write-only message passing interface to a process
-		
-**********************************************************************************************************************/
+
 CAddMailboxMessage::CAddMailboxMessage( const shared_ptr< CWriteOnlyMailbox > &mailbox ) :
 	Mailbox( mailbox )
 {
 }
 
-/**********************************************************************************************************************
-	CAddMailboxMessage::~CAddMailboxMessage -- destructor
-		
-**********************************************************************************************************************/
+
 CAddMailboxMessage::~CAddMailboxMessage() 
 {
 }

@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	DatabaseEnvironmentInterface.h
-		A component defining the abstract interface to the database environment object (one per process).  This is not
-		the top level interface to database functionality; it's a wrapper of the ODBC environment handle.
-
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

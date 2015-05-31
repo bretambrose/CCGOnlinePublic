@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	TimeUtils.h
-		A component defining several utility functions for converting between different fundamental time types
-			used in the library
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

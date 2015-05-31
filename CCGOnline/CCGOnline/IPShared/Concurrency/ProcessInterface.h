@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessInterface.h
-		A component defining the top-level pure virtual interface to a process.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

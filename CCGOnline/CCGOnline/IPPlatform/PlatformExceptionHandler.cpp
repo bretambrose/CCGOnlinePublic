@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	PlatformExceptionHandler.cpp
-		A component that wraps OS-specific exception handling logic, including generating a stack trace
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -197,14 +194,6 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 
 #endif
 
-/**********************************************************************************************************************
-	Convert_Exception_Code_To_Message - Converts a Win32 exception code to a descriptive string
-
-		exception_code -- the exception code to describe
-
-		Returns: string describing the exception
-
-**********************************************************************************************************************/
 static std::wstring Convert_Exception_Code_To_Message( uint32_t exception_code )
 {
 	switch ( exception_code )
@@ -248,14 +237,7 @@ static std::wstring Convert_Exception_Code_To_Message( uint32_t exception_code )
 	}
 }
 
-/**********************************************************************************************************************
-	WindowsExceptionHandler -- the top-level structured exception handler for our programs
 
-		windows_exception_info -- windows-specific contextual information about the exception
-
-		Returns: a code telling windows to either look for another handler or try and continue execution
-
-**********************************************************************************************************************/
 static LONG WINAPI WindowsExceptionHandler( struct _EXCEPTION_POINTERS *windows_exception_info )
 {
 	CSimplePlatformMutexLocker exception_lock( CPlatformExceptionHandler::Get_Lock() );
@@ -288,12 +270,7 @@ ISimplePlatformMutex *CPlatformExceptionHandler::ExceptionLock = nullptr;
 bool CPlatformExceptionHandler::SymbolsLoaded = false;
 bool CPlatformExceptionHandler::Initialized = false;
 
-/**********************************************************************************************************************
-	CPlatformExceptionHandler::Initialize -- Initializes the platform-specific exception handling mechanism
 
-		handler -- a platform-agnostic exception handler to call once all information has been gathered
-
-**********************************************************************************************************************/
 void CPlatformExceptionHandler::Initialize( const DExceptionHandler &handler )
 {
 	FATAL_ASSERT( !Initialized );
@@ -306,10 +283,7 @@ void CPlatformExceptionHandler::Initialize( const DExceptionHandler &handler )
 	Initialized = true;
 }
 
-/**********************************************************************************************************************
-	CPlatformExceptionHandler::Shutdown -- shuts down and cleans up the platform-specific exception handling mechanism
 
-**********************************************************************************************************************/
 void CPlatformExceptionHandler::Shutdown( void )
 {
 	if ( !Initialized )
@@ -332,13 +306,7 @@ void CPlatformExceptionHandler::Shutdown( void )
 	Initialized = false;
 }
 
-/**********************************************************************************************************************
-	CPlatformExceptionHandler::On_Exception -- forwards the now-agnostic exception info to the agnostic exception
-		handler
 
-		shared_exception_info -- OS-neutral exception information
-
-**********************************************************************************************************************/
 void CPlatformExceptionHandler::On_Exception( CStructuredExceptionInfo &shared_exception_info )
 {
 	if ( !Handler.empty() )
@@ -347,15 +315,7 @@ void CPlatformExceptionHandler::On_Exception( CStructuredExceptionInfo &shared_e
 	}
 }
 
-/**********************************************************************************************************************
-	CPlatformExceptionHandler::Load_Symbols -- loads the symbols associated with this process, only done when there's
-		an exception
 
-		error_message -- output parameter describing any errors that occurred during the loading process
-
-		Returns: success/failure
-
-**********************************************************************************************************************/
 bool CPlatformExceptionHandler::Load_Symbols( std::wstring &error_message )
 {
 	if ( SymbolsLoaded )

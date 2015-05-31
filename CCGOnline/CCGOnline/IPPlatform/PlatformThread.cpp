@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	PlatformThread.cpp
-		A simple component that wraps OS threads
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -91,24 +88,14 @@ class CPlatformThreadImpl : public IPlatformThread
 		STrueThreadExecutionContext TranslationContext;
 };
 
-/**********************************************************************************************************************
-	CPlatformThreadImpl::CPlatformThreadImpl -- default constructor
 
-**********************************************************************************************************************/
 CPlatformThreadImpl::CPlatformThreadImpl( void ) :
 	ThreadHandle( nullptr ),
 	TranslationContext()
 {
 }
 
-/**********************************************************************************************************************
-	CPlatformThreadImpl::Launch_Thread -- creates and starts a new Windows thread
 
-		stack_size -- desired size of thread's user stack, 0 for default (1 MB)
-		execution_function -- what function the thread should run
-		run_context -- parameter to the execution function
-
-**********************************************************************************************************************/
 void CPlatformThreadImpl::Launch_Thread( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context )
 {
 	FATAL_ASSERT( ThreadHandle == nullptr );
@@ -121,10 +108,7 @@ void CPlatformThreadImpl::Launch_Thread( uint64_t stack_size, const ThreadExecut
 	FATAL_ASSERT( ThreadHandle != nullptr );
 }
 
-/**********************************************************************************************************************
-	CPlatformThreadImpl::Shutdown_Thread -- cleans up a Windows thread
 
-**********************************************************************************************************************/
 void CPlatformThreadImpl::Shutdown_Thread( void )
 {
 	if ( !Is_Valid() )
@@ -144,13 +128,7 @@ void CPlatformThreadImpl::Shutdown_Thread( void )
 	ThreadHandle = nullptr;
 }
 
-/**********************************************************************************************************************
-	CPlatformThreadImpl::Is_Running -- checks if the thread is currently running; answer may be erroneous by the time it's
-		checked
 
-		Returns: if the thread is running or not
-
-**********************************************************************************************************************/
 bool CPlatformThreadImpl::Is_Running( void ) const
 {
 	if ( !Is_Valid() )
@@ -164,14 +142,7 @@ bool CPlatformThreadImpl::Is_Running( void ) const
 	return ( exit_code == STILL_ACTIVE );
 }
 
-/**********************************************************************************************************************
-	CPlatformThreadImpl::Run_Thread -- Windows compatible wrapper function around the thread's actual execution invocation
 
-		thread_param -- execution context needed to reconstruct the actual function invocation
-
-		Returns: 0
-
-**********************************************************************************************************************/
 uint32_t WINAPI CPlatformThreadImpl::Run_Thread( LPVOID thread_param )
 {
 	STrueThreadExecutionContext *translation_context = static_cast< STrueThreadExecutionContext * >( thread_param );
@@ -185,32 +156,19 @@ uint32_t WINAPI CPlatformThreadImpl::Run_Thread( LPVOID thread_param )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**********************************************************************************************************************
-	CPlatformThread::CPlatformThread -- default constructor
 
-**********************************************************************************************************************/
 CPlatformThread::CPlatformThread( void ) :
 	ThreadImpl( new CPlatformThreadImpl )
 {
 }
 
-/**********************************************************************************************************************
-	CPlatformThread::~CPlatformThread -- destructor
 
-**********************************************************************************************************************/
 CPlatformThread::~CPlatformThread()
 {
 	Shutdown();
 }
 
-/**********************************************************************************************************************
-	CPlatformThread::Create_And_Run -- creates and starts a new platform thread
 
-		stack_size -- desired size of thread's user stack, 0 for default (1 MB)
-		execution_function -- what function the thread should run
-		run_context -- parameter to the execution function
-
-**********************************************************************************************************************/
 void CPlatformThread::Create_And_Run( uint64_t stack_size, const ThreadExecutionFunctionType &execution_function, void *run_context )
 {
 	FATAL_ASSERT( !ThreadImpl->Is_Valid() );
@@ -218,22 +176,13 @@ void CPlatformThread::Create_And_Run( uint64_t stack_size, const ThreadExecution
 	ThreadImpl->Launch_Thread( stack_size, execution_function, run_context );
 }
 
-/**********************************************************************************************************************
-	CPlatformThread::Shutdown -- shuts down a platform thread
 
-**********************************************************************************************************************/
 void CPlatformThread::Shutdown( void )
 {
 	ThreadImpl->Shutdown_Thread();
 }
 
-/**********************************************************************************************************************
-	CPlatformThread::Is_Running -- checks if the thread is currently running; answer may be erroneous by the time it's
-		checked
 
-		Returns: if the thread is running or not
-
-**********************************************************************************************************************/
 bool CPlatformThread::Is_Running( void ) const
 {
 	return ThreadImpl->Is_Running();

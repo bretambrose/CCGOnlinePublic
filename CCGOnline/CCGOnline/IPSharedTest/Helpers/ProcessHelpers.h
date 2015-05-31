@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessHelpers.h
-		component defining classes with permission to dig inside Process objects
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

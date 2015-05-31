@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	LogInterface.cpp
-		A component defining the static interface to the logging system.  This system provides services to record
-		arbitrary information to files split by thread key function in a thread-safe manner.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -54,14 +50,7 @@ std::wstring CLogInterface::ArchiveSubdirectory( L"Logs\\Archives" );
 bool CLogInterface::StaticInitialized = false;
 bool CLogInterface::DynamicInitialized = false;
 
-/**********************************************************************************************************************
-	CLogInterface::Initialize_Static -- global initialization function for the logging system.  Only ever invoke once
-		per process.
 
-		service_name -- the name of the executing process
-		log_level -- logging level that the system should start at
-		
-**********************************************************************************************************************/
 void CLogInterface::Initialize_Static( const std::wstring &service_name, ELogLevel log_level )
 {
 	FATAL_ASSERT( StaticInitialized == false );
@@ -86,11 +75,7 @@ void CLogInterface::Initialize_Static( const std::wstring &service_name, ELogLev
 	StaticInitialized = true;
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Shutdown_Static -- global shutdown function for the logging system.  Only ever invoke once
-		per process.
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Shutdown_Static( void )
 {
 	if ( !StaticInitialized )
@@ -106,13 +91,7 @@ void CLogInterface::Shutdown_Static( void )
 	StaticInitialized = false;
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Initialize_Dynamic -- second level initialization function; ok to call multiple times as long as an
-		intervening Shutdown_Dynamic is used.  
 
-		delete_all_logs -- should we attempt to delete all log files corresponding to this process
-		
-**********************************************************************************************************************/
 void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 {
 	static const uint64_t SECONDS_PER_HOUR = 3600;
@@ -148,10 +127,7 @@ void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 	DynamicInitialized = true;
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Shutdown_Dynamic -- second level shutdown function  
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Shutdown_Dynamic( void )
 {
 	FATAL_ASSERT( StaticInitialized == true );
@@ -166,13 +142,7 @@ void CLogInterface::Shutdown_Dynamic( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Service_Logging -- invoke the logging process to actually perform logging
-	
-		current_time -- current time in seconds
-		context -- execution context that the log thread should use
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Service_Logging( const CProcessExecutionContext &context )
 {
 	CSimplePlatformMutexLocker lock( LogLock );
@@ -188,35 +158,20 @@ void CLogInterface::Service_Logging( const CProcessExecutionContext &context )
 	}
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
-	
-		message -- string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( std::wstring &message )
 {
 	Log( std::move( message ) );
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
-	
-		message -- string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( const std::wstring &message )
 {
 	std::wstring message_copy( message );
 	Log( std::move( message_copy ) );
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
-	
-		message -- string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( std::wstring &&message )
 {
 	IProcess *virtual_process = CProcessStatics::Get_Current_Process();
@@ -233,35 +188,20 @@ void CLogInterface::Log( std::wstring &&message )
 	}
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- logging function; forwards text to the log thread to be logged
-	
-		message -- string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( const wchar_t *message )
 {
 	std::wstring wmessage( message );
 	Log( std::move( wmessage ) );
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- logging function; forwards text to the log thread to be logged
-	
-		message_stream -- stream containing the string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( const std::basic_ostringstream< wchar_t > &message_stream )
 {
 	Log( std::move( message_stream.rdbuf()->str() ) );
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- primary logging function; forwards text to the log process to be logged
-	
-		message -- string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( const std::string &message )
 {
 	std::wstring w_message;
@@ -270,12 +210,7 @@ void CLogInterface::Log( const std::string &message )
 	Log( std::move( w_message ) );
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- logging function; forwards text to the log thread to be logged
-	
-		message -- string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( const char *message )
 {
 	std::wstring w_message;
@@ -284,12 +219,7 @@ void CLogInterface::Log( const char *message )
 	Log( std::move( w_message ) );
 }
 
-/**********************************************************************************************************************
-	CLogInterface::Log -- logging function; forwards text to the log thread to be logged
-	
-		message_stream -- stream containing the string to be logged
-		
-**********************************************************************************************************************/
+
 void CLogInterface::Log( const std::basic_ostringstream< char > &message_stream )
 {
 	Log( message_stream.rdbuf()->str() );

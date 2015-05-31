@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessMessageFrame.h
-		A component definining a container of process messages.  Batching messages into a container leads to more
-		efficiency with the concurrency queues in high-traffic situations.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

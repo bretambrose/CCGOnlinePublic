@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	StructuredExceptionInfo.h
-		A component that holds data about an exception.  OS-specific logic extracts call stack and context information
-			and adds it to this OS-agnostic object.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

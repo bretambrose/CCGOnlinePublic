@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessManagementMessages.h
-		A component containing definitions for messages that manage and/or control processes
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -26,14 +23,7 @@
 
 #include "IPShared/Concurrency/ProcessInterface.h"
 
-/**********************************************************************************************************************
-	CAddNewProcessMessage::CAddNewProcessMessage -- constructor
-	
-		process -- the process to add to the conurrency system
-		return_interface -- should the manager return an interface to this new process to the requesting thread?
-		forward_creator_interface -- should the manager forward the requesting process's interface to the new process?
-		
-**********************************************************************************************************************/
+
 CAddNewProcessMessage::CAddNewProcessMessage( const shared_ptr< IProcess > &process, bool return_mailbox, bool forward_creator_mailbox ) :
 	Process( process ),
 	ReturnMailbox( return_mailbox ),
@@ -41,10 +31,7 @@ CAddNewProcessMessage::CAddNewProcessMessage( const shared_ptr< IProcess > &proc
 {
 }
 
-/**********************************************************************************************************************
-	CAddNewProcessMessage::~CAddNewProcessMessage -- destructor
-		
-**********************************************************************************************************************/
+
 CAddNewProcessMessage::~CAddNewProcessMessage()
 {
 }

@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	PlatformTime.cpp
-		A component that wraps miscellaneous OS-specific time functionality
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -33,10 +30,7 @@ bool CPlatformTime::Initialized = false;
 
 #ifdef WIN32
 
-/**********************************************************************************************************************
-	CPlatformTime::Initialize -- initializes the class by querying performance counter information
 
-**********************************************************************************************************************/
 void CPlatformTime::Initialize( void )
 {
 	if ( Initialized )
@@ -54,13 +48,7 @@ void CPlatformTime::Initialize( void )
 	Initialized = true;
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Get_High_Resolution_Time -- gets the current time using the highest resolution timer the os
-		has available
 
-		Returns: the current time in high-resolution units
-
-**********************************************************************************************************************/
 uint64_t CPlatformTime::Get_High_Resolution_Time( void )
 {
   LARGE_INTEGER count;
@@ -69,14 +57,7 @@ uint64_t CPlatformTime::Get_High_Resolution_Time( void )
   return count.QuadPart;
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Convert_High_Resolution_Time_To_Seconds -- converts a high-resolution time to seconds
 
-		ticks -- a high resolution time value
-
-		Returns: time in seconds the supplied tick count represents
-
-**********************************************************************************************************************/
 double CPlatformTime::Convert_High_Resolution_Time_To_Seconds( uint64_t ticks )
 {
 	FATAL_ASSERT( Initialized );
@@ -84,14 +65,7 @@ double CPlatformTime::Convert_High_Resolution_Time_To_Seconds( uint64_t ticks )
 	return static_cast< double >( ticks ) / static_cast< double >( HighResolutionFrequency );
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Convert_Seconds_To_High_Resolution_Ticks -- converts a time in seconds to high-res ticks
 
-		seconds -- a time in seconds
-
-		Returns: high-resolution ticks represented by that supplied time value
-
-**********************************************************************************************************************/
 uint64_t CPlatformTime::Convert_Seconds_To_High_Resolution_Ticks( double seconds )
 {
 	FATAL_ASSERT( Initialized );
@@ -99,12 +73,7 @@ uint64_t CPlatformTime::Convert_Seconds_To_High_Resolution_Ticks( double seconds
 	return static_cast< uint64_t >( seconds *  static_cast< double >( HighResolutionFrequency ) );
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Get_Raw_Time -- gets the current time using the OS's generic standard system query
 
-		Returns: the current time in os-specific units
-
-**********************************************************************************************************************/
 uint64_t CPlatformTime::Get_Raw_Time( void )
 {
 	FILETIME file_time;
@@ -113,14 +82,7 @@ uint64_t CPlatformTime::Get_Raw_Time( void )
 	return static_cast< uint64_t >( file_time.dwLowDateTime ) | ( static_cast< uint64_t >( file_time.dwHighDateTime ) << 32 );
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Get_File_Write_Raw_Time -- gets the last-modified time for a file, in generic os time units
 
-		file_name -- file to get the last written time for
-
-		Returns: the last-written time of the file in os-specific units
-
-**********************************************************************************************************************/
 uint64_t CPlatformTime::Get_File_Write_Raw_Time( const std::wstring &file_name )
 {
 	FILETIME write_time;
@@ -134,16 +96,7 @@ uint64_t CPlatformTime::Get_File_Write_Raw_Time( const std::wstring &file_name )
 	return static_cast< uint64_t >( write_time.dwLowDateTime ) | ( static_cast< uint64_t >( write_time.dwHighDateTime ) << 32 );
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Is_Raw_Time_Less_Than_Seconds -- compares two os-specific system time values
 
-		time1 -- an os-specific time value
-		time2 -- an os-specific time value
-		seconds -- a time value in seconds
-
-		Returns: true if time1_in_seconds + seconds < time2_in_seconds
-
-**********************************************************************************************************************/
 bool CPlatformTime::Is_Raw_Time_Less_Than_Seconds( uint64_t time1, uint64_t time2, uint64_t seconds )
 {
 	static const uint64_t HUNDRED_NANOSECONDS_IN_A_SECOND = 10000000;
@@ -151,16 +104,7 @@ bool CPlatformTime::Is_Raw_Time_Less_Than_Seconds( uint64_t time1, uint64_t time
 	return time1 + seconds * HUNDRED_NANOSECONDS_IN_A_SECOND < time2;
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Is_Raw_Time_Greater_Than_Seconds -- compares two os-specific system time values
 
-		time1 -- an os-specific time value
-		time2 -- an os-specific time value
-		seconds -- a time value in seconds
-
-		Returns: true if time1_in_seconds + seconds > time2_in_seconds
-
-**********************************************************************************************************************/
 bool CPlatformTime::Is_Raw_Time_Greater_Than_Seconds( uint64_t time1, uint64_t time2, uint64_t seconds )
 {
 	static const uint64_t HUNDRED_NANOSECONDS_IN_A_SECOND = 10000000;
@@ -168,14 +112,7 @@ bool CPlatformTime::Is_Raw_Time_Greater_Than_Seconds( uint64_t time1, uint64_t t
 	return time1 + seconds * HUNDRED_NANOSECONDS_IN_A_SECOND > time2;
 }
 
-/**********************************************************************************************************************
-	CPlatformTime::Format_Raw_Time -- takes an os-specific time value and converts it to a human-readable string
 
-		raw_time -- os-specific time value
-
-		Returns: formatted time string
-
-**********************************************************************************************************************/
 std::wstring CPlatformTime::Format_Raw_Time( uint64_t raw_time )
 {
 	FILETIME file_time;

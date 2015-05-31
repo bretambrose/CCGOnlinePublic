@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	TimeType.h
-		Definition for a type that enumerate the different kinds of tick-based time scales used in the library
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

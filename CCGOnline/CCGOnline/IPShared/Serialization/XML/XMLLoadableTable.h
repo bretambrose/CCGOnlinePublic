@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	XMLLoadableTable.h
-		Definition for a container of XML loadable objects keyed by some type/function
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

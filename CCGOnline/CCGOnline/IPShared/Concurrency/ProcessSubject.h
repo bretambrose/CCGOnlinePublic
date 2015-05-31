@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessSubject.h
-		A component containing the type enumerating different process subjects.  The subject is the high-level
-		logical role of the process.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

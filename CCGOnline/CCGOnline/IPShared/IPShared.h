@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	IP_Shared.h
-		Component containing initialization and shutdown entry points for the IP_Shared library
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessStatics.h
-		A component containing a static class that manages the thread-local variables that hold handles to
-		the executing process and the concurrency manager.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -34,10 +30,7 @@ uint32_t CProcessStatics::ProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
 uint32_t CProcessStatics::ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
 bool CProcessStatics::Initialized = false;
 
-/**********************************************************************************************************************
-	CProcessStatics::Initialize -- Initialize the thread local storage needed
-					
-**********************************************************************************************************************/
+
 void CProcessStatics::Initialize( void )
 {
 	if ( Initialized )
@@ -57,10 +50,7 @@ void CProcessStatics::Initialize( void )
 	Initialized = true;
 }
 
-/**********************************************************************************************************************
-	CProcessStatics::Initialize -- Cleans up the thread local storage used
-					
-**********************************************************************************************************************/
+
 void CProcessStatics::Shutdown( void )
 {
 	if ( !Initialized )
@@ -77,12 +67,7 @@ void CProcessStatics::Shutdown( void )
 	ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
 }
 
-/**********************************************************************************************************************
-	CProcessStatics::Set_Current_Thread_Task -- sets the current executing thread task variable
 
-		thread_task -- the currently executing thread task
-					
-**********************************************************************************************************************/
 void CProcessStatics::Set_Current_Process( IProcess *process )
 {
 	FATAL_ASSERT( Initialized );
@@ -90,12 +75,7 @@ void CProcessStatics::Set_Current_Process( IProcess *process )
 	CThreadLocalStorage::Set_TLS_Value( ProcessHandle, process );
 }
 
-/**********************************************************************************************************************
-	CProcessStatics::Set_Concurrency_Manager -- sets the concurrency manager variable
 
-		manager -- the global concurrency manager
-					
-**********************************************************************************************************************/
 void CProcessStatics::Set_Concurrency_Manager( CConcurrencyManager *manager )
 {
 	FATAL_ASSERT( Initialized );
@@ -103,12 +83,7 @@ void CProcessStatics::Set_Concurrency_Manager( CConcurrencyManager *manager )
 	CThreadLocalStorage::Set_TLS_Value( ConcurrencyManagerHandle, manager );
 }
 
-/**********************************************************************************************************************
-	CProcessStatics::Get_Current_Process -- gets the current executing process
 
-		Returns: the currently executing process or null
-					
-**********************************************************************************************************************/
 IProcess *CProcessStatics::Get_Current_Process( void )
 {
 	if ( !Initialized )
@@ -119,12 +94,7 @@ IProcess *CProcessStatics::Get_Current_Process( void )
 	return CThreadLocalStorage::Get_TLS_Value< IProcess >( ProcessHandle );
 }
 
-/**********************************************************************************************************************
-	CProcessStatics::Get_Concurrency_Manager -- gets the concurrency manager variable
 
-		Returns: the global concurrency manager
-					
-**********************************************************************************************************************/
 CConcurrencyManager *CProcessStatics::Get_Concurrency_Manager( void )
 {
 	if ( !Initialized )

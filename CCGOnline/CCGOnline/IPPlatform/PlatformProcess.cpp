@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	PlatformMisc.cpp
-		A component that wraps miscellaneous OS-specific process functionality
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -28,23 +25,13 @@
 #include "Shlwapi.h"
 #include "StringUtils.h"
 
-/**********************************************************************************************************************
-	NPlatform::Get_Self_Process_ID -- gets the id of the current process
 
-		Returns: a 32 bit process id
-
-**********************************************************************************************************************/
 uint32_t NPlatform::Get_Self_PID( void )
 {
 	return ::GetCurrentProcessId();
 }
 
-/**********************************************************************************************************************
-	NPlatform::Get_Exe_Name -- gets the file name of the current executing process
 
-		Returns: the file name of the executing process, minus any . extension
-
-**********************************************************************************************************************/
 std::wstring NPlatform::Get_Exe_Name( void )
 {
 
@@ -63,13 +50,7 @@ std::wstring NPlatform::Get_Exe_Name( void )
 	return exe_name;
 }
 
-/**********************************************************************************************************************
-	NPlatform::Get_Service_Name -- gets the service name of the current executing process.  The service name is the
-		file name minus the extension and minus release/debug (R/D) and 32/64 bit tags.
 
-		Returns: the service name of the executing process
-
-**********************************************************************************************************************/
 std::wstring NPlatform::Get_Service_Name( void )
 {
 	std::wstring exe_name = Get_Exe_Name();
@@ -89,12 +70,7 @@ std::wstring NPlatform::Get_Service_Name( void )
 	return exe_name;
 }
 
-/**********************************************************************************************************************
-	NPlatform::Sleep -- asks the os to put the current thread to sleep for a period of time
 
-		milliseconds -- time to sleep for, in milliseconds
-
-**********************************************************************************************************************/
 void NPlatform::Sleep( uint32_t milliseconds )
 {
 	::Sleep( milliseconds );

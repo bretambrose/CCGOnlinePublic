@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	WindowsWrapper.h
-		A wrapper for the windows header files that turns off the conflicting min/max functions
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

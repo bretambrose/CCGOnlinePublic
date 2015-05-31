@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ConcurrencyManager.cpp
-		A component definining the central, manager class that manages all processes
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -222,13 +219,7 @@ class CProcessRecord
 		std::set< EProcessID::Enum > PendingShutdownIDs;
 };
 
-/**********************************************************************************************************************
-	CProcessRecord::CProcessRecord -- constructor
 
-		process -- pointer to the process this record tracks
-		execute_delegate -- the function to invoke when it's time to execute the process through a TBB task
-					
-**********************************************************************************************************************/
 CProcessRecord::CProcessRecord( const shared_ptr< IManagedProcess > &process, const ExecuteProcessDelegateType &execute_delegate ) :
 	ProcessID( process->Get_ID() ),
 	Process( process ),
@@ -245,12 +236,7 @@ CProcessRecord::CProcessRecord( const shared_ptr< IManagedProcess > &process, co
 	}
 }
 
-/**********************************************************************************************************************
-	CProcessRecord::CProcessRecord -- alternative dummy constructor, only used to proxy the manager
 
-		key -- key of the proxy process
-					
-**********************************************************************************************************************/
 CProcessRecord::CProcessRecord( EProcessID::Enum process_id ) :
 	ProcessID( process_id ),
 	Process( nullptr ),
@@ -263,22 +249,13 @@ CProcessRecord::CProcessRecord( EProcessID::Enum process_id ) :
 	FATAL_ASSERT( process_id == EProcessID::CONCURRENCY_MANAGER );
 }
 
-/**********************************************************************************************************************
-	CProcessRecord::~CProcessRecord -- destructor
-					
-**********************************************************************************************************************/
+
 CProcessRecord::~CProcessRecord()
 {
 	FATAL_ASSERT( ExecuteTask == nullptr || !ExecuteTask->Is_Scheduled() );
 }
 
-/**********************************************************************************************************************
-	CProcessRecord::Add_Execute_Task -- Schedules an execution task for this process at a requested time
 
-		task_scheduler -- task scheduler to schedule the task in
-		execution_time -- time the process should be serviced
-					
-**********************************************************************************************************************/
 void CProcessRecord::Add_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler, double execution_time )
 {
 	if ( ExecuteTask == nullptr )
@@ -295,12 +272,7 @@ void CProcessRecord::Add_Execute_Task( const shared_ptr< CTaskScheduler > &task_
 	task_scheduler->Submit_Task( ExecuteTask );
 }
 
-/**********************************************************************************************************************
-	CProcessRecord::Remove_Execute_Task -- removes a process's execution task from a task scheduler
 
-		task_scheduler -- task scheduler to remove the task from
-					
-**********************************************************************************************************************/
 void CProcessRecord::Remove_Execute_Task( const shared_ptr< CTaskScheduler > &task_scheduler )
 {
 	if ( ExecuteTask != nullptr && ExecuteTask->Is_Scheduled() )
@@ -321,10 +293,7 @@ enum EConcurrencyManagerState
 	ECMS_FINISHED
 };
 
-/**********************************************************************************************************************
-	CConcurrencyManager::CConcurrencyManager -- constructor
-					
-**********************************************************************************************************************/
+
 CConcurrencyManager::CConcurrencyManager( void ) :
 	ProcessRecords(),
 	IDToPropertiesTable(),
@@ -342,21 +311,13 @@ CConcurrencyManager::CConcurrencyManager( void ) :
 	TaskSchedulers[ TT_GAME_TIME ] = std::make_shared< CTaskScheduler >();
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::~CConcurrencyManager -- destructor
-					
-**********************************************************************************************************************/
+
 CConcurrencyManager::~CConcurrencyManager()
 {
 	Shutdown();
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Initialize -- initializes the concurrency manager before running
 
-		delete_all_logs -- should all log files be cleaned up during the init process?
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Initialize( bool delete_all_logs )
 {
 	FATAL_ASSERT( State == ECMS_PRE_INITIALIZE );
@@ -369,10 +330,7 @@ void CConcurrencyManager::Initialize( bool delete_all_logs )
 	State = ECMS_INITIALIZED;
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Shutdown -- cleans up the concurrency manager state
-					
-**********************************************************************************************************************/
+
 void CConcurrencyManager::Shutdown( void )
 {
 	FATAL_ASSERT( State == ECMS_SHUTTING_DOWN_PHASE2 || State == ECMS_INITIALIZED || State == ECMS_PRE_INITIALIZE );
@@ -388,14 +346,7 @@ void CConcurrencyManager::Shutdown( void )
 	State = ECMS_FINISHED;
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Get_Record -- gets the process record for a given process by id
 
-		process_id -- id of the process to get a record for
-
-		Returns: pointer to the process record, or null
-					
-**********************************************************************************************************************/
 shared_ptr< CProcessRecord > CConcurrencyManager::Get_Record( EProcessID::Enum process_id ) const
 {
 	auto iter = ProcessRecords.find( process_id );
@@ -407,14 +358,7 @@ shared_ptr< CProcessRecord > CConcurrencyManager::Get_Record( EProcessID::Enum p
 	return nullptr;
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Get_Process -- gets the process for a given process id
 
-		process_id -- id of the process to look up
-
-		Returns: pointer to the process, or null
-					
-**********************************************************************************************************************/
 shared_ptr< IManagedProcess > CConcurrencyManager::Get_Process( EProcessID::Enum process_id ) const
 {
 	shared_ptr< CProcessRecord > record = Get_Record( process_id );
@@ -426,13 +370,7 @@ shared_ptr< IManagedProcess > CConcurrencyManager::Get_Process( EProcessID::Enum
 	return shared_ptr< IManagedProcess >( nullptr );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Enumerate_Virtual_Processes -- enumerates all active processes in the system; only used by
-		unit tests
 
-		processes -- output parameter for set of all processes
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Enumerate_Processes( std::vector< shared_ptr< IManagedProcess > > &processes ) const
 {
 	processes.clear();
@@ -446,12 +384,7 @@ void CConcurrencyManager::Enumerate_Processes( std::vector< shared_ptr< IManaged
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Run -- starts the concurrency manager system
 
-		starting_thread -- initial thread task
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Run( const shared_ptr< IManagedProcess > &starting_process )
 {
 	Setup_For_Run( starting_process );
@@ -459,12 +392,7 @@ void CConcurrencyManager::Run( const shared_ptr< IManagedProcess > &starting_pro
 	Service();
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Setup_For_Run -- prepares the manager to begin its service loop
 
-		starting_process -- initial virtual process
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Setup_For_Run( const shared_ptr< IManagedProcess > &starting_process )
 {
 	FATAL_ASSERT( State == ECMS_INITIALIZED );
@@ -484,24 +412,13 @@ void CConcurrencyManager::Setup_For_Run( const shared_ptr< IManagedProcess > &st
 	State = ECMS_RUNNING;
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Add_Process -- adds a new process into the concurrency system
 
-		thread -- process to add to the concurrency system
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &process )
 {
 	Add_Process( process, Allocate_Process_ID() );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Add_Process -- adds a new process into the concurrency system
 
-		thread -- process to add to the concurrency system
-		id -- id to bind to the process
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &process, EProcessID::Enum id )
 {
 	FATAL_ASSERT( id != EProcessID::CONCURRENCY_MANAGER );
@@ -532,14 +449,7 @@ void CConcurrencyManager::Add_Process( const shared_ptr< IManagedProcess > &proc
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Ongoing_Interface_Requests -- when a process is added, this function pushes all
-		interfaces that should be given to the new process as well as sends this process's interface to everyone
-		who has an outstanding request for its mailbox
 
-		thread_connection -- handle to a process's read and write interfaces
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Ongoing_Mailbox_Requests( CProcessMailbox *mailbox )
 {
 	EProcessID::Enum new_id = mailbox->Get_Process_ID();
@@ -560,14 +470,7 @@ void CConcurrencyManager::Handle_Ongoing_Mailbox_Requests( CProcessMailbox *mail
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Get_Mailbox -- gets the write-only mailbox to a process
 
-		process_id -- id of the process to get the mailbox for
-
-		Returns: a pointer to the write-only mailbox, or null
-					
-**********************************************************************************************************************/
 shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EProcessID::Enum process_id ) const
 {
 	auto iter = ProcessRecords.find( process_id );
@@ -579,12 +482,7 @@ shared_ptr< CWriteOnlyMailbox > CConcurrencyManager::Get_Mailbox( EProcessID::En
 	return shared_ptr< CWriteOnlyMailbox >( nullptr );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Get_My_Mailbox -- gets the read-only mailbox of the manager
 
-		Returns: a pointer to the read-only mailbox of the manager
-					
-**********************************************************************************************************************/
 shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 {
 	auto iter = ProcessRecords.find( EProcessID::CONCURRENCY_MANAGER );
@@ -593,13 +491,7 @@ shared_ptr< CReadOnlyMailbox > CConcurrencyManager::Get_My_Mailbox( void ) const
 	return iter->second->Get_Mailbox()->Get_Readable_Mailbox();
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Send_Process_Message -- queues up a message to a process
 
-		dest_process_id -- the message's destination process
-		message -- message to send
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Send_Process_Message( EProcessID::Enum dest_process_id, unique_ptr< const IProcessMessage > &message )
 {
 	auto iter = PendingOutboundFrames.find( dest_process_id );
@@ -614,10 +506,7 @@ void CConcurrencyManager::Send_Process_Message( EProcessID::Enum dest_process_id
 	iter->second->Add_Message( message );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Flush_Frames -- sends all outbound message frames to their respective process destinations
-					
-**********************************************************************************************************************/
+
 void CConcurrencyManager::Flush_Frames( void )
 {
 	std::vector< EProcessID::Enum > sent_frames;
@@ -642,10 +531,7 @@ void CConcurrencyManager::Flush_Frames( void )
 	FATAL_ASSERT( PendingOutboundFrames.size() == 0 );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Service -- run function for the concurrency system
-					
-**********************************************************************************************************************/
+
 void CConcurrencyManager::Service( void )
 {
 	while ( ProcessRecords.size() > 0 )
@@ -656,10 +542,7 @@ void CConcurrencyManager::Service( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Service_One_Iteration -- performs a single service iteration of the concurrency system
-					
-**********************************************************************************************************************/
+
 void CConcurrencyManager::Service_One_Iteration( void )
 {
 	Service_Incoming_Frames();
@@ -676,10 +559,7 @@ void CConcurrencyManager::Service_One_Iteration( void )
 	Service_Shutdown();
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Service_Shutdown -- handles shutdown-related logic and state transitions
-					
-**********************************************************************************************************************/
+
 void CConcurrencyManager::Service_Shutdown( void )
 {
 	if ( ProcessRecords.size() == 2 && State != ECMS_SHUTTING_DOWN_PHASE2 )
@@ -701,11 +581,7 @@ void CConcurrencyManager::Service_Shutdown( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Service_Incoming_Frames -- iterates all incoming message frames and handles the messages
-		within them
-					
-**********************************************************************************************************************/
+
 void CConcurrencyManager::Service_Incoming_Frames( void )
 {
 	std::vector< unique_ptr< CProcessMessageFrame > > control_frames;
@@ -725,13 +601,7 @@ void CConcurrencyManager::Service_Incoming_Frames( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Message -- top-level dispatch function for handling an incoming process message
 
-		source_process_id -- process id of the message sender
-		message -- message that was sent to the manager
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Message( EProcessID::Enum source_process_id, unique_ptr< const IProcessMessage > &message )
 {
 	const IProcessMessage *msg_base = message.get();
@@ -743,10 +613,7 @@ void CConcurrencyManager::Handle_Message( EProcessID::Enum source_process_id, un
 	iter->second->Handle_Message( source_process_id, message );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Register_Message_Handlers -- registers all message handlers for the concurrency manager
-					
-**********************************************************************************************************************/
+
 void CConcurrencyManager::Register_Message_Handlers( void )
 {
 	REGISTER_THIS_HANDLER( CGetMailboxByIDRequest, CConcurrencyManager, Handle_Get_Mailbox_By_ID_Request )
@@ -759,13 +626,7 @@ void CConcurrencyManager::Register_Message_Handlers( void )
 	REGISTER_THIS_HANDLER( CShutdownManagerMessage, CConcurrencyManager, Handle_Shutdown_Manager_Message )
 } 
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Register_Handler -- registers a single message handler for a message type
 
-		message_type_info -- C++ type info for the message class
-		handler -- message handling delegate to invoke for this message type
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Register_Handler( const std::type_info &message_type_info, unique_ptr< IProcessMessageHandler > &handler )
 {
 	Loki::TypeInfo key( message_type_info );
@@ -774,13 +635,7 @@ void CConcurrencyManager::Register_Handler( const std::type_info &message_type_i
 	MessageHandlers[ key ] = std::move( handler );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request -- message handler for a GetMailboxByID request
 
-		source_process_id -- process source of the request
-		message -- the get mailbox request
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request( EProcessID::Enum source_process_id, unique_ptr< const CGetMailboxByIDRequest > &message )
 {
 	// don't handle messages while shutting down
@@ -806,13 +661,7 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_ID_Request( EProcessID::Enum sou
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request -- message handler for a GetMailboxByProperties request
 
-		source_process_id -- process source of the request
-		message -- the get mailbox request
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EProcessID::Enum source_process_id, unique_ptr< const CGetMailboxByPropertiesRequest > &message )
 {
 	// don't handle messages while shutting down
@@ -841,13 +690,7 @@ void CConcurrencyManager::Handle_Get_Mailbox_By_Properties_Request( EProcessID::
 	PersistentGetRequests.insert( GetMailboxByPropertiesRequestCollectionType::value_type( source_process_id, std::move( message ) ) );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Add_New_Process_Message -- message handler for an AddNewProcess message
 
-		source_process_id -- process source of the request
-		message -- the add process message
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Add_New_Process_Message( EProcessID::Enum source_process_id, unique_ptr< const CAddNewProcessMessage > &message )
 {
 	if ( Is_Manager_Shutting_Down() )
@@ -874,13 +717,7 @@ void CConcurrencyManager::Handle_Add_New_Process_Message( EProcessID::Enum sourc
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Shutdown_Process_Message -- message handler for an ShutdownVirtualProcess message
 
-		source_process_id -- process source of the message
-		message -- the shutdown process message
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Shutdown_Process_Message( EProcessID::Enum /*source_process_id*/, unique_ptr< const CShutdownProcessMessage > &message )
 {
 	if ( Is_Manager_Shutting_Down() )
@@ -891,13 +728,7 @@ void CConcurrencyManager::Handle_Shutdown_Process_Message( EProcessID::Enum /*so
 	Initiate_Process_Shutdown( message->Get_Process_ID() );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Reschedule_Process_Message -- message handler for a RescheduleProcess message
 
-		source_process_id -- process source of the message
-		message -- the reschedule process message
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Reschedule_Process_Message( EProcessID::Enum source_process_id, unique_ptr< const CRescheduleProcessMessage > &message )
 {
 	shared_ptr< CProcessRecord > record = Get_Record( source_process_id );
@@ -911,13 +742,7 @@ void CConcurrencyManager::Handle_Reschedule_Process_Message( EProcessID::Enum so
 	record->Add_Execute_Task( Get_Task_Scheduler( time_type ), execute_time );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Release_Mailbox_Response -- message handler for a ReleaseMailbox response
 
-		source_process_id -- process source of the response
-		response -- the release mailbox response
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Release_Mailbox_Response( EProcessID::Enum source_process_id, unique_ptr< const CReleaseMailboxResponse > &response )
 {
 	if ( Is_Manager_Shutting_Down() )
@@ -945,13 +770,7 @@ void CConcurrencyManager::Handle_Release_Mailbox_Response( EProcessID::Enum sour
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Shutdown_Self_Response -- message handler for a ShutdownSelf response
 
-		source_process_id -- process source of the response
-		message -- the shutdown self response
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Shutdown_Self_Response( EProcessID::Enum source_process_id, unique_ptr< const CShutdownSelfResponse > & /*message*/ )
 {
 	auto iter = ProcessRecords.find( source_process_id );
@@ -961,13 +780,7 @@ void CConcurrencyManager::Handle_Shutdown_Self_Response( EProcessID::Enum source
 	ProcessRecords.erase( iter );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Handle_Shutdown_Manager_Message -- message handler for a ShutdownManager message
 
-		source_process_id -- process source of the message
-		message -- the shutdown manager message
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Handle_Shutdown_Manager_Message( EProcessID::Enum /*source_process_id*/, unique_ptr< const CShutdownManagerMessage > & /*message*/ )
 {
 	if ( Is_Manager_Shutting_Down() )
@@ -990,26 +803,13 @@ void CConcurrencyManager::Handle_Shutdown_Manager_Message( EProcessID::Enum /*so
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Get_Task_Scheduler -- gets the task scheduler for a specified time type
 
-		time_type -- time type to get the task scheduler for
-
-		Returns: pointer to the task scheduler for that time type
-					
-**********************************************************************************************************************/
 shared_ptr< CTaskScheduler > CConcurrencyManager::Get_Task_Scheduler( ETimeType time_type ) const
 {
 	return TaskSchedulers.find( time_type )->second;
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Execute_Process -- queues up a tbb task to execute the supplied process's service
 
-		process_id -- id of the process to have executed
-		current_time_seconds -- current time from the process's standpoint
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Execute_Process( EProcessID::Enum process_id, double current_time_seconds )
 {
 	auto iter = ProcessRecords.find( process_id );
@@ -1056,12 +856,7 @@ void CConcurrencyManager::Execute_Process( EProcessID::Enum process_id, double c
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Initiate_Process_Shutdown -- guides a process into the shutdown procedire
 
-		process_id -- ID of the process to start shutting down
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Initiate_Process_Shutdown( EProcessID::Enum process_id )
 {
 	FATAL_ASSERT( process_id != EProcessID::CONCURRENCY_MANAGER && process_id != EProcessID::LOGGING );
@@ -1101,25 +896,13 @@ void CConcurrencyManager::Initiate_Process_Shutdown( EProcessID::Enum process_id
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Clear_Related_Mailbox_Requests -- clears mailbox requests related to a thread
 
-		process_id -- id of the virtual process to clear mailbox requests about
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Clear_Related_Mailbox_Requests( EProcessID::Enum process_id )
 {
 	PersistentGetRequests.erase( PersistentGetRequests.lower_bound( process_id ), PersistentGetRequests.upper_bound( process_id ) );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Is_Process_Shutting_Down -- asks if the supplied process is in the process of shutting down
 
-		process_id -- id of the process to check shutdown status of
-
-		Returns: true if the process is shutting down, false otherwise
-					
-**********************************************************************************************************************/
 bool CConcurrencyManager::Is_Process_Shutting_Down( EProcessID::Enum process_id ) const
 {
 	shared_ptr< CProcessRecord > record = Get_Record( process_id );
@@ -1131,23 +914,13 @@ bool CConcurrencyManager::Is_Process_Shutting_Down( EProcessID::Enum process_id 
 	return record->Is_Shutting_Down();
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Is_Manager_Shutting_Down -- is the manager in the process of shutting down
 
-		Returns: true if the manager is shutting down, false otherwise
-					
-**********************************************************************************************************************/
 bool CConcurrencyManager::Is_Manager_Shutting_Down( void ) const
 {
 	return State == ECMS_SHUTTING_DOWN_PHASE1 || State == ECMS_SHUTTING_DOWN_PHASE2;
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Log -- logs some text to the log file for the manager
 
-		message -- message to log
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Log( std::wstring &&message )
 {
 	if ( State != ECMS_SHUTTING_DOWN_PHASE2 )
@@ -1157,34 +930,19 @@ void CConcurrencyManager::Log( std::wstring &&message )
 	}
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Get_Game_Time -- gets the current game time of the manager
 
-		Returns: the current game time
-					
-**********************************************************************************************************************/
 double CConcurrencyManager::Get_Game_Time( void ) const
 {
 	return TimeKeeper->Get_Elapsed_Seconds( TT_GAME_TIME );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Set_Game_Time -- sets the current game time of the manager
 
-		game_time_seconds -- the new current game time
-					
-**********************************************************************************************************************/
 void CConcurrencyManager::Set_Game_Time( double game_time_seconds )
 {
 	TimeKeeper->Set_Current_Time( TT_GAME_TIME, NTimeUtils::Convert_Seconds_To_Game_Ticks( game_time_seconds ) );
 }
 
-/**********************************************************************************************************************
-	CConcurrencyManager::Allocate_Virtual_Process_ID -- allocates a new process ID
 
-		Returns: a new process id
-					
-**********************************************************************************************************************/
 EProcessID::Enum CConcurrencyManager::Allocate_Process_ID( void )
 {
 	EProcessID::Enum id = NextID;

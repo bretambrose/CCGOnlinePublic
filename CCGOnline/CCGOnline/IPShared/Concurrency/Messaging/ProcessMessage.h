@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessMessage.h
-		A component defining the base pure virtual interface for all process message classes
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

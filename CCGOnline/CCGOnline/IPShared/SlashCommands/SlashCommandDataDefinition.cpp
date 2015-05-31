@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	SlashCommandDataDefinition.cpp
-		A component containing the static data of a slash command
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -28,10 +25,7 @@
 #include "IPPlatform/StringUtils.h"
 #include "IPShared/Serialization/SerializationRegistrar.h"
 
-/**********************************************************************************************************************
-	CSlashCommandParam::CSlashCommandParam -- default constructor
-		
-**********************************************************************************************************************/
+
 CSlashCommandParam::CSlashCommandParam( void ) :
 	Type( SCPT_INVALID ),
 	SubType( "" ),
@@ -41,11 +35,7 @@ CSlashCommandParam::CSlashCommandParam( void ) :
 {
 }
 
-/**********************************************************************************************************************
-	CSlashCommandParam::Create_Serializer -- creates an XML serializer for this class
 
-	Returns: an XML serializer for this class		
-**********************************************************************************************************************/
 void CSlashCommandParam::Register_Type_Definition( void )
 {
 	BEGIN_ROOT_TYPE_DEFINITION( CSlashCommandParam );
@@ -59,13 +49,7 @@ void CSlashCommandParam::Register_Type_Definition( void )
 	END_TYPE_DEFINITION( CSlashCommandParam );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandParam::Is_Value_Valid -- checks if a string value is valid based on the parameter's type information
 
-		value -- string value to check for validity
-
-	Returns: true if valid, false otherwise	
-**********************************************************************************************************************/
 bool CSlashCommandParam::Is_Value_Valid( const std::wstring &value ) const
 {
 	switch ( Type )
@@ -135,10 +119,7 @@ bool CSlashCommandParam::Is_Value_Valid( const std::wstring &value ) const
 	}
 }
 
-/**********************************************************************************************************************
-	CSlashCommandParam::Initialize_Default -- Sets the Default member to something appropriate if it was not set in data
-	
-**********************************************************************************************************************/
+
 void CSlashCommandParam::Initialize_Default( void )
 {
 	if ( Default.size() > 0 )
@@ -177,10 +158,7 @@ void CSlashCommandParam::Initialize_Default( void )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**********************************************************************************************************************
-	CSlashCommandDataDefinition::CSlashCommandDataDefinition -- default constructor
-	
-**********************************************************************************************************************/
+
 CSlashCommandDataDefinition::CSlashCommandDataDefinition( void ) :
 	Command( L"" ),
 	SubCommand( L"" ),
@@ -193,12 +171,7 @@ CSlashCommandDataDefinition::CSlashCommandDataDefinition( void ) :
 {
 }
 
-/**********************************************************************************************************************
-	CSlashCommandDataDefinition::Create_Serializer -- creates an XML serializer for this class
 
-	Returns: a new XML serializer
-	
-**********************************************************************************************************************/
 void CSlashCommandDataDefinition::Register_Type_Definition( void )
 {
 	BEGIN_ROOT_TYPE_DEFINITION( CSlashCommandDataDefinition );
@@ -212,14 +185,7 @@ void CSlashCommandDataDefinition::Register_Type_Definition( void )
 	END_TYPE_DEFINITION( CSlashCommandDataDefinition );
 }
 
-/**********************************************************************************************************************
-	CSlashCommandDataDefinition::Get_Param -- gets the definition of a specific parameter to this command
 
-		index -- index of the parameter to retrieve data for
-
-	Returns: pointer to the parameter's data, or NULL if out of bounds
-	
-**********************************************************************************************************************/
 const CSlashCommandParam *CSlashCommandDataDefinition::Get_Param( uint32_t index ) const
 {
 	if ( index < Params.size() )
@@ -230,11 +196,7 @@ const CSlashCommandParam *CSlashCommandDataDefinition::Get_Param( uint32_t index
 	return nullptr;
 }
 
-/**********************************************************************************************************************
-	CSlashCommandDataDefinition::Post_Load_XML -- a function to initialize members whose values are derived from
-		data loaded from XML, as well as validate the data that was loaded
-	
-**********************************************************************************************************************/
+
 void CSlashCommandDataDefinition::Post_Load_XML( void )
 {
 	std::wstring key = CSlashCommandManager::Concat_Command( Command, SubCommand );
@@ -271,14 +233,7 @@ void CSlashCommandDataDefinition::Post_Load_XML( void )
 	}
 }
 
-/**********************************************************************************************************************
-	CSlashCommandDataDefinition::Build_Command_Matcher -- constructs a regular expression that we'll use to parse commands
-		of this type.
 
-	Returns: a regular expression string that will correctly extract the command, subcommand, and all parameters into
-		capture groups
-	
-**********************************************************************************************************************/
 std::wstring CSlashCommandDataDefinition::Build_Command_Matcher( void ) const
 {
 	std::wstring match_string;

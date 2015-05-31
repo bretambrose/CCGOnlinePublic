@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	LoggingVirtualProcess.h
-		A component defining a virtual process that performs logging of information to files split by thread key
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -93,12 +90,7 @@ class CLogFile
 		std::basic_ofstream< wchar_t > *File;
 };
 
-/**********************************************************************************************************************
-	CLoggingProcess::CLoggingProcess -- default constructor
-	
-		properties -- process properties for the logging process
-			
-**********************************************************************************************************************/
+
 CLoggingProcess::CLoggingProcess( const SProcessProperties &properties ) :
 	BASECLASS( properties ),
 	LogFiles(),
@@ -107,30 +99,19 @@ CLoggingProcess::CLoggingProcess( const SProcessProperties &properties ) :
 {
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::~CLoggingProcess -- destructor
-		
-**********************************************************************************************************************/
+
 CLoggingProcess::~CLoggingProcess()
 {
 	Shutdown();
 }
 
-/**********************************************************************************************************************
-	CLoggingThreadTask::Initialize -- initializes the process
-		
-**********************************************************************************************************************/
+
 void CLoggingProcess::Initialize( EProcessID::Enum id )
 {
 	BASECLASS::Initialize( id );
 }
 
-/**********************************************************************************************************************
-	CLoggingThreadTask::Service -- primary execution function for this process
 
-		context -- the thread task execution context
-		
-**********************************************************************************************************************/
 void CLoggingProcess::Run( const CProcessExecutionContext &context )
 {
 	// Did we get called directly by the exception handler?
@@ -147,10 +128,7 @@ void CLoggingProcess::Run( const CProcessExecutionContext &context )
 	}
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Shutdown -- flushes and closes all the log files
-		
-**********************************************************************************************************************/
+
 void CLoggingProcess::Shutdown( void )
 {
 	for ( auto iter = LogFiles.cbegin(), end = LogFiles.cend(); iter != end; ++iter )
@@ -161,10 +139,7 @@ void CLoggingProcess::Shutdown( void )
 	LogFiles.clear();
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Register_Message_Handlers -- registers message handlers specific to this process
-		
-**********************************************************************************************************************/
+
 void CLoggingProcess::Register_Message_Handlers( void )
 {
 	BASECLASS::Register_Message_Handlers();
@@ -172,27 +147,13 @@ void CLoggingProcess::Register_Message_Handlers( void )
 	REGISTER_THIS_HANDLER( CLogRequestMessage, CLoggingProcess, Handle_Log_Request_Message );
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Handle_Log_Request_Message -- handler function for all logging requests
 
-		source_process_id -- the process source of the message
-		message -- the log request message
-		
-**********************************************************************************************************************/
 void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_process_id, unique_ptr< const CLogRequestMessage > &message )
 {
 	Handle_Log_Request_Message_Aux( source_process_id, message->Get_Source_Properties(), message->Get_Message(), message->Get_Time() );
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Handle_Log_Request_Message_Aux -- handler function for all logging requests, including self
-		ones
 
-		source_process_id -- the process source of the message
-		subject -- the subject part of the source process properties
-		message -- the text to be written to the log file
-		
-**********************************************************************************************************************/
 void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64_t system_time )
 {
 	if ( IsShuttingDown )
@@ -216,14 +177,7 @@ void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_pr
 	log_file->Append_Logging_Message( Build_Log_Message( source_process_id, properties, message, system_time ) );
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Build_File_Name -- constructs the log file name to use for the supplied thread subject
 
-		subject -- thread subject of the thread task that sent a logging request
-
-		Returns: the file name to use for a given thread subject
-		
-**********************************************************************************************************************/
 std::wstring CLoggingProcess::Build_File_Name( EProcessSubject::Enum subject ) const
 {
 	std::wstring subject_string;
@@ -235,14 +189,7 @@ std::wstring CLoggingProcess::Build_File_Name( EProcessSubject::Enum subject ) c
 	return file_name_string.rdbuf()->str();
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Get_Log_File -- gets an existing log file for a thread subject, if one exists
 
-		subject -- thread subject to get the log file for
-
-		Returns: pointer to the corresponding log file, or null
-		
-**********************************************************************************************************************/
 CLogFile *CLoggingProcess::Get_Log_File( EProcessSubject::Enum subject ) const
 {
 	auto iter = LogFiles.find( subject );
@@ -254,15 +201,7 @@ CLogFile *CLoggingProcess::Get_Log_File( EProcessSubject::Enum subject ) const
 	return nullptr;
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Build_Log_Message -- formats a line of text in response to a logging request
 
-		source_key -- key of the virtual process that sent this logging request
-		message -- the text to be logged
-
-		Returns: string containing the fully formatted line of text that should be written to the log file
-		
-**********************************************************************************************************************/
 std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64_t system_time ) const
 {
 	uint16_t subject_part = source_properties.Get_Subject();
@@ -279,10 +218,7 @@ std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process
 	return output_string.rdbuf()->str();
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::On_Shutdown_Self_Request -- overridable shutdown callback
-		
-**********************************************************************************************************************/
+
 void CLoggingProcess::On_Shutdown_Self_Request( void )
 {
 	BASECLASS::On_Shutdown_Self_Request();
@@ -290,23 +226,13 @@ void CLoggingProcess::On_Shutdown_Self_Request( void )
 	IsShuttingDown = true;
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Get_Time_Type -- gets the time type that should drive this process's execution
 
-		Returns: the time type by which this process should be executed
-		
-**********************************************************************************************************************/
 ETimeType CLoggingProcess::Get_Time_Type( void ) const 
 { 
 	return TT_REAL_TIME; 
 }
 
-/**********************************************************************************************************************
-	CLoggingProcess::Log -- logs a message to the logging thread's log file
 
-		message -- message to log
-		
-**********************************************************************************************************************/
 void CLoggingProcess::Log( std::wstring &&message )
 {
 	Handle_Log_Request_Message_Aux( Get_ID(), Get_Properties(), message, CPlatformTime::Get_Raw_Time() );

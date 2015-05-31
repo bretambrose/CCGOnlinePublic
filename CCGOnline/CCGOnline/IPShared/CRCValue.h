@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	CRCValue.h
-		Type definition for CRC values.  To remove once we bring in an external hashing library.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

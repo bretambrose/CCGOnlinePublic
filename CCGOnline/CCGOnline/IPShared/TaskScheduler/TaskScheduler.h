@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	TaskScheduler.h
-		A component defining a class that tracks a set of tasks to be executed in the future.  As time advances, the
-		tasks are executed appropriately.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

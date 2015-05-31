@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	PrimitiveXMLSerializers.h
-		Definitions for a variety of xml serialization objects for basic types
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -27,7 +24,7 @@
 #include "pugixml/pugixml.h"
 #include "IPPlatform/StringUtils.h"
 #include "IPShared/EnumConversion.h"
-#include "IPShared/Serialization/SerializationBase.h"
+#include "IPShared/Serialization/SerializationHelpers.h"
 
 namespace XMLSerialization
 {

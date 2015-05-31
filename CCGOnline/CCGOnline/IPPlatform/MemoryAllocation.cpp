@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	MemoryAllocation.cpp
-		Definitions for global overrides of new and delete.  TBB's scalable allocator acts as a replacement.
-		The entries here are taken from Chapter 11 (page 257) of the book, Intel Threading Building Blocks.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

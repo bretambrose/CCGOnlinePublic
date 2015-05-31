@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	DebugAssert.h
-		A static class to catch and log asserts with, together with a set of assert macros
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

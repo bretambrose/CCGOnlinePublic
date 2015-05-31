@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	IP_ServerShared.cpp
-		Component containing  initialize/shutdown for the IP_ServerShared library
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -27,20 +24,14 @@
 #include "IPShared/IPShared.h"
 #include "GeneratedCode/RegisterIPServerSharedEnums.h"
 
-/**********************************************************************************************************************
-	NIPServerShared::Initialize -- Initializes the IP_ServerShared library and all its ancestors
 
-**********************************************************************************************************************/
 void NIPServerShared::Initialize( void )
 {
 	NIPShared::Initialize();
 	Register_IPServerShared_Enums();
 }
 
-/**********************************************************************************************************************
-	NIPServerShared::Shutdown -- Shuts down the IP_ServerShared library and all its ancestors
 
-**********************************************************************************************************************/
 void  NIPServerShared::Shutdown( void )
 {
 	NIPShared::Shutdown();

@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	Shared.cpp
-		Component containing initialization and shutdown entry points for the Shared library
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -34,10 +31,7 @@
 #include "Serialization/SerializationRegistrar.h"
 #include "SlashCommands/SlashCommandManager.h"
 
-/**********************************************************************************************************************
-	NIPShared::Initialize -- Initializes all the static process-wide systems in the Shared library
 
-**********************************************************************************************************************/
 void NIPShared::Initialize( void )
 {
 	CAssertSystem::Initialize( DLogFunctionType( CLogInterface::Log ) );
@@ -52,10 +46,7 @@ void NIPShared::Initialize( void )
 	CSlashCommandManager::Initialize();
 }
 
-/**********************************************************************************************************************
-	NIPShared::Shutdown -- Shuts down and cleans up all the static process-wide systems in the Shared library
 
-**********************************************************************************************************************/
 void NIPShared::Shutdown( void )
 {
 	CSlashCommandManager::Shutdown();

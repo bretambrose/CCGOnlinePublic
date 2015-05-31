@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	LoggingMessages.cpp
-		A component containing definitions for virtual process messages needed to log information to files
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -26,13 +23,7 @@
 
 #include "IPPlatform/PlatformTime.h"
 
-/**********************************************************************************************************************
-	CLogRequestMessage::CLogRequestMessage -- constructor
-	
-		source_properties -- properties of the requesting process
-		message -- what to write to the process's log file
-		
-**********************************************************************************************************************/
+
 CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_properties, std::wstring &&message ) :
 	SourceProperties( source_properties ),
 	Message( std::move( message ) ),
@@ -40,13 +31,7 @@ CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_propert
 {
 }
 
-/**********************************************************************************************************************
-	CLogRequestMessage::CLogRequestMessage -- constructor
-	
-		source_properties -- properties of the requesting process
-		message -- what to write to the process's log file
-		
-**********************************************************************************************************************/
+
 CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message ) :
 	SourceProperties( source_properties ),
 	Message( message ),

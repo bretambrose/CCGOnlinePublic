@@ -1,11 +1,5 @@
 /**********************************************************************************************************************
 
-	ManagedProcessTaskInterface.h
-		A pure virtual interface, underneath IProcess, that adds additional functionality intended for use
-		by the concurrency manager.  While technically against object-oriented principles, I wanted to avoid using
-		multiple inheritance.  Given that all processes were going to have both interfaces, there didn't seem to be
-		a point in splitting them, and the necessary casts seemed ugly in the multiple inheritance case.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

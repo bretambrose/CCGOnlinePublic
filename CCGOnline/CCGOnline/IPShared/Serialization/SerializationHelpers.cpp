@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	SerializationBase.h
-		...
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -20,30 +17,24 @@
 
 **********************************************************************************************************************/
 
-#ifndef SERIALIZATION_BASE_H
-#define SERIALIZATION_BASE_H
+#include "stdafx.h"
 
-#include <functional>
+#include "IPShared/Serialization/SerializationHelpers.h"
 
-using DPrepDestinationForRead = std::function< void *(void *) >;
-
-template< typename T >
-void *Prep_Vector_For_Read( void *destination )
+CTypeSerializationDefinition::CTypeSerializationDefinition( void ) :
+	Type(),
+	PointerType(),
+	BaseType(),
+	HasBaseClass( false ),
+	DataBindings(),
+	VectorPrepDelegate(),
+	PointerPrepDelegate(),
+	FactoryDelegate()
 {
-	std::vector< T > *dest = reinterpret_cast< std::vector< T > * >( destination );
-	
-	dest->push_back( T() );
-	return static_cast< void * >( &( *dest )[ dest->size() - 1 ] );
 }
 
-template< typename T >
-void *Prep_Pointer_For_Read( void *destination )
+CTypeSerializationDefinition::~CTypeSerializationDefinition()
 {
-	T **dest = reinterpret_cast< T ** >( destination );
-	
-	*dest = new T;
-
-	return static_cast< void * >( *dest );
+	std::for_each( DataBindings.begin(), DataBindings.end(), [ & ]( IDataBinding *binding ){ delete binding; } );
 }
 
-#endif // SERIALIZATION_BASE_H

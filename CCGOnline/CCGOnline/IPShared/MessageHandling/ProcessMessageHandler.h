@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessMessageHandler.h
-		A component defining a generic handler for process message objects.  Implemented as a simple trampoline that 
-		forwards handling to a delegate while retaining type safety and generic behavior.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
@@ -75,8 +71,6 @@ void Register_This_Handler( U* registry, void (U::*handler_function)( EProcessID
 }
 
 // Utility macro for handler registration
-//#define REGISTER_THIS_HANDLER( x, y, z ) Register_Handler( typeid( x ), unique_ptr< IProcessMessageHandler >( new TProcessMessageHandler< x >( TProcessMessageHandler< x >::HandlerFunctorType( this, &y::z ) ) ) );
-
 #define REGISTER_THIS_HANDLER( x, y, z ) Register_This_Handler< x, y >( this, &y::z );
 
 #endif // PROCESS_MESSAGE_HANDLER_H

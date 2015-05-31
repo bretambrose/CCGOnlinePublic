@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessMailboxTests.cpp
-		defines unit tests for process-to-process communication related functionality
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

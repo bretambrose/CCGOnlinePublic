@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	DatabaseTypes.h
-		A component defining some enums, typedefs, and constants for various database object IDs
-
 	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

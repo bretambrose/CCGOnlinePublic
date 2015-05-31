@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	ProcessExecutionContext.h
-		A component defining a helper class that contains information about the current execution context of a  
-		process.  Processes that are being run under a tbb task can use this to split/subdivide work as necessary.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

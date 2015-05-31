@@ -1,9 +1,5 @@
 /**********************************************************************************************************************
 
-	StringUtils.h
-		A component that wraps miscellaneous string functionality.  This logic is not os-specific and thus isn't
-		put in the NPlatform namespace.
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify

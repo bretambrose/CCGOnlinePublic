@@ -1,8 +1,5 @@
 /**********************************************************************************************************************
 
-	SharedXMLSerializerRegistration.cpp
-		A component containing the registration function for all xml serializers used in the shared library
-
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
 	This program is free software: you can redistribute it and/or modify
