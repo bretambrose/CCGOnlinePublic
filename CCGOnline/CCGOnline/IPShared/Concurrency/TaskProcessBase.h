@@ -34,9 +34,10 @@ class CTaskProcessBase : public CProcessBase
 		virtual ~CTaskProcessBase();
 
 		// IThreadTask interface
-		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const override;
+		virtual EProcessExecutionMode Get_Execution_Mode( void ) const override { return EProcessExecutionMode::TBB_TASK; }
 
 		virtual void Run( const CProcessExecutionContext &context ) override;
+		virtual void Finalize( void ) {}
 
 	protected:
 

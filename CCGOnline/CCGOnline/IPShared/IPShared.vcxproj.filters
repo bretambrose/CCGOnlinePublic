@@ -185,9 +185,6 @@
     <ClInclude Include="Logging\LoggingProcess.h">
       <Filter>Source Files\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Concurrency\ProcessExecutionMode.h">
-      <Filter>Source Files\Concurrency</Filter>
-    </ClInclude>
     <ClInclude Include="Concurrency\TaskProcessBase.h">
       <Filter>Source Files\Concurrency</Filter>
     </ClInclude>

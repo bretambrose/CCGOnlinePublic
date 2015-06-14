@@ -97,16 +97,20 @@ class CThreadProcessBaseTester : public CProcessBaseTester
 
 		typedef CProcessBaseTester BASECLASS;
 
-		CThreadProcessBaseTester( CThreadProcessBase *process );
+		CThreadProcessBaseTester( std::shared_ptr< CThreadProcessBase > process );
 		virtual ~CThreadProcessBaseTester();
 
 		std::shared_ptr< CThreadProcessBase > Get_Thread_Process( void ) const;
 
 		virtual CProcessBase *Get_Process( void ) const;
 
+		void Start( void );
+
 	private:
 
 		std::shared_ptr< CThreadProcessBase > ThreadProcess;
+
+		std::unique_ptr< std::thread > ProcessThread;
 
 };
 

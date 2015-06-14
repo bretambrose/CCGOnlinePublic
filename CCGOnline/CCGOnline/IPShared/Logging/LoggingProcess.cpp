@@ -115,7 +115,7 @@ void CLoggingProcess::Initialize( EProcessID::Enum id )
 void CLoggingProcess::Run( const CProcessExecutionContext &context )
 {
 	// Did we get called directly by the exception handler?
-	if ( context.Get_Spawning_Task() == nullptr )
+	if ( context.Is_Direct() )
 	{
 		IsShuttingDown = true;
 	}

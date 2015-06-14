@@ -37,7 +37,6 @@
 #include "IPShared/Logging/LogInterface.h"
 #include "Helpers/ProcessHelpers.h"
 #include "IPPlatform/PlatformProcess.h"
-#include "IPPlatform/PlatformThread.h"
 #include "SharedTestProcessSubject.h"
 
 
@@ -673,33 +672,25 @@ TEST_F( ProcessTests, Shutdown_Hard )
 
 TEST_F( ProcessTests, Thread_Shutdown )
 {
-	CTestThreadProcess *test_thread_process = new CTestThreadProcess( AI_PROPS );
-	CThreadProcessBaseTester process_tester( test_thread_process );
+	std::shared_ptr< CTestThreadProcess > test_thread_process = std::make_shared< CTestThreadProcess >( AI_PROPS );
+	CThreadProcessBaseTester process_tester( std::static_pointer_cast< CThreadProcessBase >( test_thread_process ) );
 
 	std::shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
 	process_tester.Set_Logging_Mailbox( log_conn->Get_Writable_Mailbox() );
 
-	std::shared_ptr< CPlatformThread > platform_thread( new CPlatformThread() );
-
-	CProcessExecutionContext thread_context( platform_thread.get() );
-	process_tester.Get_Thread_Process()->Run( thread_context );
+	process_tester.Start();
 
 	while( test_thread_process->Get_Frames_Completed() < 10 )
 	{
 		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 	}
 
-	ASSERT_TRUE( platform_thread->Is_Running() );
-
 	std::unique_ptr< CProcessMessageFrame > shutdown_frame( new CProcessMessageFrame( MANAGER_PROCESS_ID ) );
 	shutdown_frame->Add_Message( std::unique_ptr< const IProcessMessage >( new CShutdownSelfRequest( false ) ) );
 
 	process_tester.Get_Self_Proxy()->Get_Writable_Mailbox()->Add_Frame( shutdown_frame );
 
-	while ( platform_thread->Is_Running() )
-	{
-		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
-	}
+	test_thread_process->Finalize();
 }
 
 

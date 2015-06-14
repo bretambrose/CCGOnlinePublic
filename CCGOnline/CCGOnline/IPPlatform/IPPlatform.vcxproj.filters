@@ -56,9 +56,6 @@
     <ClInclude Include="PlatformMisc.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlatformThread.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -101,9 +98,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlatformMisc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlatformThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

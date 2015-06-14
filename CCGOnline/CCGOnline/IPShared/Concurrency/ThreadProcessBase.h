@@ -34,9 +34,10 @@ class CThreadProcessBase : public CProcessBase
 		virtual ~CThreadProcessBase();
 
 		// IThreadTask interface
-		virtual EProcessExecutionMode::Enum Get_Execution_Mode( void ) const override;
+		virtual EProcessExecutionMode Get_Execution_Mode( void ) const override { return EProcessExecutionMode::THREAD; }
 
 		virtual void Run( const CProcessExecutionContext &context ) override;
+		virtual void Finalize( void );
 
 	protected:
 
@@ -46,15 +47,15 @@ class CThreadProcessBase : public CProcessBase
 
 	private:
 
-		void Thread_Function( void *thread_data );
+		void Thread_Function( void );
 
 		friend class CProcessBaseTester;
 		friend class CProcessBaseExaminer;
 
 		// Private Data
 
-		// Misc
-		bool HasBeenRun;	// Do not move this to the base class
+		std::mutex StartLock;
+		std::unique_ptr< std::thread > ExecutionThread;
 };
 
 #endif // THREAD_PROCESS_BASE_H

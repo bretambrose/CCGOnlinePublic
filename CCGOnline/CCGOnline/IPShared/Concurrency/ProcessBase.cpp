@@ -26,7 +26,6 @@
 #include "ProcessSubject.h"
 #include "MailboxInterfaces.h"
 #include "ProcessConstants.h"
-#include "ProcessExecutionMode.h"
 #include "ProcessMessageFrame.h"
 #include "Messaging/LoggingMessages.h"
 #include "Messaging/ProcessManagementMessages.h"
@@ -337,7 +336,7 @@ void CProcessBase::Handle_Shutdown_Mailboxes( void )
 
 bool CProcessBase::Should_Reschedule( void ) const
 {
-	return State == EPS_RUNNING && Get_Execution_Mode() == EProcessExecutionMode::TASK;
+	return State == EPS_RUNNING && Get_Execution_Mode() == EProcessExecutionMode::TBB_TASK;
 }
 
 

@@ -30,10 +30,8 @@
 #include "Messaging/ProcessManagementMessages.h"
 #include "IPPlatform/PlatformProcess.h"
 #include "IPPlatform/PlatformTime.h"
-#include "IPPlatform/PlatformThread.h"
 #include "ProcessConstants.h"
 #include "ProcessExecutionContext.h"
-#include "ProcessExecutionMode.h"
 #include "ProcessID.h"
 #include "ProcessMailbox.h"
 #include "ProcessMessageFrame.h"
@@ -186,8 +184,6 @@ class CProcessRecord
 
 		CProcessMailbox *Get_Mailbox( void ) const { return Mailbox.get(); }
 
-		CPlatformThread *Get_Platform_Thread( void ) const { return PlatformThread.get(); }
-
 		// Operations
 		void Add_Execute_Task( const std::shared_ptr< CTaskScheduler > &task_scheduler, double execution_time );
 		void Remove_Execute_Task( const std::shared_ptr< CTaskScheduler > &task_scheduler );
@@ -210,8 +206,6 @@ class CProcessRecord
 
 		std::shared_ptr< CExecuteProcessScheduledTask > ExecuteTask;
 
-		std::unique_ptr< CPlatformThread > PlatformThread;
-
 		ExecuteProcessDelegateType ExecuteDelegate;
 
 		EInternalProcessState State;
@@ -225,15 +219,10 @@ CProcessRecord::CProcessRecord( const std::shared_ptr< IManagedProcess > &proces
 	Process( process ),
 	Mailbox( new CProcessMailbox( process->Get_ID(), process->Get_Properties() ) ),
 	ExecuteTask( nullptr ),
-	PlatformThread( nullptr ),
 	ExecuteDelegate( execute_delegate ),
 	State( EIPS_INITIALIZING ),
 	PendingShutdownIDs()
 {
-	if ( process->Get_Execution_Mode() == EProcessExecutionMode::THREAD )
-	{
-		PlatformThread.reset( new CPlatformThread );
-	}
 }
 
 
@@ -777,6 +766,8 @@ void CConcurrencyManager::Handle_Shutdown_Self_Response( EProcessID::Enum source
 	FATAL_ASSERT( iter != ProcessRecords.cend() );
 	FATAL_ASSERT( iter->second->Get_State() == EIPS_SHUTTING_DOWN_PHASE2 || Is_Manager_Shutting_Down() );
 
+	iter->second->Get_Process()->Finalize();
+
 	ProcessRecords.erase( iter );
 }
 
@@ -828,7 +819,7 @@ void CConcurrencyManager::Execute_Process( EProcessID::Enum process_id, double c
 
 	switch ( thread_task_base->Get_Execution_Mode() )
 	{
-		case EProcessExecutionMode::TASK:
+		case EProcessExecutionMode::TBB_TASK:
 			if ( process_id == EProcessID::LOGGING )
 			{
 				CServiceLoggingProcessTBBTask &tbb_task = *new( tbb::task::allocate_root() ) CServiceLoggingProcessTBBTask( current_time_seconds );
@@ -844,7 +835,7 @@ void CConcurrencyManager::Execute_Process( EProcessID::Enum process_id, double c
 
 		case EProcessExecutionMode::THREAD:
 		{
-			CProcessExecutionContext context( record->Get_Platform_Thread() );
+			CProcessExecutionContext context;
 			thread_task_base->Run( context );
 
 			break;

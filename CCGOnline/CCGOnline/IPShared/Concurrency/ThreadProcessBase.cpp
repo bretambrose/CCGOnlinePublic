@@ -22,51 +22,47 @@
 #include "ThreadProcessBase.h"
 
 #include "IPPlatform/PlatformProcess.h"
-#include "IPPlatform/PlatformThread.h"
 #include "IPPlatform/PlatformTime.h"
 #include "ProcessExecutionContext.h"
-#include "ProcessExecutionMode.h"
 #include "ProcessStatics.h"
 
 
 CThreadProcessBase::CThreadProcessBase( const SProcessProperties &properties ) :
 	BASECLASS( properties ),
-	HasBeenRun( false )
+	StartLock(),
+	ExecutionThread( nullptr )
 {
 }
-
 
 CThreadProcessBase::~CThreadProcessBase()
 {
 }
 
-
-EProcessExecutionMode::Enum CThreadProcessBase::Get_Execution_Mode( void ) const
-{
-	return EProcessExecutionMode::THREAD;
-}
-
-
 void CThreadProcessBase::Run( const CProcessExecutionContext &context )
 {
-	FATAL_ASSERT( !HasBeenRun );
+	IP_UNREFERENCED_PARAM( context );
 
-	HasBeenRun = true;
+	std::lock_guard< std::mutex > startLock( StartLock );
 
-	CPlatformThread *thread = context.Get_Platform_Thread();
-	FATAL_ASSERT( thread != nullptr );
-
-	thread->Create_And_Run( 0, ThreadExecutionFunctionType( this, &CThreadProcessBase::Thread_Function ), thread );
+	if ( ExecutionThread == nullptr )
+	{
+		ExecutionThread = std::make_unique< std::thread >( std::bind( &CThreadProcessBase::Thread_Function, this ) );
+	}
 }
 
-
-void CThreadProcessBase::Thread_Function( void *thread_data )
+void CThreadProcessBase::Finalize( void )
 {
-	CPlatformThread *thread = static_cast< CPlatformThread * >( thread_data );
+	if ( ExecutionThread && ExecutionThread->joinable() )
+	{
+		ExecutionThread->join();
+	}
+}
 
+void CThreadProcessBase::Thread_Function( void )
+{
 	while ( !Is_Shutting_Down() )
 	{
-		CProcessExecutionContext context( thread );
+		CProcessExecutionContext context;
 
 		CProcessStatics::Set_Current_Process( this );
 		BASECLASS::Run( context );

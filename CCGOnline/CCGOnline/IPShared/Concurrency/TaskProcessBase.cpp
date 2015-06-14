@@ -21,7 +21,6 @@
 
 #include "TaskProcessBase.h"
 
-#include "ProcessExecutionMode.h"
 #include "ProcessExecutionContext.h"
 #include "Messaging/ProcessManagementMessages.h"
 
@@ -38,13 +37,6 @@ CTaskProcessBase::CTaskProcessBase( const SProcessProperties &properties ) :
 CTaskProcessBase::~CTaskProcessBase()
 {
 }
-
-
-EProcessExecutionMode::Enum CTaskProcessBase::Get_Execution_Mode( void ) const
-{
-	return EProcessExecutionMode::TASK;
-}
-
 
 double CTaskProcessBase::Get_Current_Process_Time( void ) const
 {

@@ -51,6 +51,7 @@ class IManagedProcess : public IProcess
 		virtual bool Is_Root_Thread( void ) const = 0;
 
 		virtual void Run( const CProcessExecutionContext &context ) = 0;
+		virtual void Finalize( void ) = 0;
 
 };
 

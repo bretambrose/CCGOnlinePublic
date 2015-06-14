@@ -184,7 +184,6 @@
     <ClInclude Include="Concurrency\ProcessBase.h" />
     <ClInclude Include="Concurrency\ProcessConstants.h" />
     <ClInclude Include="Concurrency\ProcessExecutionContext.h" />
-    <ClInclude Include="Concurrency\ProcessExecutionMode.h" />
     <ClInclude Include="Concurrency\ProcessID.h" />
     <ClInclude Include="Concurrency\ProcessInterface.h" />
     <ClInclude Include="Concurrency\ProcessMailbox.h" />

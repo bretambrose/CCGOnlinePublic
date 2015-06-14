@@ -137,14 +137,19 @@ CProcessBase *CTaskProcessBaseTester::Get_Process( void ) const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CThreadProcessBaseTester::CThreadProcessBaseTester( CThreadProcessBase *process ) :
-	BASECLASS( process ),
-	ThreadProcess( process )
+CThreadProcessBaseTester::CThreadProcessBaseTester( std::shared_ptr< CThreadProcessBase > process ) :
+	BASECLASS( process.get() ),
+	ThreadProcess( process ),
+	ProcessThread( nullptr )
 {
 }
 
 CThreadProcessBaseTester::~CThreadProcessBaseTester()
 {
+	if ( ProcessThread != nullptr && ProcessThread->joinable() )
+	{
+		ProcessThread->join();
+	}
 }
 
 std::shared_ptr< CThreadProcessBase > CThreadProcessBaseTester::Get_Thread_Process( void ) const 
@@ -155,5 +160,11 @@ std::shared_ptr< CThreadProcessBase > CThreadProcessBaseTester::Get_Thread_Proce
 CProcessBase *CThreadProcessBaseTester::Get_Process( void ) const 
 { 
 	return ThreadProcess.get(); 
+}
+
+void CThreadProcessBaseTester::Start( void )
+{
+	CProcessExecutionContext thread_context;
+	ThreadProcess->Run( thread_context );
 }
 
