@@ -17,12 +17,15 @@
 
 **********************************************************************************************************************/
 
-#ifndef SHARED_XML_SERIALIZER_REGISTRATION_H
-#define SHARED_XML_SERIALIZER_REGISTRATION_H
+#pragma once
 
-namespace NIPShared
+namespace IP
 {
-	void Register_Shared_XML_Serializers( void );
-}
+namespace Global
+{
 
-#endif // SHARED_XML_SERIALIZER_REGISTRATION_H
+	void Register_IPShared_XML_Serializers( void );
+
+} // namespace Init
+} // namespace IP
+

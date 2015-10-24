@@ -17,20 +17,23 @@
 
 **********************************************************************************************************************/
 
-#ifndef SERIALIZATION_REGISTRAR_H
-#define SERIALIZATION_REGISTRAR_H
+#pragma once
 
 #include "IPShared/Serialization/SerializationHelpers.h"
 #include "IPShared/Serialization/XML/XMLSerializerInterface.h"
 #include "IPShared/Serialization/XML/PrimitiveXMLSerializers.h"
 
+namespace IP
+{
+namespace Serialization
+{
 
 class CSerializationRegistrar
 {
 	public:
 		
 		// registration
-		static void Register_Primitive_XML_Serializer( const Loki::TypeInfo &type_info, IXMLSerializer *serializer );
+		static void Register_Primitive_XML_Serializer( const Loki::TypeInfo &type_info, XML::IXMLSerializer *serializer );
 
 		template< typename T >
 		static void Register_Type_Serialization_Definition( CTypeSerializationDefinition *definition );
@@ -49,7 +52,7 @@ class CSerializationRegistrar
 		static CTypeSerializationDefinition *Get_Type_Serialization_Definition( const Loki::TypeInfo& type_info );
 
 		template< typename T >
-		static IXMLSerializer *Get_XML_Serializer( bool allow_polymorphism = true );
+		static XML::IXMLSerializer *Get_XML_Serializer( bool allow_polymorphism = true );
 
 	private:
 
@@ -70,9 +73,9 @@ class CSerializationRegistrar
 
 		static CSerializerFactorySet *Get_Factory_Set( const Loki::TypeInfo& type_info );
 
-		static void Register_XML_Serializer( const Loki::TypeInfo& type_info, IXMLSerializer *serializer );
+		static void Register_XML_Serializer( const Loki::TypeInfo& type_info, XML::IXMLSerializer *serializer );
 
-		static void Add_Binding_Set_To_Serializer( CCompositeXMLSerializer *serializer, CTypeSerializationDefinition *type_definition )
+		static void Add_Binding_Set_To_Serializer( XML::CCompositeXMLSerializer *serializer, CTypeSerializationDefinition *type_definition )
 		{
 			auto binding_set = type_definition->Get_Data_Bindings();
 
@@ -86,7 +89,7 @@ class CSerializationRegistrar
 			}
 		}
 
-		static IXMLSerializer *Build_Composite_Serializer( const Loki::TypeInfo &type_info )
+		static XML::IXMLSerializer *Build_Composite_Serializer( const Loki::TypeInfo &type_info )
 		{
 			auto type_definition_iter = TypeSerializationDefinitions.find( type_info );
 			FATAL_ASSERT( type_definition_iter != TypeSerializationDefinitions.end() );
@@ -94,7 +97,7 @@ class CSerializationRegistrar
 			CTypeSerializationDefinition *type_definition = type_definition_iter->second;
 			FATAL_ASSERT( type_definition != nullptr );
 
-			auto serializer = new CCompositeXMLSerializer;
+			auto serializer = new XML::CCompositeXMLSerializer;
 			Add_Binding_Set_To_Serializer( serializer, type_definition );
 
 			while( type_definition->Has_Base_Class() )
@@ -115,7 +118,7 @@ class CSerializationRegistrar
 		{
 			public:
 
-				IXMLSerializer* operator()( bool allow_polymorphism ) const {
+				XML::IXMLSerializer* operator()( bool allow_polymorphism ) const {
 					IP_UNREFERENCED_PARAM( allow_polymorphism );
 
 					Loki::TypeInfo type_info( typeid( T ) );
@@ -139,7 +142,7 @@ class CSerializationRegistrar
 		{
 			public:
 
-				IXMLSerializer* operator()( bool allow_polymorphism ) const {
+				XML::IXMLSerializer* operator()( bool allow_polymorphism ) const {
 					Loki::TypeInfo type_info( typeid( std::vector< T > ) );
 					auto iter = XMLSerializers.find( type_info );
 					if( iter != XMLSerializers.end() )
@@ -147,8 +150,8 @@ class CSerializationRegistrar
 						return iter->second;
 					}
 
-					IXMLSerializer *serializer = CGetOrBuildXMLSerializer< T >()( allow_polymorphism );
-					IXMLSerializer *vector_serializer = new CVectorXMLSerializer( serializer, Prep_Vector_For_Read< T > );
+					XML::IXMLSerializer *serializer = CGetOrBuildXMLSerializer< T >()( allow_polymorphism );
+					XML::IXMLSerializer *vector_serializer = new XML::CVectorXMLSerializer( serializer, Prep_Vector_For_Read< T > );
 					XMLSerializers[ type_info ] = vector_serializer;
 
 					return vector_serializer;
@@ -160,7 +163,7 @@ class CSerializationRegistrar
 		{
 			public:
 
-				IXMLSerializer* operator()( bool allow_polymorphism ) const {
+				XML::IXMLSerializer* operator()( bool allow_polymorphism ) const {
 					Loki::TypeInfo type_info( typeid( T ) );
 					auto type_iter = TypeSerializationDefinitions.find( type_info );
 
@@ -214,8 +217,8 @@ class CSerializationRegistrar
 						return iter->second;
 					}
 
-					IXMLSerializer *serializer = CGetOrBuildXMLSerializer< T >()( allow_polymorphism );
-					IXMLSerializer *pointer_serializer = new CPointerXMLSerializer( serializer, Prep_Pointer_For_Read< T > );
+					XML::IXMLSerializer *serializer = CGetOrBuildXMLSerializer< T >()( allow_polymorphism );
+					XML::IXMLSerializer *pointer_serializer = new CPointerXMLSerializer( serializer, Prep_Pointer_For_Read< T > );
 
 					FATAL_ASSERT( pointer_serializer != nullptr );
 
@@ -228,14 +231,14 @@ class CSerializationRegistrar
 		static bool Inherits_From( const Loki::TypeInfo &base_type_info, const Loki::TypeInfo &derived_type_info );
 
 		static bool Has_Polymorphic_Enum_Mapping( const Loki::TypeInfo &type_info );
-		static IXMLSerializer *Get_Or_Build_Polymorphic_Enum_Serializer( const Loki::TypeInfo &type_info );
+		static XML::IXMLSerializer *Get_Or_Build_Polymorphic_Enum_Serializer( const Loki::TypeInfo &type_info );
 		static CTypeSerializationDefinition *Get_Most_Derived_Type_Singleton( const Loki::TypeInfo &type_info );
 
 		static void Build_Derived_Type_List( const Loki::TypeInfo &type_info, std::vector< Loki::TypeInfo > &derived_types );
 
 		using TypeSerializationDefinitionTableType = std::unordered_map< Loki::TypeInfo, CTypeSerializationDefinition *, STypeInfoContainerHelper >;
 		using FactorySetTableType = std::unordered_map< Loki::TypeInfo, CSerializerFactorySet *, STypeInfoContainerHelper >;
-		using XMLSerializerTableType = std::unordered_map< Loki::TypeInfo, IXMLSerializer *, STypeInfoContainerHelper >;
+		using XMLSerializerTableType = std::unordered_map< Loki::TypeInfo, XML::IXMLSerializer *, STypeInfoContainerHelper >;
 		using DerivedClassTableType = std::unordered_map< Loki::TypeInfo, std::vector< Loki::TypeInfo >, STypeInfoContainerHelper >;
 
 		using PolymorphicTypesTableType = std::unordered_map< Loki::TypeInfo, Loki::TypeInfo, STypeInfoContainerHelper >;
@@ -252,18 +255,25 @@ class CSerializationRegistrar
 		static XMLSerializerTableType PolymorphicSerializers;
 };
 
+} // namespace Serialization
+} // namespace IP
 
-#define BEGIN_ROOT_TYPE_DEFINITION( t ) CTypeSerializationDefinition *definition = CTypeSerializationDefinition::Create< t >();
-#define BEGIN_DERIVED_TYPE_DEFINITION( t, bt ) CTypeSerializationDefinition *definition = CTypeSerializationDefinition::Create< t >( Loki::TypeInfo( typeid( bt ) ) );
-#define REGISTER_MEMBER_BINDING( n, mp ) CSerializationRegistrar::Build_Binding_Set( definition, n, mp, true );
-#define REGISTER_LITERAL_MEMBER_BINDING( n, mp ) CSerializationRegistrar::Build_Binding_Set( definition, n, mp, false );
-#define END_TYPE_DEFINITION( t ) CSerializationRegistrar::Register_Type_Serialization_Definition< t >( definition ); 
+#define BEGIN_ROOT_TYPE_DEFINITION( t ) IP::Serialization::CTypeSerializationDefinition *definition = IP::Serialization::CTypeSerializationDefinition::Create< t >();
+#define BEGIN_DERIVED_TYPE_DEFINITION( t, bt ) IP::Serialization::CTypeSerializationDefinition *definition = IP::Serialization::CTypeSerializationDefinition::Create< t >( Loki::TypeInfo( typeid( bt ) ) );
+#define REGISTER_MEMBER_BINDING( n, mp ) IP::Serialization::CSerializationRegistrar::Build_Binding_Set( definition, n, mp, true );
+#define REGISTER_LITERAL_MEMBER_BINDING( n, mp ) IP::Serialization::CSerializationRegistrar::Build_Binding_Set( definition, n, mp, false );
+#define END_TYPE_DEFINITION( t ) IP::Serialization::CSerializationRegistrar::Register_Type_Serialization_Definition< t >( definition ); 
 
-#define REGISTER_PRIMITIVE_XML_SERIALIZER( t, s ) CSerializationRegistrar::Register_Primitive_XML_Serializer( Loki::TypeInfo( typeid( t ) ), s );
+#define REGISTER_PRIMITIVE_XML_SERIALIZER( t, s ) IP::Serialization::CSerializationRegistrar::Register_Primitive_XML_Serializer( Loki::TypeInfo( typeid( t ) ), s );
 
-#define REGISTER_POLYMORPHIC_ENUM_ENTRY( e, t ) CSerializationRegistrar::Register_Polymorphic_Enum_Entry( e, Loki::TypeInfo( typeid( t ) ) );
+#define REGISTER_POLYMORPHIC_ENUM_ENTRY( e, t ) IP::Serialization::CSerializationRegistrar::Register_Polymorphic_Enum_Entry( e, Loki::TypeInfo( typeid( t ) ) );
 
-#define REGISTER_ENUM_SERIALIZER( e ) CSerializationRegistrar::Register_Primitive_XML_Serializer( Loki::TypeInfo( typeid( e ) ), new CEnumXMLSerializer< e > );
+#define REGISTER_ENUM_SERIALIZER( e ) IP::Serialization::CSerializationRegistrar::Register_Primitive_XML_Serializer( Loki::TypeInfo( typeid( e ) ), new IP::Serialization::XML::CEnumXMLSerializer< e > );
+
+namespace IP
+{
+namespace Serialization
+{
 
 template< typename T >
 void CSerializationRegistrar::Register_Type_Serialization_Definition( CTypeSerializationDefinition *definition )
@@ -290,7 +300,7 @@ void CSerializationRegistrar::Build_Binding_Set( CTypeSerializationDefinition *d
 }
 
 template< typename T >
-IXMLSerializer *CSerializationRegistrar::Get_XML_Serializer( bool allow_polymorphism )
+XML::IXMLSerializer *CSerializationRegistrar::Get_XML_Serializer( bool allow_polymorphism )
 {
 	return CGetOrBuildXMLSerializer< T >()( allow_polymorphism );
 }
@@ -318,4 +328,5 @@ void CSerializationRegistrar::Register_Polymorphic_Enum_Entry( T enum_entry, con
 	( *enum_table )[ static_cast< uint64_t >( enum_entry ) ] = type_info;
 }
 
-#endif // SERIALIZATION_REGISTRAR_H
+} // namespace Serialization
+} // namespace IP

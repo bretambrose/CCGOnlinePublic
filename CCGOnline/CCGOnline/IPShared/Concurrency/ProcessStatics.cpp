@@ -25,6 +25,13 @@
 #include "ProcessInterface.h"
 #include "IPPlatform/ThreadLocalStorage.h"
 
+using namespace IP::TLS;
+
+namespace IP
+{
+namespace Execution
+{
+
 // Static member data definitions
 uint32_t CProcessStatics::ProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
 uint32_t CProcessStatics::ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
@@ -41,10 +48,10 @@ void CProcessStatics::Initialize( void )
 	FATAL_ASSERT( ProcessHandle == THREAD_LOCAL_INVALID_HANDLE );
 	FATAL_ASSERT( ConcurrencyManagerHandle == THREAD_LOCAL_INVALID_HANDLE );
 
-	ProcessHandle = CThreadLocalStorage::Allocate_Thread_Local_Storage();
+	ProcessHandle = Allocate_Thread_Local_Storage();
 	FATAL_ASSERT( ProcessHandle != THREAD_LOCAL_INVALID_HANDLE );
 
-	ConcurrencyManagerHandle = CThreadLocalStorage::Allocate_Thread_Local_Storage();
+	ConcurrencyManagerHandle = Allocate_Thread_Local_Storage();
 	FATAL_ASSERT( ConcurrencyManagerHandle != THREAD_LOCAL_INVALID_HANDLE );
 
 	Initialized = true;
@@ -60,10 +67,10 @@ void CProcessStatics::Shutdown( void )
 
 	Initialized = false;
 
-	CThreadLocalStorage::Deallocate_Thread_Local_Storage( ProcessHandle );
+	Deallocate_Thread_Local_Storage( ProcessHandle );
 	ProcessHandle = THREAD_LOCAL_INVALID_HANDLE;
 
-	CThreadLocalStorage::Deallocate_Thread_Local_Storage( ConcurrencyManagerHandle );
+	Deallocate_Thread_Local_Storage( ConcurrencyManagerHandle );
 	ConcurrencyManagerHandle = THREAD_LOCAL_INVALID_HANDLE;
 }
 
@@ -72,7 +79,7 @@ void CProcessStatics::Set_Current_Process( IProcess *process )
 {
 	FATAL_ASSERT( Initialized );
 
-	CThreadLocalStorage::Set_TLS_Value( ProcessHandle, process );
+	Set_TLS_Value( ProcessHandle, process );
 }
 
 
@@ -80,7 +87,7 @@ void CProcessStatics::Set_Concurrency_Manager( CConcurrencyManager *manager )
 {
 	FATAL_ASSERT( Initialized );
 
-	CThreadLocalStorage::Set_TLS_Value( ConcurrencyManagerHandle, manager );
+	Set_TLS_Value( ConcurrencyManagerHandle, manager );
 }
 
 
@@ -91,7 +98,7 @@ IProcess *CProcessStatics::Get_Current_Process( void )
 		return nullptr;
 	}
 
-	return CThreadLocalStorage::Get_TLS_Value< IProcess >( ProcessHandle );
+	return Get_TLS_Value< IProcess >( ProcessHandle );
 }
 
 
@@ -102,5 +109,8 @@ CConcurrencyManager *CProcessStatics::Get_Concurrency_Manager( void )
 		return nullptr;
 	}
 
-	return CThreadLocalStorage::Get_TLS_Value< CConcurrencyManager >( ConcurrencyManagerHandle );
+	return Get_TLS_Value< CConcurrencyManager >( ConcurrencyManagerHandle );
 }
+
+} // namespace Execution
+} // namespace IP

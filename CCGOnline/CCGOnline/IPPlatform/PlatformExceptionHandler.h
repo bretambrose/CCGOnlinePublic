@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef PLATFORM_EXCEPTION_HANDLER_H
-#define PLATFORM_EXCEPTION_HANDLER_H
+#pragma once
 
 #include "StructuredExceptionTypes.h"
+
+namespace IP
+{
+namespace Debug
+{
 
 class CStructuredExceptionInfo;
 
@@ -48,4 +52,6 @@ class CPlatformExceptionHandler
 		static bool Initialized;
 };
 
-#endif // PLATFORM_EXCEPTION_HANDLER_H
+} // namespace Debug
+} // namespace IP
+

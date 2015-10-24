@@ -31,7 +31,6 @@
 #include "IPShared/Concurrency/Messaging/ExchangeMailboxMessages.h"
 #include "IPShared/Concurrency/Messaging/LoggingMessages.h"
 #include "IPShared/Concurrency/ProcessID.h"
-#include "IPShared/Time/TimeType.h"
 #include "IPShared/TaskScheduler/ScheduledTask.h"
 #include "IPShared/TaskScheduler/TaskScheduler.h"
 #include "IPShared/Logging/LogInterface.h"
@@ -39,6 +38,9 @@
 #include "IPPlatform/PlatformProcess.h"
 #include "SharedTestProcessSubject.h"
 
+using namespace IP::Execution;
+using namespace IP::Execution::Messaging;
+using namespace IP::Logging;
 
 class ProcessTests : public testing::Test 
 {
@@ -51,13 +53,12 @@ class CTestProcessTask : public CTaskProcessBase
 {
 	public:
 
-		typedef CTaskProcessBase BASECLASS;
+		using BASECLASS = CTaskProcessBase;
 
 		CTestProcessTask( const SProcessProperties &properties ) :
 			BASECLASS( properties )
 		{}
 
-		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
 	protected:
@@ -69,14 +70,13 @@ class CTestThreadProcess : public CThreadProcessBase
 {
 	public:
 
-		typedef CThreadProcessBase BASECLASS;
+		using BASECLASS = CThreadProcessBase;
 
 		CTestThreadProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties ),
 			FramesCompleted( 0 )
 		{}
 
-		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
 		uint64_t Get_Frames_Completed( void ) const { return FramesCompleted; }
@@ -97,7 +97,7 @@ class CBasicServiceTestTask : public CScheduledTask
 {
 	public:
 
-		typedef CScheduledTask BASECLASS;
+		using BASECLASS = CScheduledTask;
 
 		CBasicServiceTestTask( double execute_time_seconds ) :
 			BASECLASS( execute_time_seconds )
@@ -172,13 +172,13 @@ TEST_F( ProcessTests, Basic_Service_And_Reschedule )
 
 
 static const SProcessProperties DB_PROPS( ETestExtendedProcessSubject::DATABASE );
-static const EProcessID::Enum DB_PROCESS_ID = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 1 );
+static const EProcessID DB_PROCESS_ID = static_cast< EProcessID >( static_cast< uint64_t >( EProcessID::FIRST_FREE_ID ) + 1 );
 
 class CSendAddMailboxMessageServiceTask : public CScheduledTask
 {
 	public:
 
-		typedef CScheduledTask BASECLASS;
+		using BASECLASS = CScheduledTask;
 
 		CSendAddMailboxMessageServiceTask( double execute_time_seconds, const std::shared_ptr< CWriteOnlyMailbox > &mailbox ) :
 			BASECLASS( execute_time_seconds ),
@@ -348,15 +348,15 @@ TEST_F( ProcessTests, Add_Mailbox_And_Logging )
 }
 
 static const SProcessProperties UI_PROPS( ETestExtendedProcessSubject::UI );
-static const EProcessID::Enum UI_PROCESS_ID = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 2 );
+static const EProcessID UI_PROCESS_ID = static_cast< EProcessID >( static_cast< uint64_t >( EProcessID::FIRST_FREE_ID ) + 2 );
 
 class CSendMailboxMessageTask : public CScheduledTask
 {
 	public:
 
-		typedef CScheduledTask BASECLASS;
+		using BASECLASS = CScheduledTask;
 
-		CSendMailboxMessageTask( double execute_time_seconds, const std::shared_ptr< CWriteOnlyMailbox > &mailbox, EProcessID::Enum target_process_id ) :
+		CSendMailboxMessageTask( double execute_time_seconds, const std::shared_ptr< CWriteOnlyMailbox > &mailbox, EProcessID target_process_id ) :
 			BASECLASS( execute_time_seconds ),
 			Mailbox( mailbox ),
 			TargetProcessID( target_process_id )
@@ -371,7 +371,7 @@ class CSendMailboxMessageTask : public CScheduledTask
 	private:
 
 		std::shared_ptr< CWriteOnlyMailbox > Mailbox;
-		EProcessID::Enum TargetProcessID;
+		EProcessID TargetProcessID;
 };
 
 TEST_F( ProcessTests, Shutdown_Interface )
@@ -379,7 +379,7 @@ TEST_F( ProcessTests, Shutdown_Interface )
 	static const std::wstring LOG_MESSAGE( L"Log Test" );
 
 	CTaskProcessBaseTester process_tester( new CTestProcessTask( AI_PROPS ) );
-	EProcessID::Enum tester_id = process_tester.Get_Process()->Get_ID();
+	EProcessID tester_id = process_tester.Get_Process()->Get_ID();
 
 	std::shared_ptr< CProcessMailbox > log_conn( new CProcessMailbox( LOGGING_PROCESS_ID, LOGGING_PROCESS_PROPERTIES ) );
 	std::shared_ptr< CProcessMailbox > ui_conn( new CProcessMailbox( UI_PROCESS_ID, UI_PROPS ) );

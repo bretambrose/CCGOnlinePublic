@@ -17,8 +17,10 @@
 
 **********************************************************************************************************************/
 
-#ifndef MESSAGE_HANDLER_H
-#define MESSAGE_HANDLER_H
+#pragma once
+
+namespace IP
+{
 
 // A simple base class for all message handlers
 template< typename MessageSourceType, typename MessageBaseType >
@@ -32,4 +34,4 @@ class IMessageHandler
 		virtual void Handle_Message( MessageSourceType source, std::unique_ptr< const MessageBaseType > &message ) const = 0;
 };
 
-#endif // MESSAGE_HANDLER_H
+} // namespace IP

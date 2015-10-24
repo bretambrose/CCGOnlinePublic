@@ -17,25 +17,32 @@
 
 **********************************************************************************************************************/
 
-#ifndef MAILBOX_INTERFACES_H
-#define MAILBOX_INTERFACES_H
+#pragma once
 
 #include "ProcessProperties.h"
 
-class CProcessMessageFrame;
+namespace IP
+{
+namespace Concurrency
+{
+
 template < typename T > class IConcurrentQueue;
 
-namespace EProcessID
+} // namespace Concurrency
+
+namespace Execution
 {
-	enum Enum;
-}
+
+class CProcessMessageFrame;
+
+enum class EProcessID;
 
 // The write-only mailbox of a virtual process.  Other processes talk to a process by adding messages to this
 class CWriteOnlyMailbox
 {
 	public:
 
-		CWriteOnlyMailbox( EProcessID::Enum process_id, const SProcessProperties &properties, const std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &write_queue );
+		CWriteOnlyMailbox( EProcessID process_id, const SProcessProperties &properties, const std::shared_ptr< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &write_queue );
 		~CWriteOnlyMailbox();
 
 		CWriteOnlyMailbox( CWriteOnlyMailbox &&rhs ) = delete;
@@ -43,18 +50,18 @@ class CWriteOnlyMailbox
 		CWriteOnlyMailbox( const CWriteOnlyMailbox &rhs ) = delete;
 		CWriteOnlyMailbox & operator =( const CWriteOnlyMailbox &rhs ) = delete;
 
-		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		EProcessID Get_Process_ID( void ) const { return ProcessID; }
 		const SProcessProperties &Get_Properties( void ) const { return Properties; }
 
 		void Add_Frame( std::unique_ptr< CProcessMessageFrame > &frame );
 
 	private:
 
-		EProcessID::Enum ProcessID;
+		EProcessID ProcessID;
 
 		SProcessProperties Properties;
 
-		std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > WriteQueue;
+		std::shared_ptr< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > WriteQueue;
 
 };
 
@@ -63,7 +70,7 @@ class CReadOnlyMailbox
 {
 	public:
 
-		CReadOnlyMailbox( const std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &read_queue );
+		CReadOnlyMailbox( const std::shared_ptr< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &read_queue );
 		~CReadOnlyMailbox();
 
 		CReadOnlyMailbox( CReadOnlyMailbox &&rhs ) = delete;
@@ -75,8 +82,9 @@ class CReadOnlyMailbox
 
 	private:
 
-		std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > ReadQueue;
+		std::shared_ptr< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > ReadQueue;
 
 };
 
-#endif // MAILBOX_INTERFACES_H
+} // namespace Execution
+} // namespace IP

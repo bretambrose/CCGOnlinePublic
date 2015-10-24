@@ -44,6 +44,11 @@ static void Build_Assertion_String( const char *expression_string, const char *f
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace IP
+{
+namespace Debug
+{
+
 // Static members
 std::mutex CAssertSystem::AssertLock;
 DLogFunctionType CAssertSystem::LogFunction;
@@ -105,3 +110,5 @@ bool CAssertSystem::Assert_Handler( const char *expression_string, const char *f
 	return true;	
 }
 
+} // namespace Debug
+} // namespace IP

@@ -17,12 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef COMPOUND_DATABASE_TASK_INTERFACE_H
-#define COMPOUND_DATABASE_TASK_INTERFACE_H
+#pragma once
 
 #include "DatabaseTaskBaseInterface.h"
 
 #include "IPDatabase/DatabaseTypes.h"
+
+namespace IP
+{
+namespace Db
+{
 
 template< typename T > class TCompoundDatabaseTaskBatch;
 
@@ -30,7 +34,7 @@ class ICompoundDatabaseTask : public IDatabaseTaskBase
 {
 	public:
 		
-		typedef IDatabaseTaskBase BASECLASS;
+		using BASECLASS = IDatabaseTaskBase;
 
 		ICompoundDatabaseTask( void ) {}
 		virtual ~ICompoundDatabaseTask() {}
@@ -45,4 +49,5 @@ class ICompoundDatabaseTask : public IDatabaseTaskBase
 
 };
 
-#endif // COMPOUND_DATABASE_TASK_INTERFACE_H
+} // namespace Db
+} // namespace IP

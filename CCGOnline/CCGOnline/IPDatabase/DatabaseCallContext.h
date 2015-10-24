@@ -17,17 +17,21 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_CALL_CONTEXT_H
-#define DATABASE_CALL_CONTEXT_H
+#pragma once
 
-#include "Interfaces/DatabaseCallContextInterface.h"
+#include "IPDatabase/Interfaces/DatabaseCallContextInterface.h"
+
+namespace IP
+{
+namespace Db
+{
 
 template < typename I, uint32_t ISIZE, typename O, uint32_t OSIZE >
 class CDatabaseCallContext : public IDatabaseCallContext
 {
 	public:
 
-		typedef IDatabaseCallContext BASECLASS;
+		using BASECLASS = IDatabaseCallContext;
 
 		CDatabaseCallContext( void ) :
 			BASECLASS(),
@@ -74,4 +78,5 @@ class CDatabaseCallContext : public IDatabaseCallContext
 		std::wstring StatementText;
 };
 
-#endif // DATABASE_CALL_CONTEXT_H
+} // namespace Db
+} // namespace IP

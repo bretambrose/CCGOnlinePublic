@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef CONCURRENT_QUEUE_INTERFACE_H
-#define CONCURRENT_QUEUE_INTERFACE_H
+#pragma once
+
+namespace IP
+{
+namespace Concurrency
+{
 
 // An abstract base class for concurrent queue implementations
 template< typename T >
@@ -26,7 +30,7 @@ class IConcurrentQueue
 {
 	public:
 
-		virtual ~IConcurrentQueue() {}
+		virtual ~IConcurrentQueue() = default;
 
 		virtual void Move_Item( T &&item ) = 0;
 
@@ -34,4 +38,5 @@ class IConcurrentQueue
 
 };
 
-#endif // CONCURRENT_QUEUE_INTERFACE_H
+} // namespace Concurrency
+} // namespace IP

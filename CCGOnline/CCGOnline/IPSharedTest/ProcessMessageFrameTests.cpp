@@ -24,6 +24,9 @@
 #include "IPShared/Concurrency/ProcessMessageFrame.h"
 #include "IPShared/Concurrency/ProcessID.h"
 
+using namespace IP::Execution;
+using namespace IP::Execution::Messaging;
+
 static const std::wstring LOG_MESSAGES[] = {
 	std::wstring( L"Help I'm a message" ),
 	std::wstring( L"Blah" )

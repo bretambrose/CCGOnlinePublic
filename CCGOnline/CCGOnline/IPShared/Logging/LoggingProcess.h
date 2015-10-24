@@ -17,36 +17,46 @@
 
 **********************************************************************************************************************/
 
-#ifndef LOGGING_PROCESS_H
-#define LOGGING_PROCESS_H
+#pragma once
 
 #include "IPShared/Concurrency/TaskProcessBase.h"
 
-class CLogRequestMessage;
-class CLogFile;
+#include "IPPlatform/PlatformTime.h"
 
 namespace EProcessSubject
 {
 	enum Enum;
 }
 
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
+
+class CLogRequestMessage;
+
+} // namespace Messaging
+
+class CLogFile;
+
 // A class that performs logging of information to files split by thread key
 class CLoggingProcess : public CTaskProcessBase
 {
 	public:
 
-		typedef CTaskProcessBase BASECLASS;
+		using BASECLASS = CTaskProcessBase;
 
 		// Construction/destruction
 		CLoggingProcess( const SProcessProperties &properties );
 		virtual ~CLoggingProcess();
 
 		// CThreadTaskBase public interface
-		virtual void Initialize( EProcessID::Enum id ) override;
+		virtual void Initialize( EProcessID id ) override;
 
 		virtual void Log( std::wstring &&message ) override;
 
-		virtual ETimeType Get_Time_Type( void ) const override;
 		virtual bool Is_Root_Thread( void ) const override { return true; }
 
 		virtual void Run( const CProcessExecutionContext &context ) override;
@@ -65,14 +75,14 @@ class CLoggingProcess : public CTaskProcessBase
 		CLogFile *Get_Log_File( EProcessSubject::Enum subject ) const;
 
 		std::wstring Build_File_Name( EProcessSubject::Enum subject ) const;
-		std::wstring Build_Log_Message( EProcessID::Enum process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64_t system_time ) const;
+		std::wstring Build_Log_Message( EProcessID process_id, const SProcessProperties &source_properties, const std::wstring &message, IP::Time::SystemTimePoint system_time ) const;
 
-		void Handle_Log_Request_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CLogRequestMessage > &message );
+		void Handle_Log_Request_Message( EProcessID source_process_id, std::unique_ptr< const Messaging::CLogRequestMessage > &message );
 
-		void Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64_t system_time );
+		void Handle_Log_Request_Message_Aux( EProcessID source_process_id, const SProcessProperties &properties, const std::wstring &message, IP::Time::SystemTimePoint system_time );
 
 		// Private Data
-		typedef std::unordered_map< EProcessSubject::Enum, std::unique_ptr< CLogFile > > LogFileTableType; 
+		using LogFileTableType = std::unordered_map< EProcessSubject::Enum, std::unique_ptr< CLogFile > >; 
 		LogFileTableType LogFiles;
 
 		uint32_t PID;
@@ -80,4 +90,5 @@ class CLoggingProcess : public CTaskProcessBase
 		bool IsShuttingDown;
 };
 
-#endif // LOGGING_PROCESS_H
+} // namespace Execution
+} // namespace IP

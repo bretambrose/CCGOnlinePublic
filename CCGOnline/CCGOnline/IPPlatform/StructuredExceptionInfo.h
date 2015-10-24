@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef STRUCTURED_EXCEPTION_INFO_H
-#define STRUCTURED_EXCEPTION_INFO_H
+#pragma once
+
+namespace IP
+{
+namespace Debug
+{
 
 // A class representing a single frame of the call stack
 struct CStackFrame
@@ -90,4 +94,5 @@ class CStructuredExceptionInfo
 		bool IsTestException;
 };
 
-#endif // STRUCTURED_EXCEPTION_INFO_H
+} // namespace Debug
+} // namespace IP

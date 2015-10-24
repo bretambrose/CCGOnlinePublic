@@ -17,16 +17,20 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_CONNECTION_INTERFACE_H
-#define DATABASE_CONNECTION_INTERFACE_H
+#pragma once
+
+enum DBErrorStateType;
+enum DBConnectionIDType;
+enum EDatabaseTaskType;
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseStatement;
 class IDatabaseTask;
 class IDatabaseVariableSet;
-
-enum DBConnectionIDType;
-enum DBErrorStateType;
-enum EDatabaseTaskType;
 
 class IDatabaseConnection
 {
@@ -50,4 +54,5 @@ class IDatabaseConnection
 
 };
 
-#endif // DATABASE_CONNECTION_INTERFACE_H
+} // namespace Db
+} // namespace IP

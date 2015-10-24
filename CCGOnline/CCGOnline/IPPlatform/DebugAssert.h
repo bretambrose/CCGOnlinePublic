@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef DEBUG_ASSERT_H
-#define DEBUG_ASSERT_H
+#pragma once
 
-typedef FastDelegate1< std::wstring &, void > DLogFunctionType;
+namespace IP
+{
+namespace Debug
+{
+
+using DLogFunctionType = FastDelegate1< std::wstring &, void > ;
 
 // A static class to handle all assertion failures.  Multi-threaded safe via a mutex.
 class CAssertSystem
@@ -42,11 +46,14 @@ class CAssertSystem
 		static std::atomic< bool > Initialized;
 };
 
+} // namespace Debug
+} // namespace IP
+
 // Macros
 #ifdef _DEBUG
 
-#define FAIL_IF( x ) if ( ( x ) && CAssertSystem::Assert_Handler( #x, __FILE__, __LINE__, false ) )
-#define DEBUG_ASSERT( x ) ( ( x ) || CAssertSystem::Assert_Handler( #x, __FILE__, __LINE__, false ) )
+#define FAIL_IF( x ) if ( ( x ) && IP::Debug::CAssertSystem::Assert_Handler( #x, __FILE__, __LINE__, false ) )
+#define DEBUG_ASSERT( x ) ( ( x ) || IP::Debug::CAssertSystem::Assert_Handler( #x, __FILE__, __LINE__, false ) )
 
 #else
 
@@ -55,6 +62,5 @@ class CAssertSystem
 
 #endif // _DEBUG
 
-#define FATAL_ASSERT( x ) ( ( x ) || CAssertSystem::Assert_Handler( #x, __FILE__, __LINE__, true ) )
+#define FATAL_ASSERT( x ) ( ( x ) || IP::Debug::CAssertSystem::Assert_Handler( #x, __FILE__, __LINE__, true ) )
 
-#endif // DEBUG_ASSERT_H

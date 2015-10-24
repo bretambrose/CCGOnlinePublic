@@ -21,6 +21,10 @@
 
 #include "StructuredExceptionInfo.h"
 
+namespace IP
+{
+namespace Debug
+{
 
 CStackFrame::CStackFrame( void ) :
 	Address( 0 ),
@@ -72,3 +76,6 @@ CStructuredExceptionInfo::CStructuredExceptionInfo( bool is_test_exception ) :
 	IsTestException( is_test_exception )
 {
 }
+
+} // namespace Debug
+} // namespace IP

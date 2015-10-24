@@ -17,20 +17,33 @@
 
 **********************************************************************************************************************/
 
-#ifndef SLASH_COMMAND_MANAGER_H
-#define SLASH_COMMAND_MANAGER_H
+#pragma once
+
+namespace IP
+{
+namespace Serialization
+{
+namespace XML
+{
+
+template< typename K, typename T > class CXMLLoadableTable;
+
+} // namespace XML
+} // namespace Serialization
+
+namespace Command
+{
 
 class CSlashCommandInstance;
 class CSlashCommandDefinition;
 class CSlashCommandDataDefinition;
-template< typename K, typename T > class CXMLLoadableTable;
 
 // Static interface to the slash command system
 class CSlashCommandManager
 {
 	public:
 
-		typedef fastdelegate::FastDelegate2< const CSlashCommandInstance &, std::wstring &, bool > CommandHandlerDelegate;
+		using CommandHandlerDelegate = fastdelegate::FastDelegate2< const CSlashCommandInstance &, std::wstring &, bool >;
 
 		// Init/Cleanup
 		static void Initialize( void );
@@ -53,11 +66,12 @@ class CSlashCommandManager
 	private:
 
 		// Data
-		static CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition > *DataDefinitions;
+		static std::unique_ptr< IP::Serialization::XML::CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition > > DataDefinitions;
 
 		static std::unordered_map< std::wstring, const CSlashCommandDefinition * > Definitions;
 
 		static std::unordered_map< std::wstring, CommandHandlerDelegate > CommandHandlers;
 };
 
-#endif // SLASH_COMMAND_MANAGER_H
+} // namespace Command
+} // namespace IP

@@ -17,17 +17,22 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_CONSTANTS_H
-#define PROCESS_CONSTANTS_H
+#pragma once
 
 #include "ProcessSubject.h"
 #include "ProcessProperties.h"
 #include "ProcessID.h"
 
+namespace IP
+{
+namespace Execution
+{
+
 static const SProcessProperties LOGGING_PROCESS_PROPERTIES( EProcessSubject::LOGGING );
 static const SProcessProperties MANAGER_PROCESS_PROPERTIES( EProcessSubject::CONCURRENCY_MANAGER );
 
-static const EProcessID::Enum MANAGER_PROCESS_ID( EProcessID::CONCURRENCY_MANAGER );
-static const EProcessID::Enum LOGGING_PROCESS_ID( EProcessID::LOGGING );
+static const EProcessID MANAGER_PROCESS_ID( EProcessID::CONCURRENCY_MANAGER );
+static const EProcessID LOGGING_PROCESS_ID( EProcessID::LOGGING );
 
-#endif // PROCESS_CONSTANTS_H
+} // namespace Execution
+} // namespace IP

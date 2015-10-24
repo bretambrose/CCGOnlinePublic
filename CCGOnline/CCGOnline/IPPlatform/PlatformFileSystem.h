@@ -17,10 +17,11 @@
 
 **********************************************************************************************************************/
 
-#ifndef PLATFORM_FILE_SYSTEM_H
-#define PLATFORM_FILE_SYSTEM_H
+#pragma once
 
-namespace NPlatform
+namespace IP
+{
+namespace File
 {
 	// Directory functions
 	bool Directory_Exists( const std::wstring &path );
@@ -34,6 +35,6 @@ namespace NPlatform
 
 	// Misc file-related
 	std::wstring Strip_Path( const std::wstring &full_path );
-}
+} // namespace File
+} // namespace IP
 
-#endif // PLATFORM_FILE_SYSTEM_H

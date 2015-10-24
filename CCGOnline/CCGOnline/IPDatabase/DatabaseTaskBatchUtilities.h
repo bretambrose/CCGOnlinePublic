@@ -17,30 +17,26 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_UTILITES_H
-#define DATABASE_TASK_BATCH_UTILITES_H
+#pragma once
 
 #include "DatabaseTypes.h"
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseCallContext;
 class IDatabaseStatement;
 
-namespace ExecuteDBTaskListResult
+enum class EExecuteDBTaskListResult
 {
-	enum Enum
-	{
-		SUCCESS,
-		FAILED_SPECIFIC_TASK,
-		FAILED_UNKNOWN_TASK
-	};
-}
+	SUCCESS,
+	FAILED_SPECIFIC_TASK,
+	FAILED_UNKNOWN_TASK
+};
 
-namespace DBUtils
-{
+void Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseStatement *statement, const DBTaskListType &sub_list, EExecuteDBTaskListResult &result, DBTaskListType::const_iterator &first_failed_task );
 
-	void Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseStatement *statement, const DBTaskListType &sub_list, ExecuteDBTaskListResult::Enum &result, DBTaskListType::const_iterator &first_failed_task );
-
-}
-
-
-#endif // DATABASE_TASK_BATCH_UTILITES_H
+} // namespace Db
+} // namespace IP

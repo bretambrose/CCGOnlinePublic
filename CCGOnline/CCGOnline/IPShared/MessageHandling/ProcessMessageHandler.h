@@ -17,10 +17,19 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_MESSAGE_HANDLER_H
-#define PROCESS_MESSAGE_HANDLER_H
+#pragma once
 
 #include "ProcessMessageHandlerBase.h"
+
+namespace IP
+{
+namespace Execution
+{
+
+enum class EProcessID;
+
+namespace Messaging
+{
 
 // Generic handler for thread messages
 template< typename MessageType >
@@ -29,9 +38,9 @@ class TProcessMessageHandler : public IProcessMessageHandler
 	public:
 
 		// signature of the actual handling function for a specific message type
-		typedef FastDelegate2< EProcessID::Enum, std::unique_ptr< const MessageType > &, void > HandlerFunctorType;
+		using HandlerFunctorType = FastDelegate2< IP::Execution::EProcessID, std::unique_ptr< const MessageType > &, void >;
 
-		typedef IProcessMessageHandler BASECLASS;
+		using BASECLASS = IProcessMessageHandler;
 
 		TProcessMessageHandler( void ) :
 			BASECLASS(),
@@ -48,7 +57,7 @@ class TProcessMessageHandler : public IProcessMessageHandler
 			MessageHandler( message_handler )
 		{}
 
-		virtual void Handle_Message( EProcessID::Enum source_process_id, std::unique_ptr< const IProcessMessage > &message ) const override
+		virtual void Handle_Message( EProcessID source_process_id, std::unique_ptr< const IProcessMessage > &message ) const override
 		{
 			// The handlers are tracked generically so they can go in one big hash table, but our forwarding delegates
 			// have specific type signatures, requiring a down cast that preserves smart pointer reference counting
@@ -64,13 +73,17 @@ class TProcessMessageHandler : public IProcessMessageHandler
 };
 
 template < typename T, typename U >
-void Register_This_Handler( U* registry, void (U::*handler_function)( EProcessID::Enum, std::unique_ptr< const T > & ) )
+void Register_This_Handler( U* registry, void (U::*handler_function)( IP::Execution::EProcessID, std::unique_ptr< const T > & ) )
 {
 	std::unique_ptr< IProcessMessageHandler > handler( new TProcessMessageHandler< T >( TProcessMessageHandler< T >::HandlerFunctorType( registry, handler_function ) ) );
 	registry->Register_Handler( typeid( T ), handler );
 }
 
-// Utility macro for handler registration
-#define REGISTER_THIS_HANDLER( x, y, z ) Register_This_Handler< x, y >( this, &y::z );
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP
 
-#endif // PROCESS_MESSAGE_HANDLER_H
+// Utility macro for handler registration
+#define REGISTER_THIS_HANDLER( x, y, z ) IP::Execution::Messaging::Register_This_Handler< x, y >( this, &y::z );
+
+

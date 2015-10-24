@@ -17,16 +17,20 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_VARIABLE_SET_H
-#define ODBC_VARIABLE_SET_H
+#pragma once
 
 #include "IPDatabase/Interfaces/DatabaseVariableSetInterface.h"
+
+namespace IP
+{
+namespace Db
+{
 
 class CODBCVariableSet : public IDatabaseVariableSet
 {
 	public:
 
-		typedef IDatabaseVariableSet BASECLASS;
+		using BASECLASS = IDatabaseVariableSet;
 
 		CODBCVariableSet( void ) {}
 		CODBCVariableSet( const CODBCVariableSet & /*rhs*/ ) {}
@@ -34,4 +38,5 @@ class CODBCVariableSet : public IDatabaseVariableSet
 		virtual void Convert_Variable_To_String( IDatabaseVariable *variable, std::string &value ) const;
 };
 
-#endif // ODBC_VARIABLE_SET_H
+} // namespace Db
+} // namespace IP

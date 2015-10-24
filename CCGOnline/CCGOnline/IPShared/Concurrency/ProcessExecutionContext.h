@@ -17,13 +17,17 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_EXECUTION_CONTEXT_H
-#define PROCESS_EXECUTION_CONTEXT_H
+#pragma once
 
 namespace tbb
 {
 	class task;
 }
+
+namespace IP
+{
+namespace Execution
+{
 
 // Defines a virtual process's execution context; currently only contains TBB info
 class CProcessExecutionContext
@@ -53,4 +57,5 @@ class CProcessExecutionContext
 		bool IsDirect;
 };
 
-#endif // PROCESS_EXECUTION_CONTEXT_H
+} // namespace Execution
+} // namespace IP

@@ -17,17 +17,21 @@
 
 **********************************************************************************************************************/
 
-#ifndef TASK_PROCESS_BASE_H
-#define TASK_PROCESS_BASE_H
+#pragma once
 
 #include "ProcessBase.h"
+
+namespace IP
+{
+namespace Execution
+{
 
 // The shared logic level of all task-based virtual processes; not instantiable
 class CTaskProcessBase : public CProcessBase
 {
 	public:
 		
-		typedef CProcessBase BASECLASS;
+		using BASECLASS = CProcessBase;
 
 		// Construction/destruction
 		CTaskProcessBase( const SProcessProperties &properties );
@@ -64,4 +68,5 @@ class CTaskProcessBase : public CProcessBase
 
 };
 
-#endif // TASK_PROCESS_BASE_H
+} // namespace Execution
+} // namespace IP

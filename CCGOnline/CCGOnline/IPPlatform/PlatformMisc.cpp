@@ -44,7 +44,12 @@ static void Convert_GUID_To_Numeric( const GUID &guid, uint32_t &first32, uint32
 	}
 }
 
-uint32_t NPlatform::Get_Semi_Unique_ID( void )
+namespace IP
+{
+namespace Misc
+{
+
+uint32_t Get_Semi_Unique_ID( void )
 {
 	GUID guid;
 	::CoCreateGuid( &guid ); 
@@ -55,7 +60,7 @@ uint32_t NPlatform::Get_Semi_Unique_ID( void )
 	return part1 ^ part2 ^ part3 ^ part4;
 }
 
-std::wstring NPlatform::Format_OS_Error_Message( uint32_t error_code )
+std::wstring Format_OS_Error_Message( uint32_t error_code )
 {
 	wchar_t msg_buffer[ 1024 ];
 
@@ -69,3 +74,6 @@ std::wstring NPlatform::Format_OS_Error_Message( uint32_t error_code )
 
 	return std::wstring( msg_buffer );
 }
+
+} // namespace Misc
+} // namespace IP

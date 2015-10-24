@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_STATICS_H
-#define PROCESS_STATICS_H
+#pragma once
+
+namespace IP
+{
+namespace Execution
+{
 
 class IProcess;
 class CConcurrencyManager;
@@ -46,4 +50,5 @@ class CProcessStatics
 		static bool Initialized;
 };
 
-#endif // PROCESS_STATICS_H
+} // namespace Execution
+} // namespace IP

@@ -22,14 +22,18 @@
 #include "PlatformFileSystem.h"
 #include "Shlwapi.h"
 
+namespace IP
+{
+namespace File
+{
 
-std::wstring NPlatform::Strip_Path( const std::wstring &full_path )
+std::wstring Strip_Path( const std::wstring &full_path )
 {
 	return std::wstring( ::PathFindFileName( full_path.c_str() ) );
 }
 
 
-bool NPlatform::Directory_Exists( const std::wstring &path )
+bool Directory_Exists( const std::wstring &path )
 {
 	DWORD attribs = ::GetFileAttributesW( path.c_str() );
 	if ( attribs == INVALID_FILE_ATTRIBUTES ) 
@@ -41,19 +45,19 @@ bool NPlatform::Directory_Exists( const std::wstring &path )
 }
 
 
-bool NPlatform::Create_Directory( const std::wstring &path )
+bool Create_Directory( const std::wstring &path )
 {
 	return ::CreateDirectoryW( path.c_str(), nullptr ) != 0;
 } 
 
 
-void NPlatform::Delete_Directory( const std::wstring &path )
+void Delete_Directory( const std::wstring &path )
 {
 	::RemoveDirectoryW( path.c_str() );
 }
 
 
-void NPlatform::Enumerate_Matching_Files( const std::wstring &pattern, std::vector< std::wstring > &file_names )
+void Enumerate_Matching_Files( const std::wstring &pattern, std::vector< std::wstring > &file_names )
 {
 	file_names.clear();
 
@@ -79,9 +83,18 @@ void NPlatform::Enumerate_Matching_Files( const std::wstring &pattern, std::vect
 }
 
 
-bool NPlatform::Delete_File( const std::wstring &file_name )
+bool Delete_File( const std::wstring &file_name )
 {
-	return ::DeleteFile( file_name.c_str() ) != FALSE;
+	if ( DeleteFile( file_name.c_str() ) == 0 )
+	{
+		DWORD error = GetLastError();
+		error = error;
+		return false;
+	}
+
+	return true;
 }
 
+} // namespace File
+} // namespace IP
 

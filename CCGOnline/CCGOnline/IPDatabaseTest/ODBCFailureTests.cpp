@@ -34,6 +34,8 @@
 #include "ODBCShared.h"
 #include "IPPlatform/StringUtils.h"
 
+using namespace IP::Db;
+
 class ODBCFailureTests : public testing::Test 
 {
 	public:
@@ -57,7 +59,7 @@ class CMissingProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet, 
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CEmptyVariableSet, OSIZE >;
 
 		CMissingProcedureCall( void ) : 
 			BASECLASS(),
@@ -164,7 +166,7 @@ class CTooFewInputParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTooFewInputParams( void ) :
 			BASECLASS(),
@@ -194,7 +196,7 @@ class CTooManyInputParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTooManyInputParams( void ) :
 			BASECLASS(),
@@ -233,7 +235,7 @@ class CWrongArityProcedureCall : public TDatabaseProcedureCall< IPARAMS, ISIZE, 
 {
 	public:
 
-		typedef TDatabaseProcedureCall< IPARAMS, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< IPARAMS, ISIZE, CEmptyVariableSet, OSIZE >;
 
 		CWrongArityProcedureCall( void ) : 
 			BASECLASS(),
@@ -373,7 +375,7 @@ class CInconvertibleProcedureParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CInconvertibleProcedureParams( void ) :
 			BASECLASS(),
@@ -400,7 +402,7 @@ class CBadParamConversionProcedureCall : public TDatabaseProcedureCall< CInconve
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CInconvertibleProcedureParams, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CInconvertibleProcedureParams, ISIZE, CEmptyVariableSet, OSIZE >;
 
 		CBadParamConversionProcedureCall( void ) : 
 			BASECLASS(),
@@ -508,7 +510,7 @@ class CInconvertibleFunctionParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CInconvertibleFunctionParams( void ) :
 			BASECLASS(),
@@ -539,7 +541,7 @@ class CBadParamConversionFunctionCall : public TDatabaseFunctionCall< CInconvert
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CInconvertibleFunctionParams, ISIZE > BASECLASS;
+		using BASECLASS = TDatabaseFunctionCall< CInconvertibleFunctionParams, ISIZE >;
 
 		CBadParamConversionFunctionCall( void ) : 
 			BASECLASS(),
@@ -640,7 +642,7 @@ class CInconvertibleResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CInconvertibleResultSet( void ) :
 			BASECLASS(),
@@ -667,7 +669,7 @@ class CBadResultSetConversionProcedureCall : public TDatabaseProcedureCall< CEmp
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CInconvertibleResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CInconvertibleResultSet, OSIZE >;
 
 		CBadResultSetConversionProcedureCall( void ) : 
 			BASECLASS(),
@@ -770,7 +772,7 @@ class CFunctionInputProcedureSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CFunctionInputProcedureSet( void ) :
 			BASECLASS(),
@@ -801,7 +803,7 @@ class CFunctionInputProcedureCall : public TDatabaseFunctionCall< CFunctionInput
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CFunctionInputProcedureSet, ISIZE > BASECLASS;
+		using BASECLASS = TDatabaseFunctionCall< CFunctionInputProcedureSet, ISIZE >;
 
 		CFunctionInputProcedureCall( void ) : 
 			BASECLASS(),
@@ -902,7 +904,7 @@ class CProcedureInputFunctionSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CProcedureInputFunctionSet( void ) :
 			BASECLASS(),
@@ -933,7 +935,7 @@ class CProcedureInputFunctionCall : public TDatabaseProcedureCall< CProcedureInp
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CProcedureInputFunctionSet, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CProcedureInputFunctionSet, ISIZE, CEmptyVariableSet, OSIZE >;
 
 		CProcedureInputFunctionCall( void ) : 
 			BASECLASS(),
@@ -1036,7 +1038,7 @@ class CExceptionInputParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CExceptionInputParams( void ) :
 			BASECLASS(),
@@ -1072,7 +1074,7 @@ class CExceptionOutputParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CExceptionOutputParams( void ) :
 			BASECLASS(),
@@ -1099,7 +1101,7 @@ class CThrowExceptionProcedureCall : public TDatabaseProcedureCall< CExceptionIn
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CExceptionInputParams, ISIZE, CExceptionOutputParams, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CExceptionInputParams, ISIZE, CExceptionOutputParams, OSIZE >;
 
 		CThrowExceptionProcedureCall( const wchar_t *proc_name, bool throw_exception ) : 
 			BASECLASS(),
@@ -1410,7 +1412,7 @@ class CMissingSelectParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CMissingSelectParams( void ) :
 			BASECLASS(),
@@ -1446,7 +1448,7 @@ class CMissingSelectResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CMissingSelectResultSet( void ) :
 			BASECLASS(),
@@ -1473,7 +1475,7 @@ class CMissingSelectProcedureCall : public TDatabaseProcedureCall< CMissingSelec
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CMissingSelectParams, ISIZE, CMissingSelectResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CMissingSelectParams, ISIZE, CMissingSelectResultSet, OSIZE >;
 
 		CMissingSelectProcedureCall( bool skip_select ) : 
 			BASECLASS(),
@@ -1693,7 +1695,7 @@ class CExtraSelectParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CExtraSelectParams( void ) :
 			BASECLASS(),
@@ -1730,7 +1732,7 @@ class CExtraSelectProcedureCall : public TDatabaseProcedureCall< CExtraSelectPar
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CExtraSelectParams, ISIZE, CEmptyVariableSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CExtraSelectParams, ISIZE, CEmptyVariableSet, OSIZE >;
 
 		CExtraSelectProcedureCall( bool extra_select ) : 
 			BASECLASS(),
@@ -1910,7 +1912,7 @@ class CTooManyResultsParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTooManyResultsParams( void ) :
 			BASECLASS(),
@@ -1941,7 +1943,7 @@ class CTooManyResultsResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTooManyResultsResultSet( void ) :
 			BASECLASS(),
@@ -1968,7 +1970,7 @@ class CTooManyResultsProcedureCall : public TDatabaseProcedureCall< CTooManyResu
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CTooManyResultsParams, ISIZE, CTooManyResultsResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CTooManyResultsParams, ISIZE, CTooManyResultsResultSet, OSIZE >;
 
 		CTooManyResultsProcedureCall( bool extra_select ) : 
 			BASECLASS(),
@@ -2148,7 +2150,7 @@ class CExtraColumnParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CExtraColumnParams( void ) :
 			BASECLASS(),
@@ -2179,7 +2181,7 @@ class CExtraColumnResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CExtraColumnResultSet( void ) :
 			BASECLASS(),
@@ -2206,7 +2208,7 @@ class CExtraColumnProcedureCall : public TDatabaseProcedureCall< CExtraColumnPar
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CExtraColumnParams, ISIZE, CExtraColumnResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CExtraColumnParams, ISIZE, CExtraColumnResultSet, OSIZE >;
 
 		CExtraColumnProcedureCall( bool extra_column ) : 
 			BASECLASS(),
@@ -2376,7 +2378,7 @@ class CMissingColumnParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CMissingColumnParams( void ) :
 			BASECLASS(),
@@ -2407,7 +2409,7 @@ class CMissingColumnResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CMissingColumnResultSet( void ) :
 			BASECLASS(),
@@ -2438,7 +2440,7 @@ class CMissingColumnProcedureCall : public TDatabaseProcedureCall< CMissingColum
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CMissingColumnParams, ISIZE, CMissingColumnResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CMissingColumnParams, ISIZE, CMissingColumnResultSet, OSIZE >;
 
 		CMissingColumnProcedureCall( bool missing_column ) : 
 			BASECLASS(),
@@ -2609,7 +2611,7 @@ class CInvalidResultConversionParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CInvalidResultConversionParams( void ) :
 			BASECLASS(),
@@ -2640,7 +2642,7 @@ class CInvalidResultConversionResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CInvalidResultConversionResultSet( void ) :
 			BASECLASS(),
@@ -2667,7 +2669,7 @@ class CInvalidResultConversionProcedureCall : public TDatabaseProcedureCall< CIn
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CInvalidResultConversionParams, ISIZE, CInvalidResultConversionResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CInvalidResultConversionParams, ISIZE, CInvalidResultConversionResultSet, OSIZE >;
 
 		CInvalidResultConversionProcedureCall( bool do_bad_conversion ) : 
 			BASECLASS(),
@@ -2847,7 +2849,7 @@ class CResultStringTruncationParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CResultStringTruncationParams( void ) :
 			BASECLASS(),
@@ -2878,7 +2880,7 @@ class CResultStringTruncationResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CResultStringTruncationResultSet( void ) :
 			BASECLASS(),
@@ -2905,7 +2907,7 @@ class CResultStringTruncationProcedureCall : public TDatabaseProcedureCall< CRes
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CResultStringTruncationParams, ISIZE, CResultStringTruncationResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CResultStringTruncationParams, ISIZE, CResultStringTruncationResultSet, OSIZE >;
 
 		CResultStringTruncationProcedureCall( bool truncate ) : 
 			BASECLASS(),
@@ -3110,7 +3112,7 @@ class CSelectAccountBadTableResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CSelectAccountBadTableResultSet( void ) :
 			BASECLASS(),
@@ -3149,7 +3151,7 @@ class CSelectAccountBadTableTask : public TDatabaseSelect< CSelectAccountBadTabl
 {
 	public:
 
-		typedef TDatabaseSelect< CSelectAccountBadTableResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseSelect< CSelectAccountBadTableResultSet, OSIZE >;
 
 		CSelectAccountBadTableTask( void ) : 
 			BASECLASS(),
@@ -3259,7 +3261,7 @@ class CSelectAccountBadColumnResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CSelectAccountBadColumnResultSet( void ) :
 			BASECLASS(),
@@ -3298,7 +3300,7 @@ class CSelectAccountBadColumnTask : public TDatabaseSelect< CSelectAccountBadCol
 {
 	public:
 
-		typedef TDatabaseSelect< CSelectAccountBadColumnResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseSelect< CSelectAccountBadColumnResultSet, OSIZE >;
 
 		CSelectAccountBadColumnTask( void ) : 
 			BASECLASS(),
@@ -3408,7 +3410,7 @@ class CSelectAccountBadConversionResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CSelectAccountBadConversionResultSet( void ) :
 			BASECLASS(),
@@ -3447,7 +3449,7 @@ class CSelectAccountBadConversionTask : public TDatabaseSelect< CSelectAccountBa
 {
 	public:
 
-		typedef TDatabaseSelect< CSelectAccountBadConversionResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseSelect< CSelectAccountBadConversionResultSet, OSIZE >;
 
 		CSelectAccountBadConversionTask( void ) : 
 			BASECLASS(),
@@ -3557,7 +3559,7 @@ class CTVFBadColumnParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTVFBadColumnParams( void ) :
 			BASECLASS(),
@@ -3583,7 +3585,7 @@ class CTVFBadColumnResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTVFBadColumnResultSet( void ) :
 			BASECLASS(),
@@ -3608,7 +3610,7 @@ class CBadColumnTableValuedFunctionTask : public TDatabaseTableValuedFunctionCal
 {
 	public:
 
-		typedef TDatabaseTableValuedFunctionCall< CTVFBadColumnParams, ISIZE, CTVFBadColumnResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseTableValuedFunctionCall< CTVFBadColumnParams, ISIZE, CTVFBadColumnResultSet, OSIZE >;
 
 		CBadColumnTableValuedFunctionTask( uint64_t account_id ) : 
 			BASECLASS(),
@@ -3754,7 +3756,7 @@ class CFailableCompoundInsertParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CFailableCompoundInsertParams( void ) :
 			BASECLASS(),
@@ -3789,7 +3791,7 @@ class CFailableCompoundInsertProcedureCall : public TDatabaseProcedureCall< CFai
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CFailableCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CFailableCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 >;
 
 		CFailableCompoundInsertProcedureCall( uint64_t id, uint64_t index, bool should_fail ) : 
 			BASECLASS(),
@@ -3836,7 +3838,7 @@ class CFailableCompoundInsertCountParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CFailableCompoundInsertCountParams( void ) :
 			BASECLASS(),
@@ -3866,7 +3868,7 @@ class CFailableCompoundInsertCountResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CFailableCompoundInsertCountResultSet( void ) :
 			BASECLASS(),
@@ -3888,7 +3890,7 @@ class CFailableCompoundInsertCountProcedureCall : public TDatabaseProcedureCall<
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CFailableCompoundInsertCountParams, ISIZE, CFailableCompoundInsertCountResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CFailableCompoundInsertCountParams, ISIZE, CFailableCompoundInsertCountResultSet, OSIZE >;
 
 		CFailableCompoundInsertCountProcedureCall( uint64_t id, uint64_t expected_count, bool should_fail ) : 
 			BASECLASS(),
@@ -3951,10 +3953,10 @@ class CFailableCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
 {
 	public:
 
-		typedef TCompoundDatabaseTask< BATCH_SIZE > BASECLASS;
+		using BASECLASS = TCompoundDatabaseTask< BATCH_SIZE >;
 
-		typedef CFailableCompoundInsertProcedureCall< ISIZE1 > Child1Type;
-		typedef CFailableCompoundInsertCountProcedureCall< ISIZE2, OSIZE2 > Child2Type;
+		using Child1Type = CFailableCompoundInsertProcedureCall< ISIZE1 >;
+		using Child2Type = CFailableCompoundInsertCountProcedureCall< ISIZE2, OSIZE2 >;
 
 		CFailableCompoundInsertTask( uint64_t id, uint64_t insert_count, ChildTaskFailureType failure_type, uint32_t failure_index ) :
 			BASECLASS(),
@@ -4021,12 +4023,12 @@ class CFailableCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
 
 uint32_t Get_Insert_Count( IDatabaseConnection *connection, uint32_t row_id )
 {
-	typedef CCompoundInsertCountProcedureCall< 1, 1 > TaskType;
+	using TaskType = CCompoundInsertCountProcedureCall< 1, 1 >;
 	TDatabaseTaskBatch< TaskType > db_task_batch;
 	std::vector< TaskType * > tasks;
 
 	auto db_task = new TaskType( row_id + 1, 0 );
-	db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( 1 ) );
+	db_task->Set_ID( static_cast< EDatabaseTaskIDType >( 1 ) );
 	tasks.push_back( db_task );
 	db_task_batch.Add_Task( db_task );
 
@@ -4046,13 +4048,13 @@ void Run_FirstFailableCompoundInsertTask_Test( uint32_t task_count, uint32_t bad
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
-	typedef CFailableCompoundInsertTask< BATCH_SIZE, ISIZE1, ISIZE2, 1 > CompoundTaskType;
+	using CompoundTaskType = CFailableCompoundInsertTask< BATCH_SIZE, ISIZE1, ISIZE2, 1 >;
 	TCompoundDatabaseTaskBatch< CompoundTaskType > db_compound_task_batch;
 	std::vector< CompoundTaskType * > tasks;
 	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		auto db_task = new CompoundTaskType( i + 1, INSERT_COUNT, ( i == bad_task ) ? CTFT_FIRST : CTFT_NONE, bad_first_child_index );
-		db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( i + 1 ) );
+		db_task->Set_ID( static_cast< EDatabaseTaskIDType >( i + 1 ) );
 		tasks.push_back( db_task );
 		db_compound_task_batch.Add_Task( db_task );
 	}

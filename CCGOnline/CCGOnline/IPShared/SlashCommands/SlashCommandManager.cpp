@@ -28,7 +28,15 @@
 #include "IPPlatform/StringUtils.h"
 #include <regex>
 
-CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition > *CSlashCommandManager::DataDefinitions( nullptr );
+using namespace IP::Serialization;
+using namespace IP::Serialization::XML;
+
+namespace IP
+{
+namespace Command
+{
+
+std::unique_ptr< CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition > > CSlashCommandManager::DataDefinitions( nullptr );
 std::unordered_map< std::wstring, const CSlashCommandDefinition * > CSlashCommandManager::Definitions;
 std::unordered_map< std::wstring, CSlashCommandManager::CommandHandlerDelegate > CSlashCommandManager::CommandHandlers;
 
@@ -36,7 +44,7 @@ std::unordered_map< std::wstring, CSlashCommandManager::CommandHandlerDelegate >
 void CSlashCommandManager::Initialize( void )
 {
 	Shutdown();
-	DataDefinitions = new CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition >( &CSlashCommandDataDefinition::Get_Key, L"Commands" );
+	DataDefinitions = std::make_unique< CXMLLoadableTable< std::wstring, CSlashCommandDataDefinition > >( &CSlashCommandDataDefinition::Get_Key, L"Commands" );
 	DataDefinitions->Set_Post_Load_Function( &CSlashCommandDataDefinition::Post_Load_XML );
 }
 
@@ -50,11 +58,7 @@ void CSlashCommandManager::Shutdown( void )
 
 	Definitions.clear();
 
-	if ( DataDefinitions != nullptr )
-	{
-		delete DataDefinitions;
-		DataDefinitions = nullptr;
-	}
+	DataDefinitions = nullptr;
 
 	CommandHandlers.clear();
 }
@@ -87,7 +91,7 @@ void CSlashCommandManager::Load_Command_File( const std::string &file_name )
 		}
 
 		std::wstring upper_command;
-		NStringUtils::To_Upper_Case( data_definition->Get_Command(), upper_command );
+		IP::String::To_Upper_Case( data_definition->Get_Command(), upper_command );
 
 		if ( Definitions.find( upper_command ) == Definitions.cend() )
 		{
@@ -128,7 +132,7 @@ bool CSlashCommandManager::Parse_Command( const std::wstring &command_line, CSla
 	}
 
 	std::wstring upper_command;
-	NStringUtils::To_Upper_Case( command, upper_command );
+	IP::String::To_Upper_Case( command, upper_command );
 	auto iter = Definitions.find( upper_command );
 	if ( iter == Definitions.cend() )
 	{
@@ -155,7 +159,7 @@ bool CSlashCommandManager::Parse_Command( const std::wstring &command_line, CSla
 	}
 
 	std::wstring upper_sub_command;
-	NStringUtils::To_Upper_Case( sub_command, upper_sub_command );
+	IP::String::To_Upper_Case( sub_command, upper_sub_command );
 
 	std::wstring concat_command = Concat_Command( upper_command, upper_sub_command );
 	iter = Definitions.find( concat_command );
@@ -187,7 +191,7 @@ bool CSlashCommandManager::Handle_Command( const CSlashCommandInstance &command,
 	std::wstring concat_command = Concat_Command( command.Get_Command(), command.Get_Sub_Command() );
 
 	std::wstring upper_concat_command;
-	NStringUtils::To_Upper_Case( concat_command, upper_concat_command );
+	IP::String::To_Upper_Case( concat_command, upper_concat_command );
 	
 	auto iter = CommandHandlers.find( upper_concat_command );
 	if ( iter == CommandHandlers.end() )
@@ -203,7 +207,7 @@ bool CSlashCommandManager::Handle_Command( const CSlashCommandInstance &command,
 void CSlashCommandManager::Register_Command_Handler( const std::wstring &command, CommandHandlerDelegate handler )
 {
 	std::wstring upper_command;
-	NStringUtils::To_Upper_Case( command, upper_command );
+	IP::String::To_Upper_Case( command, upper_command );
 
 	FATAL_ASSERT( CommandHandlers.find( upper_command ) == CommandHandlers.cend() );
 	CommandHandlers[ upper_command ] = handler;
@@ -215,8 +219,11 @@ void CSlashCommandManager::Register_Command_Handler( const std::wstring &command
 	std::wstring concat_command = Concat_Command( command, sub_command );
 
 	std::wstring upper_concat_command;
-	NStringUtils::To_Upper_Case( concat_command, upper_concat_command );
+	IP::String::To_Upper_Case( concat_command, upper_concat_command );
 
 	FATAL_ASSERT( CommandHandlers.find( upper_concat_command ) == CommandHandlers.cend() );
 	CommandHandlers[ upper_concat_command ] = handler;
 }
+
+} // namespace Command
+} // namespace IP

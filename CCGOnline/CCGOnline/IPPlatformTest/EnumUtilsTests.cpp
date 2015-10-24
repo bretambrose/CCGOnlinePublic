@@ -29,6 +29,8 @@ enum class EUtilFlagTest
 	Flag3 = 1 << 2
 };
 
+using namespace IP::Enum;
+
 TEST( EnumUtilsTests, Build_Mask )
 {
 	EUtilFlagTest empty_value = Make_Enum_Mask( EUtilFlagTest::None );

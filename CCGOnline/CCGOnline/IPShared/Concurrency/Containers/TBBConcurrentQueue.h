@@ -17,12 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef TBB_CONCURRENT_QUEUE_H
-#define TBB_CONCURRENT_QUEUE_H
+#pragma once
 
 #include "ConcurrentQueueInterface.h"
 
 #include "tbb/include/tbb/concurrent_queue.h"
+
+namespace IP
+{
+namespace Concurrency
+{
 
 // A concurrent queue that wraps TBB's concurrent queue
 template< typename T >
@@ -66,4 +70,5 @@ class CTBBConcurrentQueue : public IConcurrentQueue< T >
 		tbb::strict_ppl::concurrent_queue< T > Queue;
 };
 
-#endif // TBB_CONCURRENT_QUEUE_H
+} // namespace Concurrency
+} // namespace IP

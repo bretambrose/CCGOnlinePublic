@@ -31,23 +31,32 @@
 #include "Serialization/SerializationRegistrar.h"
 #include "SlashCommands/SlashCommandManager.h"
 
+using namespace IP::Command;
+using namespace IP::Debug;
+using namespace IP::Execution;
+using namespace IP::Logging;
+using namespace IP::Serialization;
 
-void NIPShared::Initialize( void )
+namespace IP
+{
+namespace Global
+{
+
+void Initialize_IPShared( void )
 {
 	CAssertSystem::Initialize( DLogFunctionType( CLogInterface::Log ) );
 	CStructuredExceptionHandler::Initialize();
-	CLogInterface::Initialize_Static( NPlatform::Get_Service_Name(), LL_LOW );
+	CLogInterface::Initialize_Static( IP::Process::Get_Service_Name(), ELogLevel::LL_LOW );
 	CProcessStatics::Initialize();
-	CPlatformTime::Initialize();	// does not have a corresponding shutdown function
 
 	Register_IPShared_Enums();
-	Register_Shared_XML_Serializers();
+	Register_IPShared_XML_Serializers();
 
 	CSlashCommandManager::Initialize();
 }
 
 
-void NIPShared::Shutdown( void )
+void Shutdown_IPShared( void )
 {
 	CSlashCommandManager::Shutdown();
 	CSerializationRegistrar::Cleanup();
@@ -56,3 +65,6 @@ void NIPShared::Shutdown( void )
 	CStructuredExceptionHandler::Shutdown();
 	CAssertSystem::Shutdown();
 }
+
+} // namespace Global
+} // namespace IP

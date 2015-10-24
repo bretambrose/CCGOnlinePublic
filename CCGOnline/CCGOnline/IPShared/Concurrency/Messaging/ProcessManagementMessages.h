@@ -17,18 +17,22 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_MANAGEMENT_MESSAGES_H
-#define PROCESS_MANAGEMENT_MESSAGES_H
+#pragma once
 
 #include "ProcessMessage.h"
 #include "IPShared/Concurrency/ProcessProperties.h"
 
+namespace IP
+{
+namespace Execution
+{
+
 class IProcess;
 
-namespace EProcessID
+enum class EProcessID;
+
+namespace Messaging
 {
-	enum Enum;
-}
 
 // Process -> Manager
 // Requests that a new process be added to the concurrency system
@@ -36,18 +40,18 @@ class CAddNewProcessMessage : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
-		CAddNewProcessMessage( const std::shared_ptr< IProcess > &process, bool return_mailbox, bool forward_creator_mailbox );
+		CAddNewProcessMessage( const std::shared_ptr< IP::Execution::IProcess > &process, bool return_mailbox, bool forward_creator_mailbox );
 		virtual ~CAddNewProcessMessage();
 
-		const std::shared_ptr< IProcess > &Get_Process( void ) const { return Process; }
+		const std::shared_ptr< IP::Execution::IProcess > &Get_Process( void ) const { return Process; }
 		bool Should_Return_Mailbox( void ) const { return ReturnMailbox; }
 		bool Should_Forward_Creator_Mailbox( void ) const { return ForwardCreatorMailbox; }
 
 	private:
 
-		std::shared_ptr< IProcess > Process;
+		std::shared_ptr< IP::Execution::IProcess > Process;
 
 		bool ReturnMailbox;
 		bool ForwardCreatorMailbox;
@@ -59,7 +63,7 @@ class CRescheduleProcessMessage : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
 		CRescheduleProcessMessage( double reschedule_time ) :
 			RescheduleTime( reschedule_time )
@@ -80,19 +84,19 @@ class CReleaseMailboxRequest : public IProcessMessage
 {
 	public:
 		
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 
-		CReleaseMailboxRequest( EProcessID::Enum process_id ) :
+		CReleaseMailboxRequest( IP::Execution::EProcessID process_id ) :
 			ProcessID( process_id )
 		{}
 
 		virtual ~CReleaseMailboxRequest() = default;
 
-		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		IP::Execution::EProcessID Get_Process_ID( void ) const { return ProcessID; }
 
 	private:
 
-		EProcessID::Enum ProcessID;
+		IP::Execution::EProcessID ProcessID;
 };
 
 // Process -> Manager
@@ -101,19 +105,19 @@ class CReleaseMailboxResponse : public IProcessMessage
 {
 	public:
 		
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 
-		CReleaseMailboxResponse( EProcessID::Enum shutdown_process_id ) :
+		CReleaseMailboxResponse( IP::Execution::EProcessID shutdown_process_id ) :
 			ShutdownProcessID( shutdown_process_id )
 		{}
 
 		virtual ~CReleaseMailboxResponse() = default;
 
-		EProcessID::Enum Get_Shutdown_Process_ID( void ) const { return ShutdownProcessID; }
+		IP::Execution::EProcessID Get_Shutdown_Process_ID( void ) const { return ShutdownProcessID; }
 
 	private:
 
-		EProcessID::Enum ShutdownProcessID;
+		IP::Execution::EProcessID ShutdownProcessID;
 };
 
 // Process -> manager
@@ -122,19 +126,19 @@ class CShutdownProcessMessage : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
-		CShutdownProcessMessage( EProcessID::Enum process_id ) :
+		CShutdownProcessMessage( IP::Execution::EProcessID process_id ) :
 			ProcessID( process_id )
 		{}
 
 		virtual ~CShutdownProcessMessage() = default;
 
-		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		IP::Execution::EProcessID Get_Process_ID( void ) const { return ProcessID; }
 
 	private:
 
-		EProcessID::Enum ProcessID;
+		IP::Execution::EProcessID ProcessID;
 };
 
 // Manager -> process
@@ -143,7 +147,7 @@ class CShutdownSelfRequest : public IProcessMessage
 {
 	public:
 		
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 
 		CShutdownSelfRequest( bool is_hard_shutdown ) :
 			IsHardShutdown( is_hard_shutdown )
@@ -164,7 +168,7 @@ class CShutdownSelfResponse : public IProcessMessage
 {
 	public:
 		
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 
 		CShutdownSelfResponse( void ) {}
 
@@ -180,7 +184,7 @@ class CShutdownManagerMessage : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
 		CShutdownManagerMessage( void ) {}
 
@@ -190,4 +194,6 @@ class CShutdownManagerMessage : public IProcessMessage
 
 };
 
-#endif // PROCESS_MANAGEMENT_MESSAGES_H
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

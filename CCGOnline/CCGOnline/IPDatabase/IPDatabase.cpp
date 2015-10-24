@@ -21,12 +21,19 @@
 
 #include "IPDatabase.h"
 
+namespace IP
+{
+namespace Global
+{
 
-void NIPDatabase::Initialize( void )
+void Initialize_IPDatabase( void )
 {
 }
 
 
-void NIPDatabase::Shutdown( void )
+void Shutdown_IPDatabase( void )
 {
 }
+
+} // namespace Global
+} // namespace IP

@@ -23,6 +23,13 @@
 
 #include "Interfaces/DatabaseTaskInterface.h"
 
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
+
 CRunDatabaseTaskRequest::~CRunDatabaseTaskRequest()
 {
 }
@@ -30,3 +37,7 @@ CRunDatabaseTaskRequest::~CRunDatabaseTaskRequest()
 CRunDatabaseTaskResponse::~CRunDatabaseTaskResponse()
 {
 }
+
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

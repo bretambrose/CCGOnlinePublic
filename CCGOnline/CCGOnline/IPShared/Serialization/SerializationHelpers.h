@@ -17,12 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef SERIALIZATION_HELPERS_H
-#define SERIALIZATION_HELPERS_H
+#pragma once
 
 #include <functional>
 
 #include "IPShared/Serialization/XML/XMLSerializerInterface.h"
+
+namespace IP
+{
+namespace Serialization
+{
 
 using DPrepDestinationForRead = std::function< void *(void *) >;
 
@@ -45,7 +49,7 @@ void *Prep_Pointer_For_Read( void *destination )
 	return static_cast< void * >( *dest );
 }
 
-using XMLSerializerFactory = std::function< IXMLSerializer*( bool ) >;
+using XMLSerializerFactory = std::function< XML::IXMLSerializer*( bool ) >;
 
 class CSerializerFactorySet
 {
@@ -188,4 +192,5 @@ class CTypeSerializationDefinition
 		VoidFactory FactoryDelegate;
 };
 
-#endif // SERIALIZATION_HELPERS_H
+} // namespace Serialization
+} // namespace IP

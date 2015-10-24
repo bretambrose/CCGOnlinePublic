@@ -17,10 +17,15 @@
 
 **********************************************************************************************************************/
 
-#ifndef CRC_VALUE_H
-#define CRC_VALUE_H
+#pragma once
 
-typedef uint32_t CRCValue;
+namespace IP
+{
+namespace CRC
+{
 
-#endif // CRC_VALUE_H
+using CRCValue = uint32_t;
+
+} // namespace CRC
+} // namespace IP
 

@@ -26,6 +26,10 @@
 #include "ProcessExecutionContext.h"
 #include "ProcessStatics.h"
 
+namespace IP
+{
+namespace Execution
+{
 
 CThreadProcessBase::CThreadProcessBase( const SProcessProperties &properties ) :
 	BASECLASS( properties ),
@@ -76,5 +80,8 @@ void CThreadProcessBase::Thread_Function( void )
 
 double CThreadProcessBase::Get_Current_Process_Time( void ) const
 {
-	return CPlatformTime::Convert_High_Resolution_Time_To_Seconds( CPlatformTime::Get_High_Resolution_Time() );
+	return IP::Time::Convert_Duration_To_Seconds( IP::Time::Get_Elapsed_System_Time() );
 }
+
+} // namespace Execution
+} // namespace IP

@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef MEMORY_ALLOCATION_H
-#define MEMORY_ALLOCATION_H
+#pragma once
 
 //#define USE_CACHE_ALIGNED_ALLOCATION
 
@@ -37,4 +36,4 @@ void operator delete[]( void *memory, const std::nothrow_t &no_throw ) throw();
 
 #pragma warning( pop ) 
 
-#endif // MEMORY_ALLOCATION_H
+

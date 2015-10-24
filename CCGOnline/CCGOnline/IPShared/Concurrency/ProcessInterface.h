@@ -17,18 +17,23 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_INTERFACE_H
-#define PROCESS_INTERFACE_H
+#pragma once
 
-class CTaskScheduler;
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
+
 class IProcessMessage;
 
+} // namespace Messaging
+
+class CTaskScheduler;
 struct SProcessProperties;
 
-namespace EProcessID
-{
-	enum Enum;
-}
+enum class EProcessID;
 
 enum class EProcessExecutionMode
 {
@@ -44,16 +49,16 @@ class IProcess
 		IProcess( void ) {}
 		virtual ~IProcess() = default;
 
-		virtual void Initialize( EProcessID::Enum id ) = 0;
+		virtual void Initialize( EProcessID id ) = 0;
 
 		virtual const SProcessProperties &Get_Properties( void ) const = 0;
-		virtual EProcessID::Enum Get_ID( void ) const = 0;
+		virtual EProcessID Get_ID( void ) const = 0;
 		virtual EProcessExecutionMode Get_Execution_Mode( void ) const = 0;
 
-		virtual void Send_Process_Message( EProcessID::Enum destination_id, std::unique_ptr< const IProcessMessage > &message ) = 0;
-		virtual void Send_Process_Message( EProcessID::Enum destination_id, std::unique_ptr< const IProcessMessage > &&message ) = 0;
-		virtual void Send_Manager_Message( std::unique_ptr< const IProcessMessage > &message ) = 0;
-		virtual void Send_Manager_Message( std::unique_ptr< const IProcessMessage > &&message ) = 0;
+		virtual void Send_Process_Message( EProcessID destination_id, std::unique_ptr< const Messaging::IProcessMessage > &message ) = 0;
+		virtual void Send_Process_Message( EProcessID destination_id, std::unique_ptr< const Messaging::IProcessMessage > &&message ) = 0;
+		virtual void Send_Manager_Message( std::unique_ptr< const Messaging::IProcessMessage > &message ) = 0;
+		virtual void Send_Manager_Message( std::unique_ptr< const Messaging::IProcessMessage > &&message ) = 0;
 		virtual void Log( std::wstring &&message ) = 0;
 
 		virtual CTaskScheduler *Get_Task_Scheduler( void ) const = 0;
@@ -61,4 +66,5 @@ class IProcess
 		virtual void Flush_System_Messages( void ) = 0;
 };
 
-#endif // PROCESS_INTERFACE_H
+} // namespace Execution
+} // namespace IP

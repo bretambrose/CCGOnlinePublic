@@ -191,7 +191,6 @@ copy $(TargetDir)$(ProjectName).pdb $(SolutionDir)..\Run\Tests\$(CONFIG_PROCESSO
     <ClCompile Include="PlatformFileSystemTests.cpp" />
     <ClCompile Include="PlatformProcessTests.cpp" />
     <ClCompile Include="IPPlatformTest.cpp" />
-    <ClCompile Include="PlatformTimeTests.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

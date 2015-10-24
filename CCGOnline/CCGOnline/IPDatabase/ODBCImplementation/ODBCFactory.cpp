@@ -22,6 +22,11 @@
 #include "ODBCFactory.h"
 #include "ODBCEnvironment.h"
 
+namespace IP
+{
+namespace Db
+{
+
 IDatabaseEnvironment *CODBCFactory::Environment( nullptr );
 
 void CODBCFactory::Create_Environment( void )
@@ -54,4 +59,6 @@ IDatabaseEnvironment *CODBCFactory::Get_Environment( void )
 	return Environment;
 }
 
+} // namespace Db
+} // namespace IP
 

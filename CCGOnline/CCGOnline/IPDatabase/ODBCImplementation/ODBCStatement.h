@@ -17,20 +17,24 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_STATEMENT_H
-#define ODBC_STATEMENT_H
+#pragma once
 
 #include "IPDatabase/Interfaces/DatabaseStatementInterface.h"
 #include "ODBCObjectBase.h"
 
-enum ODBCStatementStateType;
-enum ODBCStatementOperationType;
+namespace IP
+{
+namespace Db
+{
+
+enum class ODBCStatementStateType;
+enum class ODBCStatementOperationType;
 
 class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 {
 	public:
 
-		typedef CODBCObjectBase BASECLASS;
+		using BASECLASS = CODBCObjectBase;
 
 		CODBCStatement( DBStatementIDType id, IDatabaseConnection *connection, SQLHENV environment_handle, SQLHDBC connection_handle, SQLHSTMT statement_handle );
 		virtual ~CODBCStatement();
@@ -83,4 +87,5 @@ class CODBCStatement : public CODBCObjectBase, public IDatabaseStatement
 
 };
 
-#endif // ODBC_STATEMENT_H
+} // namespace Db
+} // namespace IP

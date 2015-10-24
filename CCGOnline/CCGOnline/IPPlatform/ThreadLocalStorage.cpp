@@ -23,8 +23,12 @@
 
 #ifdef WIN32
 
+namespace IP
+{
+namespace TLS
+{
 
-uint32_t CThreadLocalStorage::Allocate_Thread_Local_Storage( void )
+uint32_t Allocate_Thread_Local_Storage( void )
 {
 	uint32_t tls_handle = TlsAlloc();
 	TlsSetValue( tls_handle, nullptr );
@@ -33,21 +37,24 @@ uint32_t CThreadLocalStorage::Allocate_Thread_Local_Storage( void )
 }
 
 
-void CThreadLocalStorage::Deallocate_Thread_Local_Storage( uint32_t tls_handle )
+void Deallocate_Thread_Local_Storage( uint32_t tls_handle )
 {
 	TlsFree( tls_handle );
 }		
 
 
-void *CThreadLocalStorage::Get_Raw_TLS_Value( uint32_t tls_handle )
+void *Get_Raw_TLS_Value( uint32_t tls_handle )
 {
 	return TlsGetValue( tls_handle );
 }
 
 
-void CThreadLocalStorage::Set_Raw_TLS_Value( uint32_t tls_handle, void *handle )
+void Set_Raw_TLS_Value( uint32_t tls_handle, void *handle )
 {
 	TlsSetValue( tls_handle, handle );
 }
+
+} // namespace TLS
+} // namespace IP
 
 #endif // WIN32

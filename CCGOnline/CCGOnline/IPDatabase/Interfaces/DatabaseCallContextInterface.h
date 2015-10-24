@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_CALL_CONTEXT_INTERFACE_H
-#define DATABASE_CALL_CONTEXT_INTERFACE_H
+#pragma once
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseVariableSet;
 
@@ -43,4 +47,5 @@ class IDatabaseCallContext
 		virtual void Set_Statement_Text( const std::wstring &statement_text ) = 0;
 };
 
-#endif // DATABASE_CALL_CONTEXT_INTERFACE_H
+} // namespace Db
+} // namespace IP

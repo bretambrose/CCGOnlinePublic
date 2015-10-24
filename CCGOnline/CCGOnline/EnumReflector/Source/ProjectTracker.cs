@@ -148,6 +148,9 @@ namespace EnumReflector
 			cpp_text.Append( "#include \"IPShared/EnumConversion.h\"" );
 			cpp_text.Append( END_OF_LINE );
 			cpp_text.Append( END_OF_LINE );
+			cpp_text.Append( "using namespace IP::Enum;" );
+			cpp_text.Append( END_OF_LINE );
+			cpp_text.Append( END_OF_LINE );
 
 			List< CEnumRecord > project_enums = new List< CEnumRecord >();
 			CEnumReflector.EnumTracker.Build_Project_Enum_List( ID, project_enums );
@@ -209,18 +212,18 @@ namespace EnumReflector
 
 		private void Add_Enum_Conversions( StringBuilder cpp_text, CEnumRecord enum_record )
 		{
-			cpp_text.Append( "\tCEnumConverter::Register_Enum< " );
+			cpp_text.Append( "\tIP::Enum::CEnumConverter::Register_Enum< " );
 			cpp_text.Append( enum_record.FullName );
 			cpp_text.Append( " >( \"" );
 			cpp_text.Append( enum_record.FullName );
 			cpp_text.Append( "\", " );
 			if ( ( enum_record.Flags & EEnumFlags.IsBitfield ) != 0 )
 			{
-				cpp_text.Append( "CEP_BITFIELD" );
+				cpp_text.Append( "EConvertibleEnumProperties::CEP_BITFIELD" );
 			}
 			else
 			{
-				cpp_text.Append( "CEP_NONE" );
+				cpp_text.Append( "EConvertibleEnumProperties::CEP_NONE" );
 			}
 			cpp_text.Append( " );" );
 			cpp_text.Append( END_OF_LINE );
@@ -229,7 +232,7 @@ namespace EnumReflector
 			{
 				if ( entry.EntryName.Length > 0 )
 				{
-					cpp_text.Append( "\tCEnumConverter::Register_Enum_Entry( \"" );
+					cpp_text.Append( "\tIP::Enum::CEnumConverter::Register_Enum_Entry( \"" );
 					cpp_text.Append( entry.EntryName );
 					cpp_text.Append( "\", static_cast< " );
 					cpp_text.Append( enum_record.FullName );
@@ -249,7 +252,7 @@ namespace EnumReflector
 			{
 				if ( entry.EntryName.Length > 0 )
 				{
-					cpp_text.Append( "\tCEnumConverter::Register_Enum_Entry( \"" );
+					cpp_text.Append( "\tIP::Enum::CEnumConverter::Register_Enum_Entry( \"" );
 					cpp_text.Append( entry.EntryName );
 					cpp_text.Append( "\", static_cast< " );
 					cpp_text.Append( primary_enum.FullName );

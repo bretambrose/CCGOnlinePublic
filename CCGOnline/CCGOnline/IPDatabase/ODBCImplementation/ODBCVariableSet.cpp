@@ -25,6 +25,11 @@
 
 #include <sstream>
 
+namespace IP
+{
+namespace Db
+{
+
 void CODBCVariableSet::Convert_Variable_To_String( IDatabaseVariable *variable, std::string &value ) const
 {
 	std::basic_ostringstream< char > varstream;
@@ -98,3 +103,6 @@ void CODBCVariableSet::Convert_Variable_To_String( IDatabaseVariable *variable, 
 
 	value = varstream.rdbuf()->str();
 }
+
+} // namespace Db
+} // namespace IP

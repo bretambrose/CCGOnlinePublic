@@ -28,12 +28,19 @@
 #include "IPShared/MessageHandling/ProcessMessageHandler.h"
 #include "DatabaseProcessMessages.h"
 
+using namespace IP::Db;
+
+namespace IP
+{
+namespace Execution
+{
+
 CDatabaseProcessBase::CDatabaseProcessBase( IDatabaseEnvironment *environment, const std::wstring &connection_string, bool process_task_results_locally, const SProcessProperties &properties ) :
 	BASECLASS( properties ),
 	Batches(),
 	BatchOrdering(),
 	PendingRequests(),
-	NextID( static_cast< DatabaseTaskIDType::Enum >( DatabaseTaskIDType::INVALID + 1 ) ),
+	NextID( static_cast< EDatabaseTaskIDType >( static_cast< uint32_t >( EDatabaseTaskIDType::INVALID ) + 1 ) ),
 	Environment( environment ),
 	ConnectionString( connection_string ),
 	ProcessTaskResultsLocally( process_task_results_locally ),
@@ -48,7 +55,7 @@ CDatabaseProcessBase::~CDatabaseProcessBase()
 	FATAL_ASSERT( Environment == nullptr );
 }	
 
-void CDatabaseProcessBase::Initialize( EProcessID::Enum id )
+void CDatabaseProcessBase::Initialize( EProcessID id )
 {
 	BASECLASS::Initialize( id );
 
@@ -113,7 +120,7 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 		}
 		else
 		{
-			std::unique_ptr< const IProcessMessage > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, true ) );
+			std::unique_ptr< const Messaging::IProcessMessage > response( new  Messaging::CRunDatabaseTaskResponse( pending_request_iter->second.second, true ) );
 			Send_Process_Message( pending_request_iter->second.first, response );
 		}
 
@@ -132,7 +139,7 @@ void CDatabaseProcessBase::Per_Frame_Logic_End( void )
 		}
 		else
 		{
-			std::unique_ptr< const IProcessMessage > response( new CRunDatabaseTaskResponse( pending_request_iter->second.second, false ) );
+			std::unique_ptr< const  Messaging::IProcessMessage > response( new  Messaging::CRunDatabaseTaskResponse( pending_request_iter->second.second, false ) );
 			Send_Process_Message( pending_request_iter->second.first, response );
 		}
 
@@ -144,7 +151,7 @@ void CDatabaseProcessBase::Register_Message_Handlers( void )
 {
 	BASECLASS::Register_Message_Handlers();
 
-	REGISTER_THIS_HANDLER( CRunDatabaseTaskRequest, CDatabaseProcessBase, Handle_Run_Database_Task_Request )
+	REGISTER_THIS_HANDLER( Messaging::CRunDatabaseTaskRequest, CDatabaseProcessBase, Handle_Run_Database_Task_Request )
 }
 
 uint32_t CDatabaseProcessBase::Get_Sleep_Interval_In_Milliseconds( void ) const
@@ -163,7 +170,7 @@ void CDatabaseProcessBase::Add_Batch( IDatabaseTaskBatch *batch )
 	BatchOrdering.push_back( type_info );
 }
 
-void CDatabaseProcessBase::Handle_Run_Database_Task_Request( EProcessID::Enum process_id, std::unique_ptr< const CRunDatabaseTaskRequest > &message )
+void CDatabaseProcessBase::Handle_Run_Database_Task_Request( EProcessID process_id, std::unique_ptr< const Messaging::CRunDatabaseTaskRequest > &message )
 {
 	IDatabaseTask *task = message->Get_Task();
 
@@ -171,17 +178,20 @@ void CDatabaseProcessBase::Handle_Run_Database_Task_Request( EProcessID::Enum pr
 	auto iter = Batches.find( hash_key );
 	FATAL_ASSERT( iter != Batches.end() );
 
-	DatabaseTaskIDType::Enum task_id = Allocate_Task_ID();
+	IP::Db::EDatabaseTaskIDType task_id = Allocate_Task_ID();
 	task->Set_ID( task_id );
 	iter->second->Add_Task( task );
 
 	PendingRequests.insert( PendingRequestTableType::value_type( task_id, PendingRequestPairType( process_id, std::move( message ) ) ) );
 }
 
-DatabaseTaskIDType::Enum CDatabaseProcessBase::Allocate_Task_ID( void )
+EDatabaseTaskIDType CDatabaseProcessBase::Allocate_Task_ID( void )
 {
-	DatabaseTaskIDType::Enum id = NextID;
-	NextID = static_cast< DatabaseTaskIDType::Enum >( NextID + 1 );
+	EDatabaseTaskIDType id = NextID;
+	NextID = static_cast< EDatabaseTaskIDType >( static_cast< uint32_t >( NextID ) + 1 );
 
 	return id;
 }
+
+} // namespace Execution
+} // namespace IP

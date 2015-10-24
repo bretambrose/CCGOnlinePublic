@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef ENUM_UTILS_H
-#define ENUM_UTILS_H
+#pragma once
+
+namespace IP
+{
+namespace Enum
+{
 
 // make all functions constexpr when compiler supports
 template < typename T >
@@ -61,4 +65,5 @@ T Make_Enum_Mask( T first, Args... rest )
 	return static_cast< T >( static_cast< BaseEnumType >( first ) | rest_value );
 }
 
-#endif // ENUM_UTILS_H
+} // namespace Enum
+} // namespace IP

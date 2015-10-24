@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_INTERFACE_H
-#define DATABASE_TASK_BATCH_INTERFACE_H
+#pragma once
 
 #include "IPDatabase/DatabaseTypes.h"
+
+namespace IP
+{
+namespace Db
+{
 
 class ICompoundDatabaseTask;
 class IDatabaseTask;
@@ -39,4 +43,5 @@ class IDatabaseTaskBatch
 		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks ) = 0;
 };
 
-#endif // DATABASE_TASK_BATCH_H
+} // namespace Db
+} // namespace IP

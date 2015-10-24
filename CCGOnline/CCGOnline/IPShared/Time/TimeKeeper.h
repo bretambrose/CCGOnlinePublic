@@ -17,11 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef TIME_KEEPER_H
-#define TIME_KEEPER_H
+#pragma once
 
-struct STickTime;
-enum ETimeType;
+#include <IPPlatform/PlatformTime.h>
+
+namespace IP
+{
+namespace Time
+{
 
 // Class that tracks the current tick times for one or more time types
 class CTimeKeeper
@@ -29,23 +32,19 @@ class CTimeKeeper
 	public:
 
 		CTimeKeeper( void );
-		~CTimeKeeper() {}
+		virtual ~CTimeKeeper() {}
 
-		void Set_Current_Time( ETimeType time_type, const STickTime &current_time );
-		void Set_Base_Time( ETimeType time_type, const STickTime &current_time );
+		virtual SystemTimePoint Get_Current_Time( void ) const;
+		SystemTimePoint Get_Base_Time( void ) const { return BaseTime; }
+		virtual void Set_Base_Time( SystemTimePoint base_time ) { BaseTime = base_time; }
 
-		STickTime Get_Elapsed_Ticks( ETimeType time_type ) const;
-		double Get_Elapsed_Seconds( ETimeType time_type ) const;
-
+		SystemDuration Get_Elapsed_Time( void ) const;
+		double Get_Elapsed_Seconds( void ) const;
+		
 	private:
 
-		const STickTime &Get_Base_Time( ETimeType time_type ) const;
-		const STickTime &Get_Current_Time( ETimeType time_type ) const;
-
-		typedef std::unordered_map< ETimeType, STickTime > TimeTableType;
-
-		TimeTableType CurrentTimes;
-		TimeTableType BaseTimes;
+		SystemTimePoint BaseTime;
 };
 
-#endif // TIME_KEEPER_H
+} // namespace Time
+} // namespace IP

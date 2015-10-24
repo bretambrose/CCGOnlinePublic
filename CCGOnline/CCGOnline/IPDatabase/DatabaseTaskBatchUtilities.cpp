@@ -29,14 +29,23 @@
 #include "IPShared/Logging/LogInterface.h"
 #include "IPShared/EnumConversion.h"
 
+using namespace IP::Db;
+using namespace IP::Enum;
+using namespace IP::Logging;
+
+namespace IP
+{
+namespace Db
+{
+
 static void Log_DB_Error( IDatabaseStatement *statement, IDatabaseVariableSet *input_params, const wchar_t *additional_error_context )
 {
 	FATAL_ASSERT( statement != nullptr );
 
-	LOG( LL_LOW, "\tBATCH PROCESSING ERROR" );
+	LOG( ELogLevel::LL_LOW, "\tBATCH PROCESSING ERROR" );
 	if ( additional_error_context != nullptr )
 	{
-		WLOG( LL_LOW, additional_error_context );
+		WLOG( ELogLevel::LL_LOW, additional_error_context );
 	}
 			 
 	statement->Log_Error_State();
@@ -47,7 +56,7 @@ static void Log_DB_Error( IDatabaseStatement *statement, IDatabaseVariableSet *i
 		input_params->Get_Variables( params );
 		if ( !params.empty() )
 		{
-			LOG( LL_LOW, "\tDumping Parameters:" );
+			LOG( ELogLevel::LL_LOW, "\tDumping Parameters:" );
 			for ( uint32_t i = 0; i < params.size(); ++i )
 			{
 				std::string value_string;
@@ -59,17 +68,17 @@ static void Log_DB_Error( IDatabaseStatement *statement, IDatabaseVariableSet *i
 				std::string param_type_string;
 				CEnumConverter::Convert< EDatabaseVariableType >( params[ i ]->Get_Parameter_Type(), param_type_string );
 
-				LOG( LL_LOW, "\t\t" << i << ": " << value_string.c_str() << "(" << type_string.c_str() << ", " << param_type_string.c_str() << ")" );
+				LOG( ELogLevel::LL_LOW, "\t\t" << i << ": " << value_string.c_str() << "(" << type_string.c_str() << ", " << param_type_string.c_str() << ")" );
 			}
 		}
 		else
 		{
-			LOG( LL_LOW, "\tNo Input Parameters." );
+			LOG( ELogLevel::LL_LOW, "\tNo Input Parameters." );
 		}
 	}
 	else
 	{
-		LOG( LL_LOW, "\tUnable to determine which task invocation created this error." );
+		LOG( ELogLevel::LL_LOW, "\tUnable to determine which task invocation created this error." );
 	}
 }
 
@@ -77,7 +86,7 @@ static void Extract_Batch_Error( IDatabaseCallContext *call_context,
 											IDatabaseStatement *statement, 
 											const wchar_t *additional_error_context, 
 											const DBTaskListType &sub_list, 
-											ExecuteDBTaskListResult::Enum &result, 
+											EExecuteDBTaskListResult &result, 
 											DBTaskListType::const_iterator &first_failed_task )
 {
 	FATAL_ASSERT( !sub_list.empty() );
@@ -85,7 +94,7 @@ static void Extract_Batch_Error( IDatabaseCallContext *call_context,
 	if ( sub_list.size() == 1 )
 	{
 		Log_DB_Error( statement, call_context->Get_Param_Row( 0 ), additional_error_context );
-		result = ExecuteDBTaskListResult::FAILED_SPECIFIC_TASK;
+		result = EExecuteDBTaskListResult::FAILED_SPECIFIC_TASK;
 		first_failed_task = sub_list.cbegin();
 		return;
 	}
@@ -100,22 +109,22 @@ static void Extract_Batch_Error( IDatabaseCallContext *call_context,
 			if ( row == bad_row_number )
 			{
 				Log_DB_Error( statement, call_context->Get_Param_Row( row ), additional_error_context );
-				result = ExecuteDBTaskListResult::FAILED_SPECIFIC_TASK;
+				result = EExecuteDBTaskListResult::FAILED_SPECIFIC_TASK;
 				return;
 			}
 		}
 	}
 
 	Log_DB_Error( statement, nullptr, additional_error_context );
-	result = ExecuteDBTaskListResult::FAILED_UNKNOWN_TASK;
+	result = EExecuteDBTaskListResult::FAILED_UNKNOWN_TASK;
 }
 
-void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseStatement *statement, const DBTaskListType &sub_list, ExecuteDBTaskListResult::Enum &result, DBTaskListType::const_iterator &first_failed_task )
+void Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseStatement *statement, const DBTaskListType &sub_list, EExecuteDBTaskListResult &result, DBTaskListType::const_iterator &first_failed_task )
 {
 	FATAL_ASSERT( call_context != nullptr );
 	FATAL_ASSERT( statement != nullptr );
 
-	result = ExecuteDBTaskListResult::SUCCESS;
+	result = EExecuteDBTaskListResult::SUCCESS;
 	first_failed_task = sub_list.cend();
 
 	if ( sub_list.empty() )
@@ -204,3 +213,6 @@ void DBUtils::Execute_Task_List( IDatabaseCallContext *call_context, IDatabaseSt
 		return;
 	}
 }	
+
+} // namespace Db
+} // namespace IP

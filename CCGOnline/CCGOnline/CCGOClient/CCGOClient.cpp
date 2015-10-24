@@ -26,19 +26,26 @@
 #include "GeneratedCode\RegisterCCGOClientEnums.h"
 #include "IPShared/IPShared.h"
 
-namespace NCCGOClient
+namespace IP
 {
-	void Initialize( void )
+namespace Global
+{
+
+	void Initialize_CCGOClient( void )
 	{
-		NIPShared::Initialize();
+		Initialize_IPShared();
 		Register_CCGOClient_Enums();
 	}
 
-	void Shutdown( void )
+	void Shutdown_CCGOClient( void )
 	{
-		NIPShared::Shutdown();
+		Shutdown_IPShared();
 	}
-}
+
+} // namespace Global
+} // namespace IP
+
+using namespace IP::Global;
 
 #define MAX_LOADSTRING 100
 
@@ -61,7 +68,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	NCCGOClient::Initialize();
+	Initialize_CCGOClient();
 
  	// TODO: Place code here.
 	MSG msg;
@@ -90,7 +97,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		}
 	}
 
-	NCCGOClient::Shutdown();
+	Shutdown_CCGOClient();
 
 	return (int) msg.wParam;
 }

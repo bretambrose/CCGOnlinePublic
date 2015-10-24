@@ -20,7 +20,13 @@
 #include "stdafx.h"
 
 #include "EnumConversion.h"
+#include "IPPlatform/EnumUtils.h"
 #include "IPPlatform/StringUtils.h"
+
+namespace IP
+{
+namespace Enum
+{
 
 // A simple, hidden class that contains all the conversion information for a single enum
 class CConvertibleEnum 
@@ -70,7 +76,7 @@ CConvertibleEnum::CConvertibleEnum( const std::string &name, EConvertibleEnumPro
 
 bool CConvertibleEnum::Convert( const std::string &entry_name, uint64_t &output_value ) const
 {
-	if ( ( Properties & CEP_BITFIELD ) != 0 )
+	if ( Is_An_Enum_Flag_Set( Properties, EConvertibleEnumProperties::CEP_BITFIELD ) )
 	{
 		return Convert_Bitfield_Internal( entry_name, output_value );
 	}
@@ -83,7 +89,7 @@ bool CConvertibleEnum::Convert( const std::string &entry_name, uint64_t &output_
 
 bool CConvertibleEnum::Convert( uint64_t value, std::string &entry_name ) const
 {
-	if ( ( Properties & CEP_BITFIELD ) != 0 )
+	if ( Is_An_Enum_Flag_Set( Properties, EConvertibleEnumProperties::CEP_BITFIELD ) )
 	{
 		return Convert_Bitfield_Internal( value, entry_name );
 	}
@@ -97,7 +103,7 @@ bool CConvertibleEnum::Convert( uint64_t value, std::string &entry_name ) const
 void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64_t value )
 {
 	std::string upper_entry_name;
-	NStringUtils::To_Upper_Case( entry_name, upper_entry_name );
+	IP::String::To_Upper_Case( entry_name, upper_entry_name );
 
 	auto name_iter = NameToValueTable.find( upper_entry_name );
 	FATAL_ASSERT( name_iter == NameToValueTable.cend() );
@@ -113,7 +119,7 @@ void CConvertibleEnum::Register_Entry( const std::string &entry_name, uint64_t v
 bool CConvertibleEnum::Convert_Internal( const std::string &entry_name, uint64_t &output_value ) const
 {
 	std::string upper_entry_name;
-	NStringUtils::To_Upper_Case( entry_name, upper_entry_name );
+	IP::String::To_Upper_Case( entry_name, upper_entry_name );
 
 	auto iter = NameToValueTable.find( upper_entry_name );
 	if ( iter == NameToValueTable.cend() )
@@ -248,7 +254,7 @@ void CEnumConverter::Register_Enum_Internal( const Loki::TypeInfo &enum_type_inf
 	FATAL_ASSERT( Enums.find( enum_type_info ) == Enums.cend() );
 
 	std::string upper_enum_name;
-	NStringUtils::To_Upper_Case( enum_name, upper_enum_name );
+	IP::String::To_Upper_Case( enum_name, upper_enum_name );
 	FATAL_ASSERT( EnumsByName.find( upper_enum_name ) == EnumsByName.cend() );
 
 	CConvertibleEnum *enum_object = new CConvertibleEnum( enum_name, properties );
@@ -281,7 +287,7 @@ CConvertibleEnum *CEnumConverter::Find_Enum( const Loki::TypeInfo &enum_type_inf
 CConvertibleEnum *CEnumConverter::Find_Enum( const std::string &enum_name )
 {
 	std::string upper_enum_name;
-	NStringUtils::To_Upper_Case( enum_name, upper_enum_name );
+	IP::String::To_Upper_Case( enum_name, upper_enum_name );
 
 	auto iter = EnumsByName.find( upper_enum_name );
 	if ( iter == EnumsByName.end() )
@@ -296,7 +302,7 @@ CConvertibleEnum *CEnumConverter::Find_Enum( const std::string &enum_name )
 bool CEnumConverter::Convert( const Loki::TypeInfo &enum_type_info, const std::wstring &entry_name, uint64_t &output_value )
 {
 	std::string usable_entry_name;
-	NStringUtils::WideString_To_String( entry_name, usable_entry_name );
+	IP::String::WideString_To_String( entry_name, usable_entry_name );
 
 	return Convert_Internal( enum_type_info, usable_entry_name, output_value );
 }
@@ -338,7 +344,7 @@ bool CEnumConverter::Convert_Internal( const Loki::TypeInfo &enum_type_info, uin
 	bool success = enum_object->Convert( value, narrow_entry_name );
 	if ( success )
 	{
-		NStringUtils::String_To_WideString( narrow_entry_name, entry_name );
+		IP::String::String_To_WideString( narrow_entry_name, entry_name );
 	}
 
 	return success;
@@ -354,7 +360,10 @@ bool CEnumConverter::Convert( const std::string &enum_name, const std::wstring &
 	}
 
 	std::string usable_entry_name;
-	NStringUtils::WideString_To_String( entry_name, usable_entry_name );
+	IP::String::WideString_To_String( entry_name, usable_entry_name );
 
 	return enum_object->Convert( usable_entry_name, output_value );
 }
+
+} // namespace Enum
+} // namespace IP

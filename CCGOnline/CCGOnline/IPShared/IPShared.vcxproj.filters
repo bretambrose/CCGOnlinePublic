@@ -89,15 +89,6 @@
     <ClInclude Include="StructuredExceptionHandler.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Time\TickTime.h">
-      <Filter>Source Files\Time</Filter>
-    </ClInclude>
-    <ClInclude Include="Time\TimeType.h">
-      <Filter>Source Files\Time</Filter>
-    </ClInclude>
-    <ClInclude Include="Time\TimeUtils.h">
-      <Filter>Source Files\Time</Filter>
-    </ClInclude>
     <ClInclude Include="EnumConversion.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -231,9 +222,6 @@
     </ClCompile>
     <ClCompile Include="StructuredExceptionHandler.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Time\TimeUtils.cpp">
-      <Filter>Source Files\Time</Filter>
     </ClCompile>
     <ClCompile Include="EnumConversion.cpp">
       <Filter>Source Files</Filter>

@@ -17,37 +17,26 @@
 
 **********************************************************************************************************************/
 
-#ifndef PLATFORM_TIME_H
-#define PLATFORM_TIME_H
+#pragma once
 
-// A class that wraps a variety of time-related functionality that is os-specific.  
-class CPlatformTime
+// A class that wraps a variety of time-related functionality that is os-specific. 
+namespace IP
 {
-	public:
+namespace Time
+{
+	// Types
+	using SystemTimePoint = std::chrono::system_clock::time_point;
+	using SystemDuration = std::chrono::system_clock::duration;
 
-		static void Initialize( void );
+	// Interface
+	SystemTimePoint Get_Current_System_Time( void );
+	SystemDuration Get_Elapsed_System_Time( void );
+	SystemTimePoint Get_File_Last_Modified_Time( const std::wstring &file_name );
 
-		// High-resolution time
-		static uint64_t Get_High_Resolution_Time( void );
+	double Convert_Duration_To_Seconds( SystemDuration duration );
 
-		static double Convert_High_Resolution_Time_To_Seconds( uint64_t ticks );
-		static uint64_t Convert_Seconds_To_High_Resolution_Ticks( double seconds );
+	std::wstring Format_System_Time( SystemTimePoint time_point );
 
-		// File/OS time
-		static uint64_t Get_Raw_Time( void );
-		static uint64_t Get_File_Write_Raw_Time( const std::wstring &file_name );
+} // namespace Time
+} // namespace IP
 
-		static std::wstring Format_Raw_Time( uint64_t raw_time );
-
-		static bool Is_Raw_Time_Less_Than_Seconds( uint64_t time1, uint64_t time2, uint64_t seconds );
-		static bool Is_Raw_Time_Greater_Than_Seconds( uint64_t time1, uint64_t time2, uint64_t seconds );
-
-	private:
-
-		static uint64_t HighResolutionFrequency;
-
-		static bool Initialized;
-
-};
-
-#endif // PLATFORM_TIME_H

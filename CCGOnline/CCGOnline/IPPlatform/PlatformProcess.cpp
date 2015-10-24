@@ -25,14 +25,18 @@
 #include "Shlwapi.h"
 #include "StringUtils.h"
 
+namespace IP
+{
+namespace Process
+{
 
-uint32_t NPlatform::Get_Self_PID( void )
+uint32_t Get_Self_PID( void )
 {
 	return ::GetCurrentProcessId();
 }
 
 
-std::wstring NPlatform::Get_Exe_Name( void )
+std::wstring Get_Exe_Name( void )
 {
 
 	static wchar_t file_name_buffer[ 1024 ];
@@ -51,7 +55,7 @@ std::wstring NPlatform::Get_Exe_Name( void )
 }
 
 
-std::wstring NPlatform::Get_Service_Name( void )
+std::wstring Get_Service_Name( void )
 {
 	std::wstring exe_name = Get_Exe_Name();
 
@@ -59,7 +63,7 @@ std::wstring NPlatform::Get_Service_Name( void )
 	if ( name_length > 3 )
 	{
 		std::wstring config_platform;
-		NStringUtils::To_Upper_Case( exe_name.c_str() + name_length - 3, config_platform );
+		IP::String::To_Upper_Case( exe_name.c_str() + name_length - 3, config_platform );
 		
 		if ( config_platform == L"D32" || config_platform == L"R32" || config_platform == L"D64" || config_platform == L"R64" )
 		{
@@ -69,3 +73,6 @@ std::wstring NPlatform::Get_Service_Name( void )
 
 	return exe_name;
 }
+
+} // namespace Process
+} // namespace IP

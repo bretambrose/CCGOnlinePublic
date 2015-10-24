@@ -24,6 +24,8 @@
 #include "IPPlatform/WindowsWrapper.h"
 #include "IPPlatform/PlatformProcess.h"
 
+using namespace IP::Debug;
+
 void Fake_Exception_Handler( CStructuredExceptionInfo &info )
 {
 	ASSERT_TRUE( info.Get_Exception_Message() == L"Unknown Exception Code: 1" );
@@ -35,7 +37,7 @@ void Fake_Exception_Handler( CStructuredExceptionInfo &info )
 	ASSERT_TRUE( call_stack[ 0 ].Get_Function_Name() == L"RaiseException" );
 	ASSERT_TRUE( call_stack[ 0 ].Get_File_Name().size() == 0 );
 	ASSERT_TRUE( call_stack[ 1 ].Get_Function_Name() == L"Exception_Level_3" );
-	ASSERT_TRUE( call_stack[ 1 ].Get_Module_Name() == NPlatform::Get_Exe_Name() );
+	ASSERT_TRUE( call_stack[ 1 ].Get_Module_Name() == IP::Process::Get_Exe_Name() );
 	ASSERT_TRUE( call_stack[ 1 ].Get_Line_Number() > 0 );
 #endif // _DEBUG
 }

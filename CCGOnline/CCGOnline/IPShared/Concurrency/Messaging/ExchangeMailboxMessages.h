@@ -17,56 +17,59 @@
 
 **********************************************************************************************************************/
 
-#ifndef EXCHANGE_INTERFACE_MESSAGES_H
-#define EXCHANGE_INTERFACE_MESSAGES_H
+#pragma once
 
 #include "ProcessMessage.h"
 #include "IPShared/Concurrency/ProcessProperties.h"
 
-class CWriteOnlyMailbox;
-
-namespace EProcessID
+namespace IP
 {
-	enum Enum;
-}
+namespace Execution
+{
+
+class CWriteOnlyMailbox;
+enum class EProcessID;
+
+namespace Messaging
+{
 
 // Requests the interface to a thread tasks or set of thread tasks
 class CGetMailboxByPropertiesRequest : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
-		CGetMailboxByPropertiesRequest( const SProcessProperties &target_properties ) :
+		CGetMailboxByPropertiesRequest( const IP::Execution::SProcessProperties &target_properties ) :
 			TargetProperties( target_properties )
 		{}
 
 		virtual ~CGetMailboxByPropertiesRequest() = default;
 
-		const SProcessProperties &Get_Target_Properties( void ) const { return TargetProperties; }
+		const IP::Execution::SProcessProperties &Get_Target_Properties( void ) const { return TargetProperties; }
 
 	private:
 
-		SProcessProperties TargetProperties;
+		IP::Execution::SProcessProperties TargetProperties;
 };
 
 class CGetMailboxByIDRequest : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
-		CGetMailboxByIDRequest( EProcessID::Enum target_process_id ) :
+		CGetMailboxByIDRequest( IP::Execution::EProcessID target_process_id ) :
 			TargetProcessID( target_process_id )
 		{}
 
 		virtual ~CGetMailboxByIDRequest() = default;
 
-		EProcessID::Enum Get_Target_Process_ID( void ) const { return TargetProcessID; }
+		IP::Execution::EProcessID Get_Target_Process_ID( void ) const { return TargetProcessID; }
 
 	private:
 
-		EProcessID::Enum TargetProcessID;
+		IP::Execution::EProcessID TargetProcessID;
 };
 
 // Tells a thread task about an interface to another thread task
@@ -74,18 +77,20 @@ class CAddMailboxMessage : public IProcessMessage
 {
 	public:
 		
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 
-		CAddMailboxMessage( const std::shared_ptr< CWriteOnlyMailbox > &mailbox );
+		CAddMailboxMessage( const std::shared_ptr< IP::Execution::CWriteOnlyMailbox > &mailbox );
 
 		virtual ~CAddMailboxMessage();
 
-		const std::shared_ptr< CWriteOnlyMailbox > &Get_Mailbox( void ) const { return Mailbox; }
+		const std::shared_ptr< IP::Execution::CWriteOnlyMailbox > &Get_Mailbox( void ) const { return Mailbox; }
 
 	private:
 
-		std::shared_ptr< CWriteOnlyMailbox > Mailbox;
+		std::shared_ptr< IP::Execution::CWriteOnlyMailbox > Mailbox;
 };
 
 
-#endif // EXCHANGE_MAILBOX_MESSAGES_H
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

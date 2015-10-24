@@ -25,6 +25,14 @@
 #include "IPShared/Logging/LogInterface.h"
 #include "IPShared/EnumConversion.h"
 
+using namespace IP::Enum;
+using namespace IP::Logging;
+
+namespace IP
+{
+namespace Db
+{
+
 SODBCError::SODBCError( void ) :
 	SQLErrorCode( SQL_SUCCESS ),
 	SQLState( L"" ),
@@ -146,19 +154,21 @@ void CODBCObjectBase::Log_Error_State_Base( void ) const
 {
 	std::string state_string;
 	CEnumConverter::Convert< DBErrorStateType >( ErrorState, state_string );
-	LOG( LL_LOW, "\tState: " << state_string.c_str() );
+	LOG( ELogLevel::LL_LOW, "\tState: " << state_string.c_str() );
 	if ( Errors.size() > 0 )
 	{
-		LOG( LL_LOW, "\tODBC Error Records:" );
+		LOG( ELogLevel::LL_LOW, "\tODBC Error Records:" );
 		for ( uint32_t i = 0; i < Errors.size(); ++i )
 		{
 			const SODBCError &error_record = Errors[ i ]; 
-			WLOG( LL_LOW, L"\t\t" << i << L" - EC: " << error_record.SQLErrorCode << L", SQLState: " << error_record.SQLState << L", Desc: " << error_record.ErrorDescription );
+			WLOG( ELogLevel::LL_LOW, L"\t\t" << i << L" - EC: " << error_record.SQLErrorCode << L", SQLState: " << error_record.SQLState << L", Desc: " << error_record.ErrorDescription );
 		}
 	}
 	else
 	{
-		LOG( LL_LOW, "\tNo ODBC Error records found." );
+		LOG( ELogLevel::LL_LOW, "\tNo ODBC Error records found." );
 	}
 }
 
+} // namespace Db
+} // namespace IP

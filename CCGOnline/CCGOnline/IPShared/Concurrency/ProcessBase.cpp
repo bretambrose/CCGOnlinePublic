@@ -21,6 +21,7 @@
 
 #include "ProcessBase.h"
 
+
 #include "IPShared/MessageHandling/ProcessMessageHandler.h"
 #include "IPShared/TaskScheduler/TaskScheduler.h"
 #include "ProcessSubject.h"
@@ -31,6 +32,11 @@
 #include "Messaging/ProcessManagementMessages.h"
 #include "Messaging/ExchangeMailboxMessages.h"
 #include "ProcessID.h"
+
+namespace IP
+{
+namespace Execution
+{
 
 enum EProcessState
 {
@@ -70,7 +76,7 @@ CProcessBase::~CProcessBase()
 }
 
 
-void CProcessBase::Initialize( EProcessID::Enum id )
+void CProcessBase::Initialize( EProcessID id )
 {
 	ID = id;
 	Register_Message_Handlers();
@@ -88,12 +94,12 @@ void CProcessBase::Log( std::wstring &&message )
 	// actual logging thread should override this function and never call the baseclass
 	FATAL_ASSERT( ID != EProcessID::LOGGING );
 
-	std::unique_ptr< const IProcessMessage > log_request( new CLogRequestMessage( Properties, std::move( message ) ) );
+	std::unique_ptr< const Messaging::IProcessMessage > log_request( new Messaging::CLogRequestMessage( Properties, std::move( message ) ) );
 	Send_Process_Message( EProcessID::LOGGING, log_request );
 }
 
 
-std::shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID::Enum process_id ) const
+std::shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID process_id ) const
 {
 	auto interface_iter = Mailboxes.find( process_id );
 	if ( interface_iter != Mailboxes.cend() )
@@ -105,13 +111,13 @@ std::shared_ptr< CWriteOnlyMailbox > CProcessBase::Get_Mailbox( EProcessID::Enum
 }
 
 
-void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, std::unique_ptr< const IProcessMessage > &message )
+void CProcessBase::Send_Process_Message( EProcessID dest_process_id, std::unique_ptr< const Messaging::IProcessMessage > &message )
 {
 	Send_Process_Message( dest_process_id, std::move( message ) );
 }
 
 
-void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, std::unique_ptr< const IProcessMessage > &&message )
+void CProcessBase::Send_Process_Message( EProcessID dest_process_id, std::unique_ptr< const Messaging::IProcessMessage > &&message )
 {
 	// manager and logging threads are special-cased in order to avoid race conditions related to rescheduling
 	if ( dest_process_id == EProcessID::CONCURRENCY_MANAGER )
@@ -149,13 +155,13 @@ void CProcessBase::Send_Process_Message( EProcessID::Enum dest_process_id, std::
 }
 
 
-void CProcessBase::Send_Manager_Message( std::unique_ptr< const IProcessMessage > &message )
+void CProcessBase::Send_Manager_Message( std::unique_ptr< const Messaging::IProcessMessage > &message )
 {
 	Send_Process_Message( EProcessID::CONCURRENCY_MANAGER, message );
 }
 
 
-void CProcessBase::Send_Manager_Message( std::unique_ptr< const IProcessMessage > &&message )
+void CProcessBase::Send_Manager_Message( std::unique_ptr< const Messaging::IProcessMessage > &&message )
 {
 	Send_Process_Message( EProcessID::CONCURRENCY_MANAGER, message );
 }
@@ -166,7 +172,7 @@ void CProcessBase::Flush_Regular_Messages( void )
 	if ( !Is_Shutting_Down() )
 	{
 		// under normal circumstances, send all messages to threads we have an interface for
-		std::vector< EProcessID::Enum > sent_frames;
+		std::vector< EProcessID > sent_frames;
 
 		for ( auto frame_iterator = PendingOutboundFrames.begin(), end = PendingOutboundFrames.end(); frame_iterator != end; ++frame_iterator )
 		{
@@ -289,7 +295,7 @@ void CProcessBase::Service_Message_Frames( void )
 	for ( uint32_t i = 0; i < frames.size(); ++i )
 	{
 		std::unique_ptr< CProcessMessageFrame > &frame = frames[ i ];
-		EProcessID::Enum source_process_id = frame->Get_Process_ID();
+		EProcessID source_process_id = frame->Get_Process_ID();
 
 		// iterate all messages in the frame
 		for ( auto iter = frame->begin(), end = frame->end(); iter != end; ++iter )
@@ -304,7 +310,7 @@ void CProcessBase::Handle_Shutdown_Mailboxes( void )
 {
 	for ( auto iter = ShutdownMailboxes.cbegin(), end = ShutdownMailboxes.cend(); iter != end; ++iter )
 	{
-		EProcessID::Enum process_id = *iter;
+		EProcessID process_id = *iter;
 
 		auto interface_iter = Mailboxes.find( process_id );
 		if ( interface_iter == Mailboxes.cend() )
@@ -326,7 +332,7 @@ void CProcessBase::Handle_Shutdown_Mailboxes( void )
 		Remove_Process_ID_From_Tables( process_id );
 
 		// let the manager know we've release this interface
-		std::unique_ptr< const IProcessMessage > release_msg( new CReleaseMailboxResponse( process_id ) );
+		std::unique_ptr< const Messaging::IProcessMessage > release_msg( new Messaging::CReleaseMailboxResponse( process_id ) );
 		Send_Manager_Message( release_msg );
 	}
 
@@ -340,9 +346,9 @@ bool CProcessBase::Should_Reschedule( void ) const
 }
 
 
-void CProcessBase::Handle_Message( EProcessID::Enum process_id, std::unique_ptr< const IProcessMessage > &message )
+void CProcessBase::Handle_Message( EProcessID process_id, std::unique_ptr< const Messaging::IProcessMessage > &message )
 {
-	const IProcessMessage *msg_base = message.get();
+	const Messaging::IProcessMessage *msg_base = message.get();
 
 	Loki::TypeInfo hash_key( typeid( *msg_base ) );
 	auto iter = MessageHandlers.find( hash_key );
@@ -354,13 +360,13 @@ void CProcessBase::Handle_Message( EProcessID::Enum process_id, std::unique_ptr<
 
 void CProcessBase::Register_Message_Handlers( void )
 {
-	REGISTER_THIS_HANDLER( CAddMailboxMessage, CProcessBase, Handle_Add_Mailbox_Message )
-	REGISTER_THIS_HANDLER( CReleaseMailboxRequest, CProcessBase, Handle_Release_Mailbox_Request )
-	REGISTER_THIS_HANDLER( CShutdownSelfRequest, CProcessBase, Handle_Shutdown_Self_Request )
+	REGISTER_THIS_HANDLER( Messaging::CAddMailboxMessage, CProcessBase, Handle_Add_Mailbox_Message )
+	REGISTER_THIS_HANDLER( Messaging::CReleaseMailboxRequest, CProcessBase, Handle_Release_Mailbox_Request )
+	REGISTER_THIS_HANDLER( Messaging::CShutdownSelfRequest, CProcessBase, Handle_Shutdown_Self_Request )
 } 
 
 
-void CProcessBase::Register_Handler( const std::type_info &message_type_info, std::unique_ptr< IProcessMessageHandler > &handler )
+void CProcessBase::Register_Handler( const std::type_info &message_type_info, std::unique_ptr< Messaging::IProcessMessageHandler > &handler )
 {
 	Loki::TypeInfo key( message_type_info );
 
@@ -370,9 +376,9 @@ void CProcessBase::Register_Handler( const std::type_info &message_type_info, st
 }
 
 
-void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process_id*/, std::unique_ptr< const CAddMailboxMessage > &message )
+void CProcessBase::Handle_Add_Mailbox_Message( EProcessID /*source_process_id*/, std::unique_ptr< const Messaging::CAddMailboxMessage > &message )
 {
-	EProcessID::Enum add_id = message->Get_Mailbox()->Get_Process_ID();
+	EProcessID add_id = message->Get_Mailbox()->Get_Process_ID();
 	FATAL_ASSERT( add_id != EProcessID::CONCURRENCY_MANAGER && add_id != EProcessID::LOGGING );
 
 	if ( Mailboxes.find( add_id ) == Mailboxes.cend() )
@@ -386,18 +392,18 @@ void CProcessBase::Handle_Add_Mailbox_Message( EProcessID::Enum /*source_process
 }
 
 
-void CProcessBase::Handle_Release_Mailbox_Request( EProcessID::Enum source_process_id, std::unique_ptr< const CReleaseMailboxRequest > &request )
+void CProcessBase::Handle_Release_Mailbox_Request( EProcessID source_process_id, std::unique_ptr< const Messaging::CReleaseMailboxRequest > &request )
 {
 	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
 
-	EProcessID::Enum shutdown_process_id = request->Get_Process_ID();
+	EProcessID shutdown_process_id = request->Get_Process_ID();
 	FATAL_ASSERT( shutdown_process_id != EProcessID::CONCURRENCY_MANAGER && shutdown_process_id != EProcessID::LOGGING );
 
 	ShutdownMailboxes.insert( shutdown_process_id );
 }
 
 
-void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process_id, std::unique_ptr< const CShutdownSelfRequest > &message )
+void CProcessBase::Handle_Shutdown_Self_Request( EProcessID source_process_id, std::unique_ptr< const Messaging::CShutdownSelfRequest > &message )
 {
 	FATAL_ASSERT( source_process_id == EProcessID::CONCURRENCY_MANAGER );
 	FATAL_ASSERT( !Is_Shutting_Down() );
@@ -413,7 +419,7 @@ void CProcessBase::Handle_Shutdown_Self_Request( EProcessID::Enum source_process
 
 	On_Shutdown_Self_Request();
 
-	std::unique_ptr< const IProcessMessage > shutdown_self_msg( new CShutdownSelfResponse() );
+	std::unique_ptr< const Messaging::IProcessMessage > shutdown_self_msg( new Messaging::CShutdownSelfResponse() );
 	Send_Manager_Message( shutdown_self_msg );	
 }
 
@@ -460,7 +466,7 @@ void CProcessBase::Flush_System_Messages( void )
 }
 
 
-void CProcessBase::Remove_Process_ID_From_Tables( EProcessID::Enum process_id )
+void CProcessBase::Remove_Process_ID_From_Tables( EProcessID process_id )
 {
 	auto iter1 = IDToPropertiesTable.find( process_id );
 	if ( iter1 == IDToPropertiesTable.cend() )
@@ -482,7 +488,7 @@ void CProcessBase::Remove_Process_ID_From_Tables( EProcessID::Enum process_id )
 }
 
 
-void CProcessBase::Build_Process_ID_List_By_Properties( const SProcessProperties &properties, std::vector< EProcessID::Enum > &process_ids ) const
+void CProcessBase::Build_Process_ID_List_By_Properties( const SProcessProperties &properties, std::vector< EProcessID > &process_ids ) const
 {
 	process_ids.clear();
 
@@ -494,4 +500,7 @@ void CProcessBase::Build_Process_ID_List_By_Properties( const SProcessProperties
 		}
 	}
 }
+
+} // namespace Execution
+} // namespace IP
 

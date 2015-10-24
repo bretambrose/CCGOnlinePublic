@@ -17,14 +17,17 @@
 
 **********************************************************************************************************************/
 
-#ifndef PLATFORM_MISC_H
-#define PLATFORM_MISC_H
+#pragma once
 
-namespace NPlatform
+namespace IP
 {
+namespace Misc
+{
+
 	uint32_t Get_Semi_Unique_ID( void );
 
 	std::wstring Format_OS_Error_Message( uint32_t error_code );
-}
 
-#endif // PLATFORM_MISC_H
+} // namespace Misc
+} // namespace IP
+

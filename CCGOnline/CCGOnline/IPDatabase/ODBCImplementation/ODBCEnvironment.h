@@ -17,20 +17,22 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_ENVIRONMENT_H
-#define ODBC_ENVIRONMENT_H
+#pragma once
 
 #include "IPDatabase/Interfaces/DatabaseEnvironmentInterface.h"
 #include "ODBCObjectBase.h"
 
-enum ODBCEnvironmentStateType;
-enum ODBCEnvironmentOperationType;
+namespace IP
+{
+namespace Db
+{
+
+enum class ODBCEnvironmentStateType;
+enum class ODBCEnvironmentOperationType;
 
 class CODBCEnvironment : public CODBCObjectBase, public IDatabaseEnvironment
 {
 	public:
-
-		typedef CODBCObjectBase BASECLASS;
 
 		CODBCEnvironment( SQLHENV environment_handle );
 		virtual ~CODBCEnvironment();
@@ -58,4 +60,5 @@ class CODBCEnvironment : public CODBCObjectBase, public IDatabaseEnvironment
 
 };
 
-#endif // ODBC_ENVIRONMENT_H
+} // namespace Db
+} // namespace IP

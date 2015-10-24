@@ -21,8 +21,12 @@
 
 #include "StringUtils.h"
 
+namespace IP
+{
+namespace String
+{
 
-void NStringUtils::String_To_WideString( const std::string &source, std::wstring &target )
+void String_To_WideString( const std::string &source, std::wstring &target )
 {
 	size_t buffer_length = source.size() * 2 + 2;
 	size_t buffer_word_length = buffer_length * sizeof( wchar_t ) / sizeof( uint32_t );
@@ -36,13 +40,13 @@ void NStringUtils::String_To_WideString( const std::string &source, std::wstring
 }
 
 
-void NStringUtils::String_To_WideString( const char *source, std::wstring &target )
+void String_To_WideString( const char *source, std::wstring &target )
 {
 	String_To_WideString( std::string( source ), target );
 }
 
 
-void NStringUtils::WideString_To_String( const std::wstring &source, std::string &target )
+void WideString_To_String( const std::wstring &source, std::string &target )
 {
 	size_t buffer_length = 2 * ( source.size() + 1 );
 	char *target_buffer = new char[ buffer_length ];
@@ -55,13 +59,13 @@ void NStringUtils::WideString_To_String( const std::wstring &source, std::string
 }
 
 
-void NStringUtils::WideString_To_String( const wchar_t *source, std::string &target )
+void WideString_To_String( const wchar_t *source, std::string &target )
 {
 	WideString_To_String( std::wstring( source ), target );
 }
 
 
-void NStringUtils::To_Upper_Case( const std::string &source, std::string &dest )
+void To_Upper_Case( const std::string &source, std::string &dest )
 {
 	size_t buffer_size = source.size() + 1;
 	char *buffer = new char[ buffer_size ];
@@ -74,7 +78,7 @@ void NStringUtils::To_Upper_Case( const std::string &source, std::string &dest )
 }
 
 
-void NStringUtils::To_Upper_Case( const std::wstring &source, std::wstring &dest )
+void To_Upper_Case( const std::wstring &source, std::wstring &dest )
 {
 	size_t buffer_size = source.size() + 1;
 	wchar_t *buffer = new wchar_t[ buffer_size ];
@@ -87,61 +91,61 @@ void NStringUtils::To_Upper_Case( const std::wstring &source, std::wstring &dest
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, int32_t &value ) 
+bool Convert( const std::wstring &source, int32_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, uint32_t &value ) 
+bool Convert( const std::wstring &source, uint32_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, int64_t &value ) 
+bool Convert( const std::wstring &source, int64_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, uint64_t &value ) 
+bool Convert( const std::wstring &source, uint64_t &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, std::wstring &value ) 
+bool Convert( const std::wstring &source, std::wstring &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, std::string &value ) 
+bool Convert( const std::wstring &source, std::string &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, float &value ) 
+bool Convert( const std::wstring &source, float &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, double &value ) 
+bool Convert( const std::wstring &source, double &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert( const std::wstring &source, bool &value ) 
+bool Convert( const std::wstring &source, bool &value ) 
 {
 	return Convert_Raw( source.c_str(), value );
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, int32_t &value ) 
+bool Convert_Raw( const wchar_t *source, int32_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = wcstol( source, &end_ptr, 10 );
@@ -150,7 +154,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, int32_t &value )
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, uint32_t &value ) 
+bool Convert_Raw( const wchar_t *source, uint32_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = wcstoul( source, &end_ptr, 10 );
@@ -159,7 +163,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, uint32_t &value )
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, int64_t &value ) 
+bool Convert_Raw( const wchar_t *source, int64_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = _wcstoi64( source, &end_ptr, 10 );
@@ -168,7 +172,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, int64_t &value )
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, uint64_t &value ) 
+bool Convert_Raw( const wchar_t *source, uint64_t &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = _wcstoui64( source, &end_ptr, 10 );
@@ -177,21 +181,21 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, uint64_t &value )
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, std::wstring &value ) 
+bool Convert_Raw( const wchar_t *source, std::wstring &value ) 
 {
 	value = source;
 	return true;
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, std::string &value ) 
+bool Convert_Raw( const wchar_t *source, std::string &value ) 
 {
 	WideString_To_String( source, value );
 	return true;
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, float &value ) 
+bool Convert_Raw( const wchar_t *source, float &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	double value_d = wcstod( source, &end_ptr );
@@ -201,7 +205,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, float &value )
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, double &value ) 
+bool Convert_Raw( const wchar_t *source, double &value ) 
 {
 	wchar_t *end_ptr = nullptr;
 	value = wcstod( source, &end_ptr );
@@ -210,7 +214,7 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, double &value )
 }
 
 
-bool NStringUtils::Convert_Raw( const wchar_t *source, bool &value ) 
+bool Convert_Raw( const wchar_t *source, bool &value ) 
 {
 	value = false;
 	if ( _wcsicmp( source, L"TRUE" ) == 0 || _wcsicmp( source, L"YES" ) == 0 || _wcsicmp( source, L"1" ) == 0 )
@@ -220,3 +224,6 @@ bool NStringUtils::Convert_Raw( const wchar_t *source, bool &value )
 
 	return true;
 }
+
+} // namespace String
+} // namespace IP

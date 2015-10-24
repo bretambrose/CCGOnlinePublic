@@ -17,15 +17,24 @@
 
 **********************************************************************************************************************/
 
-#ifndef TASK_SCHEDULER_H
-#define TASK_SCHEDULER_H
+#pragma once
+
+namespace IP
+{
+namespace Algorithm
+{
+
+template< typename T1, typename T2, typename T3 > class TPriorityQueue;
+
+} // namespace Algorithm
+
+namespace Execution
+{
 
 class CScheduledTask;
 class CScheduledTaskMovementPolicy;
 class CScheduledTaskComparator;
-struct STickTime;
 
-template< typename T1, typename T2, typename T3 > class TPriorityQueue;
 
 // A class that tracks and executes time-scheduled tasks
 class CTaskScheduler
@@ -47,9 +56,10 @@ class CTaskScheduler
 
 	private:
 
-		std::unique_ptr< TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator > > TaskQueue;
+		std::unique_ptr< IP::Algorithm::TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator > > TaskQueue;
 
 		double TimeGranularity;
 };
 
-#endif // TASK_SCHEDULER_H
+} // namespace Execution
+} // namespace IP

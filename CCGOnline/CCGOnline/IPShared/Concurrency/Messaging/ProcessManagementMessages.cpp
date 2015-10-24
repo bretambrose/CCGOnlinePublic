@@ -23,8 +23,14 @@
 
 #include "IPShared/Concurrency/ProcessInterface.h"
 
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
 
-CAddNewProcessMessage::CAddNewProcessMessage( const std::shared_ptr< IProcess > &process, bool return_mailbox, bool forward_creator_mailbox ) :
+CAddNewProcessMessage::CAddNewProcessMessage( const std::shared_ptr< IP::Execution::IProcess > &process, bool return_mailbox, bool forward_creator_mailbox ) :
 	Process( process ),
 	ReturnMailbox( return_mailbox ),
 	ForwardCreatorMailbox( forward_creator_mailbox )
@@ -36,3 +42,6 @@ CAddNewProcessMessage::~CAddNewProcessMessage()
 {
 }
 
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

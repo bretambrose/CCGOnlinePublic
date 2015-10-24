@@ -59,8 +59,12 @@ static uint32_t CRCTable[ 256 ] = {
 	0xAFB010B1, 0xAB710D06, 0xA6322BDF, 0xA2F33668, 0xBCB4666D, 0xB8757BDA, 0xB5365D03, 0xB1F740B4
 };
 
+namespace IP
+{
+namespace CRC
+{
 
-CRCValue NCRCUtils::CRC_Memory( const void *memory, size_t length )
+CRCValue CRC_Memory( const void *memory, size_t length )
 {
 	const char *mem = reinterpret_cast< const char * >( memory );
 	CRCValue crc = 0xFFFFFFFF;
@@ -75,7 +79,7 @@ CRCValue NCRCUtils::CRC_Memory( const void *memory, size_t length )
 }
 
 
-CRCValue NCRCUtils::String_To_CRC( const std::string &value )
+CRCValue String_To_CRC( const std::string &value )
 {
 	CRCValue crc = CRC_Memory( static_cast< const void * >( value.c_str() ), value.size() );
 	
@@ -83,16 +87,16 @@ CRCValue NCRCUtils::String_To_CRC( const std::string &value )
 }
 
 
-CRCValue NCRCUtils::String_To_CRC_Case_Insensitive( const std::string &value )
+CRCValue String_To_CRC_Case_Insensitive( const std::string &value )
 {
 	std::string upper_string;
-	NStringUtils::To_Upper_Case( value, upper_string );
+	IP::String::To_Upper_Case( value, upper_string );
 	
 	return String_To_CRC( upper_string );
 }
 
 
-CRCValue NCRCUtils::String_To_CRC( const std::wstring &value )
+CRCValue String_To_CRC( const std::wstring &value )
 {
 	CRCValue crc = CRC_Memory( static_cast< const void * >( value.c_str() ), value.size() * sizeof( wchar_t ) );
 	
@@ -100,10 +104,13 @@ CRCValue NCRCUtils::String_To_CRC( const std::wstring &value )
 }
 
 
-CRCValue NCRCUtils::String_To_CRC_Case_Insensitive( const std::wstring &value )
+CRCValue String_To_CRC_Case_Insensitive( const std::wstring &value )
 {
 	std::wstring upper_string;
-	NStringUtils::To_Upper_Case( value, upper_string );
+	IP::String::To_Upper_Case( value, upper_string );
 
 	return String_To_CRC( upper_string );
 }
+
+} // namespace CRC
+} // namespace IP

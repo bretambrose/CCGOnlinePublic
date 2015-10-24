@@ -17,13 +17,19 @@
 
 **********************************************************************************************************************/
 
-#ifndef XML_SERIALIZER_INTERFACE_H
-#define XML_SERIALIZER_INTERFACE_H
+#pragma once
 
 namespace pugi
 {
 	class xml_node;
 }
+
+namespace IP
+{
+namespace Serialization
+{
+namespace XML
+{
 
 class IXMLSerializer
 {
@@ -37,4 +43,6 @@ class IXMLSerializer
 
 };
 
-#endif // XML_SERIALIZER_INTERFACE_H
+} // namespace XML
+} // namespace Serialization
+} // namespace IP

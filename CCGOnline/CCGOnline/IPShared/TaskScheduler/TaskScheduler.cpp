@@ -26,18 +26,23 @@
 #include "IPShared/PriorityQueue.h"
 #include <limits.h>
 
+namespace IP
+{
+namespace Execution
+{
+
 static const double TIME_GRANULARITY_FRACTION_CUTOFF = .00001;
 
 
 CTaskScheduler::CTaskScheduler( void ) :
-	TaskQueue( new TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator >() ),
+	TaskQueue( std::make_unique< IP::Algorithm::TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator > >() ),
 	TimeGranularity( 0.0 )
 {
 }
 
 
 CTaskScheduler::CTaskScheduler( double time_granularity ) :
-	TaskQueue( new TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator >() ),
+	TaskQueue( new IP::Algorithm::TPriorityQueue< std::shared_ptr< CScheduledTask >, CScheduledTaskMovementPolicy, CScheduledTaskComparator >() ),
 	TimeGranularity( time_granularity )
 {
 }
@@ -109,3 +114,5 @@ void CTaskScheduler::Service( double current_time_seconds )
 	}
 }
 
+} // namespace Execution
+} // namespace IP

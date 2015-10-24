@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef SCHEDULED_TASK_POLICIES_H
-#define SCHEDULED_TASK_POLICIES_H
+#pragma once
 
 #include "ScheduledTask.h"
+
+namespace IP
+{
+namespace Execution
+{
 
 // a priority queue policy for scheduled tasks that adds internal heap index tracking, allowing
 // for efficient ( O( Log N ) ) removes of cancelled tasks.
@@ -59,4 +63,5 @@ class CScheduledTaskComparator
 		}
 };
 
-#endif // SCHEDULED_TASK_POLICIES_H
+} // namespace Execution
+} // namespace IP

@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef SCHEDULED_TASK_H
-#define SCHEDULED_TASK_H
+#pragma once
+
+namespace IP
+{
+namespace Execution
+{
 
 // A base class to be used by all schedule task objects
 class CScheduledTask
@@ -50,5 +54,6 @@ class CScheduledTask
 
 };
 
+} // namespace Execution
+} // namespace IP
 
-#endif // SCHEDULED_TASK_H

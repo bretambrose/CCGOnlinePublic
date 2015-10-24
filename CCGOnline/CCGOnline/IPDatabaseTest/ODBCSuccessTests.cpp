@@ -33,6 +33,8 @@
 #include "ODBCShared.h"
 #include "IPPlatform/StringUtils.h"
 
+using namespace IP::Db;
+
 class ODBCSuccessTests : public testing::Test 
 {
 	public:
@@ -55,7 +57,7 @@ class CGetAccountProcedureResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CGetAccountProcedureResultSet( void ) :
 			BASECLASS(),
@@ -94,7 +96,7 @@ class CGetAllAccountsProcedureCall : public TDatabaseProcedureCall< CEmptyVariab
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CGetAccountProcedureResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CGetAccountProcedureResultSet, OSIZE >;
 
 		CGetAllAccountsProcedureCall( void ) : 
 			BASECLASS(),
@@ -295,7 +297,7 @@ class CGetAllAccountsInOutParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CGetAllAccountsInOutParams( void ) :
 			BASECLASS(),
@@ -342,7 +344,7 @@ class CGetAllAccountsInOutProcedureCall : public TDatabaseProcedureCall< CGetAll
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CGetAllAccountsInOutParams, ISIZE, CGetAccountProcedureResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CGetAllAccountsInOutParams, ISIZE, CGetAccountProcedureResultSet, OSIZE >;
 
 		CGetAllAccountsInOutProcedureCall( const std::string &filter_nickname, uint64_t in_test, uint64_t out_test ) : 
 			BASECLASS(),
@@ -502,7 +504,7 @@ class CGetAccountCountParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CGetAccountCountParams( void ) :
 			BASECLASS(),
@@ -539,7 +541,7 @@ class CGetAccountCountFunctionCall : public TDatabaseFunctionCall< CGetAccountCo
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CGetAccountCountParams, ISIZE > BASECLASS;
+		using BASECLASS = TDatabaseFunctionCall< CGetAccountCountParams, ISIZE >;
 
 		CGetAccountCountFunctionCall( const std::string &filter_nickname ) : 
 			BASECLASS(),
@@ -654,7 +656,7 @@ class CGetAccountEmailFunctionParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CGetAccountEmailFunctionParams( void ) :
 			BASECLASS(),
@@ -691,7 +693,7 @@ class CGetAccountEmailFunctionCall : public TDatabaseFunctionCall< CGetAccountEm
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE > BASECLASS;
+		using BASECLASS = TDatabaseFunctionCall< CGetAccountEmailFunctionParams, ISIZE >;
 
 		CGetAccountEmailFunctionCall( uint64_t account_id ) : 
 			BASECLASS(),
@@ -818,7 +820,7 @@ class CDoNothingProcedureCall : public TDatabaseProcedureCall< CEmptyVariableSet
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CEmptyVariableSet, 1 > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CEmptyVariableSet, ISIZE, CEmptyVariableSet, 1 >;
 
 		CDoNothingProcedureCall( void ) : 
 			BASECLASS(),
@@ -917,7 +919,7 @@ class CTestBooleanDataParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestBooleanDataParams( void ) :
 			BASECLASS(),
@@ -953,7 +955,7 @@ class CTestBooleanDataResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestBooleanDataResultSet( void ) :
 			BASECLASS(),
@@ -980,7 +982,7 @@ class CTestBooleanDataProcedureCall : public TDatabaseProcedureCall< CTestBoolea
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CTestBooleanDataParams, ISIZE, CTestBooleanDataResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CTestBooleanDataParams, ISIZE, CTestBooleanDataResultSet, OSIZE >;
 
 		CTestBooleanDataProcedureCall( bool in, bool in_out ) : 
 			BASECLASS(),
@@ -1119,7 +1121,7 @@ class CTestFPDataParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestFPDataParams( void ) :
 			BASECLASS(),
@@ -1165,7 +1167,7 @@ class CTestFPDataResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestFPDataResultSet( void ) :
 			BASECLASS(),
@@ -1196,7 +1198,7 @@ class CTestFPDataProcedureCall : public TDatabaseProcedureCall< CTestFPDataParam
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CTestFPDataParams, ISIZE, CTestFPDataResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CTestFPDataParams, ISIZE, CTestFPDataResultSet, OSIZE >;
 
 		CTestFPDataProcedureCall( float float_in, double double_in, float float_in_out, double double_in_out ) : 
 			BASECLASS(),
@@ -1328,7 +1330,7 @@ class CNullableFunctionParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CNullableFunctionParams( void ) :
 			BASECLASS(),
@@ -1365,7 +1367,7 @@ class CNullableFunctionCall : public TDatabaseFunctionCall< CNullableFunctionPar
 {
 	public:
 
-		typedef TDatabaseFunctionCall< CNullableFunctionParams, ISIZE > BASECLASS;
+		using BASECLASS = TDatabaseFunctionCall< CNullableFunctionParams, ISIZE >;
 
 		CNullableFunctionCall( const std::wstring &nickname ) : 
 			BASECLASS(),
@@ -1511,7 +1513,7 @@ class CNullableProcedureParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CNullableProcedureParams( void ) :
 			BASECLASS(),
@@ -1562,7 +1564,7 @@ class CNullableProcedureResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CNullableProcedureResultSet( void ) :
 			BASECLASS(),
@@ -1593,7 +1595,7 @@ class CNullableProcedureCall : public TDatabaseProcedureCall< CNullableProcedure
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CNullableProcedureParams, ISIZE, CNullableProcedureResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CNullableProcedureParams, ISIZE, CNullableProcedureResultSet, OSIZE >;
 
 		CNullableProcedureCall( uint64_t null_account_id, bool string_null, bool wstring_null ) : 
 			BASECLASS(),
@@ -1756,7 +1758,7 @@ class CSelectAccountDetailsResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CSelectAccountDetailsResultSet( void ) :
 			BASECLASS(),
@@ -1795,7 +1797,7 @@ class CSelectAccountDetailsTask : public TDatabaseSelect< CSelectAccountDetailsR
 {
 	public:
 
-		typedef TDatabaseSelect< CSelectAccountDetailsResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseSelect< CSelectAccountDetailsResultSet, OSIZE >;
 
 		CSelectAccountDetailsTask( void ) : 
 			BASECLASS(),
@@ -1953,7 +1955,7 @@ class CTestTVFParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestTVFParams( void ) :
 			BASECLASS(),
@@ -1979,7 +1981,7 @@ class CTestTVFResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestTVFResultSet( void ) :
 			BASECLASS(),
@@ -2004,7 +2006,7 @@ class CTableValuedFunctionTask : public TDatabaseTableValuedFunctionCall< CTestT
 {
 	public:
 
-		typedef TDatabaseTableValuedFunctionCall< CTestTVFParams, ISIZE, CTestTVFResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseTableValuedFunctionCall< CTestTVFParams, ISIZE, CTestTVFResultSet, OSIZE >;
 
 		CTableValuedFunctionTask( uint64_t account_id ) : 
 			BASECLASS(),
@@ -2175,7 +2177,7 @@ class CTrivialCompoundTask : public TCompoundDatabaseTask< BATCH_SIZE >
 {
 	public:
 
-		typedef TCompoundDatabaseTask< BATCH_SIZE > BASECLASS;
+		using BASECLASS = TCompoundDatabaseTask< BATCH_SIZE >;
 
 		CTrivialCompoundTask( void ) :
 			BASECLASS()
@@ -2222,7 +2224,7 @@ void Run_TrivialCompoundTask_Test( uint32_t task_count )
 	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		auto db_task = new CTrivialCompoundTask< BATCH_SIZE, ISIZE1, OSIZE1 >;
-		db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( i + 1 ) );
+		db_task->Set_ID( static_cast< EDatabaseTaskIDType >( i + 1 ) );
 		tasks.push_back( db_task );
 		db_compound_task_batch.Add_Task( db_task );
 	}
@@ -2265,7 +2267,7 @@ class CCompoundInsertParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CCompoundInsertParams( void ) :
 			BASECLASS(),
@@ -2296,7 +2298,7 @@ class CCompoundInsertProcedureCall : public TDatabaseProcedureCall< CCompoundIns
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CCompoundInsertParams, ISIZE, CEmptyVariableSet, 1 >;
 
 		CCompoundInsertProcedureCall( uint64_t id, uint64_t index ) : 
 			BASECLASS(),
@@ -2343,10 +2345,10 @@ class CCompoundInsertTask : public TCompoundDatabaseTask< BATCH_SIZE >
 {
 	public:
 
-		typedef TCompoundDatabaseTask< BATCH_SIZE > BASECLASS;
+		using BASECLASS = TCompoundDatabaseTask< BATCH_SIZE >;
 
-		typedef CCompoundInsertProcedureCall< ISIZE1 > Child1Type;
-		typedef CCompoundInsertCountProcedureCall< ISIZE2, OSIZE2 > Child2Type;
+		using Child1Type = CCompoundInsertProcedureCall< ISIZE1 >;
+		using Child2Type = CCompoundInsertCountProcedureCall< ISIZE2, OSIZE2 >;
 
 		CCompoundInsertTask( uint64_t id, uint32_t insert_count ) :
 			BASECLASS(),
@@ -2414,13 +2416,13 @@ void Run_CompoundInsertTask_Test( uint32_t task_count )
 	IDatabaseConnection *connection = CODBCFactory::Get_Environment()->Add_Connection( L"Driver={SQL Server Native Client 11.0};Server=AZAZELPC\\CCGONLINE;Database=testdb;UID=testserver;PWD=TEST5erver#;", false );
 	ASSERT_TRUE( connection != nullptr );
 
-	typedef CCompoundInsertTask< BATCH_SIZE, ISIZE1, ISIZE2, 1 > CompoundTaskType;
+	using CompoundTaskType = CCompoundInsertTask< BATCH_SIZE, ISIZE1, ISIZE2, 1 >;
 	TCompoundDatabaseTaskBatch< CompoundTaskType > db_compound_task_batch;
 	std::vector< CompoundTaskType * > tasks;
 	for ( uint32_t i = 0; i < task_count; ++i )
 	{
 		auto db_task = new CompoundTaskType( i + 1, INSERT_COUNT );
-		db_task->Set_ID( static_cast< DatabaseTaskIDType::Enum >( i + 1 ) );
+		db_task->Set_ID( static_cast< EDatabaseTaskIDType >( i + 1 ) );
 		tasks.push_back( db_task );
 		db_compound_task_batch.Add_Task( db_task );
 	}

@@ -20,17 +20,21 @@
 #include "stdafx.h"
 
 #include "PlatformTime.h"
+#include "StringUtils.h"
 
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
+/*
 uint64_t CPlatformTime::HighResolutionFrequency = 0;
 bool CPlatformTime::Initialized = false;
+*/
 
-#ifdef WIN32
-
-
+/*
 void CPlatformTime::Initialize( void )
 {
 	if ( Initialized )
@@ -127,5 +131,102 @@ std::wstring CPlatformTime::Format_Raw_Time( uint64_t raw_time )
 
 	return output_string.rdbuf()->str();
 }
+*/
+// v2.0 interface
 
-#endif // WIN32
+namespace IP
+{
+namespace Time
+{
+
+SystemTimePoint Get_Current_System_Time( void )
+{
+	return std::chrono::system_clock::now();
+}
+
+SystemTimePoint Get_File_Last_Modified_Time( const std::wstring &file_name )
+{
+	std::string narrow_file_name;
+	IP::String::WideString_To_String( file_name, narrow_file_name );
+
+	FILE *fp = nullptr;
+	auto open_result = fopen_s( &fp, narrow_file_name.c_str(), "r" );
+	FATAL_ASSERT( fp != nullptr && open_result == 0 );
+
+	int fd = _fileno( fp ); 
+	FATAL_ASSERT( fd != -1 );
+
+	struct _stat file_stats;
+	auto result = _fstat( fd, &file_stats );	// Windows-specific
+	FATAL_ASSERT( result == 0 );
+
+	fclose(fp);
+
+	return std::chrono::system_clock::from_time_t(file_stats.st_mtime);
+}
+
+/*
+void CTimeToFileTime(time_t t, FILETIME &windows_file_time)
+{
+	int64_t ll;
+
+	ll = Int32x32To64(t, 10000000) + 116444736000000000;
+	windows_file_time.dwLowDateTime = (DWORD)ll;
+	windows_file_time.dwHighDateTime = ll >> 32;
+}
+
+void CTimeToSystemTime(time_t t, SYSTEMTIME &windows_system_time)
+{
+	FILETIME file_time;
+
+	CTimeToFileTime(t, file_time);
+	FileTimeToSystemTime(&file_time, &windows_system_time);
+}
+*/
+
+std::tm localtime(std::time_t time)
+{
+	std::tm tm_snapshot;
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+	localtime_s(&tm_snapshot, &time); 
+#else
+	localtime_r(&time, &tm_snapshot); // POSIX  
+#endif
+	return tm_snapshot;
+}
+
+std::wstring Format_System_Time( SystemTimePoint time_point )
+{
+	auto c_time = std::chrono::system_clock::to_time_t( time_point );
+	auto tm_time = localtime( c_time );
+	auto year_remainder = tm_time.tm_year % 100;
+
+	// Grungy hack assumes that system clock "starts" with 0 milliseconds elapsed
+	auto milliseconds_elapsed = std::chrono::duration_cast< std::chrono::milliseconds >( time_point - SystemTimePoint::min() );
+	auto milliseconds_remainder = milliseconds_elapsed.count() % 1000;
+
+	std::basic_ostringstream< wchar_t > output_string;
+	output_string << std::setw( 2 ) << tm_time.tm_mon << L"-" << tm_time.tm_mday << L"-" << year_remainder << L" ";
+	output_string << std::setw( 2 ) << tm_time.tm_hour << L":" << tm_time.tm_min << L":" << tm_time.tm_sec << L"." << std::setw( 3 ) << milliseconds_remainder;
+
+	return output_string.rdbuf()->str();
+}
+
+SystemDuration Get_Elapsed_System_Time( void )
+{
+	auto now = std::chrono::system_clock::now();
+
+	return now - SystemTimePoint::min();
+}
+
+double Convert_Duration_To_Seconds(SystemDuration duration)
+{
+	// Question: what is the best way of doing this precision-wise?
+	double raw_count = static_cast< double >( duration.count() );
+
+	return raw_count / static_cast< double >( SystemDuration::period::den ) * static_cast< double >( SystemDuration::period::num );
+}
+
+} // namespace Time
+} // namespace IP
+

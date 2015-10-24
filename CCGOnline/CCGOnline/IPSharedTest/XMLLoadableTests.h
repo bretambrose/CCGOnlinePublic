@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef XML_LOADABLE_TESTS_H
-#define XML_LOADABLE_TESTS_H
+#pragma once
  
 //:EnumBegin()
 enum EPolySerializerTestTypes
@@ -42,4 +41,3 @@ enum ETableTestClass
 };
 //:EnumEnd
 
-#endif // XML_LOADABLE_TESTS_H

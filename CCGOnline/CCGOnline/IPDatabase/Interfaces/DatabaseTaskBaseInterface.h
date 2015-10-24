@@ -17,18 +17,19 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BASE_INTERFACE_H
-#define DATABASE_TASK_BASE_INTERFACE_H
+#pragma once
+
+namespace IP
+{
+namespace Db
+{
 
 class ICompoundDatabaseTask;
 
-namespace DatabaseTaskIDType
+enum class EDatabaseTaskIDType
 {
-	enum Enum
-	{
-		INVALID
-	};
-}
+	INVALID
+};
 
 class IDatabaseTaskBase
 {
@@ -37,8 +38,8 @@ class IDatabaseTaskBase
 		IDatabaseTaskBase( void ) {}
 		virtual ~IDatabaseTaskBase() {}
 
-		virtual DatabaseTaskIDType::Enum Get_ID( void ) const = 0;
-		virtual void Set_ID( DatabaseTaskIDType::Enum id ) = 0;	
+		virtual EDatabaseTaskIDType Get_ID( void ) const = 0;
+		virtual void Set_ID( EDatabaseTaskIDType id ) = 0;	
 
 		virtual void On_Task_Success( void ) = 0;					
 		virtual void On_Task_Failure( void ) = 0;	
@@ -50,4 +51,5 @@ class IDatabaseTaskBase
 
 };
 
-#endif // DATABASE_TASK_BASE_INTERFACE_H
+} // namespace Db
+} // namespace IP

@@ -24,6 +24,10 @@
 #include "IPShared/Concurrency/Messaging/LoggingMessages.h"
 #include "IPShared/Concurrency/ProcessConstants.h"
 
+using namespace IP::Concurrency;
+using namespace IP::Execution;
+using namespace IP::Execution::Messaging;
+
 TEST( ConcurrentQueueTests, Add_Remove_Locking )
 {
 	IConcurrentQueue< int > *int_queue = new CLockingConcurrentQueue< int >();

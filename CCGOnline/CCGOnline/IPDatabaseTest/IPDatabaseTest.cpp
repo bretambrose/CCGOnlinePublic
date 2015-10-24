@@ -22,29 +22,36 @@
 #include "IPDatabase/IPDatabase.h"
 #include "IPShared/IPShared.h"
 
-namespace NIPDatabaseTest
+namespace IP
 {
-	void Initialize( void )
-	{
-		NIPShared::Initialize();
-		NIPDatabase::Initialize();
-	}
+namespace Global
+{
 
-	void Shutdown( void )
-	{
-		NIPDatabase::Shutdown();
-		NIPShared::Shutdown();
-	}
+void Initialize_IPDatabaseTest( void )
+{
+	Initialize_IPShared();
+	Initialize_IPDatabase();
 }
+
+void Shutdown_IPDatabaseTest( void )
+{
+	Shutdown_IPDatabase();
+	Shutdown_IPShared();
+}
+
+} // namespace Global
+} // namespace IP
+
+using namespace IP::Global;
 
 int main(int argc, wchar_t* argv[])
 {
-	NIPDatabaseTest::Initialize();
+	Initialize_IPDatabaseTest();
 
 	::testing::InitGoogleTest(&argc, argv);
 	int result_code = RUN_ALL_TESTS();
 
-	NIPDatabaseTest::Shutdown();
+	Shutdown_IPDatabaseTest();
 
 	return result_code;
 }

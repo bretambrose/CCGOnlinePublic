@@ -17,17 +17,26 @@
 
 **********************************************************************************************************************/
 
-#ifndef LOG_INTERFACE_H
-#define LOG_INTERFACE_H
+#pragma once
 
 #define ENABLE_LOGGING
+
+namespace IP
+{
+namespace Execution
+{
 
 class IManagedProcess;
 class CProcessExecutionContext;
 
+} // namespace Execution
+
+namespace Logging
+{
+
 // A type enumerating the different levels of logging.  This level can be changed on the fly so that the process
 // naturally records more or less information as desired.
-enum ELogLevel
+enum class ELogLevel
 {
 	LL_LOW,
 	LL_MEDIUM,
@@ -49,7 +58,7 @@ class CLogInterface
 		static void Shutdown_Dynamic( void );
 		
 		// Invokes the log process
-		static void Service_Logging( const CProcessExecutionContext &context );
+		static void Service_Logging( const IP::Execution::CProcessExecutionContext &context );
 
 		// Access the current logging level; technically not thread-safe, but doesn't matter
 		static void Set_Log_Level( ELogLevel log_level ) { LogLevel = log_level; }
@@ -71,7 +80,7 @@ class CLogInterface
 		static void Log( const std::string &message );
 		static void Log( const char *message );
 
-		static std::shared_ptr< IManagedProcess > Get_Logging_Process( void ) { return LogProcess; }
+		static std::shared_ptr< IP::Execution::IManagedProcess > Get_Logging_Process( void ) { return LogProcess; }
 
 	private:
 		
@@ -79,7 +88,7 @@ class CLogInterface
 
 		static std::mutex LogLock;
 
-		static std::shared_ptr< IManagedProcess > LogProcess;
+		static std::shared_ptr< IP::Execution::IManagedProcess > LogProcess;
 
 		static std::wstring LogPath;
 		static std::wstring LogSubdirectory;
@@ -93,13 +102,16 @@ class CLogInterface
 
 };
 
+} // namespace Logging
+} // namespace IP
+
 // Conditional macros for logging
 #ifdef ENABLE_LOGGING
 
 #include <sstream>
 
-#define WLOG( log_level, stream_expression ) if ( CLogInterface::Get_Log_Level() >= log_level ) { std::basic_ostringstream< wchar_t > log_stream; log_stream << stream_expression; CLogInterface::Log( log_stream ); }
-#define LOG( log_level, stream_expression ) if ( CLogInterface::Get_Log_Level() >= log_level ) { std::basic_ostringstream< char > log_stream; log_stream << stream_expression; CLogInterface::Log( log_stream ); }
+#define WLOG( log_level, stream_expression ) if ( IP::Logging::CLogInterface::Get_Log_Level() >= log_level ) { std::basic_ostringstream< wchar_t > log_stream; log_stream << stream_expression; IP::Logging::CLogInterface::Log( log_stream ); }
+#define LOG( log_level, stream_expression ) if ( IP::Logging::CLogInterface::Get_Log_Level() >= log_level ) { std::basic_ostringstream< char > log_stream; log_stream << stream_expression; IP::Logging::CLogInterface::Log( log_stream ); }
 
 #else
 
@@ -109,4 +121,3 @@ class CLogInterface
 #endif // ENABLE_LOGGING
 
 
-#endif // LOG_INTERFACE_H

@@ -24,6 +24,10 @@
 #include "SlashCommandInstance.h"
 #include "IPPlatform/StringUtils.h"
 
+namespace IP
+{
+namespace Command
+{
 
 CSlashCommandInstance::CSlashCommandInstance( void ) :
 	Command( L"" ),
@@ -103,7 +107,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, int32_t &value ) const
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -114,7 +118,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, uint32_t &value ) const
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -125,7 +129,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, int64_t &value ) const
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -136,7 +140,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, uint64_t &value ) const
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -147,7 +151,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, std::wstring &value ) con
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -158,7 +162,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, std::string &value ) cons
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -169,7 +173,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, float &value ) const
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -180,7 +184,7 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, double &value ) const
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
 
@@ -191,6 +195,8 @@ bool CSlashCommandInstance::Get_Param( uint32_t index, bool &value ) const
 		return false;
 	}
 
-	return NStringUtils::Convert( Params[ index ], value );
+	return IP::String::Convert( Params[ index ], value );
 }
 
+} // namespace Command
+} // namespace IP

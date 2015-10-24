@@ -26,6 +26,9 @@
 #include "IPShared/Concurrency/ProcessConstants.h"
 #include "IPShared/Concurrency/ProcessID.h"
 
+using namespace IP::Execution;
+using namespace IP::Execution::Messaging;
+
 static const std::wstring LOG_MESSAGES[] = {
 	std::wstring( L"Message 1-1" ),
 	std::wstring( L"Message 1-2" ),

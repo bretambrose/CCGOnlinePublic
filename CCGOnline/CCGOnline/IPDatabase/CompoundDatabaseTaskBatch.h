@@ -17,14 +17,18 @@
 
 **********************************************************************************************************************/
 
-#ifndef COMPOUND_DATABASE_TASK_BATCH_H
-#define COMPOUND_DATABASE_TASK_BATCH_H
+#pragma once
 
 #include "Interfaces/CompoundDatabaseTaskBatchInterface.h"
 #include "Interfaces/DatabaseTaskBaseInterface.h"
 #include "DatabaseCallContext.h"
 #include "DatabaseTaskBatchUtilities.h"
 #include "IPShared/Logging/LogInterface.h"
+
+namespace IP
+{
+namespace Db
+{
 
 class ICompoundDatabaseTask;
 
@@ -33,7 +37,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 {
 	public:
 
-		typedef ICompoundDatabaseTaskBatch BASECLASS;
+		using BASECLASS = ICompoundDatabaseTaskBatch;
 
 		TCompoundDatabaseTaskBatch( void ) :
 			BASECLASS(),
@@ -73,7 +77,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				return;
 			}
 
-			LOG( LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
+			LOG( IP::Logging::ELogLevel::LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
 
 			while ( !PendingTasks.empty() )
 			{
@@ -86,7 +90,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				Process_Parent_Task_List( connection, sub_list, successful_tasks, failed_tasks );
 			}
 
-			LOG( LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << ", Failures: " << failed_tasks.size() );
+			LOG( IP::Logging::ELogLevel::LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << ", Failures: " << failed_tasks.size() );
 		}
 
 		virtual void Register_Child_Variable_Sets( const Loki::TypeInfo &type_info, IDatabaseCallContext *child_call_context )
@@ -105,8 +109,8 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 			{
 				std::for_each( sub_list.cbegin(), sub_list.cend(), []( ICompoundDatabaseTask *task ) { task->Clear_Child_Tasks(); task->Seed_Child_Tasks(); } );
 
-				DatabaseTaskIDType::Enum bad_task = DatabaseTaskIDType::INVALID;
-				ExecuteDBTaskListResult::Enum process_child_result = ExecuteDBTaskListResult::SUCCESS;
+				EDatabaseTaskIDType bad_task = EDatabaseTaskIDType::INVALID;
+				EExecuteDBTaskListResult process_child_result = EExecuteDBTaskListResult::SUCCESS;
 
 				for ( auto tt_iter = ChildOrdering.cbegin(), end = ChildOrdering.cend(); tt_iter != end; ++tt_iter )
 				{
@@ -118,7 +122,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 						continue;
 					}
 
-					LOG( LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << ", ChildTask " << tt_iter->name() << " - TaskCount: " << child_list.size() );
+					LOG( IP::Logging::ELogLevel::LL_LOW, "CompoundDatabaseTaskBatch " << TaskName.c_str() << ", ChildTask " << tt_iter->name() << " - TaskCount: " << child_list.size() );
 
 					auto context_iter = ChildCallContexts.find( *tt_iter );
 					FATAL_ASSERT( context_iter != ChildCallContexts.end() );
@@ -126,7 +130,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 					IDatabaseCallContext *call_context = context_iter->second;
 
 					process_child_result = Process_Child_Task_List( call_context, connection, child_list, bad_task );
-					if ( process_child_result != ExecuteDBTaskListResult::SUCCESS )
+					if ( process_child_result != EExecuteDBTaskListResult::SUCCESS )
 					{
 						break;
 					}
@@ -135,7 +139,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				}
 
 				// commit/rollback etc...
-				if(process_child_result == ExecuteDBTaskListResult::SUCCESS)
+				if(process_child_result == EExecuteDBTaskListResult::SUCCESS)
 				{
 					connection->End_Transaction( true );
 
@@ -154,7 +158,7 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 						return;
 					}
 
-					if ( bad_task != DatabaseTaskIDType::INVALID )
+					if ( bad_task != EDatabaseTaskIDType::INVALID )
 					{
 						auto find_iter = std::find_if( sub_list.begin(), sub_list.end(), [bad_task]( ICompoundDatabaseTask *task ){ return task->Get_ID() == bad_task; } );
 						if ( find_iter != sub_list.end() )
@@ -164,11 +168,11 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 						}
 						else
 						{
-							bad_task = DatabaseTaskIDType::INVALID;
+							bad_task = EDatabaseTaskIDType::INVALID;
 						}
 					}
 
-					if ( bad_task == DatabaseTaskIDType::INVALID )
+					if ( bad_task == EDatabaseTaskIDType::INVALID )
 					{
 						for ( auto iter = sub_list.begin(); iter != sub_list.end(); ++iter )
 						{
@@ -183,11 +187,11 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 			}
 		}
 
-		ExecuteDBTaskListResult::Enum Process_Child_Task_List( IDatabaseCallContext *call_context, IDatabaseConnection *connection, const DBTaskListType &child_list, DatabaseTaskIDType::Enum &bad_task_id )
+		EExecuteDBTaskListResult Process_Child_Task_List( IDatabaseCallContext *call_context, IDatabaseConnection *connection, const DBTaskListType &child_list, EDatabaseTaskIDType &bad_task_id )
 		{
 			if ( child_list.empty() )
 			{
-				return ExecuteDBTaskListResult::SUCCESS;
+				return EExecuteDBTaskListResult::SUCCESS;
 			}
 
 			if ( call_context->Get_Statement_Text().size() == 0 )
@@ -223,13 +227,13 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 				std::advance( end_of_splice_iter, std::min( static_cast<uint32_t>(child_list_copy.size()), call_context->Get_Param_Row_Count() ) );
 				sub_list.splice( sub_list.end(), child_list_copy, child_list_copy.begin(), end_of_splice_iter );
 
-				ExecuteDBTaskListResult::Enum result = ExecuteDBTaskListResult::SUCCESS;
+				EExecuteDBTaskListResult result = EExecuteDBTaskListResult::SUCCESS;
 				DBTaskListType::const_iterator failure_iter = sub_list.end();
 				
-				DBUtils::Execute_Task_List( call_context, statement, sub_list, result, failure_iter );
-				if ( result != ExecuteDBTaskListResult::SUCCESS )
+				Execute_Task_List( call_context, statement, sub_list, result, failure_iter );
+				if ( result != EExecuteDBTaskListResult::SUCCESS )
 				{
-					if ( result == ExecuteDBTaskListResult::FAILED_SPECIFIC_TASK )
+					if ( result == EExecuteDBTaskListResult::FAILED_SPECIFIC_TASK )
 					{
 						bad_task_id = ( *failure_iter )->Get_ID();
 					}
@@ -242,12 +246,12 @@ class TCompoundDatabaseTaskBatch : public ICompoundDatabaseTaskBatch
 
 			connection->Release_Statement( statement );
 
-			return ExecuteDBTaskListResult::SUCCESS;
+			return EExecuteDBTaskListResult::SUCCESS;
 		}
 
-		typedef std::vector< Loki::TypeInfo > ChildTypeVector;
-		typedef std::unordered_map< Loki::TypeInfo, IDatabaseCallContext *, STypeInfoContainerHelper > ChildCallContextTable;
-		typedef std::pair< const Loki::TypeInfo, IDatabaseCallContext * > ChildCallContextPair;
+		using ChildTypeVector = std::vector< Loki::TypeInfo >;
+		using ChildCallContextTable = std::unordered_map< Loki::TypeInfo, IDatabaseCallContext *, STypeInfoContainerHelper >;
+		using ChildCallContextPair = std::pair< const Loki::TypeInfo, IDatabaseCallContext * >;
 
 		ChildTypeVector ChildOrdering;
 		ChildCallContextTable ChildCallContexts;
@@ -266,4 +270,5 @@ void Register_Database_Child_Task_Type( ICompoundDatabaseTaskBatch *compound_bat
 	compound_batch->Register_Child_Variable_Sets( Loki::TypeInfo( typeid( T ) ), child_call_context );
 }
 
-#endif // COMPOUND_DATABASE_TASK_BATCH_H
+} // namespace Db
+} // namespace IP

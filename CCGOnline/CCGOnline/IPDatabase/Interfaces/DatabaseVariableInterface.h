@@ -17,11 +17,15 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_VARIABLE_INTERFACE_H
-#define DATABASE_VARIABLE_INTERFACE_H
+#pragma once
 
 enum EDatabaseVariableType;
 enum EDatabaseVariableValueType;
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseVariable
 {
@@ -40,4 +44,5 @@ class IDatabaseVariable
 
 };
 
-#endif // DATABASE_PARAMETER_INTERFACE_H
+} // namespace Db
+} // namespace IP

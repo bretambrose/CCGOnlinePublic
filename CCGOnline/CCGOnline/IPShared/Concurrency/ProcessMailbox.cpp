@@ -26,14 +26,18 @@
 #include "Containers/LockingConcurrentQueue.h"
 #include "ProcessMessageFrame.h"
 
+namespace IP
+{
+namespace Execution
+{
 
-CProcessMailbox::CProcessMailbox( EProcessID::Enum process_id, const SProcessProperties &properties ) :
+CProcessMailbox::CProcessMailbox( EProcessID process_id, const SProcessProperties &properties ) :
 	ProcessID( process_id ),
 	Properties( properties ),
 	WriteOnlyMailbox( nullptr ),
 	ReadOnlyMailbox( nullptr )
 {
-	std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > queue = std::static_pointer_cast< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > >( std::make_shared< ProcessToProcessQueueType >() );
+	std::shared_ptr< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > queue = std::static_pointer_cast< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > >( std::make_shared< ProcessToProcessQueueType >() );
 
 	WriteOnlyMailbox.reset( new CWriteOnlyMailbox( process_id, properties, queue ) );
 	ReadOnlyMailbox.reset( new CReadOnlyMailbox( queue ) );
@@ -44,4 +48,5 @@ CProcessMailbox::~CProcessMailbox()
 {
 }
 
-
+} // namespace Execution
+} // namespace IP

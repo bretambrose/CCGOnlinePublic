@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef COMPOUND_DATABASE_TASK_BATCH_INTERFACE_H
-#define COMPOUND_DATABASE_TASK_BATCH_INTERFACE_H
+#pragma once
 
 #include "DatabaseTaskBatchInterface.h"
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseCallContext;
 
@@ -28,7 +32,7 @@ class ICompoundDatabaseTaskBatch : public IDatabaseTaskBatch
 {
 	public:
 
-		typedef IDatabaseTaskBatch BASECLASS;
+		using BASECLASS = IDatabaseTaskBatch;
 
 		ICompoundDatabaseTaskBatch( void ) :
 			BASECLASS()
@@ -39,4 +43,5 @@ class ICompoundDatabaseTaskBatch : public IDatabaseTaskBatch
 		virtual void Register_Child_Variable_Sets( const Loki::TypeInfo &type_info, IDatabaseCallContext *child_call_context ) = 0;
 };
 
-#endif // COMPOUND_DATABASE_TASK_BATCH_INTERFACE_H
+} // namespace Db
+} // namespace IP

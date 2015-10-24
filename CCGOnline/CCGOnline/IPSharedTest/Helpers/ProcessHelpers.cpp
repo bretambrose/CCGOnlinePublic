@@ -29,6 +29,9 @@
 #include "IPShared/Concurrency/TaskProcessBase.h"
 #include "IPShared/Concurrency/ThreadProcessBase.h"
 
+using namespace IP::Execution;
+using namespace IP::Logging;
+
 bool CProcessBaseTester::HasProcessServiceExecuted = false;
 
 CProcessBaseTester::CProcessBaseTester( CProcessBase *process ) :
@@ -98,12 +101,12 @@ const std::unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Manager_F
 	return Get_Process()->ManagerFrame; 
 }
 
-bool CProcessBaseTester::Has_Frame( EProcessID::Enum id ) const
+bool CProcessBaseTester::Has_Frame( EProcessID id ) const
 {
 	return Get_Process()->PendingOutboundFrames.find( id ) != Get_Process()->PendingOutboundFrames.end();
 }
 
-const std::unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Frame( EProcessID::Enum id ) const
+const std::unique_ptr< CProcessMessageFrame > &CProcessBaseTester::Get_Frame( EProcessID id ) const
 {
 	return Get_Process()->PendingOutboundFrames.find( id )->second;
 }

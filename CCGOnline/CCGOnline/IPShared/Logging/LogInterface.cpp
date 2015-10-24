@@ -33,11 +33,18 @@
 #include "IPPlatform/PlatformFileSystem.h"
 #include "IPPlatform/StringUtils.h"
 
+using namespace IP::Execution;
+
+namespace IP
+{
+namespace Logging
+{
+
 // Static class data member definitions
 std::mutex CLogInterface::LogLock;
 std::shared_ptr< IManagedProcess > CLogInterface::LogProcess( nullptr );
 
-ELogLevel CLogInterface::LogLevel( LL_LOW );
+ELogLevel CLogInterface::LogLevel( ELogLevel::LL_LOW );
 std::wstring CLogInterface::ServiceName( L"" );
 
 std::wstring CLogInterface::LogPath( L"Logs\\" );
@@ -58,15 +65,15 @@ void CLogInterface::Initialize_Static( const std::wstring &service_name, ELogLev
 	LogLevel = log_level;
 
 	// Create the logging directory if it does not exist
-	if ( !NPlatform::Directory_Exists( LogSubdirectory ) )
+	if ( !IP::File::Directory_Exists( LogSubdirectory ) )
 	{
-		NPlatform::Create_Directory( LogSubdirectory );
+		IP::File::Create_Directory( LogSubdirectory );
 	}
 
 	// Create the log archive directory if it does not exist
-	if ( !NPlatform::Directory_Exists( ArchiveSubdirectory ) )
+	if ( !IP::File::Directory_Exists( ArchiveSubdirectory ) )
 	{
-		NPlatform::Create_Directory( ArchiveSubdirectory );
+		IP::File::Create_Directory( ArchiveSubdirectory );
 	}
 
 	StaticInitialized = true;
@@ -101,18 +108,19 @@ void CLogInterface::Initialize_Dynamic( bool delete_all_logs )
 	file_pattern_string << LogPath << ServiceName << L"*.txt";
 
 	std::vector< std::wstring > matching_file_names;
-	NPlatform::Enumerate_Matching_Files( file_pattern_string.rdbuf()->str(), matching_file_names );
+	IP::File::Enumerate_Matching_Files( file_pattern_string.rdbuf()->str(), matching_file_names );
 
-	uint64_t current_time = CPlatformTime::Get_Raw_Time();
+	auto current_time = IP::Time::Get_Current_System_Time();
 
 	// Try to remove all matching log files that are older than an hour
 	for ( uint32_t i = 0; i < matching_file_names.size(); ++i )
 	{
-		uint64_t file_time = CPlatformTime::Get_File_Write_Raw_Time( LogPath + matching_file_names[ i ] );
+		auto file_time = IP::Time::Get_File_Last_Modified_Time( LogPath + matching_file_names[ i ] );
+		auto time_difference = current_time - file_time;
 
-		if ( delete_all_logs || CPlatformTime::Is_Raw_Time_Less_Than_Seconds( file_time, current_time, SECONDS_PER_HOUR ) )
+		if ( delete_all_logs || std::chrono::duration_cast< std::chrono::seconds >( time_difference ).count() > SECONDS_PER_HOUR )
 		{
-			NPlatform::Delete_File( LogPath + matching_file_names[ i ] );
+			IP::File::Delete_File( LogPath + matching_file_names[ i ] );
 		}
 	}
 
@@ -137,13 +145,13 @@ void CLogInterface::Shutdown_Dynamic( void )
 }
 
 
-void CLogInterface::Service_Logging( const CProcessExecutionContext &context )
+void CLogInterface::Service_Logging( const IP::Execution::CProcessExecutionContext &context )
 {
 	std::lock_guard< std::mutex > lock( LogLock );
 
 	if ( LogProcess.get() != nullptr )
 	{
-		IProcess *old_process = CProcessStatics::Get_Current_Process();
+		auto old_process = CProcessStatics::Get_Current_Process();
 
 		CProcessStatics::Set_Current_Process( LogProcess.get() );
 		LogProcess->Run( context );
@@ -199,7 +207,7 @@ void CLogInterface::Log( const std::basic_ostringstream< wchar_t > &message_stre
 void CLogInterface::Log( const std::string &message )
 {
 	std::wstring w_message;
-	NStringUtils::String_To_WideString( message, w_message );
+	IP::String::String_To_WideString( message, w_message );
 
 	Log( std::move( w_message ) );
 }
@@ -208,7 +216,7 @@ void CLogInterface::Log( const std::string &message )
 void CLogInterface::Log( const char *message )
 {
 	std::wstring w_message;
-	NStringUtils::String_To_WideString( message, w_message );
+	IP::String::String_To_WideString( message, w_message );
 
 	Log( std::move( w_message ) );
 }
@@ -219,3 +227,5 @@ void CLogInterface::Log( const std::basic_ostringstream< char > &message_stream 
 	Log( message_stream.rdbuf()->str() );
 }
 
+} // namespace Logging
+} // namespace IP

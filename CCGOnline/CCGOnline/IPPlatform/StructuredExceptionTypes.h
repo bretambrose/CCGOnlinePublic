@@ -17,11 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef STRUCTURED_EXCEPTION_TYPES_H
-#define STRUCTURED_EXCEPTION_TYPES_H
+#pragma once
+
+namespace IP
+{
+namespace Debug
+{
 
 class CStructuredExceptionInfo;
 
-typedef FastDelegate1< CStructuredExceptionInfo &, void > DExceptionHandler;
+using DExceptionHandler = FastDelegate1< CStructuredExceptionInfo &, void >;
 
-#endif // STRUCTURED_EXCEPTION_TYPES_H
+} // namespace Debug
+} // namespace IP

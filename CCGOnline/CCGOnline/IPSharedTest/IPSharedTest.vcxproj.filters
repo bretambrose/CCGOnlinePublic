@@ -55,9 +55,6 @@
     <ClCompile Include="ConcurrentQueueTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TimeTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ConcurrencyManagerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

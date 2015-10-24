@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef SHARED_TEST_PROCESS_SUBJECT_H
-#define SHARED_TEST_PROCESS_SUBJECT_H
+#pragma once
 
 #include "IPShared/Concurrency/ProcessSubject.h"
 
@@ -38,4 +37,3 @@ namespace ETestExtendedProcessSubject
 }
 //:EnumEnd
 
-#endif // SHARED_TEST_PROCESS_SUBJECT_H

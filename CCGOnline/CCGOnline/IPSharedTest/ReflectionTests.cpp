@@ -22,6 +22,8 @@
 #include "ReflectionTests.h"
 #include "IPShared/EnumConversion.h"
 
+using namespace IP::Enum;
+
 TEST( ReflectionTests, Normal )
 {
 	EReflectionTest converted_value = RT_INVALID;

@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef EMPTY_VARIABLE_SET_H
-#define EMPTY_VARIABLE_SET_H
+#pragma once
 
 #include "Interfaces/DatabaseVariableSetInterface.h"
+
+namespace IP
+{
+namespace Db
+{
 
 class CEmptyVariableSet : public IDatabaseVariableSet
 {
@@ -31,14 +35,18 @@ class CEmptyVariableSet : public IDatabaseVariableSet
 
 		virtual ~CEmptyVariableSet() {}
 
-		virtual void Get_Variables( std::vector< IDatabaseVariable * > & /*variables*/ )
+		virtual void Get_Variables( std::vector< IDatabaseVariable * > &variables )
 		{
+			IP_UNREFERENCED_PARAM( variables );
 		}
 
-		virtual void Convert_Variable_To_String( IDatabaseVariable * /*variable*/, std::string & /*value*/ ) const
+		virtual void Convert_Variable_To_String( IDatabaseVariable *variable, std::string &value ) const
 		{
+			IP_UNREFERENCED_PARAM( variable );
+			IP_UNREFERENCED_PARAM( value );
 		}
 
 };
 
-#endif // EMPTY_VARIABLE_SET_H
+} // namespace Db
+} // namespace IP

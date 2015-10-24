@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef UNIVERSAL_H
-#define UNIVERSAL_H
+#pragma once
 
 #include <cstdint>
 
@@ -33,7 +32,3 @@
 
 #define IP_UNREFERENCED_PARAM( x ) ( &reinterpret_cast< const int& >( x ) )
 
-using StringCRC64 = uint64_t;
-using StringCRC32 = uint32_t;
-
-#endif // UNIVERSAL_H

@@ -21,20 +21,30 @@
 
 #include "LoggingMessages.h"
 
-#include "IPPlatform/PlatformTime.h"
+using namespace IP::Time;
 
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
 
-CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_properties, std::wstring &&message ) :
+CLogRequestMessage::CLogRequestMessage( const IP::Execution::SProcessProperties &source_properties, std::wstring &&message ) :
 	SourceProperties( source_properties ),
 	Message( std::move( message ) ),
-	Time( CPlatformTime::Get_Raw_Time() )
+	Time( Get_Current_System_Time() )
 {
 }
 
 
-CLogRequestMessage::CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message ) :
+CLogRequestMessage::CLogRequestMessage( const IP::Execution::SProcessProperties &source_properties, const std::wstring &message ) :
 	SourceProperties( source_properties ),
 	Message( message ),
-	Time( CPlatformTime::Get_Raw_Time() )
+	Time( Get_Current_System_Time() )
 {
 }
+
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

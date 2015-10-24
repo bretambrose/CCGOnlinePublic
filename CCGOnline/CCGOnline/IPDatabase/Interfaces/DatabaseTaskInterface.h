@@ -17,34 +17,31 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_INTERFACE_H
-#define DATABASE_TASK_INTERFACE_H
+#pragma once
 
 #include "DatabaseTaskBaseInterface.h"
 
 #include "IPDatabase/DatabaseTypes.h"
+#include "IPDatabase/DatabaseTaskBatchUtilities.h"
+
+enum EDatabaseTaskType;
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseVariableSet;
 class IDatabaseCallContext;
 class IDatabaseStatement;
 
-enum EDatabaseTaskType;
-
-namespace ExecuteDBTaskListResult
-{
-	enum Enum;
-}
-
-namespace DBUtils
-{
-	void Execute_Task_List( IDatabaseCallContext *, IDatabaseStatement *, const DBTaskListType &, ExecuteDBTaskListResult::Enum &, DBTaskListType::const_iterator & );
-}
+enum class ExecuteDBTaskListResult;
 
 class IDatabaseTask : public IDatabaseTaskBase
 {
 	public:
 		
-		typedef IDatabaseTaskBase BASECLASS;
+		using BASECLASS = IDatabaseTaskBase;
 
 		IDatabaseTask( void ) :
 			BASECLASS()
@@ -59,7 +56,7 @@ class IDatabaseTask : public IDatabaseTaskBase
 	protected:
 
 		template < typename T > friend class TDatabaseTaskBatch;
-		friend void DBUtils::Execute_Task_List( IDatabaseCallContext *, IDatabaseStatement *, const DBTaskListType &, ExecuteDBTaskListResult::Enum &, DBTaskListType::const_iterator & );
+		friend void Execute_Task_List( IDatabaseCallContext *, IDatabaseStatement *, const DBTaskListType &, EExecuteDBTaskListResult &, DBTaskListType::const_iterator & );
 
 		virtual void Initialize_Parameters( IDatabaseVariableSet *input_parameters ) = 0;		
 		virtual void On_Fetch_Results( IDatabaseVariableSet *result_set, int64_t rows_fetched ) = 0;			
@@ -69,4 +66,5 @@ class IDatabaseTask : public IDatabaseTaskBase
 
 };
 
-#endif // DATABASE_TASK_INTERFACE_H
+} // namespace Db
+} // namespace IP

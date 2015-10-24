@@ -23,6 +23,8 @@
 #include "IPShared/Concurrency/ProcessConstants.h"
 #include "SharedTestProcessSubject.h"
 
+using namespace IP::Execution;
+
 TEST( ProcessPropertiesTests, Constructors )
 {
 	SProcessProperties props( ETestExtendedProcessSubject::DATABASE, 5, 10, 2 );

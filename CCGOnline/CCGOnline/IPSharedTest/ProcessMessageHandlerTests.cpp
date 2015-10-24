@@ -25,6 +25,10 @@
 #include "IPShared/Concurrency/ProcessConstants.h"
 #include "IPShared/Concurrency/ProcessID.h"
 
+using namespace IP;
+using namespace IP::Execution;
+using namespace IP::Execution::Messaging;
+
 class CMockMessageHandlerTracker
 {
 	public:
@@ -47,7 +51,7 @@ class CMockMessageHandlerTracker
 		}
 
 		const std::wstring &Get_Last_Log_Message( void ) const { return LastLogMessage; }
-		EProcessID::Enum Get_Last_Shutdown_Process_ID( void ) const { return LastShutdownProcessID; }
+		EProcessID Get_Last_Shutdown_Process_ID( void ) const { return LastShutdownProcessID; }
 
 		void Register_Handler( const std::type_info &message_type_info, std::unique_ptr< IProcessMessageHandler > &handler )
 		{
@@ -57,7 +61,7 @@ class CMockMessageHandlerTracker
 			MessageHandlers.insert( MessageHandlerTableType::value_type( key, std::move( handler ) ) );
 		}
 
-		void Handle_Message( EProcessID::Enum process_id, std::unique_ptr< const IProcessMessage > &message )
+		void Handle_Message( EProcessID process_id, std::unique_ptr< const IProcessMessage > &message )
 		{
 			const IProcessMessage *msg_base = message.get();
 
@@ -70,22 +74,22 @@ class CMockMessageHandlerTracker
 
 	private:
 
-		void Handle_Log_Request( EProcessID::Enum /*process_id*/, std::unique_ptr< const CLogRequestMessage > &message )
+		void Handle_Log_Request( EProcessID /*process_id*/, std::unique_ptr< const CLogRequestMessage > &message )
 		{
 			LastLogMessage = message->Get_Message();
 		}
 
-		void Handle_Shutdown_Process_Request( EProcessID::Enum /*process_id*/, std::unique_ptr< const CShutdownProcessMessage > &message )
+		void Handle_Shutdown_Process_Request( EProcessID /*process_id*/, std::unique_ptr< const CShutdownProcessMessage > &message )
 		{
 			LastShutdownProcessID = message->Get_Process_ID();
 		}
 
-		typedef std::unordered_map< Loki::TypeInfo, std::unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > MessageHandlerTableType;
+		using MessageHandlerTableType = std::unordered_map< Loki::TypeInfo, std::unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper >;
 		MessageHandlerTableType MessageHandlers;
 
 		std::wstring LastLogMessage;
 
-		EProcessID::Enum LastShutdownProcessID;
+		EProcessID LastShutdownProcessID;
 };
 
 static const std::wstring LOG_MESSAGE_1( L"Message Handler Test 1" );

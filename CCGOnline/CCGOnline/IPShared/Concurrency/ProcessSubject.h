@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_SUBJECT_H
-#define PROCESS_SUBJECT_H
+#pragma once
 
 //:EnumBegin()
 namespace EProcessSubject
@@ -35,4 +34,4 @@ namespace EProcessSubject
 }
 //:EnumEnd
 
-#endif // PROCESS_SUBJECT_H
+

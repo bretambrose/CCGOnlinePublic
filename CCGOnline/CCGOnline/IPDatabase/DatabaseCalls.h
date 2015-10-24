@@ -17,12 +17,18 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_CALLS_H
-#define DATABASE_CALLS_H
+#pragma once
 
 #include "Interfaces/CompoundDatabaseTaskInterface.h"
 #include "Interfaces/DatabaseTaskInterface.h"
 #include "DatabaseTypes.h"
+
+namespace IP
+{
+namespace Db
+{
+
+enum class EDatabaseTaskIdType;
 
 class CEmptyVariableSet;
 
@@ -30,18 +36,18 @@ class CDatabaseTaskBase : public IDatabaseTask
 {
 	public:
 
-		typedef IDatabaseTask BASECLASS;
+		using BASECLASS = IDatabaseTask;
 
-		CDatabaseTaskBase( void ) :
+		CDatabaseTaskBase::CDatabaseTaskBase( void ) :
 			BASECLASS(),
 			Parent( nullptr ),
-			ID( DatabaseTaskIDType::INVALID )
+			ID( EDatabaseTaskIDType::INVALID )
 		{}
 
 		virtual ~CDatabaseTaskBase() {}
 
-		virtual DatabaseTaskIDType::Enum Get_ID( void ) const { return ID; }
-		virtual void Set_ID( DatabaseTaskIDType::Enum id ) { ID = id; }
+		virtual EDatabaseTaskIDType Get_ID( void ) const { return ID; }
+		virtual void Set_ID( EDatabaseTaskIDType id ) { ID = id; }
 
 	protected:
 
@@ -52,7 +58,7 @@ class CDatabaseTaskBase : public IDatabaseTask
 
 		ICompoundDatabaseTask *Parent;
 
-		DatabaseTaskIDType::Enum ID;
+		EDatabaseTaskIDType ID;
 };
 
 template < typename I, uint32_t ISIZE >
@@ -60,7 +66,7 @@ class TDatabaseFunctionCall : public CDatabaseTaskBase
 {
 	public:
 
-		typedef CDatabaseTaskBase BASECLASS;
+		using BASECLASS = CDatabaseTaskBase;
 
 		TDatabaseFunctionCall( void ) :
 			BASECLASS()
@@ -71,8 +77,8 @@ class TDatabaseFunctionCall : public CDatabaseTaskBase
 		virtual void Build_Column_Name_List( std::vector< const wchar_t * > & /*column_names*/ ) const {}
 		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_FUNCTION_CALL; }
 
-		typedef I InputParametersType;
-		typedef CEmptyVariableSet ResultSetType;
+		using InputParametersType = I;
+		using ResultSetType = CEmptyVariableSet;
 
 		static const uint32_t InputParameterBatchSize = ISIZE;
 		static const uint32_t ResultSetBatchSize = 1;
@@ -89,7 +95,7 @@ class TDatabaseProcedureCall : public CDatabaseTaskBase
 {
 	public:
 
-		typedef CDatabaseTaskBase BASECLASS;
+		using BASECLASS = CDatabaseTaskBase;
 
 		TDatabaseProcedureCall( void ) :
 			BASECLASS()
@@ -100,8 +106,8 @@ class TDatabaseProcedureCall : public CDatabaseTaskBase
 		virtual void Build_Column_Name_List( std::vector< const wchar_t * > & /*column_names*/ ) const {}
 		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_PROCEDURE_CALL; }
 
-		typedef I InputParametersType;
-		typedef O ResultSetType;
+		using InputParametersType = I;
+		using ResultSetType = O;
 
 		static const uint32_t InputParameterBatchSize = ISIZE;
 		static const uint32_t ResultSetBatchSize = OSIZE;
@@ -112,7 +118,7 @@ class TDatabaseSelect : public CDatabaseTaskBase
 {
 	public:
 
-		typedef CDatabaseTaskBase BASECLASS;
+		using BASECLASS = CDatabaseTaskBase;
 
 		TDatabaseSelect( void ) :
 			BASECLASS()
@@ -122,8 +128,8 @@ class TDatabaseSelect : public CDatabaseTaskBase
 
 		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_SELECT; }
 
-		typedef CEmptyVariableSet InputParametersType;
-		typedef O ResultSetType;
+		using InputParametersType = CEmptyVariableSet;
+		using ResultSetType = O;
 
 		static const uint32_t InputParameterBatchSize = 1;
 		static const uint32_t ResultSetBatchSize = OSIZE;
@@ -134,7 +140,7 @@ class TDatabaseTableValuedFunctionCall : public CDatabaseTaskBase
 {
 	public:
 
-		typedef CDatabaseTaskBase BASECLASS;
+		using BASECLASS = CDatabaseTaskBase;
 
 		TDatabaseTableValuedFunctionCall( void ) :
 			BASECLASS()
@@ -144,8 +150,8 @@ class TDatabaseTableValuedFunctionCall : public CDatabaseTaskBase
 
 		virtual EDatabaseTaskType Get_Task_Type( void ) const { return DTT_TABLE_VALUED_FUNCTION_CALL; }
 
-		typedef I InputParametersType;
-		typedef O ResultSetType;
+		using InputParametersType = I;
+		using ResultSetType = O;
 
 		static const uint32_t InputParameterBatchSize = ISIZE;
 		static const uint32_t ResultSetBatchSize = OSIZE;
@@ -157,11 +163,11 @@ class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
 {
 	public:
 
-		typedef ICompoundDatabaseTask BASECLASS;
+		using BASECLASS = ICompoundDatabaseTask;
 
 		CCompoundDatabaseTaskBase( void ) :
 			BASECLASS(),
-			ID( DatabaseTaskIDType::INVALID ),
+			ID( EDatabaseTaskIDType::INVALID ),
 			Children(),
 			SuccessCallbacks()
 		{}
@@ -169,8 +175,8 @@ class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
 		virtual ~CCompoundDatabaseTaskBase();
 
 		// IDatabaseTask interface
-		virtual DatabaseTaskIDType::Enum Get_ID( void ) const { return ID; }
-		virtual void Set_ID( DatabaseTaskIDType::Enum id ) { ID = id; }
+		virtual EDatabaseTaskIDType Get_ID( void ) const { return ID; }
+		virtual void Set_ID( EDatabaseTaskIDType id ) { ID = id; }
 
 		// ICompoundDatabaseTask interface
 		virtual void Add_Child_Task( IDatabaseTask *task );
@@ -182,7 +188,7 @@ class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
 
 	protected:
 
-		typedef FastDelegate0<> ChildSuccessHandlerFunctorType;
+		using ChildSuccessHandlerFunctorType = FastDelegate0<>;
 
 		// IDatabaseTask interface
 		virtual void Set_Parent( ICompoundDatabaseTask * /*parent*/ ) { FATAL_ASSERT( false ); }
@@ -192,9 +198,9 @@ class CCompoundDatabaseTaskBase : public ICompoundDatabaseTask
 
 	private:
 
-		typedef std::unordered_map< Loki::TypeInfo, ChildSuccessHandlerFunctorType, STypeInfoContainerHelper > ChildTypeCallbackTableType;
+		using ChildTypeCallbackTableType = std::unordered_map< Loki::TypeInfo, ChildSuccessHandlerFunctorType, STypeInfoContainerHelper >;
 
-		DatabaseTaskIDType::Enum ID;
+		EDatabaseTaskIDType ID;
 
 		DBTaskListTableType Children;
 
@@ -205,7 +211,7 @@ template < uint32_t BATCH_SIZE >
 class TCompoundDatabaseTask : public CCompoundDatabaseTaskBase {
 	public:
 
-		typedef CCompoundDatabaseTaskBase BASECLASS;
+		using BASECLASS = CCompoundDatabaseTaskBase;
 
 		TCompoundDatabaseTask( void ) :
 			BASECLASS()
@@ -218,4 +224,5 @@ class TCompoundDatabaseTask : public CCompoundDatabaseTaskBase {
 	private:
 };
 
-#endif // DATABASE_CALLS_H
+} // namespace Db
+} // namespace IP

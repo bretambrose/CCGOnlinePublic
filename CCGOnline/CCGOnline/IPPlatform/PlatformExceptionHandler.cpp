@@ -45,7 +45,7 @@
 
 #endif
 
-static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStructuredExceptionInfo &info )
+static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, IP::Debug::CStructuredExceptionInfo &info )
 {
 	DWORD machine_type;
 	CONTEXT local_context;
@@ -124,7 +124,7 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 		success = ::StackWalk64( machine_type, current_process, GetCurrentThread(), &stack_frame, walk_context, nullptr, SymFunctionTableAccess64, SymGetModuleBase64, NULL ) == TRUE;
 		if ( !success )
 		{
-			info.Set_Symbol_Error( NPlatform::Format_OS_Error_Message( ::GetLastError() ) );
+			info.Set_Symbol_Error( IP::Misc::Format_OS_Error_Message( ::GetLastError() ) );
 			break;
 		}
 
@@ -148,7 +148,7 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 		success = ::SymFromAddrW( current_process, address, nullptr, p_symbol ) == TRUE;
 		if ( !success )
 		{
-			info.Set_Symbol_Error( NPlatform::Format_OS_Error_Message( ::GetLastError() ) );
+			info.Set_Symbol_Error( IP::Misc::Format_OS_Error_Message( ::GetLastError() ) );
 			break;
 		}
 
@@ -160,7 +160,7 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 		module_info.SizeOfStruct = sizeof( IMAGEHLP_MODULEW64 );
 		if ( ::SymGetModuleInfoW64( current_process, address, &module_info ) == FALSE )
 		{
-			info.Set_Symbol_Error( NPlatform::Format_OS_Error_Message( ::GetLastError() ) );
+			info.Set_Symbol_Error( IP::Misc::Format_OS_Error_Message( ::GetLastError() ) );
 			break;
 		}
 
@@ -177,11 +177,11 @@ static void Capture_Stack_Trace( __in_opt CONST PCONTEXT initial_context, CStruc
 		bool file_success = ::SymGetLineFromAddrW64( current_process, address, &displacement, &line_info ) == TRUE;
 		if ( file_success )
 		{
-			info.Add_Frame( CStackFrame( address, symbol_name, module_name, std::wstring( line_info.FileName ), line_info.LineNumber ) );
+			info.Add_Frame( IP::Debug::CStackFrame( address, symbol_name, module_name, std::wstring( line_info.FileName ), line_info.LineNumber ) );
 		}
 		else
 		{
-			info.Add_Frame( CStackFrame( address, symbol_name, module_name ) );
+			info.Add_Frame( IP::Debug::CStackFrame( address, symbol_name, module_name ) );
 		}
 	}
 }
@@ -239,18 +239,18 @@ static std::wstring Convert_Exception_Code_To_Message( uint32_t exception_code )
 
 static LONG WINAPI WindowsExceptionHandler( struct _EXCEPTION_POINTERS *windows_exception_info )
 {
-	std::lock_guard< std::mutex > exception_lock( CPlatformExceptionHandler::Get_Lock() );
+	std::lock_guard< std::mutex > exception_lock( IP::Debug::CPlatformExceptionHandler::Get_Lock() );
 		
 	uint32_t exception_code = windows_exception_info->ExceptionRecord->ExceptionCode;
-	CStructuredExceptionInfo shared_exception_info( exception_code == 1 );
+	IP::Debug::CStructuredExceptionInfo shared_exception_info( exception_code == 1 );
 	shared_exception_info.Set_Exception_Message( ::Convert_Exception_Code_To_Message( exception_code ) );
 
-	if ( CPlatformExceptionHandler::Load_Symbols( shared_exception_info.Get_Symbol_Error() ) )
+	if ( IP::Debug::CPlatformExceptionHandler::Load_Symbols( shared_exception_info.Get_Symbol_Error() ) )
 	{
 		::Capture_Stack_Trace( windows_exception_info->ContextRecord, shared_exception_info );
 	}
 
-	CPlatformExceptionHandler::On_Exception( shared_exception_info );
+	IP::Debug::CPlatformExceptionHandler::On_Exception( shared_exception_info );
 
 	if ( shared_exception_info.Is_Test_Exception() )
 	{
@@ -263,6 +263,11 @@ static LONG WINAPI WindowsExceptionHandler( struct _EXCEPTION_POINTERS *windows_
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace IP
+{
+namespace Debug
+{
 
 DExceptionHandler CPlatformExceptionHandler::Handler;
 std::mutex CPlatformExceptionHandler::ExceptionLock;
@@ -301,7 +306,7 @@ void CPlatformExceptionHandler::Shutdown( void )
 }
 
 
-void CPlatformExceptionHandler::On_Exception( CStructuredExceptionInfo &shared_exception_info )
+void CPlatformExceptionHandler::On_Exception( IP::Debug::CStructuredExceptionInfo &shared_exception_info )
 {
 	if ( !Handler.empty() )
 	{
@@ -323,12 +328,15 @@ bool CPlatformExceptionHandler::Load_Symbols( std::wstring &error_message )
 
 	if ( !::SymInitializeW( ::GetCurrentProcess(), nullptr, TRUE ) )
 	{
-		error_message = NPlatform::Format_OS_Error_Message( ::GetLastError() );
+		error_message = IP::Misc::Format_OS_Error_Message( ::GetLastError() );
 		return false;
 	}
 
 	SymbolsLoaded = true;
 	return true;
 }
+
+} // namespace Debug
+} // namespace IP
 
 #endif // WIN32

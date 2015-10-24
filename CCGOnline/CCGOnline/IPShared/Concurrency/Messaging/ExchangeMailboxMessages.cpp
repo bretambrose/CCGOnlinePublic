@@ -23,8 +23,14 @@
 
 #include "IPShared/Concurrency/MailboxInterfaces.h"
 
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
 
-CAddMailboxMessage::CAddMailboxMessage( const std::shared_ptr< CWriteOnlyMailbox > &mailbox ) :
+CAddMailboxMessage::CAddMailboxMessage( const std::shared_ptr< IP::Execution::CWriteOnlyMailbox > &mailbox ) :
 	Mailbox( mailbox )
 {
 }
@@ -33,3 +39,7 @@ CAddMailboxMessage::CAddMailboxMessage( const std::shared_ptr< CWriteOnlyMailbox
 CAddMailboxMessage::~CAddMailboxMessage() 
 {
 }
+
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

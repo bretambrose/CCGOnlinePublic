@@ -22,22 +22,32 @@
 #include "IPShared/IPShared.h"
 #include "GeneratedCode/RegisterAuthServerEnums.h"
 
-namespace NAuthServer
+namespace IP
 {
-	void Initialize( void )
+namespace Global
+{
+
+	void Initialize_AuthServer( void )
 	{
-		NIPShared::Initialize();
+		Initialize_IPShared();
 		Register_AuthServer_Enums();
 	}
 
-	void Shutdown( void )
+	void Shutdown_AuthServer( void )
 	{
-		NIPShared::Shutdown();
+		Shutdown_IPShared();
 	}
-}
+
+} // namespace Global
+} // namespace IP
+
+using namespace IP::Global;
 
 int main( int /*argc*/, wchar_t* /*argv*/[] )
 {
+	Initialize_AuthServer();
+	Shutdown_AuthServer();
+
 	return 0;
 }
 

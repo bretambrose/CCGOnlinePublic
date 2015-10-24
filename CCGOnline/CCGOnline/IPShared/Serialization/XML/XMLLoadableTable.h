@@ -17,22 +17,28 @@
 
 **********************************************************************************************************************/
 
-#ifndef XML_LOADABLE_TABLE_H
-#define XML_LOADABLE_TABLE_H
+#pragma once
 
 #include "IPShared/Serialization/XML/XMLSerializerInterface.h"
 #include "pugixml/pugixml.h"
 #include "IPShared/Serialization/SerializationRegistrar.h"
+
+namespace IP
+{
+namespace Serialization
+{
+namespace XML
+{
 
 template< typename K, typename T >
 class CXMLLoadableTable
 {
 	public:
 
-		typedef const K & ( T::* KeyExtractorMemberFunction )( void ) const ;
-		typedef void ( T::* PostLoadMemberFunction )( void );
-		typedef std::unordered_map< K, const T * > TableType;
-		typedef typename TableType::const_iterator TableIterator;
+		using KeyExtractorMemberFunction = const K & ( T::* )( void ) const ;
+		using PostLoadMemberFunction = void ( T::* )( void );
+		using TableType = std::unordered_map< K, const T * >;
+		using TableIterator = typename TableType::const_iterator;
 
 		CXMLLoadableTable( KeyExtractorMemberFunction key_extractor, const wchar_t *top_child = nullptr ) :
 			KeyExtractor( key_extractor ),
@@ -108,5 +114,6 @@ class CXMLLoadableTable
 		TableType Loadables;
 };
 
-
-#endif // XML_LOADABLE_TABLE_H
+} // namespace XML
+} // namespace Serialization
+} // namespace IP

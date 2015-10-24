@@ -17,13 +17,17 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_PARAMETERS_H
-#define ODBC_PARAMETERS_H
+#pragma once
 
 #include "IPDatabase/Interfaces/DatabaseVariableInterface.h"
 #include "IPDatabase/DatabaseTypes.h"
 #include "ODBCParameterInsulation.h"
 #include "IPPlatform/StringUtils.h"
+
+namespace IP
+{
+namespace Db
+{
 
 template < typename T >
 EDatabaseVariableValueType Get_ODBC_Value_Type( const T & /*dummy*/ )
@@ -44,7 +48,7 @@ class TODBCScalarVariableBase : public IDatabaseVariable
 {
 	public:
 
-		typedef IDatabaseVariable BASECLASS;
+		using BASECLASS = IDatabaseVariable;
 
 		TODBCScalarVariableBase( void ) :
 			Value( static_cast< T >( 0 ) ),
@@ -101,7 +105,7 @@ class TODBCScalarVariable : public TODBCScalarVariableBase< T >
 {
 	public:
 
-		typedef TODBCScalarVariableBase< T > BASECLASS;
+		using BASECLASS = TODBCScalarVariableBase< T >;
 
 		TODBCScalarVariable( void ) :
 			BASECLASS()
@@ -123,33 +127,33 @@ class TODBCScalarVariable : public TODBCScalarVariableBase< T >
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef TODBCScalarVariable< int32_t, DVT_INPUT >					DBInt32In;
-typedef TODBCScalarVariable< int32_t, DVT_INPUT_OUTPUT >		DBInt32InOut;
-typedef TODBCScalarVariable< int32_t, DVT_OUTPUT >				DBInt32Out;
+using DBInt32In = TODBCScalarVariable< int32_t, DVT_INPUT >;
+using DBInt32InOut = TODBCScalarVariable< int32_t, DVT_INPUT_OUTPUT >;
+using DBInt32Out = TODBCScalarVariable< int32_t, DVT_OUTPUT >;
 
-typedef TODBCScalarVariable< uint32_t, DVT_INPUT >				DBUInt32In;
-typedef TODBCScalarVariable< uint32_t, DVT_INPUT_OUTPUT >		DBUInt32InOut;
-typedef TODBCScalarVariable< uint32_t, DVT_OUTPUT >				DBUInt32Out;
+using DBUInt32In = TODBCScalarVariable< uint32_t, DVT_INPUT >;
+using DBUInt32InOut = TODBCScalarVariable< uint32_t, DVT_INPUT_OUTPUT >;
+using DBUInt32Out = TODBCScalarVariable< uint32_t, DVT_OUTPUT >;
 
-typedef TODBCScalarVariable< int64_t, DVT_INPUT >					DBInt64In;
-typedef TODBCScalarVariable< int64_t, DVT_INPUT_OUTPUT >		DBInt64InOut;
-typedef TODBCScalarVariable< int64_t, DVT_OUTPUT >				DBInt64Out;
+using DBInt64In = TODBCScalarVariable< int64_t, DVT_INPUT >;
+using DBInt64InOut = TODBCScalarVariable< int64_t, DVT_INPUT_OUTPUT >;
+using DBInt64Out = TODBCScalarVariable< int64_t, DVT_OUTPUT >;
 
-typedef TODBCScalarVariable< uint64_t, DVT_INPUT >				DBUInt64In;
-typedef TODBCScalarVariable< uint64_t, DVT_INPUT_OUTPUT >		DBUInt64InOut;
-typedef TODBCScalarVariable< uint64_t, DVT_OUTPUT >				DBUInt64Out;
+using DBUInt64In = TODBCScalarVariable< uint64_t, DVT_INPUT >;
+using DBUInt64InOut = TODBCScalarVariable< uint64_t, DVT_INPUT_OUTPUT >;
+using DBUInt64Out = TODBCScalarVariable< uint64_t, DVT_OUTPUT >;
 
-typedef TODBCScalarVariable< float, DVT_INPUT >					DBFloatIn;
-typedef TODBCScalarVariable< float, DVT_INPUT_OUTPUT >		DBFloatInOut;
-typedef TODBCScalarVariable< float, DVT_OUTPUT >				DBFloatOut;
+using DBFloatIn = TODBCScalarVariable< float, DVT_INPUT >;
+using DBFloatInOut = TODBCScalarVariable< float, DVT_INPUT_OUTPUT >;
+using DBFloatOut = TODBCScalarVariable< float, DVT_OUTPUT >;
 
-typedef TODBCScalarVariable< double, DVT_INPUT >				DBDoubleIn;
-typedef TODBCScalarVariable< double, DVT_INPUT_OUTPUT >		DBDoubleInOut;
-typedef TODBCScalarVariable< double, DVT_OUTPUT >				DBDoubleOut;
+using DBDoubleIn = TODBCScalarVariable< double, DVT_INPUT >;
+using DBDoubleInOut = TODBCScalarVariable< double, DVT_INPUT_OUTPUT >;
+using DBDoubleOut = TODBCScalarVariable< double, DVT_OUTPUT >;
 
-typedef TODBCScalarVariable< bool, DVT_INPUT >					DBBoolIn;
-typedef TODBCScalarVariable< bool, DVT_INPUT_OUTPUT >			DBBoolInOut;
-typedef TODBCScalarVariable< bool, DVT_OUTPUT >					DBBoolOut;
+using DBBoolIn = TODBCScalarVariable< bool, DVT_INPUT >;
+using DBBoolInOut = TODBCScalarVariable< bool, DVT_INPUT_OUTPUT >;
+using DBBoolOut = TODBCScalarVariable< bool, DVT_OUTPUT >;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -157,7 +161,7 @@ class IDatabaseString : public IDatabaseVariable
 {
 	public:
 
-		typedef IDatabaseVariable BASECLASS;
+		using BASECLASS = IDatabaseVariable;
 
 		IDatabaseString( void ) :
 			BASECLASS()
@@ -175,7 +179,7 @@ class DBStringBase : public IDatabaseString
 {
 	public:
 
-		typedef IDatabaseString BASECLASS;
+		using BASECLASS = IDatabaseString;
 
 		DBStringBase( void ) :
 			BASECLASS(),
@@ -246,7 +250,7 @@ class DBString : public DBStringBase< char, BUFFER_LENGTH >
 {
 	public:
 
-		typedef DBStringBase< char, BUFFER_LENGTH > BASECLASS;
+		using BASECLASS = DBStringBase< char, BUFFER_LENGTH >;
 
 		DBString( void ) :
 			BASECLASS()
@@ -299,7 +303,7 @@ class DBString : public DBStringBase< char, BUFFER_LENGTH >
 		{
 			std::string base_value;
 			To_String( base_value );
-			NStringUtils::String_To_WideString( base_value, value );
+			IP::String::String_To_WideString( base_value, value );
 		}
 
 		void Copy_Into( std::string &dest )
@@ -320,7 +324,7 @@ class DBStringIn : public DBString< BUFFER_LENGTH, DVT_INPUT >
 {
 	public:
 
-		typedef DBString< BUFFER_LENGTH, DVT_INPUT > BASECLASS;
+		using BASECLASS = DBString< BUFFER_LENGTH, DVT_INPUT >;
 
 		DBStringIn( void ) :
 			BASECLASS()
@@ -350,7 +354,7 @@ class DBStringInOut : public DBString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
 {
 	public:
 
-		typedef DBString< BUFFER_LENGTH, DVT_INPUT_OUTPUT > BASECLASS;
+		using BASECLASS = DBString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >;
 
 		DBStringInOut( void ) :
 			BASECLASS()
@@ -380,7 +384,7 @@ class DBStringOut : public DBString< BUFFER_LENGTH, DVT_OUTPUT >
 {
 	public:
 
-		typedef DBString< BUFFER_LENGTH, DVT_OUTPUT > BASECLASS;
+		using BASECLASS = DBString< BUFFER_LENGTH, DVT_OUTPUT >;
 
 		DBStringOut( void ) :
 			BASECLASS()
@@ -404,7 +408,7 @@ class DBWString : public DBStringBase< wchar_t, BUFFER_LENGTH >
 {
 	public:
 
-		typedef DBStringBase< wchar_t, BUFFER_LENGTH > BASECLASS;
+		using BASECLASS = DBStringBase< wchar_t, BUFFER_LENGTH >;
 
 		DBWString( void ) :
 			BASECLASS()
@@ -446,7 +450,7 @@ class DBWString : public DBStringBase< wchar_t, BUFFER_LENGTH >
 		{
 			std::wstring base_value;
 			To_WString( base_value );
-			NStringUtils::WideString_To_String( base_value, value );
+			IP::String::WideString_To_String( base_value, value );
 		}
 
 		virtual void To_WString( std::wstring &value ) const
@@ -479,7 +483,7 @@ class DBWStringIn : public DBWString< BUFFER_LENGTH, DVT_INPUT >
 {
 	public:
 
-		typedef DBWString< BUFFER_LENGTH, DVT_INPUT > BASECLASS;
+		using BASECLASS = DBWString< BUFFER_LENGTH, DVT_INPUT >;
 
 		DBWStringIn( void ) :
 			BASECLASS()
@@ -509,7 +513,7 @@ class DBWStringInOut : public DBWString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >
 {
 	public:
 
-		typedef DBWString< BUFFER_LENGTH, DVT_INPUT_OUTPUT > BASECLASS;
+		using BASECLASS = DBWString< BUFFER_LENGTH, DVT_INPUT_OUTPUT >;
 
 		DBWStringInOut( void ) :
 			BASECLASS()
@@ -539,7 +543,7 @@ class DBWStringOut : public DBWString< BUFFER_LENGTH, DVT_OUTPUT >
 {
 	public:
 
-		typedef DBWString< BUFFER_LENGTH, DVT_OUTPUT > BASECLASS;
+		using BASECLASS = DBWString< BUFFER_LENGTH, DVT_OUTPUT >;
 
 		DBWStringOut( void ) :
 			BASECLASS()
@@ -556,4 +560,5 @@ class DBWStringOut : public DBWString< BUFFER_LENGTH, DVT_OUTPUT >
 		virtual ~DBWStringOut() {}
 };
 
-#endif // ODBC_PARAMETERS_H
+} // namespace Db
+} // namespace IP

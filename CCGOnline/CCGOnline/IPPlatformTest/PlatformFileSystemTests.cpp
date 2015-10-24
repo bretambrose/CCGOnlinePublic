@@ -49,38 +49,38 @@ class PlatformFileSystemTests : public testing::Test
 
 		static void Destroy_Test_Directory( void )
 		{
-			if ( NPlatform::Directory_Exists( TEST_DIRECTORY ) )
+			if ( IP::File::Directory_Exists( TEST_DIRECTORY ) )
 			{
-				NPlatform::Delete_Directory( TEST_DIRECTORY );
+				IP::File::Delete_Directory( TEST_DIRECTORY );
 			}
 		}
 
 		static void Destroy_Test_Files( void )
 		{
-			NPlatform::Delete_File( TEST_FILE1 );
-			NPlatform::Delete_File( TEST_FILE2 );
+			IP::File::Delete_File( TEST_FILE1 );
+			IP::File::Delete_File( TEST_FILE2 );
 		}
 
 };
 
 TEST_F( PlatformFileSystemTests, Directory_Ops )
 {
-	ASSERT_FALSE( NPlatform::Directory_Exists( std::wstring( L"GarbageDirectory" ) ) );
-	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"Data" ) ) );
-	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"x86\\External_DLLs" ) ) );
-	ASSERT_TRUE( NPlatform::Directory_Exists( std::wstring( L"x64\\External_DLLs" ) ) );
+	ASSERT_FALSE( IP::File::Directory_Exists( std::wstring( L"GarbageDirectory" ) ) );
+	ASSERT_TRUE( IP::File::Directory_Exists( std::wstring( L"Data" ) ) );
+	ASSERT_TRUE( IP::File::Directory_Exists( std::wstring( L"x86\\External_DLLs" ) ) );
+	ASSERT_TRUE( IP::File::Directory_Exists( std::wstring( L"x64\\External_DLLs" ) ) );
 
-	ASSERT_FALSE( NPlatform::Directory_Exists( TEST_DIRECTORY ) );
-	NPlatform::Create_Directory( TEST_DIRECTORY );
-	ASSERT_TRUE( NPlatform::Directory_Exists( TEST_DIRECTORY ) );
-	NPlatform::Delete_Directory( TEST_DIRECTORY );
-	ASSERT_FALSE( NPlatform::Directory_Exists( TEST_DIRECTORY ) );
+	ASSERT_FALSE( IP::File::Directory_Exists( TEST_DIRECTORY ) );
+	IP::File::Create_Directory( TEST_DIRECTORY );
+	ASSERT_TRUE( IP::File::Directory_Exists( TEST_DIRECTORY ) );
+	IP::File::Delete_Directory( TEST_DIRECTORY );
+	ASSERT_FALSE( IP::File::Directory_Exists( TEST_DIRECTORY ) );
 }
 
 TEST_F( PlatformFileSystemTests, File_Ops )
 {
 	std::vector< std::wstring > file_names;
-	NPlatform::Enumerate_Matching_Files( TEST_FILE_PATTERN, file_names );
+	IP::File::Enumerate_Matching_Files( TEST_FILE_PATTERN, file_names );
 
 	ASSERT_TRUE( file_names.size() == 0 );
 
@@ -92,17 +92,17 @@ TEST_F( PlatformFileSystemTests, File_Ops )
 	file2 << L"test2\n";
 	file2.close();
 
-	NPlatform::Enumerate_Matching_Files( TEST_FILE_PATTERN, file_names );
+	IP::File::Enumerate_Matching_Files( TEST_FILE_PATTERN, file_names );
 	ASSERT_TRUE( file_names.size() == 2 );
 
 	for ( uint32_t i = 0; i < file_names.size(); i++ )
 	{
-		NPlatform::Delete_File( file_names[ i ] );
+		IP::File::Delete_File( file_names[ i ] );
 	}
 
 	file_names.clear();
 
-	NPlatform::Enumerate_Matching_Files( TEST_FILE_PATTERN, file_names );
+	IP::File::Enumerate_Matching_Files( TEST_FILE_PATTERN, file_names );
 	ASSERT_TRUE( file_names.size() == 0 );
 }
 
@@ -113,8 +113,8 @@ TEST_F( PlatformFileSystemTests, Strip_Path )
 	static const std::wstring path2 = std::wstring( L"../SomeDirectory/" ) + test_file_name;
 	static const std::wstring path3 = std::wstring( L"C:\\SomeDir\\SomeOtherDir\\" ) + test_file_name;
 	
-	ASSERT_TRUE( NPlatform::Strip_Path( path1 ) == test_file_name );
-	ASSERT_TRUE( NPlatform::Strip_Path( path2 ) == test_file_name );
-	ASSERT_TRUE( NPlatform::Strip_Path( path3 ) == test_file_name );
+	ASSERT_TRUE( IP::File::Strip_Path( path1 ) == test_file_name );
+	ASSERT_TRUE( IP::File::Strip_Path( path2 ) == test_file_name );
+	ASSERT_TRUE( IP::File::Strip_Path( path3 ) == test_file_name );
 }
 

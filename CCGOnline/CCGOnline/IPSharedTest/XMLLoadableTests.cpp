@@ -25,6 +25,9 @@
 #include "IPShared/Serialization/SerializationRegistrar.h"
 #include "IPShared/Serialization/XML/PrimitiveXMLSerializers.h"
 
+using namespace IP::Serialization;
+using namespace IP::Serialization::XML;
+
 class XMLLoadableTests : public testing::Test 
 {
 	protected:  
@@ -216,7 +219,7 @@ class CDerivedXMLTest : public CBaseXMLTest
 {
 	public:
 
-		typedef CBaseXMLTest BASECLASS;
+		using BASECLASS = CBaseXMLTest;
 
 		CDerivedXMLTest( void ) :
 			BASECLASS(),
@@ -349,7 +352,7 @@ class CDerivedVectorEntry : public CVectorEntry
 {
 	public:
 
-		typedef CVectorEntry BASECLASS;
+		using BASECLASS = CVectorEntry;
 
 		CDerivedVectorEntry( void ) :
 			BASECLASS(),
@@ -461,7 +464,7 @@ class CPolyDerived1 : public CPolyBase
 {
 	public:
 
-		typedef CPolyBase BASECLASS;
+		using BASECLASS = CPolyBase;
 
 		CPolyDerived1( void ) :
 			BASECLASS(),
@@ -490,7 +493,7 @@ class CPolyDerived2 : public CPolyBase
 {
 	public:
 
-		typedef CPolyBase BASECLASS;
+		using BASECLASS = CPolyBase;
 
 		CPolyDerived2( void ) :
 			BASECLASS(),

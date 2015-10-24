@@ -36,6 +36,13 @@
 #include "IPPlatform/PlatformMisc.h"
 #include "IPPlatform/PlatformProcess.h"
 
+using namespace IP::Execution;
+using namespace IP::Logging;
+
+namespace IP
+{
+namespace Debug
+{
 
 void CStructuredExceptionHandler::Initialize( void )
 {
@@ -58,14 +65,14 @@ void CStructuredExceptionHandler::Shutdown( void )
 void CStructuredExceptionHandler::On_Structured_Exception_Callback( CStructuredExceptionInfo &shared_exception_info )
 {
 	// If the exception is in the scope of a thread task, record that fact
-	EProcessID::Enum process_id = EProcessID::INVALID;
+	EProcessID process_id = EProcessID::INVALID;
 	IProcess *task = CProcessStatics::Get_Current_Process();
 	if ( task != nullptr )
 	{
 		process_id = task->Get_ID();
 	}
 
-	shared_exception_info.Set_Process_ID( process_id );
+	shared_exception_info.Set_Process_ID( static_cast< uint64_t >( process_id ) );
 
 	// Flush all logging info to disk (by using a null context); global log mutex serializes access
 	CProcessExecutionContext context( nullptr, 0.0 );
@@ -99,7 +106,7 @@ void CStructuredExceptionHandler::Write_Exception_File( const CStructuredExcepti
 		exception_file << L"  " << frame.Get_Module_Name() << L"!" << frame.Get_Function_Name();
 		if ( frame.Get_File_Name().size() > 0 )
 		{
-			exception_file << L" (" << NPlatform::Strip_Path( frame.Get_File_Name() ) << L", line " << frame.Get_Line_Number() << L")";
+			exception_file << L" (" << IP::File::Strip_Path( frame.Get_File_Name() ) << L", line " << frame.Get_Line_Number() << L")";
 		}
 
 		exception_file << L"\n";
@@ -135,8 +142,8 @@ struct SLogFileSorter
 void CStructuredExceptionHandler::Archive_Logs( void )
 {
 	std::basic_ostringstream< wchar_t > archive_name_string;
-	archive_name_string << CLogInterface::Get_Archive_Path() << NPlatform::Get_Service_Name() << L"_" << NPlatform::Get_Self_PID() << L"_";
-	archive_name_string << NPlatform::Get_Semi_Unique_ID() << L"_Crash.txt";
+	archive_name_string << CLogInterface::Get_Archive_Path() << IP::Process::Get_Service_Name() << L"_" << IP::Process::Get_Self_PID() << L"_";
+	archive_name_string << IP::Misc::Get_Semi_Unique_ID() << L"_Crash.txt";
 
 	std::wstring archive_name = archive_name_string.rdbuf()->str();
 
@@ -145,7 +152,7 @@ void CStructuredExceptionHandler::Archive_Logs( void )
 	std::wstring log_pattern = Get_Log_File_Prefix() + L"*.txt";
 
 	std::vector< std::wstring > file_names;
-	NPlatform::Enumerate_Matching_Files( log_pattern, file_names );
+	IP::File::Enumerate_Matching_Files( log_pattern, file_names );
 
 	// sort so that the exception file is first
 	std::sort( file_names.begin(), file_names.end(), SLogFileSorter() );
@@ -173,10 +180,10 @@ void CStructuredExceptionHandler::Archive_Logs( void )
 std::wstring CStructuredExceptionHandler::Get_Log_File_Prefix( void )
 {
 	std::basic_ostringstream< wchar_t > prefix_string;
-	prefix_string << CLogInterface::Get_Log_Path() << NPlatform::Get_Service_Name() << L"_" << NPlatform::Get_Self_PID() << L"_";
+	prefix_string << CLogInterface::Get_Log_Path() << IP::Process::Get_Service_Name() << L"_" << IP::Process::Get_Self_PID() << L"_";
 
 	return prefix_string.rdbuf()->str();
 }
 
-
-
+} // namespace Debug
+} // namespace IP

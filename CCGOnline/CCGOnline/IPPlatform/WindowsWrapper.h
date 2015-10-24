@@ -17,10 +17,8 @@
 
 **********************************************************************************************************************/
 
-#ifndef WINDOWS_WRAPPER_H
-#define WINDOWS_WRAPPER_H
+#pragma once
 
 #define NOMINMAX
 #include <Windows.h>
 
-#endif // WINDOWS_WRAPPER_H

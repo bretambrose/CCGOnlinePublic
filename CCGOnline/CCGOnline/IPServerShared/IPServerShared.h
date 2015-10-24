@@ -17,13 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef IP_SERVER_SHARED_H
-#define IP_SERVER_SHARED_H
+#pragma once
 
-namespace NIPServerShared
+namespace IP
 {
-	void Initialize( void );
-	void Shutdown( void );
-} 
+namespace Global
+{
 
-#endif // SERVER_SHARED_H
+	void Initialize_IPServerShared( void );
+	void Shutdown_IPServerShared( void );
+
+} // namespace Global 
+} // namespace IP
+

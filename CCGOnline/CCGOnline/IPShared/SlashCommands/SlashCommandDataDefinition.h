@@ -17,10 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef SLASH_COMMAND_DATA_DEFINITION_H
-#define SLASH_COMMAND_DATA_DEFINITION_H
-
-class IXMLSerializer;
+#pragma once
 
 //:EnumBegin()
 enum ESlashCommandParamType
@@ -40,6 +37,11 @@ enum ESlashCommandParamType
 
 };
 //:EnumEnd
+
+namespace IP
+{
+namespace Command
+{
 
 // A class containing the static data of a single parameter to a slash command
 class CSlashCommandParam
@@ -123,4 +125,5 @@ class CSlashCommandDataDefinition
 		uint32_t TotalCaptureGroupCount;		// unserialized, derived from various properties
 };
 
-#endif // SLASH_COMMAND_DEFINITION_H
+} // namespace Command
+} // namespace IP

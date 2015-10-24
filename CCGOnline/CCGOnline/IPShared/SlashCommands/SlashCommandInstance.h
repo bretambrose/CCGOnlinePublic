@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef SLASH_COMMAND_INSTANCE_H
-#define SLASH_COMMAND_INSTANCE_H
+#pragma once
+
+namespace IP
+{
+namespace Command
+{
 
 class CSlashCommandDefinition;
 
@@ -74,4 +78,5 @@ class CSlashCommandInstance
 
 };
 
-#endif // SLASH_COMMAND_INSTANCE_H
+} // namespace Command
+} // namespace IP

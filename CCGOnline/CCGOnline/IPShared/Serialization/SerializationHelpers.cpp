@@ -21,6 +21,11 @@
 
 #include "IPShared/Serialization/SerializationHelpers.h"
 
+namespace IP
+{
+namespace Serialization
+{
+
 CTypeSerializationDefinition::CTypeSerializationDefinition( void ) :
 	Type(),
 	PointerType(),
@@ -38,3 +43,5 @@ CTypeSerializationDefinition::~CTypeSerializationDefinition()
 	std::for_each( DataBindings.begin(), DataBindings.end(), [ & ]( IDataBinding *binding ){ delete binding; } );
 }
 
+} // namespace Serialization
+} // namespace IP

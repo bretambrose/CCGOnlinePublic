@@ -23,6 +23,10 @@
 
 #include "Interfaces/CompoundDatabaseTaskInterface.h"
 
+namespace IP
+{
+namespace Db
+{
 
 void CDatabaseTaskBase::Set_Parent( ICompoundDatabaseTask *parent )
 {
@@ -44,7 +48,7 @@ CCompoundDatabaseTaskBase::~CCompoundDatabaseTaskBase()
 
 void CCompoundDatabaseTaskBase::Add_Child_Task( IDatabaseTask *task )
 {
-	FATAL_ASSERT( ID != DatabaseTaskIDType::INVALID );
+	FATAL_ASSERT( ID != EDatabaseTaskIDType::INVALID );
 
 	task->Set_ID( ID );
 
@@ -125,3 +129,6 @@ void CCompoundDatabaseTaskBase::Get_All_Child_Tasks( DBTaskListType &tasks ) con
 		std::copy( task_list->begin(), task_list->end(), back_inserter( tasks ) );
 	}
 }
+
+} // namespace Db
+} // namespace IP

@@ -23,8 +23,12 @@
 
 #include "Messaging/ProcessMessage.h"
 
+namespace IP
+{
+namespace Execution
+{
 
-CProcessMessageFrame::CProcessMessageFrame( EProcessID::Enum process_id ) :
+CProcessMessageFrame::CProcessMessageFrame( EProcessID process_id ) :
 	ProcessID( process_id ),
 	Messages()
 {
@@ -43,17 +47,19 @@ CProcessMessageFrame::~CProcessMessageFrame()
 }
 
 
-void CProcessMessageFrame::Add_Message( std::unique_ptr< const IProcessMessage > &message )
+void CProcessMessageFrame::Add_Message( std::unique_ptr< const Messaging::IProcessMessage > &message )
 {
 	Messages.emplace_back( std::move( message ) );
 }
 
 
-void CProcessMessageFrame::Add_Message( std::unique_ptr< const IProcessMessage > &&message )
+void CProcessMessageFrame::Add_Message( std::unique_ptr< const Messaging::IProcessMessage > &&message )
 {
 	Messages.emplace_back( std::move( message ) );
 }
 
+} // namespace Execution
+} // namespace IP
 
 
 

@@ -24,10 +24,14 @@
 #include "IPShared/Concurrency/Containers/ConcurrentQueueInterface.h"
 #include "ProcessMessageFrame.h"
 
+namespace IP
+{
+namespace Execution
+{
 
-CWriteOnlyMailbox::CWriteOnlyMailbox( EProcessID::Enum process_id, 
+CWriteOnlyMailbox::CWriteOnlyMailbox( EProcessID process_id, 
 												  const SProcessProperties &properties, 
-												  const std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &write_queue ) :
+												  const std::shared_ptr< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &write_queue ) :
 	ProcessID( process_id ),
 	Properties( properties ),
 	WriteQueue( write_queue )
@@ -51,7 +55,7 @@ void CWriteOnlyMailbox::Add_Frame( std::unique_ptr< CProcessMessageFrame > &fram
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-CReadOnlyMailbox::CReadOnlyMailbox( const std::shared_ptr< IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &read_queue ) :
+CReadOnlyMailbox::CReadOnlyMailbox( const std::shared_ptr< IP::Concurrency::IConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > > &read_queue ) :
 	ReadQueue( read_queue )
 {
 	FATAL_ASSERT( ReadQueue.get() != nullptr );
@@ -68,3 +72,5 @@ void CReadOnlyMailbox::Remove_Frames( std::vector< std::unique_ptr< CProcessMess
 	ReadQueue->Remove_Items( frames );
 }
 
+} // namespace Execution
+} // namespace IP

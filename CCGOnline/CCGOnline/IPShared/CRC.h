@@ -17,13 +17,15 @@
 
 **********************************************************************************************************************/
 
-#ifndef CRC_H
-#define CRC_H
+#pragma once
 
 #include "CRCValue.h"
 
-namespace NCRCUtils
+namespace IP
 {	
+namespace CRC
+{
+
 	CRCValue CRC_Memory( const void *memory, size_t length );
 
 	CRCValue String_To_CRC( const std::string &value );
@@ -32,8 +34,8 @@ namespace NCRCUtils
 	CRCValue String_To_CRC( const std::wstring &value );
 	CRCValue String_To_CRC_Case_Insensitive( const std::wstring &value );
 
-};
+} // namespace CRC
+} // namespace IP
 
-#endif // CRC_H
 
 

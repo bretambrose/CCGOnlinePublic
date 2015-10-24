@@ -21,7 +21,7 @@
 
 #include "IPPlatform/StringUtils.h"
 
-using namespace NStringUtils;
+using namespace IP::String;
 
 TEST( StringUtilsTests, String_To_WideString )
 {

@@ -21,67 +21,32 @@
 
 #include "TimeKeeper.h"
 
-#include "TimeType.h"
-#include "TickTime.h"
-#include "TimeUtils.h"
 
+namespace IP
+{
+namespace Time
+{
 
 CTimeKeeper::CTimeKeeper( void ) :
-	CurrentTimes(),
-	BaseTimes()
+	BaseTime()
 {
-	// Reset all time types into a default state
-	for ( uint32_t tt = static_cast< uint32_t >( TT_FIRST ); tt < static_cast< uint32_t >( TT_COUNT ); ++tt )
-	{
-		ETimeType time_type = static_cast< ETimeType >( tt );
+}
 
-		CurrentTimes[ time_type ] = STickTime( static_cast< uint64_t >( 0 ) );
-		BaseTimes[ time_type ] = STickTime( static_cast< uint64_t >( 0 ) );
-	}
+SystemTimePoint CTimeKeeper::Get_Current_Time( void ) const 
+{ 
+	return Get_Current_System_Time(); 
+}
+
+SystemDuration CTimeKeeper::Get_Elapsed_Time( void ) const
+{
+	return Get_Current_Time() - Get_Base_Time();
 }
 
 
-const STickTime &CTimeKeeper::Get_Current_Time( ETimeType time_type ) const
+double CTimeKeeper::Get_Elapsed_Seconds( void ) const
 {
-	auto iter = CurrentTimes.find( time_type );
-	return iter->second;
+	return Convert_Duration_To_Seconds( Get_Elapsed_Time() );
 }
 
-
-void CTimeKeeper::Set_Current_Time( ETimeType time_type, const STickTime &current_time )
-{
-	auto iter = CurrentTimes.find( time_type );
-
-	DEBUG_ASSERT( current_time.Get_Ticks() > iter->second.Get_Ticks() || iter->second.Get_Ticks() == 0 );
-	iter->second = current_time;
-}
-
-
-const STickTime &CTimeKeeper::Get_Base_Time( ETimeType time_type ) const
-{
-	auto iter = BaseTimes.find( time_type );
-	return iter->second;
-}
-
-
-void CTimeKeeper::Set_Base_Time( ETimeType time_type, const STickTime &base_time )
-{
-	auto iter = BaseTimes.find( time_type );
-
-	DEBUG_ASSERT( base_time.Get_Ticks() > iter->second.Get_Ticks() || iter->second.Get_Ticks() == 0 );
-	iter->second = base_time;
-
-	Set_Current_Time( time_type, base_time );
-}
-
-
-STickTime CTimeKeeper::Get_Elapsed_Ticks( ETimeType time_type ) const
-{
-	return Get_Current_Time( time_type ) - Get_Base_Time( time_type );
-}
-
-
-double CTimeKeeper::Get_Elapsed_Seconds( ETimeType time_type ) const
-{
-	return NTimeUtils::Convert_Ticks_To_Seconds( time_type, Get_Current_Time( time_type ) - Get_Base_Time( time_type ) );
-}
+} // namespace Time
+} // namespace IP

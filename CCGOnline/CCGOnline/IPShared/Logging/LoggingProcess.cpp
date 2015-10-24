@@ -34,7 +34,15 @@
 #include "LogInterface.h"
 #include "IPPlatform/PlatformTime.h"
 #include "IPPlatform/PlatformProcess.h"
-#include "IPShared/Time/TimeType.h"
+
+using namespace IP::Enum;
+using namespace IP::Logging;
+using namespace IP::Time;
+
+namespace IP
+{
+namespace Execution
+{
 
 // An internal class representing a single, open, active log file connected to the current process
 class CLogFile
@@ -94,7 +102,7 @@ class CLogFile
 CLoggingProcess::CLoggingProcess( const SProcessProperties &properties ) :
 	BASECLASS( properties ),
 	LogFiles(),
-	PID( NPlatform::Get_Self_PID() ),
+	PID( IP::Process::Get_Self_PID() ),
 	IsShuttingDown( false )
 {
 }
@@ -106,7 +114,7 @@ CLoggingProcess::~CLoggingProcess()
 }
 
 
-void CLoggingProcess::Initialize( EProcessID::Enum id )
+void CLoggingProcess::Initialize( EProcessID id )
 {
 	BASECLASS::Initialize( id );
 }
@@ -144,17 +152,17 @@ void CLoggingProcess::Register_Message_Handlers( void )
 {
 	BASECLASS::Register_Message_Handlers();
 
-	REGISTER_THIS_HANDLER( CLogRequestMessage, CLoggingProcess, Handle_Log_Request_Message );
+	REGISTER_THIS_HANDLER( Messaging::CLogRequestMessage, CLoggingProcess, Handle_Log_Request_Message );
 }
 
 
-void CLoggingProcess::Handle_Log_Request_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CLogRequestMessage > &message )
+void CLoggingProcess::Handle_Log_Request_Message( EProcessID source_process_id, std::unique_ptr< const  Messaging::CLogRequestMessage > &message )
 {
 	Handle_Log_Request_Message_Aux( source_process_id, message->Get_Source_Properties(), message->Get_Message(), message->Get_Time() );
 }
 
 
-void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID::Enum source_process_id, const SProcessProperties &properties, const std::wstring &message, uint64_t system_time )
+void CLoggingProcess::Handle_Log_Request_Message_Aux( EProcessID source_process_id, const SProcessProperties &properties, const std::wstring &message, SystemTimePoint system_time )
 {
 	if ( IsShuttingDown )
 	{
@@ -184,7 +192,7 @@ std::wstring CLoggingProcess::Build_File_Name( EProcessSubject::Enum subject ) c
 	CEnumConverter::Convert( subject, subject_string );
 
 	std::basic_ostringstream< wchar_t > file_name_string;
-	file_name_string << L"Logs\\" << CLogInterface::Get_Service_Name() << L"_" << PID << L"_" << subject_string.c_str() << L".txt";
+	file_name_string << L"Logs\\" << IP::Logging::CLogInterface::Get_Service_Name() << L"_" << PID << L"_" << subject_string.c_str() << L".txt";
 
 	return file_name_string.rdbuf()->str();
 }
@@ -202,7 +210,7 @@ CLogFile *CLoggingProcess::Get_Log_File( EProcessSubject::Enum subject ) const
 }
 
 
-std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process_id, const SProcessProperties &source_properties, const std::wstring &message, uint64_t system_time ) const
+std::wstring CLoggingProcess::Build_Log_Message( EProcessID source_process_id, const SProcessProperties &source_properties, const std::wstring &message, SystemTimePoint system_time ) const
 {
 	uint16_t subject_part = source_properties.Get_Subject();
 	uint16_t major_part = source_properties.Get_Major_Part();
@@ -213,7 +221,7 @@ std::wstring CLoggingProcess::Build_Log_Message( EProcessID::Enum source_process
 	CEnumConverter::Convert( subject_part, subject_string );
 
 	std::basic_ostringstream< wchar_t > output_string;
-	output_string << L"[ " << CPlatformTime::Format_Raw_Time( system_time ) << L" ]( " << source_process_id << L": " << subject_string.c_str() << L", " << major_part << L", " << minor_part << L", " << mode_part << L" ) : " << message << L"\n";
+	output_string << L"[ " << Format_System_Time( system_time ) << L" ]( " << static_cast< uint64_t >( source_process_id ) << L": " << subject_string.c_str() << L", " << major_part << L", " << minor_part << L", " << mode_part << L" ) : " << message << L"\n";
 
 	return output_string.rdbuf()->str();
 }
@@ -226,14 +234,10 @@ void CLoggingProcess::On_Shutdown_Self_Request( void )
 	IsShuttingDown = true;
 }
 
-
-ETimeType CLoggingProcess::Get_Time_Type( void ) const 
-{ 
-	return TT_REAL_TIME; 
-}
-
-
 void CLoggingProcess::Log( std::wstring &&message )
 {
-	Handle_Log_Request_Message_Aux( Get_ID(), Get_Properties(), message, CPlatformTime::Get_Raw_Time() );
+	Handle_Log_Request_Message_Aux( Get_ID(), Get_Properties(), message, Get_Current_System_Time() );
 }
+
+} // namespace Execution
+} // namespace IP

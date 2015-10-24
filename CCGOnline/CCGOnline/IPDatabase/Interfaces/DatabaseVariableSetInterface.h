@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_VARIABLE_SET_INTERFACE_H
-#define DATABASE_VARIABLE_SET_INTERFACE_H
+#pragma once
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseVariable;
 
@@ -32,4 +36,5 @@ class IDatabaseVariableSet
 		virtual void Convert_Variable_To_String( IDatabaseVariable *variable, std::string &value ) const = 0;
 };
 
-#endif // DATABASE_VARIABLE_SET_INTERFACE_H
+} // namespace Db
+} // namespace IP

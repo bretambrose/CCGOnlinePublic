@@ -17,38 +17,49 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_PROCESS_MESSAGES_H
-#define DATABASE_PROCESS_MESSAGES_H
+#pragma once
 
 #include "IPShared/Concurrency/Messaging/ProcessMessage.h"
 
+namespace IP
+{
+namespace Db
+{
+
 class IDatabaseTask;
+
+} // namespace Db
+
+namespace Execution
+{
+namespace Messaging
+{
 
 // Requests the interface to a thread tasks or set of thread tasks
 class CRunDatabaseTaskRequest : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
-		CRunDatabaseTaskRequest( IDatabaseTask *task ) :
+		CRunDatabaseTaskRequest( IP::Db::IDatabaseTask *task ) :
 			Task( task )
 		{}
 
 		virtual ~CRunDatabaseTaskRequest();
 
-		IDatabaseTask *Get_Task( void ) const { return Task.get(); }
+		IP::Db::IDatabaseTask *Get_Task( void ) const { return Task.get(); }
 
 	private:
 
-		std::unique_ptr< IDatabaseTask > Task;
+		std::unique_ptr< IP::Db::IDatabaseTask > Task;
 };
 
 class CRunDatabaseTaskResponse : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 		
 		CRunDatabaseTaskResponse( std::unique_ptr< const CRunDatabaseTaskRequest > &request, bool success ) :
 			Request( std::move( request ) ),
@@ -66,5 +77,6 @@ class CRunDatabaseTaskResponse : public IProcessMessage
 		bool Success;
 };
 
-
-#endif // DATABASE_PROCESS_MESSAGES_H
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

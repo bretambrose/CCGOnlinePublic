@@ -23,6 +23,11 @@
 
 #include <stack>
 
+namespace IP
+{
+namespace Serialization
+{
+
 CSerializationRegistrar::TypeSerializationDefinitionTableType CSerializationRegistrar::TypeSerializationDefinitions;
 CSerializationRegistrar::FactorySetTableType CSerializationRegistrar::FactorySets;
 CSerializationRegistrar::XMLSerializerTableType CSerializationRegistrar::XMLSerializers;
@@ -31,7 +36,7 @@ CSerializationRegistrar::PolymorphicTypesTableType CSerializationRegistrar::Poly
 CSerializationRegistrar::PolymorphicEnumTablesTableType CSerializationRegistrar::PolymorphicEnumTables;
 CSerializationRegistrar::XMLSerializerTableType CSerializationRegistrar::PolymorphicSerializers;
 
-void CSerializationRegistrar::Register_Primitive_XML_Serializer( const Loki::TypeInfo &type_info, IXMLSerializer *serializer )
+void CSerializationRegistrar::Register_Primitive_XML_Serializer( const Loki::TypeInfo &type_info, XML::IXMLSerializer *serializer )
 {
 	FATAL_ASSERT( serializer != nullptr );
 
@@ -126,7 +131,7 @@ bool CSerializationRegistrar::Has_Polymorphic_Enum_Mapping( const Loki::TypeInfo
 	return PolymorphicTypes.find( type_info ) != PolymorphicTypes.end();
 }
 
-IXMLSerializer *CSerializationRegistrar::Get_Or_Build_Polymorphic_Enum_Serializer( const Loki::TypeInfo &type_info )
+XML::IXMLSerializer *CSerializationRegistrar::Get_Or_Build_Polymorphic_Enum_Serializer( const Loki::TypeInfo &type_info )
 {
 	auto iter = PolymorphicTypes.find( type_info );
 	FATAL_ASSERT( iter != PolymorphicTypes.end() );
@@ -145,7 +150,7 @@ IXMLSerializer *CSerializationRegistrar::Get_Or_Build_Polymorphic_Enum_Serialize
 	FATAL_ASSERT( table != nullptr );
 	FATAL_ASSERT( table->size() > 0 );
 
-	auto poly_serializer = new CEnumPolymorphicXMLSerializer( enum_type_info );
+	auto poly_serializer = new XML::CEnumPolymorphicXMLSerializer( enum_type_info );
 
 	for ( const auto &table_iter : *table )
 	{
@@ -167,7 +172,7 @@ IXMLSerializer *CSerializationRegistrar::Get_Or_Build_Polymorphic_Enum_Serialize
 				entry_iter = XMLSerializers.find( entry_type_info );
 			}
 
-			auto pointer_serializer = new CPointerXMLSerializer( entry_iter->second, type_definition->Get_Pointer_Prep_Delegate() );
+			auto pointer_serializer = new XML::CPointerXMLSerializer( entry_iter->second, type_definition->Get_Pointer_Prep_Delegate() );
 			FATAL_ASSERT( pointer_serializer != nullptr );
 
 			XMLSerializers[ pointer_type_info ] = pointer_serializer;
@@ -271,8 +276,11 @@ void CSerializationRegistrar::Finalize( void )
 		const Loki::TypeInfo &pointer_type_info = type_definition->Get_Pointer_Type_Info();
 		FATAL_ASSERT( XMLSerializers.find( pointer_type_info ) == XMLSerializers.end() );
 
-		auto pointer_serializer = new CPointerXMLSerializer( serializer, type_definition->Get_Pointer_Prep_Delegate() );
+		auto pointer_serializer = new XML::CPointerXMLSerializer( serializer, type_definition->Get_Pointer_Prep_Delegate() );
 		
 		XMLSerializers[ pointer_type_info ] = pointer_serializer;
 	}
 }
+
+} // namespace Serialization
+} // namespace IP

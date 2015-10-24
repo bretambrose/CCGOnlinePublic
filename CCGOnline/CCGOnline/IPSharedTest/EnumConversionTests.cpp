@@ -21,6 +21,8 @@
 
 #include "IPShared/EnumConversion.h"
 
+using namespace IP::Enum;
+
 static enum ETestEnum
 {
 	TE_INVALID,
@@ -31,7 +33,7 @@ static enum ETestEnum
 
 TEST( EnumConversionTests, Normal )
 {
-	CEnumConverter::Register_Enum< ETestEnum >( "ETestEnum", CEP_NONE );
+	CEnumConverter::Register_Enum< ETestEnum >( "ETestEnum", EConvertibleEnumProperties::CEP_NONE );
 
 	CEnumConverter::Register_Enum_Entry( "Invalid", TE_INVALID );
 	CEnumConverter::Register_Enum_Entry( "Entry1", TE_ENTRY1 );
@@ -64,7 +66,7 @@ enum ETestBitfield
 
 TEST( EnumConversionTests, Bitfield )
 {
-	CEnumConverter::Register_Enum< ETestBitfield >( "ETestBitfield", CEP_BITFIELD );
+	CEnumConverter::Register_Enum< ETestBitfield >( "ETestBitfield", EConvertibleEnumProperties::CEP_BITFIELD );
 
 	CEnumConverter::Register_Enum_Entry( "None", static_cast< ETestBitfield >( 0 ) );
 	CEnumConverter::Register_Enum_Entry( "Flag1", static_cast< ETestBitfield >( 1 ) );

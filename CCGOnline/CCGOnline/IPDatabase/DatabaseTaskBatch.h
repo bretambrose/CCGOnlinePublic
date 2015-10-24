@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TASK_BATCH_H
-#define DATABASE_TASK_BATCH_H
+#pragma once
 
 #include "Interfaces/DatabaseTaskBatchInterface.h"
 #include "Interfaces/DatabaseConnectionInterface.h"
@@ -29,12 +28,17 @@
 #include "DatabaseCallContext.h"
 #include "IPShared/Logging/LogInterface.h"
 
+namespace IP
+{
+namespace Db
+{
+
 template < typename T >
 class TDatabaseTaskBatch : public IDatabaseTaskBatch
 {
 	public:
 
-		typedef IDatabaseTaskBatch BASECLASS;
+		using BASECLASS = IDatabaseTaskBatch;
 
 		TDatabaseTaskBatch( void ) :
 			BASECLASS(),
@@ -92,7 +96,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 
 			FATAL_ASSERT( statement->Is_Ready_For_Use() );
 
-			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
+			LOG( IP::Logging::ELogLevel::LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
 
 			while ( !PendingTasks.empty() )
 			{
@@ -106,7 +110,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 				Process_Task_List( statement, sub_list, successful_tasks, failed_tasks );
 			}
 
-			LOG( LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << " Failures: " << failed_tasks.size() );
+			LOG( IP::Logging::ELogLevel::LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << " Failures: " << failed_tasks.size() );
 
 			FATAL_ASSERT( statement->Is_Ready_For_Use() );
 
@@ -119,10 +123,10 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 		{
 			while( !sub_list.empty() )
 			{
-				ExecuteDBTaskListResult::Enum execute_result;
+				EExecuteDBTaskListResult execute_result;
 				DBTaskListType::const_iterator bad_task;
-				DBUtils::Execute_Task_List( CallContext, statement, sub_list, execute_result, bad_task );
-				if ( execute_result == ExecuteDBTaskListResult::SUCCESS )
+				Execute_Task_List( CallContext, statement, sub_list, execute_result, bad_task );
+				if ( execute_result == EExecuteDBTaskListResult::SUCCESS )
 				{
 					statement->Get_Connection()->End_Transaction( true );
 					statement->Return_To_Ready();
@@ -143,7 +147,7 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 						}
 					}
 
-					if ( execute_result == ExecuteDBTaskListResult::FAILED_SPECIFIC_TASK )
+					if ( execute_result == EExecuteDBTaskListResult::FAILED_SPECIFIC_TASK )
 					{
 						failed_tasks.push_back( *bad_task );
 						sub_list.erase( bad_task );
@@ -172,4 +176,5 @@ class TDatabaseTaskBatch : public IDatabaseTaskBatch
 		std::string TaskName;
 };
 
-#endif // DATABASE_TASK_BATCH_H
+} // namespace Db
+} // namespace IP

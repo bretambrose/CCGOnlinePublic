@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef PRIORITY_QUEUE_H
-#define PRIORITY_QUEUE_H
+#pragma once
+
+namespace IP
+{
+namespace Algorithm
+{
 
 // Our priority queue includes a movement policy to allow us to optionally add functionality that
 // allows a priority queue member to track its own internal location in the heap.  This allows
@@ -244,4 +248,5 @@ class TPriorityQueue {
 
 #pragma warning( pop )
 
-#endif // PRIORITY_QUEUE_H
+} // namespace Algorithm
+} // namespace IP

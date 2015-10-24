@@ -17,21 +17,24 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_CONNECTION_H
-#define ODBC_CONNECTION_H
+#pragma once
 
 #include "IPDatabase/Interfaces/DatabaseConnectionInterface.h"
 #include "ODBCObjectBase.h"
 
-enum ODBCConnectionStateType;
-enum ODBCConnectionOperationType;
 enum DBStatementIDType;
+
+namespace IP
+{
+namespace Db
+{
+
+enum class ODBCConnectionStateType;
+enum class ODBCConnectionOperationType;
 
 class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 {
 	public:
-
-		typedef CODBCObjectBase BASECLASS;
 
 		CODBCConnection( DBConnectionIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, bool cache_statements );
 		virtual ~CODBCConnection();
@@ -74,4 +77,5 @@ class CODBCConnection : public CODBCObjectBase, public IDatabaseConnection
 		bool UseStatementCaching;
 };
 
-#endif // ODBC_CONNECTION_H
+} // namespace Db
+} // namespace IP

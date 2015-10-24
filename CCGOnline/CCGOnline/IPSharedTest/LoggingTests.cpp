@@ -34,9 +34,12 @@
 #include "IPShared/Concurrency/ProcessExecutionContext.h"
 #include "IPShared/Concurrency/ProcessStatics.h"
 #include "tbb/include/tbb/task.h"
-#include "IPShared/Time/TimeType.h"
 #include "IPPlatform/PlatformFileSystem.h"
 #include "IPShared/Concurrency/ProcessID.h"
+
+using namespace IP::Execution;
+using namespace IP::Execution::Messaging;
+using namespace IP::Logging;
 
 class CLoggingVirtualProcessTester
 {
@@ -101,12 +104,12 @@ class LoggingTests : public testing::Test
 
 TEST_F( LoggingTests, Log_Level )
 {
-	CLogInterface::Set_Log_Level( LL_MEDIUM );
-	ASSERT_TRUE( CLogInterface::Get_Log_Level() == LL_MEDIUM );
+	CLogInterface::Set_Log_Level( ELogLevel::LL_MEDIUM );
+	ASSERT_TRUE( CLogInterface::Get_Log_Level() == ELogLevel::LL_MEDIUM );
 }
 
-static const EProcessID::Enum TEST_KEY1 = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID );
-static const EProcessID::Enum TEST_KEY2 = static_cast< EProcessID::Enum >( EProcessID::FIRST_FREE_ID + 1 );
+static const EProcessID TEST_KEY1 = static_cast< EProcessID >( EProcessID::FIRST_FREE_ID );
+static const EProcessID TEST_KEY2 = static_cast< EProcessID >( static_cast< uint64_t >( EProcessID::FIRST_FREE_ID ) + 1 );
 
 static const SProcessProperties TEST_PROPS1( EProcessSubject::NEXT_FREE_VALUE, 1, 1, 1 );
 static const SProcessProperties TEST_PROPS2( EProcessSubject::NEXT_FREE_VALUE + 1, 1, 1, 1 );
@@ -144,7 +147,7 @@ void Verify_Log_File( const std::wstring &file_name )
 TEST_F( LoggingTests, Direct_Logging )
 {
 	std::vector< std::wstring > file_names;
-	NPlatform::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
+	IP::File::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
 
 	ASSERT_TRUE( file_names.size() == 0 );
 
@@ -170,7 +173,7 @@ TEST_F( LoggingTests, Direct_Logging )
 
 	log_tester.Service();
 
-	NPlatform::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
+	IP::File::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
 
 	ASSERT_TRUE( file_names.size() == 3 );
 	for ( uint32_t i = 0; i < file_names.size(); i++ )
@@ -183,13 +186,12 @@ class CDummyProcess : public CTaskProcessBase
 {
 	public:
 		
-		typedef CTaskProcessBase BASECLASS;
+		using BASECLASS = CTaskProcessBase;
 
 		CDummyProcess( const SProcessProperties &properties ) :
 			BASECLASS( properties )
 		{}
 
-		virtual ETimeType Get_Time_Type( void ) const { return TT_GAME_TIME; }
 		virtual bool Is_Root_Thread( void ) const { return true; }
 
 };
@@ -197,11 +199,11 @@ class CDummyProcess : public CTaskProcessBase
 TEST_F( LoggingTests, Static_Logging )
 {
 	std::vector< std::wstring > file_names;
-	NPlatform::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
+	IP::File::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
 
 	ASSERT_TRUE( file_names.size() == 0 );
 
-	CLogInterface::Set_Log_Level( LL_HIGH );
+	CLogInterface::Set_Log_Level( ELogLevel::LL_HIGH );
 
 	CLoggingVirtualProcessTester log_tester;
 	log_tester.Initialize();
@@ -218,8 +220,8 @@ TEST_F( LoggingTests, Static_Logging )
 	CProcessExecutionContext context( nullptr, 0.0 );
 	dummy_process->Run( context );
 
-	WLOG( LL_HIGH, L"This is another test, but I have to end with " << LOG_TEST_MESSAGE );
-	WLOG( LL_HIGH, L"test: " << 5 << LOG_TEST_MESSAGE );
+	WLOG( ELogLevel::LL_HIGH, L"This is another test, but I have to end with " << LOG_TEST_MESSAGE );
+	WLOG( ELogLevel::LL_HIGH, L"test: " << 5 << LOG_TEST_MESSAGE );
 
 	CProcessStatics::Set_Current_Process( nullptr );
 
@@ -231,7 +233,7 @@ TEST_F( LoggingTests, Static_Logging )
 
 	log_tester.Service();
 
-	NPlatform::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
+	IP::File::Enumerate_Matching_Files( LOG_FILE_PATTERN, file_names );
 	ASSERT_TRUE( file_names.size() == 1 );
 
 	for ( uint32_t i = 0; i < file_names.size(); i++ )

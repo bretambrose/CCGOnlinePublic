@@ -25,6 +25,10 @@
 #include "IPPlatform/StringUtils.h"
 #include "IPShared/Serialization/SerializationRegistrar.h"
 
+namespace IP
+{
+namespace Command
+{
 
 CSlashCommandParam::CSlashCommandParam( void ) :
 	Type( SCPT_INVALID ),
@@ -57,61 +61,61 @@ bool CSlashCommandParam::Is_Value_Valid( const std::wstring &value ) const
 		case SCPT_INT32:
 		{
 			int32_t converted_value = 0;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_UINT32:
 		{
 			uint32_t converted_value = 0;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_INT64:
 		{
 			int64_t converted_value = 0;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_UINT64:
 		{
 			uint64_t converted_value = 0;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_STRING:
 		{
 			std::string converted_value;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_WIDE_STRING:
 		{
 			std::wstring converted_value;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_FLOAT:
 		{
 			float converted_value = 0.0f;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_DOUBLE:
 		{
 			double converted_value = 0.0;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_BOOLEAN:
 		{
 			bool converted_value = false;
-			return NStringUtils::Convert( value, converted_value );
+			return IP::String::Convert( value, converted_value );
 		}
 
 		case SCPT_ENUM:
 		{
 			uint64_t converted_value = 0;
-			return CEnumConverter::Convert( SubType, value, converted_value );
+			return IP::Enum::CEnumConverter::Convert( SubType, value, converted_value );
 		}
 
 		default:
@@ -200,7 +204,7 @@ const CSlashCommandParam *CSlashCommandDataDefinition::Get_Param( uint32_t index
 void CSlashCommandDataDefinition::Post_Load_XML( void )
 {
 	std::wstring key = CSlashCommandManager::Concat_Command( Command, SubCommand );
-	NStringUtils::To_Upper_Case( key, Key );
+	IP::String::To_Upper_Case( key, Key );
 
 	TotalCaptureGroupCount = Get_Match_Param_Start_Index();
 
@@ -273,4 +277,5 @@ std::wstring CSlashCommandDataDefinition::Build_Command_Matcher( void ) const
 	return match_string;
 }
 
-
+} // namespace Command
+} // namespace IP

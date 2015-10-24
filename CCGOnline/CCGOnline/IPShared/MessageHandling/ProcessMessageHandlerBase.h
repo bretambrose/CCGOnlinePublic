@@ -17,24 +17,28 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_MESSAGE_HANDLER_BASE_H
-#define PROCESS_MESSAGE_HANDLER_BASE_H
+#pragma once
 
 #include "MessageHandler.h"
 
-namespace EProcessID
+namespace IP
 {
-	enum Enum;
-}
+namespace Execution
+{
+
+enum class EProcessID;
+
+namespace Messaging
+{
 
 class IProcessMessage;
 
 // A simple base class for all thread message handlers
-class IProcessMessageHandler : public IMessageHandler< EProcessID::Enum, IProcessMessage >
+class IProcessMessageHandler : public IP::IMessageHandler< EProcessID, IProcessMessage >
 {
 	public:
 
-		typedef IMessageHandler< EProcessID::Enum, IProcessMessage > BASECLASS;
+		using BASECLASS = IP::IMessageHandler< EProcessID, IProcessMessage >;
 
 		IProcessMessageHandler( void ) :
 			BASECLASS()
@@ -44,5 +48,7 @@ class IProcessMessageHandler : public IMessageHandler< EProcessID::Enum, IProces
 
 };
 
-#endif // PROCESS_MESSAGE_HANDLER_BASE_H
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP
 

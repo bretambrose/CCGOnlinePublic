@@ -22,11 +22,13 @@
 #include "IPShared/TaskScheduler/ScheduledTask.h"
 #include "IPShared/TaskScheduler/TaskScheduler.h"
 
+using namespace IP::Execution;
+
 class CMockScheduledTask : public CScheduledTask
 {
 	public:
 
-		typedef CScheduledTask BASECLASS;
+		using BASECLASS = CScheduledTask;
 
 		CMockScheduledTask( double execute_time ) :
 			BASECLASS( execute_time ),
@@ -190,7 +192,7 @@ class CMockRescheduledTask : public CScheduledTask
 {
 	public:
 
-		typedef CScheduledTask BASECLASS;
+		using BASECLASS = CScheduledTask;
 
 		CMockRescheduledTask( double execute_time ) :
 			BASECLASS( execute_time ),

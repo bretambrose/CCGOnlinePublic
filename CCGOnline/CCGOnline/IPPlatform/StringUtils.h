@@ -17,11 +17,13 @@
 
 **********************************************************************************************************************/
 
-#ifndef STRING_UTILS_H
-#define STRING_UTILS_H
+#pragma once
 
-namespace NStringUtils
+namespace IP
 {
+namespace String
+{
+
 	void String_To_WideString( const std::string &source, std::wstring &target );
 	void String_To_WideString( const char *source, std::wstring &target );
 
@@ -51,6 +53,30 @@ namespace NStringUtils
 	bool Convert_Raw( const wchar_t *source, double &value );
 	bool Convert_Raw( const wchar_t *source, bool &value );
 
-}
+} // namespace String
+} // namespace IP
 
-#endif // STRING_UTILS_H
+#undef _STRING_
+#undef RC_INVOKED
+
+#define basic_string_test test_string
+
+template< typename T >
+class basic_string_test
+{
+	public:
+
+		basic_string_test() : blah(0) {}
+		basic_string_test(const basic_string_test& rhs ) : blah( rhs.blah ) {}
+
+	private:
+
+		uint32_t blah;
+};
+
+#undef basic_string
+
+namespace Aws
+{
+using String = test_string<char>;
+}

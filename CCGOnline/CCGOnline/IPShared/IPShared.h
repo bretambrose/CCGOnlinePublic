@@ -17,13 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef IP_SHARED_H
-#define IP_SHARED_H
+#pragma once
 
-namespace NIPShared
+namespace IP
 {
-	void Initialize( void );
-	void Shutdown( void );
-};
+namespace Global
+{
 
-#endif // SHARED_H
+	void Initialize_IPShared( void );
+	void Shutdown_IPShared( void );
+
+} // namespace Global
+} // namespace IP
+

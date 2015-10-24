@@ -17,23 +17,25 @@
 
 **********************************************************************************************************************/
 
-#ifndef MANAGED_PROCESS_INTERFACE_H
-#define MANAGED_PROCESS_INTERFACE_H
+#pragma once
 
 #include "ProcessInterface.h"
+
+namespace IP
+{
+namespace Execution
+{
 
 class CWriteOnlyMailbox;
 class CReadOnlyMailbox;
 class CProcessExecutionContext;
-
-enum ETimeType;
 
 // Pure virtual interface for virtual processes adding functionality needed by the concurrency manager
 class IManagedProcess : public IProcess
 {
 	public:
 		
-		typedef IProcess BASECLASS;
+		using BASECLASS = IProcess;
 
 		IManagedProcess( void ) :
 			BASECLASS()
@@ -47,7 +49,6 @@ class IManagedProcess : public IProcess
 
 		virtual void Cleanup( void ) = 0;
 
-		virtual ETimeType Get_Time_Type( void ) const = 0;
 		virtual bool Is_Root_Thread( void ) const = 0;
 
 		virtual void Run( const CProcessExecutionContext &context ) = 0;
@@ -55,4 +56,5 @@ class IManagedProcess : public IProcess
 
 };
 
-#endif // MANAGED_PROCESS_INTERFACE_H
+} // namespace Execution
+} // namespace IP

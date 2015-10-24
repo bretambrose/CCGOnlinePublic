@@ -17,33 +17,45 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_PROCESS_BASE_H
-#define DATABASE_PROCESS_BASE_H
+#pragma once
 
 #include "IPShared/Concurrency/ThreadProcessBase.h"
 
-class CRunDatabaseTaskRequest;
+namespace IP
+{
+namespace Db
+{
+
 class IDatabaseConnection;
 class IDatabaseEnvironment;
 class IDatabaseTaskBatch;
 
-namespace DatabaseTaskIDType
+enum class EDatabaseTaskIDType;
+
+} // namespace Db
+
+namespace Execution
 {
-	enum Enum;
-}
+namespace Messaging
+{
+
+class CRunDatabaseTaskRequest;
+
+} // namespace Messaging
+
 
 class CDatabaseProcessBase : public CThreadProcessBase
 {
 	public:
 
-		typedef CThreadProcessBase BASECLASS;
+		using BASECLASS = CThreadProcessBase;
 
 		// Construction/destruction
-		CDatabaseProcessBase( IDatabaseEnvironment *environment, const std::wstring &connection_string, bool process_task_results_locally, const SProcessProperties &properties );
+		CDatabaseProcessBase( IP::Db::IDatabaseEnvironment *environment, const std::wstring &connection_string, bool process_task_results_locally, const SProcessProperties &properties );
 		virtual ~CDatabaseProcessBase();
 
 		// IThreadTask interface
-		virtual void Initialize( EProcessID::Enum id );
+		virtual void Initialize( EProcessID id );
 
 		// IManagedProcess interface
 		virtual void Cleanup( void );
@@ -57,33 +69,34 @@ class CDatabaseProcessBase : public CThreadProcessBase
 		// CThreadProcessBase interface
 		virtual uint32_t Get_Sleep_Interval_In_Milliseconds( void ) const;
 
-		void Add_Batch( IDatabaseTaskBatch *batch );
+		void Add_Batch( IP::Db::IDatabaseTaskBatch *batch );
 
 	private:
 
-		void Handle_Run_Database_Task_Request( EProcessID::Enum process_id, std::unique_ptr< const CRunDatabaseTaskRequest > &message );
+		void Handle_Run_Database_Task_Request( EProcessID process_id, std::unique_ptr< const Messaging::CRunDatabaseTaskRequest > &message );
 
-		DatabaseTaskIDType::Enum Allocate_Task_ID( void );
+		IP::Db::EDatabaseTaskIDType Allocate_Task_ID( void );
 
-		typedef std::unordered_map< Loki::TypeInfo, IDatabaseTaskBatch *, STypeInfoContainerHelper > BatchTableType;
-		typedef std::vector< Loki::TypeInfo > BatchOrderingType;
+		using BatchTableType = std::unordered_map< Loki::TypeInfo, IP::Db::IDatabaseTaskBatch *, STypeInfoContainerHelper >;
+		using BatchOrderingType = std::vector< Loki::TypeInfo >;
 
-		typedef std::pair< EProcessID::Enum, std::unique_ptr< const CRunDatabaseTaskRequest > > PendingRequestPairType;
-		typedef std::unordered_map< DatabaseTaskIDType::Enum, PendingRequestPairType > PendingRequestTableType;
+		using PendingRequestPairType = std::pair< EProcessID, std::unique_ptr< const Messaging::CRunDatabaseTaskRequest > >;
+		using PendingRequestTableType = std::unordered_map< IP::Db::EDatabaseTaskIDType, PendingRequestPairType >;
 
 		BatchTableType Batches;
 		BatchOrderingType BatchOrdering;
 
 		PendingRequestTableType PendingRequests;
 
-		DatabaseTaskIDType::Enum NextID;
+		IP::Db::EDatabaseTaskIDType NextID;
 
-		IDatabaseEnvironment *Environment;
+		IP::Db::IDatabaseEnvironment *Environment;
 		std::wstring ConnectionString;
 		bool ProcessTaskResultsLocally;
 
-		IDatabaseConnection *Connection;
+		IP::Db::IDatabaseConnection *Connection;
 
 };
 
-#endif // DATABASE_PROCESS_BASE_H
+} // namespace Execution
+} // namespace IP

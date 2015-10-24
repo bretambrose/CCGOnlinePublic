@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef SLASH_COMMAND_DEFINITION_H
-#define SLASH_COMMAND_DEFINITION_H
+#pragma once
 
 #include <regex>
+
+namespace IP
+{
+namespace Command
+{
 
 class CSlashCommandDataDefinition;
 
@@ -49,4 +53,5 @@ class CSlashCommandDefinition
 		std::tr1::wregex ParamMatchExpression;
 };
 
-#endif // SLASH_COMMAND_DEFINITION_H
+} // namespace Command
+} // namespace IP

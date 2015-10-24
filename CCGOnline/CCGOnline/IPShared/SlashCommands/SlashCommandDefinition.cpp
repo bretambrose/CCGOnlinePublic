@@ -22,9 +22,16 @@
 #include "SlashCommandDefinition.h"
 #include "SlashCommandDataDefinition.h"
 
+namespace IP
+{
+namespace Command
+{
 
 CSlashCommandDefinition::CSlashCommandDefinition( const CSlashCommandDataDefinition *data_definition ) :
 	DataDefinition( data_definition ),
 	ParamMatchExpression( data_definition != nullptr ? data_definition->Build_Command_Matcher() : L"" )
 {
 }
+
+} // namespace Command
+} // namespace IP

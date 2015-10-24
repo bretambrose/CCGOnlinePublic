@@ -17,32 +17,37 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_MESSAGE_FRAME_H
-#define PROCESS_MESSAGE_FRAME_H
+#pragma once
+
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
 
 class IProcessMessage;
 
-namespace EProcessID
-{
-	enum Enum;
-}
+} // namespace Messaging
+
+enum class EProcessID;
 
 // A container of thread messages
 class CProcessMessageFrame
 {
 	public:
 
-		typedef std::vector< std::unique_ptr< const IProcessMessage > > MessageFrameContainerType;
+		using MessageFrameContainerType = std::vector< std::unique_ptr< const Messaging::IProcessMessage > >;
 
-		CProcessMessageFrame( EProcessID::Enum process_id );
+		CProcessMessageFrame( EProcessID process_id );
 		CProcessMessageFrame( CProcessMessageFrame &&rhs );
 
 		~CProcessMessageFrame();
 
-		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		EProcessID Get_Process_ID( void ) const { return ProcessID; }
 
-		void Add_Message( std::unique_ptr< const IProcessMessage > &message );
-		void Add_Message( std::unique_ptr< const IProcessMessage > &&message );
+		void Add_Message( std::unique_ptr< const Messaging::IProcessMessage > &message );
+		void Add_Message( std::unique_ptr< const Messaging::IProcessMessage > &&message );
 
 		MessageFrameContainerType::iterator begin( void ) { return Messages.begin(); }
 		MessageFrameContainerType::iterator end( void ) { return Messages.end(); }
@@ -52,10 +57,11 @@ class CProcessMessageFrame
 
 	private:
 
-		EProcessID::Enum ProcessID;
+		EProcessID ProcessID;
 
-		std::vector< std::unique_ptr< const IProcessMessage > > Messages;
+		std::vector< std::unique_ptr< const Messaging::IProcessMessage > > Messages;
 
 };
 
-#endif // PROCESS_MESSAGE_FRAME_H
+} // namespace Execution
+} // namespace IP

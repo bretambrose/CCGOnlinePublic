@@ -220,10 +220,7 @@
     <ClInclude Include="TaskScheduler\ScheduledTask.h" />
     <ClInclude Include="TaskScheduler\ScheduledTaskPolicies.h" />
     <ClInclude Include="TaskScheduler\TaskScheduler.h" />
-    <ClInclude Include="Time\TickTime.h" />
     <ClInclude Include="Time\TimeKeeper.h" />
-    <ClInclude Include="Time\TimeType.h" />
-    <ClInclude Include="Time\TimeUtils.h" />
     <ClInclude Include="TypeInfoUtils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -262,7 +259,6 @@
     <ClCompile Include="StructuredExceptionHandler.cpp" />
     <ClCompile Include="TaskScheduler\TaskScheduler.cpp" />
     <ClCompile Include="Time\TimeKeeper.cpp" />
-    <ClCompile Include="Time\TimeUtils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

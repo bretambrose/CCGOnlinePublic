@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef LOCKING_CONCURRENT_QUEUE_H
-#define LOCKING_CONCURRENT_QUEUE_H
+#pragma once
 
 #include "ConcurrentQueueInterface.h"
+
+namespace IP
+{
+namespace Concurrency
+{
 
 // A concurrent queue that uses a system mutex to guard add and remove operations
 template< typename T >
@@ -68,4 +72,5 @@ class CLockingConcurrentQueue : public IConcurrentQueue< T >
 
 };
 
-#endif // LOCKING_CONCURRENT_QUEUE_H
+} // namespace Concurrency
+} // namespace IP

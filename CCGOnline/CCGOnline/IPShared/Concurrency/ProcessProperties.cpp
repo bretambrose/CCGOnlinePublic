@@ -21,6 +21,10 @@
 
 #include "ProcessProperties.h"
 
+namespace IP
+{
+namespace Execution
+{
 
 bool SProcessProperties::Matches( const SProcessProperties &properties ) const
 {
@@ -50,3 +54,6 @@ bool SProcessProperties::Matches( const SProcessProperties &properties ) const
 
 	return true;
 }
+
+} // namespace Execution
+} // namespace IP

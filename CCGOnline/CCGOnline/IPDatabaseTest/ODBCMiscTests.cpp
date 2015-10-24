@@ -30,6 +30,8 @@
 #include "IPDatabase/EmptyVariableSet.h"
 #include "IPDatabase/DatabaseCalls.h"
 
+using namespace IP::Db;
+
 class ODBCMiscTests : public testing::Test 
 {
 	public:
@@ -65,7 +67,7 @@ class CGetAccountResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CGetAccountResultSet( void ) :
 			BASECLASS(),
@@ -263,7 +265,7 @@ class CTestSignatureValidation1 : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestSignatureValidation1( void ) :
 			BASECLASS(),
@@ -294,7 +296,7 @@ class CTestSignatureValidation2 : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestSignatureValidation2( void ) :
 			BASECLASS(),
@@ -325,7 +327,7 @@ class CTestSignatureValidation3 : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestSignatureValidation3( void ) :
 			BASECLASS(),
@@ -356,7 +358,7 @@ class CTestSignatureValidation4 : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CTestSignatureValidation4( void ) :
 			BASECLASS(),
@@ -386,7 +388,7 @@ class CDummyTask : public CDatabaseTaskBase
 {
 	public:
 
-		typedef CDatabaseTaskBase BASECLASS;
+		using BASECLASS = CDatabaseTaskBase;
 
 		CDummyTask( void ) :
 			BASECLASS()

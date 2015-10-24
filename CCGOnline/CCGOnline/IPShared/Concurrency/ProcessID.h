@@ -17,20 +17,23 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_ID_H
-#define PROCESS_ID_H
+#pragma once
 
-namespace EProcessID
+namespace IP
 {
-	enum Enum
-	{
-		INVALID = 0,
+namespace Execution
+{
 
-		CONCURRENCY_MANAGER,
-		LOGGING,
+enum class EProcessID
+{
+	INVALID = 0,
 
-		FIRST_FREE_ID
-	};
-}
+	CONCURRENCY_MANAGER,
+	LOGGING,
 
-#endif // PROCESS_ID_H
+	FIRST_FREE_ID
+};
+
+} // namespace Execution 
+} // namespace IP
+

@@ -34,9 +34,6 @@
     <ClCompile Include="PlatformFileSystemTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlatformTimeTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EnumUtilsTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

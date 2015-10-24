@@ -24,15 +24,22 @@
 #include "IPShared/IPShared.h"
 #include "GeneratedCode/RegisterIPServerSharedEnums.h"
 
-
-void NIPServerShared::Initialize( void )
+namespace IP
 {
-	NIPShared::Initialize();
+namespace Global
+{
+
+void Initialize_IPServerShared( void )
+{
+	Initialize_IPShared();
 	Register_IPServerShared_Enums();
 }
 
 
-void  NIPServerShared::Shutdown( void )
+void Shutdown_IPServerShared( void )
 {
-	NIPShared::Shutdown();
+	Shutdown_IPShared();
 }
+
+} // namespace Global
+} // namespace IP

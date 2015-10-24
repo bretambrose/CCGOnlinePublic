@@ -21,6 +21,8 @@
 
 #include "IPShared/PriorityQueue.h"
 
+using namespace IP::Algorithm;
+
 void Verify_Sorted( TPriorityQueue< int32_t > &int_heap )
 {
 	if ( int_heap.Empty() )

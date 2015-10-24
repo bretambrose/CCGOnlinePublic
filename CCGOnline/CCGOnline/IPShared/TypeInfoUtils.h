@@ -17,8 +17,10 @@
 
 **********************************************************************************************************************/
 
-#ifndef TYPE_INFO_UTILS_H
-#define TYPE_INFO_UTILS_H
+#pragma once
+
+namespace IP
+{
 
 // A helper policy class that allows us to use Loki's TypeInfo class in STL maps and sets.
 struct STypeInfoContainerHelper
@@ -39,4 +41,5 @@ struct STypeInfoContainerHelper
 		}
 };
 
-#endif // TYPE_INFO_UTILS_H
+} // namespace IP
+

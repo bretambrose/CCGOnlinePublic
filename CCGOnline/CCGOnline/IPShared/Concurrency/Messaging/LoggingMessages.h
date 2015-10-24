@@ -17,38 +17,46 @@
 
 **********************************************************************************************************************/
 
-#ifndef LOGGING_MESSAGES_H
-#define LOGGING_MESSAGES_H
+#pragma once
 
 #include "ProcessMessage.h"
 
+#include "IPPlatform/PlatformTime.h"
 #include "IPShared/Concurrency/ProcessProperties.h"
 
-namespace EProcessID
+namespace IP
 {
-	enum Enum;
-}
+namespace Execution
+{
+
+enum class EProcessID;
+
+namespace Messaging
+{
 
 // A message asking the logging thread to write some information to a file
 class CLogRequestMessage : public IProcessMessage
 {
 	public:
 
-		typedef IProcessMessage BASECLASS;
+		using BASECLASS = IProcessMessage;
 
-		CLogRequestMessage( const SProcessProperties &source_properties, std::wstring &&message );
-		CLogRequestMessage( const SProcessProperties &source_properties, const std::wstring &message );
+		CLogRequestMessage( const IP::Execution::SProcessProperties &source_properties, std::wstring &&message );
+		CLogRequestMessage( const IP::Execution::SProcessProperties &source_properties, const std::wstring &message );
 		virtual ~CLogRequestMessage() = default;
 
-		const SProcessProperties &Get_Source_Properties( void ) const { return SourceProperties; }
+		const IP::Execution::SProcessProperties &Get_Source_Properties( void ) const { return SourceProperties; }
 		const std::wstring &Get_Message( void ) const { return Message; }
-		uint64_t Get_Time( void ) const { return Time; }
+		IP::Time::SystemTimePoint Get_Time( void ) const { return Time; }
 
 	private:
 
-		SProcessProperties SourceProperties;
+		IP::Execution::SProcessProperties SourceProperties;
 		std::wstring Message;
-		uint64_t Time;
+		IP::Time::SystemTimePoint Time;
 };
+ 
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP
 
-#endif // LOGGING_MESSAGES_H

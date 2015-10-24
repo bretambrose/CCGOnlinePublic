@@ -17,12 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_STATEMENT_INTERFACE_H
-#define DATABASE_STATEMENT_INTERFACE_H
+#pragma once
 
-enum DBStatementIDType;
 enum DBErrorStateType;
 enum EFetchResultsStatusType;
+enum DBStatementIDType;
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseVariableSet;
 class IDatabaseConnection;
@@ -56,4 +60,5 @@ class IDatabaseStatement
 		virtual void Log_Error_State( void ) const = 0;
 };
 
-#endif // DATABASE_STATEMENT_INTERFACE_H
+} // namespace Db
+} // namespace IP

@@ -17,13 +17,16 @@
 
 **********************************************************************************************************************/
 
-#ifndef IP_DATABASE_H
-#define IP_DATABASE_H
+#pragma once
 
-namespace NIPDatabase
+namespace IP
 {
-	void Initialize( void );
-	void Shutdown( void );
-};
+namespace Global
+{
 
-#endif // IP_DATABASE_H
+	void Initialize_IPDatabase( void );
+	void Shutdown_IPDatabase( void );
+
+} // namespace Global
+} // namespace IP
+

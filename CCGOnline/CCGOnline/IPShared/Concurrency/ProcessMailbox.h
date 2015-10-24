@@ -17,44 +17,51 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_MAILBOX_H
-#define PROCESS_MAILBOX_H
+#pragma once
 
 #include "ProcessProperties.h"
 
-class CWriteOnlyMailbox;
-class CReadOnlyMailbox;
-class CProcessMessageFrame;
+namespace IP
+{
+namespace Concurrency
+{
+
 template < typename T > class IConcurrentQueue;
 template < typename T > class CTBBConcurrentQueue;
 template < typename T > class CLockingConcurrentQueue;
 
-namespace EProcessID
+} // namespace Concurrency
+
+namespace Execution
 {
-	enum Enum;
-}
+
+class CWriteOnlyMailbox;
+class CReadOnlyMailbox;
+class CProcessMessageFrame;
+
+enum class EProcessID;
 
 // Controls which concurrent queue implementation we use
-//typedef CTBBConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
-typedef CLockingConcurrentQueue< std::unique_ptr< CProcessMessageFrame > > ProcessToProcessQueueType;
+//using ProcessToProcessQueueType = CTBBConcurrentQueue< std::unique_ptr< CProcessMessageFrame > >;
+using ProcessToProcessQueueType = IP::Concurrency::CLockingConcurrentQueue< std::unique_ptr< CProcessMessageFrame > >;
 
 // A class that holds both the read and write interfaces of a thread task
 class CProcessMailbox
 {
 	public:
 
-		CProcessMailbox( EProcessID::Enum process_id, const SProcessProperties &properties );
+		CProcessMailbox( EProcessID process_id, const SProcessProperties &properties );
 		~CProcessMailbox();
 
 		const std::shared_ptr< CWriteOnlyMailbox > &Get_Writable_Mailbox( void ) const { return WriteOnlyMailbox; }
 		const std::shared_ptr< CReadOnlyMailbox > &Get_Readable_Mailbox( void ) const { return ReadOnlyMailbox; }
 
-		EProcessID::Enum Get_Process_ID( void ) const { return ProcessID; }
+		EProcessID Get_Process_ID( void ) const { return ProcessID; }
 		const SProcessProperties &Get_Properties( void ) const { return Properties; }
 
 	private:
 		
-		EProcessID::Enum ProcessID;
+		EProcessID ProcessID;
 
 		SProcessProperties Properties;
 
@@ -62,4 +69,5 @@ class CProcessMailbox
 		std::shared_ptr< CReadOnlyMailbox > ReadOnlyMailbox;
 };
 
-#endif // PROCESS_MAILBOX_H
+} // namespace Execution
+} // namespace IP

@@ -17,17 +17,21 @@
 
 **********************************************************************************************************************/
 
-#ifndef THREAD_PROCESS_BASE_H
-#define THREAD_PROCESS_BASE_H
+#pragma once
 
 #include "ProcessBase.h"
+
+namespace IP
+{
+namespace Execution
+{
 
 // The shared logic level of all thread-based virtual processes; not instantiable
 class CThreadProcessBase : public CProcessBase
 {
 	public:
 		
-		typedef CProcessBase BASECLASS;
+		using BASECLASS = CProcessBase;
 
 		// Construction/destruction
 		CThreadProcessBase( const SProcessProperties &properties );
@@ -58,4 +62,5 @@ class CThreadProcessBase : public CProcessBase
 		std::unique_ptr< std::thread > ExecutionThread;
 };
 
-#endif // THREAD_PROCESS_BASE_H
+} // namespace Execution
+} // namespace IP

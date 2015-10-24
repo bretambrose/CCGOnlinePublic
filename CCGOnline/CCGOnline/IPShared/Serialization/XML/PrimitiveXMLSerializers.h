@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef PRIMITIVE_XML_SERIALIZERS_H
-#define PRIMITIVE_XML_SERIALIZERS_H
+#pragma once
 
 #include "IPShared/Serialization/XML/XMLSerializerInterface.h"
 #include "pugixml/pugixml.h"
@@ -26,19 +25,23 @@
 #include "IPShared/EnumConversion.h"
 #include "IPShared/Serialization/SerializationHelpers.h"
 
-namespace XMLSerialization
+namespace IP
 {
-	void Register_Primitive_Serializers( void );
-}
+namespace Serialization
+{
+namespace XML
+{
 
-typedef std::pair< uint64_t, IXMLSerializer * > XMLMemberRecordType;
+void Register_Primitive_Serializers( void );
+
+using XMLMemberRecordType = std::pair< uint64_t, IXMLSerializer * >;
 
 // The base class for the serializer for compound types: classes and structs
 class CCompositeXMLSerializer : public IXMLSerializer
 {
 	public:
 
-		typedef IXMLSerializer BASECLASS;
+		using BASECLASS = IXMLSerializer;
 
 		CCompositeXMLSerializer( void ) :
 			BASECLASS(),
@@ -55,7 +58,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 			{
 				std::wstring node_name( iter.name() );
 				std::wstring upper_name;
-				NStringUtils::To_Upper_Case( node_name, upper_name );
+				IP::String::To_Upper_Case( node_name, upper_name );
 
 				auto member_iter = MemberRecords.find( upper_name );
 				FATAL_ASSERT( member_iter != MemberRecords.cend() );
@@ -70,7 +73,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 			{
 				std::wstring attribute_name( att_iter.name() );
 				std::wstring upper_attribute_name;
-				NStringUtils::To_Upper_Case( attribute_name, upper_attribute_name );
+				IP::String::To_Upper_Case( attribute_name, upper_attribute_name );
 
 				auto record_iter = MemberRecords.find( upper_attribute_name );
 				if ( record_iter == MemberRecords.cend() )
@@ -93,7 +96,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 		void Add( const std::wstring &element_name, uint64_t offset, IXMLSerializer *serializer )
 		{
 			std::wstring upper_name;
-			NStringUtils::To_Upper_Case( element_name, upper_name );
+			IP::String::To_Upper_Case( element_name, upper_name );
 
 			Add_Member_Record( upper_name,  XMLMemberRecordType( offset, serializer ) );
 		}
@@ -107,7 +110,7 @@ class CCompositeXMLSerializer : public IXMLSerializer
 			MemberRecords[ member_name ] = member_record;
 		}
 
-		typedef std::unordered_map< std::wstring, XMLMemberRecordType > MemberRecordTableType;
+		using MemberRecordTableType = std::unordered_map< std::wstring, XMLMemberRecordType >;
 		MemberRecordTableType MemberRecords;
 };
 
@@ -197,7 +200,7 @@ class CEnumXMLSerializer : public IXMLSerializer
 		{
 			T *dest = reinterpret_cast< T * >( destination );
 
-			if ( !CEnumConverter::Convert( value, *dest ) )
+			if ( !IP::Enum::CEnumConverter::Convert( value, *dest ) )
 			{
 				FATAL_ASSERT( false );
 			}
@@ -224,7 +227,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 			uint64_t type_value;
 			std::string attribute_value;
 
-			if ( !CEnumConverter::Convert( EnumTypeInfo, std::wstring( attrib.value() ), type_value ) )
+			if ( !IP::Enum::CEnumConverter::Convert( EnumTypeInfo, std::wstring( attrib.value() ), type_value ) )
 			{
 				FATAL_ASSERT( false );
 			}
@@ -243,7 +246,7 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 
 	private:
 
-		typedef std::unordered_map< uint64_t, IXMLSerializer * > SerializerTableType;
+		using SerializerTableType = std::unordered_map< uint64_t, IXMLSerializer * >;
 		
 		Loki::TypeInfo EnumTypeInfo;
 
@@ -252,4 +255,6 @@ class CEnumPolymorphicXMLSerializer : public IXMLSerializer
 
 
 
-#endif // PRIMITIVE_XML_SERIALIZERS_H
+} // namespace XML
+} // namespace Serialization
+} // namespace IP

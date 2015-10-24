@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_FACTORY_H
-#define ODBC_FACTORY_H
+#pragma once
+
+namespace IP
+{
+namespace Db
+{
 
 class IDatabaseEnvironment;
 
@@ -36,4 +40,5 @@ class CODBCFactory
 		static IDatabaseEnvironment *Environment;
 };
 
-#endif // ODBC_FACTORY_H
+} // namespace Db
+} // namespace IP

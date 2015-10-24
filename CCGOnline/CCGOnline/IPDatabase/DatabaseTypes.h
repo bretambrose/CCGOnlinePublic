@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_TYPES_H
-#define DATABASE_TYPES_H
+#pragma once
 
 //:EnumBegin()
 enum DBErrorStateType
@@ -87,15 +86,22 @@ enum EDatabaseTaskType
 	DTT_TABLE_VALUED_FUNCTION_CALL
 };
 
+namespace IP
+{
+namespace Db
+{
+
 class IDatabaseTaskBase;
 class IDatabaseTask;
 class ICompoundDatabaseTask;
 
-typedef std::list< IDatabaseTaskBase * > DBTaskBaseListType;
-typedef std::list< IDatabaseTask * > DBTaskListType;
-typedef std::list< ICompoundDatabaseTask * > DBCompoundTaskListType;
+} // namespace Db
+} // namespace IP
 
-typedef std::unordered_map< Loki::TypeInfo, DBTaskListType *, STypeInfoContainerHelper > DBTaskListTableType;
-typedef std::pair< Loki::TypeInfo, DBTaskListType * > DBTaskListTablePairType;
+using DBTaskBaseListType = std::list< IP::Db::IDatabaseTaskBase * >;
+using DBTaskListType = std::list< IP::Db::IDatabaseTask * >;
+using DBCompoundTaskListType = std::list< IP::Db::ICompoundDatabaseTask * >;
 
-#endif // DATABASE_TYPES_H
+using DBTaskListTableType = std::unordered_map< Loki::TypeInfo, DBTaskListType *, IP::STypeInfoContainerHelper >;
+using DBTaskListTablePairType = std::pair< Loki::TypeInfo, DBTaskListType * >;
+

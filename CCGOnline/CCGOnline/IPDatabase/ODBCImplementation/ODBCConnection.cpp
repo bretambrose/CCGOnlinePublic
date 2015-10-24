@@ -30,27 +30,32 @@
 #include "IPDatabase/Interfaces/DatabaseVariableInterface.h"
 #include "IPDatabase/Interfaces/DatabaseVariableSetInterface.h"
 
-enum ODBCConnectionStateType
+namespace IP
 {
-	ODBCCST_UNINITIALIZED,
-	ODBCCST_CONNECTED,
+namespace Db
+{
 
-	ODBCCST_SHUTDOWN,
-	ODBCCST_FATAL_ERROR
+enum class ODBCConnectionStateType
+{
+	UNINITIALIZED,
+	CONNECTED,
+
+	SHUTDOWN,
+	FATAL_ERROR
 };
 
-enum ODBCConnectionOperationType
+enum class ODBCConnectionOperationType
 {
-	ODBCCOT_CONNECT_TO_DB,
-	ODBCCOT_ALLOCATE_STATEMENT_HANDLE,
-	ODBCCOT_TOGGLE_AUTO_COMMIT,
-	ODBCCOT_COMMIT
+	CONNECT_TO_DB,
+	ALLOCATE_STATEMENT_HANDLE,
+	TOGGLE_AUTO_COMMIT,
+	COMMIT
 };
 
 CODBCConnection::CODBCConnection( DBConnectionIDType id, SQLHENV environment_handle, SQLHDBC connection_handle, bool cache_statements ) :
-	BASECLASS( environment_handle, connection_handle, 0 ),
+	CODBCObjectBase( environment_handle, connection_handle, 0 ),
 	ID( id ),
-	State( ODBCCST_UNINITIALIZED ),
+	State( ODBCConnectionStateType::UNINITIALIZED ),
 	Statements(),
 	CachedStatements(),
 	NextStatementID( static_cast< DBStatementIDType >( 1 ) ),
@@ -65,7 +70,7 @@ CODBCConnection::~CODBCConnection()
 
 void CODBCConnection::Initialize( const std::wstring &connection_string )
 {
-	FATAL_ASSERT( State == ODBCCST_UNINITIALIZED );
+	FATAL_ASSERT( State == ODBCConnectionStateType::UNINITIALIZED );
 
 	SQLWCHAR output_connection_buffer[ 1024 ] = { 0 };
 	SQLSMALLINT output_size = 0;
@@ -79,27 +84,27 @@ void CODBCConnection::Initialize( const std::wstring &connection_string )
 														  &output_size, 
 														  SQL_DRIVER_COMPLETE );
 
-	Update_Error_Status( ODBCCOT_CONNECT_TO_DB, error_code );
+	Update_Error_Status( ODBCConnectionOperationType::CONNECT_TO_DB, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCCST_FATAL_ERROR;
+		State = ODBCConnectionStateType::FATAL_ERROR;
 		return;
 	}
 
 	error_code = SQLSetConnectAttr( ConnectionHandle, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) SQL_AUTOCOMMIT_OFF, 0 );
-	Update_Error_Status( ODBCCOT_TOGGLE_AUTO_COMMIT, error_code );
+	Update_Error_Status( ODBCConnectionOperationType::TOGGLE_AUTO_COMMIT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCCST_FATAL_ERROR;
+		State = ODBCConnectionStateType::FATAL_ERROR;
 		return;
 	}
 
-	State = ODBCCST_CONNECTED;
+	State = ODBCConnectionStateType::CONNECTED;
 }
 
 void CODBCConnection::Shutdown( void )
 {
-	if ( State != ODBCCST_UNINITIALIZED && State != ODBCCST_SHUTDOWN )
+	if ( State != ODBCConnectionStateType::UNINITIALIZED && State != ODBCConnectionStateType::SHUTDOWN )
 	{
 		for ( auto iter = Statements.begin(); iter != Statements.end(); ++iter )
 		{
@@ -116,20 +121,20 @@ void CODBCConnection::Shutdown( void )
 		Invalidate_Handles();
 	}
 
-	State = ODBCCST_SHUTDOWN;
+	State = ODBCConnectionStateType::SHUTDOWN;
 }
 
 IDatabaseStatement *CODBCConnection::Allocate_Statement( const std::wstring &statement_text )
 {
-	FATAL_ASSERT( State != ODBCCST_UNINITIALIZED );
+	FATAL_ASSERT( State != ODBCConnectionStateType::UNINITIALIZED );
 
-	if ( State != ODBCCST_CONNECTED )
+	if ( State != ODBCConnectionStateType::CONNECTED )
 	{
 		return nullptr;
 	}
 
 	std::wstring upper_statement_text;
-	NStringUtils::To_Upper_Case( statement_text, upper_statement_text );
+	IP::String::To_Upper_Case( statement_text, upper_statement_text );
 	auto iter = CachedStatements.find( upper_statement_text );
 	if ( iter != CachedStatements.end() )
 	{
@@ -141,7 +146,7 @@ IDatabaseStatement *CODBCConnection::Allocate_Statement( const std::wstring &sta
 
 	SQLHSTMT statement_handle = 0;
 	SQLRETURN error_code = SQLAllocHandle( SQL_HANDLE_STMT, ConnectionHandle, &statement_handle );
-	Update_Error_Status( ODBCCOT_ALLOCATE_STATEMENT_HANDLE, error_code );
+	Update_Error_Status( ODBCConnectionOperationType::ALLOCATE_STATEMENT_HANDLE, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
 		return nullptr;
@@ -211,19 +216,19 @@ void CODBCConnection::Update_Error_Status( ODBCConnectionOperationType operation
 
 	switch ( operation_type )
 	{
-		case ODBCCOT_CONNECT_TO_DB:
+		case ODBCConnectionOperationType::CONNECT_TO_DB:
 			Set_Error_State_Base( ( error_code == SQL_SUCCESS_WITH_INFO ) ? DBEST_WARNING : DBEST_FATAL_ERROR );
 			break;
 
-		case ODBCCOT_TOGGLE_AUTO_COMMIT:
+		case ODBCConnectionOperationType::TOGGLE_AUTO_COMMIT:
 			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;
 
-		case ODBCCOT_ALLOCATE_STATEMENT_HANDLE:
+		case ODBCConnectionOperationType::ALLOCATE_STATEMENT_HANDLE:
 			Set_Error_State_Base( DBEST_RECOVERABLE_ERROR );
 			break;
 
-		case ODBCCOT_COMMIT:
+		case ODBCConnectionOperationType::COMMIT:
 			Set_Error_State_Base( DBEST_FATAL_ERROR );
 			break;
 
@@ -503,13 +508,16 @@ bool CODBCConnection::Validate_Input_Output_Signatures( IDatabaseTask *task, IDa
 
 void CODBCConnection::End_Transaction( bool commit )
 {
-	FATAL_ASSERT( State == ODBCCST_CONNECTED );	
+	FATAL_ASSERT( State == ODBCConnectionStateType::CONNECTED );	
 
 	SQLRETURN error_code = SQLEndTran( SQL_HANDLE_DBC, ConnectionHandle, commit ? SQL_COMMIT : SQL_ROLLBACK );
-	Update_Error_Status( ODBCCOT_COMMIT, error_code );
+	Update_Error_Status( ODBCConnectionOperationType::COMMIT, error_code );
 	if ( !Was_Last_ODBC_Operation_Successful() )
 	{
-		State = ODBCCST_FATAL_ERROR;
+		State = ODBCConnectionStateType::FATAL_ERROR;
 		return;
 	}
 }
+
+} // namespace Db
+} // namespace IP

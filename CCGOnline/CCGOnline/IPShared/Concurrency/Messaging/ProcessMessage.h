@@ -17,8 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_MESSAGE_H
-#define PROCESS_MESSAGE_H
+#pragma once
+
+namespace IP
+{
+namespace Execution
+{
+namespace Messaging
+{
 
 class IProcessMessage
 {
@@ -27,4 +33,6 @@ class IProcessMessage
 		virtual ~IProcessMessage() = default;
 };
 
-#endif // PROCESS_MESSAGE_H
+} // namespace Messaging
+} // namespace Execution
+} // namespace IP

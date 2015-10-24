@@ -23,6 +23,9 @@
 #include "IPShared/SlashCommands/SlashCommandInstance.h"
 #include "IPShared/Serialization/SerializationRegistrar.h"
 
+using namespace IP::Command;
+using namespace IP::Serialization;
+
 class SlashCommandTests : public testing::Test 
 {
 	protected:  

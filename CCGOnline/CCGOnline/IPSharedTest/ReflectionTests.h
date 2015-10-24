@@ -17,8 +17,7 @@
 
 **********************************************************************************************************************/
 
-#ifndef REFLECTION_TESTS_H
-#define REFLECTION_TESTS_H
+#pragma once
  
 //:EnumBegin()
 enum EReflectionTest
@@ -80,4 +79,3 @@ enum DerivedTest
 };
 //:EnumEnd
 
-#endif // REFLECTION_TESTS_H

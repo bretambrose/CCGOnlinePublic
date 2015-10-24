@@ -25,12 +25,24 @@
 #include "IPShared/Serialization/XML/PrimitiveXMLSerializers.h"
 #include "IPShared/SlashCommands/SlashCommandDataDefinition.h"
 
-void NIPShared::Register_Shared_XML_Serializers( void )
+using namespace IP::Command;
+using namespace IP::Serialization;
+using namespace IP::Serialization::XML;
+
+namespace IP
 {
-	XMLSerialization::Register_Primitive_Serializers();
+namespace Global
+{
+
+void Register_IPShared_XML_Serializers( void )
+{
+	Register_Primitive_Serializers();
 
 	REGISTER_PRIMITIVE_XML_SERIALIZER( ESlashCommandParamType, new CEnumXMLSerializer< ESlashCommandParamType > );
 
 	CSlashCommandParam::Register_Type_Definition();
 	CSlashCommandDataDefinition::Register_Type_Definition();
 }
+
+} // namespace Global
+} // namespace IP

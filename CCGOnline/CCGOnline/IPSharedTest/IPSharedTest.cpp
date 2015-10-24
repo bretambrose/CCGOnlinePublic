@@ -26,13 +26,13 @@ namespace NIPSharedTest
 {
 	void Initialize( void )
 	{
-		NIPShared::Initialize();
+		IP::Global::Initialize_IPShared();
 		Register_IPSharedTest_Enums();
 	}
 
 	void Shutdown( void )
 	{
-		NIPShared::Shutdown();
+		IP::Global::Shutdown_IPShared();
 	}
 }
 

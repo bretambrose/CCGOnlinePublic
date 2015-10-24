@@ -23,6 +23,13 @@
 #include "IPShared/Serialization/SerializationRegistrar.h"
 #include "pugixml/pugixml.h"
 
+namespace IP
+{
+namespace Serialization
+{
+namespace XML
+{
+
 class CPrimitiveXMLSerializer : public IXMLSerializer
 {
 	public:
@@ -45,7 +52,7 @@ class CXMLIntegerSerializer : public CPrimitiveXMLSerializer
 		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
 			int64_t node_value = 0;
-			bool result = NStringUtils::Convert_Raw( value, node_value );
+			bool result = IP::String::Convert_Raw( value, node_value );
 			FATAL_ASSERT( result );
 
 			T *dest_ptr = reinterpret_cast< T * >( destination );
@@ -65,7 +72,7 @@ class CXMLUnsignedIntegerSerializer : public CPrimitiveXMLSerializer
 		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
 			uint64_t node_value = 0;
-			bool result = NStringUtils::Convert_Raw( value, node_value );
+			bool result = IP::String::Convert_Raw( value, node_value );
 			FATAL_ASSERT( result );
 
 			T *dest_ptr = reinterpret_cast< T * >( destination );
@@ -85,7 +92,7 @@ class CXMLDoubleSerializer : public CPrimitiveXMLSerializer
 		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
 			double node_value = 0;
-			bool result = NStringUtils::Convert_Raw( value, node_value );
+			bool result = IP::String::Convert_Raw( value, node_value );
 			FATAL_ASSERT( result );
 
 			T *dest_ptr = reinterpret_cast< T * >( destination );
@@ -121,7 +128,7 @@ class CXMLStringSerializer : public CPrimitiveXMLSerializer
 		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
 			std::string node_value;
-			NStringUtils::WideString_To_String( value, node_value );
+			IP::String::WideString_To_String( value, node_value );
 
 			std::string *dest_ptr = reinterpret_cast< std::string * >( destination );
 			*dest_ptr = node_value;
@@ -139,7 +146,7 @@ class CXMLBoolSerializer : public CPrimitiveXMLSerializer
 		virtual void Load_From_String( const wchar_t *value, void *destination ) const override
 		{
 			bool node_value = false;
-			bool result = NStringUtils::Convert_Raw( value, node_value );
+			bool result = IP::String::Convert_Raw( value, node_value );
 			FATAL_ASSERT( result );
 
 			bool *dest_ptr = reinterpret_cast< bool * >( destination );
@@ -147,23 +154,24 @@ class CXMLBoolSerializer : public CPrimitiveXMLSerializer
 		}
 };
 
-namespace XMLSerialization
-{
 
-	void Register_Primitive_Serializers( void )
-	{
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int8_t, new CXMLIntegerSerializer< int8_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint8_t, new CXMLIntegerSerializer< uint8_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int16_t, new CXMLIntegerSerializer< int16_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint16_t, new CXMLIntegerSerializer< uint16_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int32_t, new CXMLIntegerSerializer< int32_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint32_t, new CXMLIntegerSerializer< uint32_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( int64_t, new CXMLIntegerSerializer< int64_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( uint64_t, new CXMLIntegerSerializer< uint64_t > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( std::wstring, new CXMLWideStringSerializer );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( std::string, new CXMLStringSerializer );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( double, new CXMLDoubleSerializer< double > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( float, new CXMLDoubleSerializer< float > );
-		REGISTER_PRIMITIVE_XML_SERIALIZER( bool, new CXMLBoolSerializer );
-	}
+void Register_Primitive_Serializers( void )
+{
+	REGISTER_PRIMITIVE_XML_SERIALIZER( int8_t, new CXMLIntegerSerializer< int8_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( uint8_t, new CXMLIntegerSerializer< uint8_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( int16_t, new CXMLIntegerSerializer< int16_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( uint16_t, new CXMLIntegerSerializer< uint16_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( int32_t, new CXMLIntegerSerializer< int32_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( uint32_t, new CXMLIntegerSerializer< uint32_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( int64_t, new CXMLIntegerSerializer< int64_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( uint64_t, new CXMLIntegerSerializer< uint64_t > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( std::wstring, new CXMLWideStringSerializer );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( std::string, new CXMLStringSerializer );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( double, new CXMLDoubleSerializer< double > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( float, new CXMLDoubleSerializer< float > );
+	REGISTER_PRIMITIVE_XML_SERIALIZER( bool, new CXMLBoolSerializer );
 }
+
+} // namespace XML
+} // namespace Serialization
+} // namespace IP

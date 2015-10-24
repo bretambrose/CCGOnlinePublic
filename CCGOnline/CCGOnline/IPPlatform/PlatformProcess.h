@@ -17,15 +17,18 @@
 
 **********************************************************************************************************************/
 
-#ifndef PLATFORM_PROCESS_H
-#define PLATFORM_PROCESS_H
+#pragma once
 
-namespace NPlatform
+namespace IP
 {
+namespace Process
+{
+
 	std::wstring Get_Exe_Name( void );
 	std::wstring Get_Service_Name( void );
 
 	uint32_t Get_Self_PID( void );
-}
 
-#endif // PLATFORM_PROCESS_H
+} // namespace Process
+} // namespace IP
+

@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef STRUCTURED_EXCEPTION_HANDLER_H
-#define STRUCTURED_EXCEPTION_HANDLER_H
+#pragma once
 
 #include "IPPlatform/StructuredExceptionTypes.h"
+
+namespace IP
+{
+namespace Debug
+{
 
 // A static class that does platform-agnostic exception handling.  Platform specific logic is done in the
 // PlatformExceptionHandler component and then a generic information structure is passed here for processing.
@@ -45,4 +49,5 @@ class CStructuredExceptionHandler
 
 };
 
-#endif // STRUCTURED_EXCEPTION_HANDLING_H
+} // namespace Debug
+} // namespace IP

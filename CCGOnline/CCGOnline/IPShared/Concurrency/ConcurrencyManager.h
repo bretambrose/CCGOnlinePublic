@@ -17,44 +17,54 @@
 
 **********************************************************************************************************************/
 
-#ifndef CONCURRENCY_MANAGER_H
-#define CONCURRENCY_MANAGER_H
+#pragma once
 
 #include "ProcessProperties.h"
-
-class IManagedProcess;
-class CReadOnlyMailbox;
-class CProcessMailbox;
-class CGetMailboxByIDRequest;
-class CGetMailboxByPropertiesRequest;
-class CAddNewProcessMessage;
-class CShutdownProcessMessage;
-class CRescheduleProcessMessage;
-class CReleaseMailboxResponse;
-class CShutdownSelfResponse;
-class CShutdownManagerMessage;
-class CWriteOnlyMailbox;
-class IProcessMessage;
-class IProcessMessageHandler;
-class CProcessMessageFrame;
-class CTaskScheduler;
-class CTimeKeeper;
-class CProcessRecord;
-
-struct STickTime;
-
-enum ETimeType;
-enum EConcurrencyManagerState;
 
 namespace tbb
 {
 	class task_scheduler_init;
 }
 
-namespace EProcessID
+class CConcurrencyManagerTester;
+
+namespace IP
 {
-	enum Enum;
-}
+namespace Time
+{
+
+class CTimeKeeper;
+
+} // namespace Time
+
+namespace Execution
+{
+namespace Messaging
+{
+
+class IProcessMessage;
+class IProcessMessageHandler;
+class CAddNewProcessMessage;
+class CShutdownProcessMessage;
+class CRescheduleProcessMessage;
+class CReleaseMailboxResponse;
+class CShutdownSelfResponse;
+class CShutdownManagerMessage;
+class CGetMailboxByIDRequest;
+class CGetMailboxByPropertiesRequest;
+
+} // namespace Messaging
+
+class IManagedProcess;
+class CReadOnlyMailbox;
+class CProcessMailbox;
+class CWriteOnlyMailbox;
+class CProcessMessageFrame;
+class CTaskScheduler;
+class CProcessRecord;
+
+enum class EConcurrencyManagerState;
+enum class EProcessID;
 
 // the central, manager class that manages all thread tasks
 class CConcurrencyManager
@@ -72,35 +82,35 @@ class CConcurrencyManager
 
 		void Log( std::wstring &&message );
 
-		void Register_Handler( const std::type_info &message_type_info, std::unique_ptr< IProcessMessageHandler > &handler );
+		void Register_Handler( const std::type_info &message_type_info, std::unique_ptr< Messaging::IProcessMessageHandler > &handler );
 
 	private:
 
 		friend class CConcurrencyManagerTester;
 
 		// Accessors
-		std::shared_ptr< CProcessRecord > Get_Record( EProcessID::Enum process_id ) const;
+		std::shared_ptr< CProcessRecord > Get_Record( EProcessID process_id ) const;
 
-		std::shared_ptr< IManagedProcess > Get_Process( EProcessID::Enum process_id ) const;
+		std::shared_ptr< IManagedProcess > Get_Process( EProcessID process_id ) const;
 		void Enumerate_Processes( std::vector< std::shared_ptr< IManagedProcess > > &processes ) const;
 
-		std::shared_ptr< CWriteOnlyMailbox > Get_Mailbox( EProcessID::Enum process_id ) const;
-		std::shared_ptr< CReadOnlyMailbox > Get_My_Mailbox( void ) const;
+		std::shared_ptr< CWriteOnlyMailbox > Get_Mailbox( EProcessID process_id ) const;
+		const std::shared_ptr< CReadOnlyMailbox >& Get_My_Mailbox( void ) const;
 
-		std::shared_ptr< CTaskScheduler > Get_Task_Scheduler( ETimeType time_type ) const;
+		const std::shared_ptr< CTaskScheduler >& Get_Task_Scheduler( void ) const;
 
 		// Message handling
 		void Register_Message_Handlers( void );
 
-		void Handle_Message( EProcessID::Enum source_process_id, std::unique_ptr< const IProcessMessage > &message );
-		void Handle_Get_Mailbox_By_ID_Request( EProcessID::Enum source_process_id, std::unique_ptr< const CGetMailboxByIDRequest > &message );
-		void Handle_Get_Mailbox_By_Properties_Request( EProcessID::Enum source_process_id, std::unique_ptr< const CGetMailboxByPropertiesRequest > &message );
-		void Handle_Add_New_Process_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CAddNewProcessMessage > &message );
-		void Handle_Shutdown_Process_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CShutdownProcessMessage > &message );
-		void Handle_Reschedule_Process_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CRescheduleProcessMessage > &message );
-		void Handle_Release_Mailbox_Response( EProcessID::Enum source_process_id, std::unique_ptr< const CReleaseMailboxResponse > &message );
-		void Handle_Shutdown_Self_Response( EProcessID::Enum source_process_id, std::unique_ptr< const CShutdownSelfResponse > &message );
-		void Handle_Shutdown_Manager_Message( EProcessID::Enum source_process_id, std::unique_ptr< const CShutdownManagerMessage > &message );
+		void Handle_Message( EProcessID source_process_id, std::unique_ptr< const Messaging::IProcessMessage > &message );
+		void Handle_Get_Mailbox_By_ID_Request( EProcessID source_process_id, std::unique_ptr< const Messaging::CGetMailboxByIDRequest > &message );
+		void Handle_Get_Mailbox_By_Properties_Request( EProcessID source_process_id, std::unique_ptr< const Messaging::CGetMailboxByPropertiesRequest > &message );
+		void Handle_Add_New_Process_Message( EProcessID source_process_id, std::unique_ptr< const Messaging::CAddNewProcessMessage > &message );
+		void Handle_Shutdown_Process_Message( EProcessID source_process_id, std::unique_ptr< const Messaging::CShutdownProcessMessage > &message );
+		void Handle_Reschedule_Process_Message( EProcessID source_process_id, std::unique_ptr< const Messaging::CRescheduleProcessMessage > &message );
+		void Handle_Release_Mailbox_Response( EProcessID source_process_id, std::unique_ptr< const Messaging::CReleaseMailboxResponse > &message );
+		void Handle_Shutdown_Self_Response( EProcessID source_process_id, std::unique_ptr< const Messaging::CShutdownSelfResponse > &message );
+		void Handle_Shutdown_Manager_Message( EProcessID source_process_id, std::unique_ptr< const Messaging::CShutdownManagerMessage > &message );
 
 		// Execution
 		void Service( void );
@@ -112,38 +122,34 @@ class CConcurrencyManager
 		void Shutdown( void );
 
 		// Execution helpers
-		void Execute_Process( EProcessID::Enum process_id, double current_time_seconds );
+		void Execute_Process( EProcessID process_id, double current_time_seconds );
 
 		void Add_Process( const std::shared_ptr< IManagedProcess > &process );
-		void Add_Process( const std::shared_ptr< IManagedProcess > &process, EProcessID::Enum id );
+		void Add_Process( const std::shared_ptr< IManagedProcess > &process, EProcessID id );
 
-		void Send_Process_Message( EProcessID::Enum dest_process_id, std::unique_ptr< const IProcessMessage > &message );
+		void Send_Process_Message( EProcessID dest_process_id, std::unique_ptr< const Messaging::IProcessMessage > &message );
 		void Flush_Frames( void );
 
 		void Handle_Ongoing_Mailbox_Requests( CProcessMailbox *mailbox );
-		void Clear_Related_Mailbox_Requests( EProcessID::Enum process_id );
+		void Clear_Related_Mailbox_Requests( EProcessID process_id );
 
 		// Shutdown helpers
-		void Initiate_Process_Shutdown( EProcessID::Enum process_id );
-		bool Is_Process_Shutting_Down( EProcessID::Enum process_id ) const;
+		void Initiate_Process_Shutdown( EProcessID process_id );
+		bool Is_Process_Shutting_Down( EProcessID process_id ) const;
 		bool Is_Manager_Shutting_Down( void ) const;
-		
-		// Time management
-		double Get_Game_Time( void ) const;
-		void Set_Game_Time( double game_time_seconds );
 
 		// Misc
-		EProcessID::Enum Allocate_Process_ID( void );
+		EProcessID Allocate_Process_ID( void );
 
 		// Types
-		typedef std::multimap< EProcessID::Enum, std::unique_ptr< const CGetMailboxByPropertiesRequest > > GetMailboxByPropertiesRequestCollectionType;
+		using GetMailboxByPropertiesRequestCollectionType = std::multimap< EProcessID, std::unique_ptr< const Messaging::CGetMailboxByPropertiesRequest > >;
 
-		typedef std::unordered_map< EProcessID::Enum, std::unique_ptr< CProcessMessageFrame > > FrameTableType;
-		typedef std::unordered_map< Loki::TypeInfo, std::unique_ptr< IProcessMessageHandler >, STypeInfoContainerHelper > ProcessMessageHandlerTableType;
-		typedef std::unordered_map< EProcessID::Enum, std::shared_ptr< CProcessRecord > > ProcessRecordTableType;
+		using FrameTableType = std::unordered_map< EProcessID, std::unique_ptr< CProcessMessageFrame > >;
+		using ProcessMessageHandlerTableType = std::unordered_map< Loki::TypeInfo, std::unique_ptr< Messaging::IProcessMessageHandler >, STypeInfoContainerHelper >;
+		using ProcessRecordTableType = std::unordered_map< EProcessID, std::shared_ptr< CProcessRecord > >;
 
-		typedef std::unordered_map< EProcessID::Enum, SProcessProperties > IDToProcessPropertiesTableType;
-		typedef std::unordered_multimap< SProcessProperties, EProcessID::Enum, SProcessPropertiesContainerHelper > ProcessPropertiesToIDTableType;
+		using IDToProcessPropertiesTableType = std::unordered_map< EProcessID, SProcessProperties >;
+		using ProcessPropertiesToIDTableType = std::unordered_multimap< SProcessProperties, EProcessID, SProcessPropertiesContainerHelper >;
 
 		// Private Data
 		ProcessRecordTableType ProcessRecords;
@@ -156,16 +162,15 @@ class CConcurrencyManager
 
 		ProcessMessageHandlerTableType MessageHandlers;
 
-		std::unordered_map< ETimeType, std::shared_ptr< CTaskScheduler > > TaskSchedulers;
-		std::unique_ptr< CTimeKeeper > TimeKeeper;
+		std::shared_ptr< CTaskScheduler > TaskScheduler;
+		std::unique_ptr< IP::Time::CTimeKeeper > TimeKeeper;
 
 		std::unique_ptr< tbb::task_scheduler_init > TBBTaskSchedulerInit;
 
 		EConcurrencyManagerState State;
 
-		EProcessID::Enum NextID;
+		EProcessID NextID;
 };
 
-
-
-#endif // CONCURRENCY_MANAGER_H
+} // namespace Execution
+} // namespace IP

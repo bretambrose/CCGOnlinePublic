@@ -17,13 +17,17 @@
 
 **********************************************************************************************************************/
 
-#ifndef DATABASE_ENVIRONMENT_INTERFACE_H
-#define DATABASE_ENVIRONMENT_INTERFACE_H
-
-class IDatabaseConnection;
+#pragma once
 
 enum DBConnectionIDType;
 enum DBErrorStateType;
+
+namespace IP
+{
+namespace Db
+{
+
+class IDatabaseConnection;
 
 class IDatabaseEnvironment
 {
@@ -41,4 +45,5 @@ class IDatabaseEnvironment
 		virtual DBErrorStateType Get_Error_State( void ) const = 0;
 };
 
-#endif // DATABASE_ENVIRONMENT_INTERFACE_H
+} // namespace Db
+} // namespace IP

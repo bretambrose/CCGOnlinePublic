@@ -17,18 +17,22 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_SHARED_H
-#define ODBC_SHARED_H
+#pragma once
 
 #include "IPDatabase/ODBCImplementation/ODBCVariableSet.h"
 #include "IPDatabase/ODBCImplementation/ODBCParameters.h"
 #include "IPDatabase/DatabaseCalls.h"
 
+namespace IP
+{
+namespace Db
+{
+
 class CCompoundInsertCountParams : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CCompoundInsertCountParams( void ) :
 			BASECLASS(),
@@ -54,7 +58,7 @@ class CCompoundInsertCountResultSet : public CODBCVariableSet
 {
 	public:
 
-		typedef CODBCVariableSet BASECLASS;
+		using BASECLASS = CODBCVariableSet;
 
 		CCompoundInsertCountResultSet( void ) :
 			BASECLASS(),
@@ -76,7 +80,7 @@ class CCompoundInsertCountProcedureCall : public TDatabaseProcedureCall< CCompou
 {
 	public:
 
-		typedef TDatabaseProcedureCall< CCompoundInsertCountParams, ISIZE, CCompoundInsertCountResultSet, OSIZE > BASECLASS;
+		using BASECLASS = TDatabaseProcedureCall< CCompoundInsertCountParams, ISIZE, CCompoundInsertCountResultSet, OSIZE >;
 
 		CCompoundInsertCountProcedureCall( uint64_t id, uint32_t expected_count ) : 
 			BASECLASS(),
@@ -127,5 +131,5 @@ class CCompoundInsertCountProcedureCall : public TDatabaseProcedureCall< CCompou
 
 };
 
-
-#endif // ODBC_SHARED_H
+} // namespace Db
+} // namespace IP

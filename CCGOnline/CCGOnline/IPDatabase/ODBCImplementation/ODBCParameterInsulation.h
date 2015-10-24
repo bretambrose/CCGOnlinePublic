@@ -17,24 +17,23 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_PARAMETER_INSULATION_H
-#define ODBC_PARAMETER_INSULATION_H
+#pragma once
 
 #define INSULATE_FROM_WINDOWS_HEADERS
 
 #ifdef INSULATE_FROM_WINDOWS_HEADERS
 
 /*
-typedef short				SQLSMALLINT;
+using SQLSMALLINT = short;
 
-typedef SQLSMALLINT     SQLRETURN;
+using SQLRETURN = SQLSMALLINT;
 
-typedef void*					SQLHANDLE;
+using SQLHANDLE = void*;
 
-typedef SQLHANDLE               SQLHENV;
-typedef SQLHANDLE               SQLHDBC;
-typedef SQLHANDLE               SQLHSTMT;
-typedef SQLHANDLE               SQLHDESC;
+using SQLHENV = SQLHANDLE;
+using SQLHDBC = SQLHANDLE;
+using SQLHSTMT = SQLHANDLE;
+using SQLHDESC = SQLHANDLE;
 
 */
 
@@ -60,4 +59,3 @@ static const int32_t IP_SQL_NULL_DATA = SQL_NULL_DATA;
 
 #endif // INSULATE_FROM_WINDOWS_HEADERS
 
-#endif // ODBC_PARAMETER_INSULATION_H

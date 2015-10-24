@@ -17,10 +17,14 @@
 
 **********************************************************************************************************************/
 
-#ifndef ENUM_CONVERSION_H
-#define ENUM_CONVERSION_H
+#pragma once
 
-enum EConvertibleEnumProperties
+namespace IP
+{
+namespace Enum
+{
+
+enum class EConvertibleEnumProperties
 {
 	CEP_NONE						= 0,
 	CEP_BITFIELD				= 1 << 0,
@@ -66,7 +70,7 @@ class CEnumConverter
 		static bool Convert( const std::wstring &entry_name, T &output_value )
 		{
 			std::string usable_entry_name;
-			NStringUtils::WideString_To_String( entry_name, usable_entry_name );
+			IP::String::WideString_To_String( entry_name, usable_entry_name );
 
 			return Convert( usable_entry_name, output_value );
 		}
@@ -100,10 +104,11 @@ class CEnumConverter
 		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, uint64_t value, std::wstring &entry_name );
 		static bool Convert_Internal( const Loki::TypeInfo &enum_type_info, const std::string &entry_name, uint64_t &output_value );
 
-		typedef std::unordered_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper > EnumTableType;
+		using EnumTableType = std::unordered_map< Loki::TypeInfo, CConvertibleEnum *, STypeInfoContainerHelper >;
 
 		static EnumTableType Enums;
 		static std::unordered_map< std::string, CConvertibleEnum * > EnumsByName;
 };
 
-#endif // ENUM_CONVERSION_H
+} // namespace Enum
+} // namespace IP

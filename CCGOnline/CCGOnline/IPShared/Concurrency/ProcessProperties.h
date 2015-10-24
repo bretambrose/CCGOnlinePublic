@@ -17,8 +17,12 @@
 
 **********************************************************************************************************************/
 
-#ifndef PROCESS_PROPERTIES_H
-#define PROCESS_PROPERTIES_H
+#pragma once
+
+namespace IP
+{
+namespace Execution
+{
 
 /*
 	A struct describing properties about an execution process.  This is an immutable data structure and it is not
@@ -144,4 +148,5 @@ struct SProcessPropertiesContainerHelper
 		}
 };
 
-#endif // PROCESS_PROPERTIES_H
+} // namespace Execution
+} // namespace IP

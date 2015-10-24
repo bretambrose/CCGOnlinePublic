@@ -17,13 +17,17 @@
 
 **********************************************************************************************************************/
 
-#ifndef ODBC_OBJECT_BASE_H
-#define ODBC_OBJECT_BASE_H
+#pragma once
 
 #include "IPPlatform/WindowsWrapper.h"
 #include <sql.h>
 
 enum DBErrorStateType;
+
+namespace IP
+{
+namespace Db
+{
 
 struct SODBCError
 {
@@ -73,4 +77,5 @@ class CODBCObjectBase
 		std::vector< SODBCError > Errors;
 };
 
-#endif // ODBC_OBJECT_BASE_H
+} // namespace Db
+} // namespace IP
