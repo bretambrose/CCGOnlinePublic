@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DBSettings>
+	<DB>localhost:5432</DB>
+	<Roles>
+		<Role Mode="root" Name="postgres" Password="DontGiveUp"/>
+		<Role Mode="runtime" Schema="test" Name="testserver" Password=""/>
+		<Role Mode="developer" Schema="test" Name="testdev" Password=""/>
+		<Role Mode="runtime" Schema="game" Name="ccgserver" Password=""/>
+		<Role Mode="developer" Schema="game" Name="ccgdev" Password=""/>
+	</Roles>
+</DBSettings>

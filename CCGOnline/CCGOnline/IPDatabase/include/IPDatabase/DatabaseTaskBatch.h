@@ -1,0 +1,180 @@
+/**********************************************************************************************************************
+
+	(c) Copyright 2012, Bret Ambrose (mailto:bretambrose@gmail.com).
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+**********************************************************************************************************************/
+
+#pragma once
+
+#include <IPDatabase/IPDatabase.h>
+
+#include <IPDatabase/DatabaseCallContext.h>
+#include <IPDatabase/DatabaseTaskBatchUtilities.h>
+#include <IPDatabase/DatabaseTypes.h>
+#include <IPDatabase/Interfaces/DatabaseConnectionInterface.h>
+#include <IPDatabase/Interfaces/DatabaseStatementInterface.h>
+#include <IPDatabase/Interfaces/DatabaseTaskBatchInterface.h>
+#include <IPDatabase/Interfaces/DatabaseTaskInterface.h>
+#include <IPShared/Logging/LogInterface.h>
+#include <loki/LokiTypeInfo.h>
+
+namespace IP
+{
+namespace Db
+{
+
+template < typename T >
+class TDatabaseTaskBatch : public IDatabaseTaskBatch
+{
+	public:
+
+		using BASECLASS = IDatabaseTaskBatch;
+
+		TDatabaseTaskBatch( void ) :
+			BASECLASS(),
+			PendingTasks(),
+			CallContext( nullptr ),
+			TaskName( typeid( T ).name() )
+		{
+			FATAL_ASSERT( T::InputParameterBatchSize > 0 && T::ResultSetBatchSize > 0 );
+
+			CallContext = IP::Make_Unique< CDatabaseCallContext< T::InputParametersType, T::InputParameterBatchSize, T::ResultSetType, T::ResultSetBatchSize > >( MEMORY_TAG );
+		}
+
+		virtual ~TDatabaseTaskBatch()
+		{
+			FATAL_ASSERT( PendingTasks.empty() );
+		}
+
+		virtual Loki::TypeInfo Get_Task_Type_Info( void ) const
+		{
+			return Loki::TypeInfo( typeid( T ) );
+		}
+
+		virtual void Add_Task( IDatabaseTask *task ) { PendingTasks.push_back( task ); }
+		virtual void Add_Task( ICompoundDatabaseTask * /*task*/ ) { FATAL_ASSERT( false ); }
+
+		virtual void Execute_Tasks( IDatabaseConnection *connection, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
+		{
+			if ( PendingTasks.empty() )
+			{
+				return;
+			}
+
+			if ( CallContext->Get_Statement_Text().size() == 0 )
+			{
+				IDatabaseTask *first_task = *PendingTasks.begin();
+				FATAL_ASSERT( connection->Validate_Input_Output_Signatures( first_task, CallContext->Get_Param_Rows(), CallContext->Get_Result_Rows() ) );
+
+				IP::String statement_text;
+				connection->Construct_Statement_Text( first_task, CallContext->Get_Param_Rows(), statement_text );
+
+				CallContext->Set_Statement_Text( statement_text );
+			}
+
+			IDatabaseStatement *statement = connection->Allocate_Statement( CallContext->Get_Statement_Text() );
+			FATAL_ASSERT( statement != nullptr );
+
+			if ( statement->Needs_Binding() )
+			{
+				statement->Bind_Input( CallContext->Get_Param_Rows(), sizeof(T::InputParametersType) );
+				statement->Bind_Output( CallContext->Get_Result_Rows(), sizeof(T::ResultSetType), T::ResultSetBatchSize );
+			}
+
+			FATAL_ASSERT( statement->Is_Ready_For_Use() );
+
+			LOG( IP::Logging::ELogLevel::LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - TaskCount: " << PendingTasks.size() );
+
+			while ( !PendingTasks.empty() )
+			{
+				DBTaskListType sub_list;
+
+				auto splice_iter = PendingTasks.begin();
+				uint32_t advance_amount = std::min<uint32_t>( static_cast< uint32_t >( PendingTasks.size() ), T::InputParameterBatchSize );
+				std::advance( splice_iter, advance_amount );
+				sub_list.splice( sub_list.end(), PendingTasks, PendingTasks.begin(), splice_iter );
+
+				Process_Task_List( statement, sub_list, successful_tasks, failed_tasks );
+			}
+
+			LOG( IP::Logging::ELogLevel::LL_LOW, "DatabaseTaskBatch " << TaskName.c_str() << " - Successes: " << successful_tasks.size() << " Failures: " << failed_tasks.size() );
+
+			FATAL_ASSERT( statement->Is_Ready_For_Use() );
+
+			connection->Release_Statement( statement );
+		}
+
+	private:
+
+		void Process_Task_List( IDatabaseStatement *statement, DBTaskListType &sub_list, DBTaskBaseListType &successful_tasks, DBTaskBaseListType &failed_tasks )
+		{
+			while( !sub_list.empty() )
+			{
+				EExecuteDBTaskListResult execute_result;
+				DBTaskListType::const_iterator bad_task;
+				Execute_Task_List( CallContext.get(), statement, sub_list, execute_result, bad_task );
+				if ( execute_result == EExecuteDBTaskListResult::SUCCESS )
+				{
+					statement->Get_Connection()->End_Transaction( true );
+					statement->Return_To_Ready();
+
+					std::for_each( sub_list.begin(), sub_list.end(), [ &successful_tasks ]( IDatabaseTask *task ){ successful_tasks.push_back( task ); } );
+					sub_list.clear();
+				}
+				else
+				{
+					statement->Get_Connection()->End_Transaction( false );
+					statement->Return_To_Ready();
+
+					for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
+					{
+						if ( iter != bad_task )
+						{
+							( *iter )->On_Rollback();
+						}
+					}
+
+					if ( execute_result == EExecuteDBTaskListResult::FAILED_SPECIFIC_TASK )
+					{
+						failed_tasks.push_back( *bad_task );
+						sub_list.erase( bad_task );
+					}
+					else
+					{
+						DBTaskListType individual_list;
+						for ( DBTaskListType::iterator iter = sub_list.begin(); iter != sub_list.end(); ++iter )
+						{
+							individual_list.clear();
+							individual_list.push_back( *iter );
+
+							Process_Task_List( statement, individual_list, successful_tasks, failed_tasks );
+						}
+
+						sub_list.clear();
+					}
+				}
+			}
+		}
+
+		DBTaskListType PendingTasks;
+
+		IP::UniquePtr< IDatabaseCallContext > CallContext;
+
+		IP::String TaskName;
+};
+
+} // namespace Db
+} // namespace IP
