@@ -9,6 +9,9 @@ CCGOnline/IPCodeGen/obj/
 CCGOnline/Grammars/output/
 CCGOnline/IPPreBuild/bin/
 CCGOnline/IPPreBuild/obj/
+CCGOnline/tbb/
+CCGOnline/loki/
+CGGOnline/googletest/
 Run/Tools/*.exe
 Run/Tools/*.pdb
 Run/Tools/Logs/
@@ -21,6 +24,7 @@ DB/SQLServer/Temp/
 DB/SQLServer/Python/__pycache__/
 DB/SQLServer/DBSettings.txt
 CCGOnline/tmp/
+.idea
 
 
 
