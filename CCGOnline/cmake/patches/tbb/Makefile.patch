@@ -1,0 +1,21 @@
+--- /tmp/Makefile	2016-05-15 08:11:24.238522348 -0700
++++ Makefile	2016-05-15 08:13:29.482521598 -0700
+@@ -54,6 +54,18 @@
+ examples: tbb tbbmalloc
+ 	$(MAKE) -C examples -r -f Makefile tbb_root=.. release test
+ 
++tbb_debug: mkdir
++	$(MAKE) -C "$(work_dir)_debug"  -r -f $(tbb_root)/build/Makefile.tbb cfg=debug
++
++tbbmalloc_debug: mkdir
++	$(MAKE) -C "$(work_dir)_debug"  -r -f $(tbb_root)/build/Makefile.tbbmalloc cfg=debug malloc
++
++tbb_release: mkdir
++	$(MAKE) -C "$(work_dir)_release"  -r -f $(tbb_root)/build/Makefile.tbb cfg=release
++
++tbbmalloc_release: mkdir
++	$(MAKE) -C "$(work_dir)_release"  -r -f $(tbb_root)/build/Makefile.tbbmalloc cfg=release malloc
++
+ .PHONY: clean clean_examples mkdir info
+ 
+ clean: clean_examples
