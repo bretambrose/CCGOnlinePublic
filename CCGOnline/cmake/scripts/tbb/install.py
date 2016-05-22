@@ -8,7 +8,7 @@ import argparse
 def Main():
 
     parser = argparse.ArgumentParser(description="tbb install script")
-    parser.add_argument("--config", action="store_true")
+    parser.add_argument("--config", action="store")
 
     args = vars( parser.parse_args() )
     config = args[ "config" ] or "debug"

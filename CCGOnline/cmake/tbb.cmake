@@ -31,7 +31,7 @@ elseif(PLATFORM_LINUX)
             CONFIGURE_COMMAND ""
             BUILD_COMMAND make -j8 ${TBB_COMPILER_OPTION} arch=${ARCHITECTURE_PREFIX} tbb_build_prefix=tbb tbb_${TBB_BUILD_CONFIG} tbbmalloc_${TBB_BUILD_CONFIG}
             BUILD_IN_SOURCE 1
-            INSTALL_COMMAND python ${CMAKE_SOURCE_DIR}/cmake/scripts/tbb/install.py --config=${TBB_BUILD_CONFIG}
+            INSTALL_COMMAND python ${CMAKE_SOURCE_DIR}/cmake/scripts/tbb/install.py --config ${TBB_BUILD_CONFIG}
             CMAKE_ARGS
             )
 elseif(PLATFORM_APPLE)
