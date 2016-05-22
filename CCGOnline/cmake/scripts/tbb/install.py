@@ -7,13 +7,13 @@ import argparse
 
 def Main():
 
-    parser = argparse.ArgumentParser(description="tbb install script)
+    parser = argparse.ArgumentParser(description="tbb install script")
     parser.add_argument("--config", action="store_true")
 
     args = vars( parser.parse_args() )
     config = args[ "config" ] or "debug"
 
-    installPath = os.path.join( "external", "tbb" )
+    installPath = os.path.join( "..", "external", "tbb" )
     if os.path.exists( installPath ):
         shutil.rmtree( installPath )
 
@@ -24,9 +24,15 @@ def Main():
     if os.path.exists( includePath ) == False:
         os.makedirs( includePath )
 
-        sourceIncludePath = os.path.join( "tbb", "include" )
+        sourceIncludePath = os.path.join( "include" )
 
-        shutil.copytree( os.path.join( sourceIncludePath, "tbb" ), os.path.join( includePath, "tbb" ) )
+        copySourceTree = os.path.join( sourceIncludePath, "tbb" )
+        copyDestTree = os.path.join( includePath, "tbb" )
+
+        print ( "SourceTree = " + str(copySourceTree) + " (" + os.path.abspath(copySourceTree) + ")")
+        print ( "DestTree = " + str(copyDestTree) + " (" + os.path.abspath(copyDestTree) + ")")
+
+        shutil.copytree( copySourceTree, copyDestTree )
 
 
     libPath = os.path.join( installPath, "lib" )
@@ -34,7 +40,7 @@ def Main():
         os.makedirs( libPath )
 
 
-    sourceLibPath = os.path.join( "tbb", "build", "tbb_" + config )
+    sourceLibPath = os.path.join( "build", "tbb_" + config )
 
     for rootDir, dirNames, fileNames in os.walk( sourceLibPath ):
         for fileName in fileNames:

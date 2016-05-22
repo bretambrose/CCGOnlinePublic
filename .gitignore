@@ -1,5 +1,6 @@
 CCGOnline/External/
 CCGOnline/_build/
+CCGOnline/tbb_src/
 CCGOnline/PackageManager/bin/
 CCGOnline/PackageManager/obj/
 CCGOnline/EnumReflector/bin/
