@@ -116,30 +116,8 @@ set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
 # external package setups
 include(ExternalProject)
 include(cmake/tbb.cmake)
-
-# loki
-#set(LOKI_INCLUDES_PATH ${EXTERNAL_ROOT}/loki/include)
-
-# tbb
-# todo: remove hard-coded visual studio part of path
-#set(TBB_INCLUDES_PATH ${EXTERNAL_ROOT}/tbb/include)
-
-#if(PLATFORM_SIZE EQUAL 64)
-#    set(TBB_EXPORT_LINK_PATH ${EXTERNAL_ROOT}/tbb/lib/intel64/vc12)
-#    set(TBB_BINARY_PATH ${EXTERNAL_ROOT}/tbb/bin/intel64/vc12)
-#else()
-#    set(TBB_EXPORT_LINK_PATH ${EXTERNAL_ROOT}/tbb/lib/ia32/vc12)
-#    set(TBB_BINARY_PATH ${EXTERNAL_ROOT}/tbb/bin/ia32/vc12)
-#endif()
-#link_directories(${TBB_EXPORT_LINK_PATH})
-
-#if(RELEASE_CONFIG)
-#    set(TBB_LIBS tbb tbb_preview tbbmalloc tbbmalloc_proxy)
-#else()
-#    set(TBB_LIBS tbb_debug tbb_preview_debug tbbmalloc_debug tbbmalloc_proxy_debug)
-#    add_definitions(-DTBB_USE_DEBUG=1)
-#endif()
-
+include(cmake/loki.cmake)
+include(cmake/gtest.cmake)
 
 # compiler options
 if(PLATFORM_WINDOWS)
@@ -181,7 +159,7 @@ elseif(PLATFORM_LINUX OR PLATFORM_APPLE)
     set(PLATFORM_DEP_LIBS pthread)
 endif()
 
-set(GTEST_LIBS gtest gmock)
+#set(GTEST_LIBS gtest gmock)
 
 #targets
 #add_subdirectory(IPCore)

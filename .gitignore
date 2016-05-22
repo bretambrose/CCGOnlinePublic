@@ -1,6 +1,8 @@
 CCGOnline/external/
 CCGOnline/_build/
 CCGOnline/tbb_src/
+CCGOnline/loki_src/
+CCGOnline/gtest_src/
 
 CCGOnline/PackageManager/bin/
 CCGOnline/PackageManager/obj/
@@ -11,9 +13,6 @@ CCGOnline/IPCodeGen/obj/
 CCGOnline/Grammars/output/
 CCGOnline/IPPreBuild/bin/
 CCGOnline/IPPreBuild/obj/
-CCGOnline/tbb/
-CCGOnline/loki/
-CGGOnline/googletest/
 Run/Tools/*.exe
 Run/Tools/*.pdb
 Run/Tools/Logs/
