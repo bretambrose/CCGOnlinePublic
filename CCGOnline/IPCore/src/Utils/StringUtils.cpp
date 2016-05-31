@@ -26,38 +26,35 @@ namespace IP
 namespace StringUtils
 {
 
-static const char *AllocationTag = "StringUtils";
-
 void String_To_WideString( const IP::String &source, IP::WString &target )
 {
-	size_t buffer_length = source.size() * 2 + 2;
-	size_t buffer_word_length = buffer_length * sizeof( wchar_t ) / sizeof( uint32_t );
-	wchar_t *target_buffer = IP::New_Array< wchar_t >( AllocationTag, buffer_length );
-	size_t bytes_written = 0;
+	std::mbstate_t state = std::mbstate_t();
+	auto source_str = source.c_str();
+	size_t len = 1 + std::mbsrtowcs(NULL, &source_str, 0, &state);
 
-	mbstowcs_s( &bytes_written, target_buffer, buffer_word_length, source.c_str(), source.size() + 1 );
-	target = IP::WString( target_buffer );
+	target.clear();
+	target.resize( len );
 
-	IP::Delete_Array( target_buffer );
+	std::mbsrtowcs(&target[0], &source_str, len, &state);
+}
+
+
+void WideString_To_String( const IP::WString &source, IP::String &target )
+{
+	std::mbstate_t state = std::mbstate_t();
+	auto source_str = source.c_str();
+	size_t len = 1 + std::wcsrtombs(nullptr, &source_str, 0, &state);
+
+	target.clear();
+	target.resize( len );
+
+	std::wcsrtombs(&target[0], &source_str, len, &state);
 }
 
 
 void String_To_WideString( const char *source, IP::WString &target )
 {
 	String_To_WideString( IP::String( source ), target );
-}
-
-
-void WideString_To_String( const IP::WString &source, IP::String &target )
-{
-	size_t buffer_length = 2 * ( source.size() + 1 );
-	char *target_buffer = IP::New_Array< char >( AllocationTag, buffer_length );
-	size_t characters_converted = 0;
-
-	wcstombs_s( &characters_converted, target_buffer, buffer_length, source.c_str(), source.size() + 1 );
-	target = IP::String( target_buffer );
-
-	IP::Delete_Array( target_buffer );
 }
 
 
@@ -69,29 +66,26 @@ void WideString_To_String( const wchar_t *source, IP::String &target )
 
 void To_Upper_Case( const IP::String &source, IP::String &dest )
 {
-	size_t buffer_size = source.size() + 1;
-	char *buffer = IP::New_Array< char >( AllocationTag, buffer_size );
-	strcpy_s( buffer, buffer_size, source.c_str() );
-	_strupr_s( buffer, buffer_size );
+	dest.clear();
+	dest.resize( source.size() );
 
-	dest = IP::String( buffer );
-
-	IP::Delete_Array( buffer );
+	for(size_t i = 0, end = source.size(); i < end; ++i)
+	{
+		dest[ i ] = std::toupper( source[ i ] );
+	}
 }
 
 
 void To_Upper_Case( const IP::WString &source, IP::WString &dest )
 {
-	size_t buffer_size = source.size() + 1;
-	wchar_t *buffer = IP::New_Array< wchar_t >( AllocationTag, buffer_size );
-	wcscpy_s( buffer, buffer_size, source.c_str() );
-	_wcsupr_s( buffer, buffer_size );
+	dest.clear();
+	dest.resize( source.size() );
 
-	dest = IP::WString( buffer );
-
-	IP::Delete_Array( buffer );
+	for(size_t i = 0, end = source.size(); i < end; ++i)
+	{
+		dest[ i ] = std::toupper( source[ i ] );
+	}
 }
-
 
 bool Convert( const IP::String &source, int32_t &value ) 
 {
@@ -219,17 +213,6 @@ bool Convert_Raw( const char *source, double &value )
 	return *end_ptr == 0;
 }
 
-
-bool Convert_Raw( const char *source, bool &value ) 
-{
-	value = false;
-	if ( _stricmp( source, "TRUE" ) == 0 || _stricmp( source, "YES" ) == 0 || _stricmp( source, "1" ) == 0 )
-	{
-		value = true;
-	}
-
-	return true;
-}
 
 } // namespace String
 } // namespace IP

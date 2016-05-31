@@ -23,8 +23,10 @@
 
 static const char* GLOBAL_ALLOCATION = "GlobalNew";
 
+#ifdef MSVC
 #pragma warning( push )
 #pragma warning( disable : 4290 )
+#endif // MSVC
 
 void *operator new( std::size_t size ) throw( std::bad_alloc )
 {
@@ -88,4 +90,6 @@ void operator delete[]( void *memory, const std::nothrow_t &no_throw ) throw()
 	operator delete( memory, no_throw );
 }
 
+#ifdef MSVC
 #pragma warning( pop ) 
+#endif // MSVC

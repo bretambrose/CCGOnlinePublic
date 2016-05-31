@@ -1,8 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
 
-
-option(BUILD_SHARED_LIBS "" ON)
-
 SET(PLATFORM_WINDOWS 0)
 SET(PLATFORM_LINUX 0)
 SET(PLATFORM_APPLE 0)
@@ -33,13 +30,7 @@ else()
     message(FATAL_ERROR "Unknown target platform.  How did this happen?")
 endif()
 
-if(BUILD_SHARED_LIBS)
-    SET(ARCHIVE_DIRECTORY "bin")
-    message(STATUS "Dynamic linking enabled")
-else()
-    SET(ARCHIVE_DIRECTORY "lib")
-    message(STATUS "Dynamic linking disabled")
-endif()
+SET(ARCHIVE_DIRECTORY "lib")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     set(RELEASE_CONFIG 1 )
@@ -71,26 +62,18 @@ endif()
 
 message(STATUS "Install binary prefix: ${PLATFORM_INSTALL_BINARY_PREFIX}")
 
-if(BUILD_SHARED_LIBS)
-    SET(LIBTYPE SHARED)
-    if(PLATFORM_WINDOWS)
-        add_definitions("-DUSE_IMPORT_EXPORT")
-        SET(SUFFIX dll)
-    elseif(PLATFORM_LINUX)
-        SET(SUFFIX so)
-    elseif(PLATFORM_APPLE)
-        SET(SUFFIX dylib)
-    endif()
-else()
-    SET(LIBTYPE STATIC)
-    if(PLATFORM_WINDOWS)
-        SET(SUFFIX lib)
-    elseif(PLATFORM_LINUX OR PLATFORM_APPLE)
-        SET(SUFFIX a)
-    endif()
-
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+SET(LIBTYPE STATIC)
+if(PLATFORM_WINDOWS)
+    SET(INTERNAL_LIBRARY_SUFFIX "lib")
+    SET(PLATFORM_LIBRARY_PREFIX "")
+    SET(DYNAMIC_LIBRARY_SUFFIX "dll")
+elseif(PLATFORM_LINUX OR PLATFORM_APPLE)
+    SET(INTERNAL_LIBRARY_SUFFIX "a")
+    SET(PLATFORM_LIBRARY_PREFIX "lib")
+    SET(DYNAMIC_LIBRARY_SUFFIX "so")
 endif()
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 
 # misc config
@@ -110,7 +93,7 @@ add_definitions(-DTRACK_MEMORY_ALLOCATIONS)
 
 # directories
 set(CCGONLINE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
-set(EXTERNAL_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/External")
+set(EXTERNAL_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/external")
 set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 # external package setups
@@ -124,7 +107,6 @@ if(PLATFORM_WINDOWS)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 else()
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
 endif()
 
 # warning control
@@ -146,12 +128,6 @@ elseif(PLATFORM_LINUX OR PLATFORM_APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 endif()
 
-#release pdbs in windows
-if(PLATFORM_WINDOWS AND BUILD_SHARED_LIBS)
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
-endif()
-
 # default libraries to link in per-platform
 if(PLATFORM_WINDOWS)
     set(PLATFORM_DEP_LIBS Shlwapi DbgHelp)
@@ -159,16 +135,19 @@ elseif(PLATFORM_LINUX OR PLATFORM_APPLE)
     set(PLATFORM_DEP_LIBS pthread)
 endif()
 
+if(NOT RELEASE_CONFIG)
+    add_definitions(-D_DEBUG)
+endif()
+
 #set(GTEST_LIBS gtest gmock)
 
 #targets
-#add_subdirectory(IPCore)
-#add_subdirectory(pugixml)
+add_subdirectory(IPCore)
+add_subdirectory(pugixml)
 #add_subdirectory(IPShared)
 #add_subdirectory(IPDatabase)
 
 #testing
-#add_subdirectory(googletest)
 #add_subdirectory(IPCoreTest)
 #add_subdirectory(IPSharedTest)
 #add_subdirectory(IPDatabaseTest)

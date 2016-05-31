@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Memory/Memory.h>
 
 #include <deque>

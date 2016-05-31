@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Memory/Stl/String.h>
 #include <IPCore/Memory/Stl/Vector.h>
 
@@ -30,17 +28,17 @@ namespace FileSystem
 {
 
 	// Directory functions
-	IPCORE_API bool Directory_Exists( const IP::String &path );
-	IPCORE_API bool Create_Directory( const IP::String &path );
-	IPCORE_API void Delete_Directory( const IP::String &path );
+	bool Directory_Exists( const IP::String &path );
+	bool Create_Directory( const IP::String &path );
+	void Delete_Directory( const IP::String &path );
 
 	// File functions
-	IPCORE_API void Enumerate_Matching_Files( const IP::String &pattern, IP::Vector< IP::String > &file_names );
+	void Enumerate_Matching_Files( const IP::String &pattern, IP::Vector< IP::String > &file_names );
 
-	IPCORE_API bool Delete_File( const IP::String &file_name );
+	bool Delete_File( const IP::String &file_name );
 
 	// Misc file-related
-	IPCORE_API IP::String Strip_Path( const IP::String &full_path );
+	IP::String Strip_Path( const IP::String &full_path );
 
 } // namespace FileSystem
 } // namespace IP

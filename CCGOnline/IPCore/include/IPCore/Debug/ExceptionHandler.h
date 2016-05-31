@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Debug/StructuredExceptionTypes.h>
 
 namespace IP
@@ -30,8 +28,8 @@ namespace Debug
 namespace Exception
 {
 
-	IPCORE_API void Initialize( const DExceptionHandler &handler );
-	IPCORE_API void Shutdown( void );
+	void Initialize( const DExceptionHandler &handler );
+	void Shutdown( void );
 
 } // namespace Exception
 } // namespace Debug

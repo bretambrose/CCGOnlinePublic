@@ -1,4 +1,4 @@
-/**********************************************************************************************************************
+/*********************************************************************************************************************
 
 	(c) Copyright 2011, Bret Ambrose (mailto:bretambrose@gmail.com).
 
@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Memory/Stl/String.h>
 #include <IPCore/Memory/Stl/Vector.h>
 
@@ -32,7 +30,7 @@ namespace Exception
 {
 
 // A class representing a single frame of the call stack
-IPCORE_API struct CStackFrame
+struct CStackFrame
 {
 	public:
 
@@ -64,7 +62,7 @@ IPCORE_API struct CStackFrame
 };
 
 // A class that represents the context of a single exception event
-IPCORE_API class CStructuredExceptionInfo
+class CStructuredExceptionInfo
 {
 	public:
 

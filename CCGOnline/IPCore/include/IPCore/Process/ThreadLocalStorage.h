@@ -19,17 +19,15 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 namespace IP
 {
 namespace TLS
 {
 
-	IPCORE_API bool Is_Valid_Handle( uint32_t tls_handle );
+	bool Is_Valid_Handle( uint32_t tls_handle );
 
-	IPCORE_API uint32_t Allocate_Thread_Local_Storage( void );
-	IPCORE_API void Deallocate_Thread_Local_Storage( uint32_t tls_handle );
+	uint32_t Allocate_Thread_Local_Storage( void );
+	void Deallocate_Thread_Local_Storage( uint32_t tls_handle );
 		
 	template< class T >
 	void Set_TLS_Value( uint32_t tls_handle, T *value )
@@ -43,8 +41,8 @@ namespace TLS
 		return static_cast< T * >( Get_Raw_TLS_Value( tls_handle ) );
 	}
 
-	IPCORE_API void *Get_Raw_TLS_Value( uint32_t tls_handle );
-	IPCORE_API void Set_Raw_TLS_Value( uint32_t tls_handle, void *handle );
+	void *Get_Raw_TLS_Value( uint32_t tls_handle );
+	void Set_Raw_TLS_Value( uint32_t tls_handle, void *handle );
 
 
 } // namespace TLS

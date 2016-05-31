@@ -71,8 +71,8 @@ CStackFrame::CStackFrame( uint64_t address, const IP::String &function_name, con
 CStructuredExceptionInfo::CStructuredExceptionInfo( bool is_test_exception ) :
 	ProcessID( 0 ),
 	CallStack(),
-	SymbolError( "" ),
 	ExceptionMessage( "" ),
+	SymbolError( "" ),
 	IsTestException( is_test_exception )
 {
 }

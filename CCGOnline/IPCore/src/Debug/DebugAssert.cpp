@@ -25,8 +25,6 @@
 #include <mutex>
 #include <atomic>
 
-#include <IPCore/System/WindowsWrapper.h>
-
 static void Build_Assertion_String( const char *expression_string, const char *file_name, uint32_t line_number, bool is_fatal, IP::String &output_string )
 {
 	IP::StringStream assert_description;
@@ -97,22 +95,22 @@ bool Assert_Handler( const char *expression_string, const char *file_name, uint3
 	}
 
 	// bring up a message box
-	int result = 0;
+	bool mb_result = false;
 	if ( force_crash )
 	{
-		::MessageBox( nullptr, assert_string.c_str(), "FATAL ASSERT!", MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3 );
+		Modal_Assert_Dialog( "FATAL ASSERT!", assert_string.c_str(), IP::Debug::Assert::AssertDialogType::Ok);
 		int32_t *null_dereference = nullptr;
 		*null_dereference = 5;
 		return false;
 	}
 	else
 	{
-		result = ::MessageBox( nullptr, assert_string.c_str(), "Assertion Failure!", MB_YESNO | MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3 );
+		mb_result = Modal_Assert_Dialog( "Assertion Failure!", assert_string.c_str(), IP::Debug::Assert::AssertDialogType::YesNo);
 	}
 
-	if ( result == IDYES )
+	if ( mb_result )
 	{
-		DebugBreak();
+		Force_Debugger();
 	}       
 
 	return true;	

@@ -3,6 +3,8 @@ project(IPCore)
 
 if(PLATFORM_WINDOWS)
 	set(PLATFORM_DIRECTORY Windows)
+elseif(PLATFORM_LINUX)
+	set(PLATFORM_DIRECTORY Linux)
 endif()
 
 file(GLOB IPCORE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/IPCore/*.h")
@@ -59,27 +61,11 @@ if(MSVC)
 	source_group("src\\Utils" FILES ${IPCORE_UTILS_SOURCE})
 endif(MSVC)
 
-include_directories(${LOKI_INCLUDES_PATH} ${TBB_INCLUDES_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-if(PLATFORM_WINDOWS AND MSVC AND BUILD_SHARED_LIBS) 
-    add_definitions("-DIPCORE_EXPORTS=1")
-endif()
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(IPCore ${LIBTYPE} ${IPCORE_BUILD_SOURCE})
 
-# todo: decide if install should set up binary directories or library form
-install (TARGETS IPCore ARCHIVE DESTINATION ${ARCHIVE_DIRECTORY}/${PLATFORM_INSTALL_BINARY_PREFIX}/\${CMAKE_INSTALL_CONFIG_NAME}
-                        LIBRARY DESTINATION lib/${PLATFORM_INSTALL_BINARY_PREFIX}/\${CMAKE_INSTALL_CONFIG_NAME}
-				            RUNTIME DESTINATION bin/${PLATFORM_INSTALL_BINARY_PREFIX}/\${CMAKE_INSTALL_CONFIG_NAME})
-
-install (FILES ${IPCORE_HEADERS} DESTINATION include/IPCore)
-install (FILES ${IPCORE_DEBUG_HEADERS} DESTINATION include/IPCore/Debug)
-install (FILES ${IPCORE_FILE_HEADERS} DESTINATION include/IPCore/File)
-install (FILES ${IPCORE_MEMORY_HEADERS} DESTINATION include/IPCore/Memory)
-install (FILES ${IPCORE_MEMORY_STL_HEADERS} DESTINATION include/IPCore/Memory/Stl)
-install (FILES ${IPCORE_PLATFORM_HEADERS} DESTINATION include/IPCore/Platform/${PLATFORM_DIRECTORY})
-install (FILES ${IPCORE_PROCESS_HEADERS} DESTINATION include/IPCore/Process)
-install (FILES ${IPCORE_SYSTEM_HEADERS} DESTINATION include/IPCore/System)
-install (FILES ${IPCORE_UTILS_HEADERS} DESTINATION include/IPCore/Utils)
-
+target_include_directories(IPCore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
+#target_link_libraries(IPCore ${PLATFORM_DEP_LIBS} ${CLIENT_LIBS} ${CRYPTO_LIBS})
+#target_compile_definitions(IPCore PUBLIC -DJSON_USE_EXCEPTION=0)
 

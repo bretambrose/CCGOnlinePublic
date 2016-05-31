@@ -11,9 +11,9 @@ elseif(PLATFORM_LINUX)
             SOURCE_DIR ${LOKI_SOURCE_DIR}
             URL "${LOKI_URL}"
             UPDATE_COMMAND ""
-            PATCH_COMMAND "" #patch ${CMAKE_SOURCE_DIR}/tbb_src/Makefile < ${CMAKE_SOURCE_DIR}/cmake/patches/tbb/Makefile.patch
+            PATCH_COMMAND ""
             CONFIGURE_COMMAND ""
-            BUILD_COMMAND make -j8 build-static #make -j8 ${TBB_COMPILER_OPTION} arch=${ARCHITECTURE_PREFIX} tbb_build_prefix=tbb tbb_${TBB_BUILD_CONFIG} tbbmalloc_${TBB_BUILD_CONFIG}
+            BUILD_COMMAND make -j8 build-static
             BUILD_IN_SOURCE 1
             INSTALL_COMMAND python ${CMAKE_SOURCE_DIR}/cmake/scripts/loki/install.py
             CMAKE_ARGS
@@ -24,7 +24,7 @@ endif()
 set(LOKI_LIBRARY_DIR "${CMAKE_SOURCE_DIR}/external/loki/lib")
 
 add_library(loki UNKNOWN IMPORTED)
-set_property(TARGET loki PROPERTY IMPORTED_LOCATION ${LOKI_LIBRARY_DIR}/libloki.a)
+set_property(TARGET loki PROPERTY IMPORTED_LOCATION ${LOKI_LIBRARY_DIR}/${PLATFORM_LIBRARY_PREFIX}loki.${INTERNAL_LIBRARY_SUFFIX})
 
 set(LOKI_INCLUDES_PATH "${CMAKE_SOURCE_DIR}/external/loki/include")
 

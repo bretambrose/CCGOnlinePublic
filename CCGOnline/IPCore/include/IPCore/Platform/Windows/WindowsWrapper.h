@@ -17,25 +17,11 @@
 
 **********************************************************************************************************************/
 
-#include <IPCore/Memory/Memory.h>
+#pragma once
 
-#include <IPCore/UnreferencedParam.h>
+#ifdef PLATFORM_WINDOWS
 
-#include <tbb/scalable_allocator.h>
+#define NOMINMAX
+#include <Windows.h>
 
-namespace IP
-{
-
-void *Malloc( const char* tag, size_t memory_size )
-{
-	IP_UNREFERENCED_PARAM( tag );
-
-	return scalable_malloc( memory_size );
-}
-
-void Free( void *memory_ptr )
-{
-	scalable_free( memory_ptr );
-}
-
-} // namespace IP
+#endif // PLATFORM_WINDOWS

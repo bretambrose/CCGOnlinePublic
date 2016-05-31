@@ -19,6 +19,9 @@
 
 #include <IPCore/System/Time.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 namespace IP
 {
 namespace Time
@@ -30,6 +33,24 @@ std::tm Localtime(std::time_t time)
 	localtime_s(&tm_snapshot, &time); // POSIX: localtime_r(&time, &tm_snapshot); 
 
 	return tm_snapshot;
+}
+
+SystemTimePoint Get_File_Last_Modified_Time( const IP::String &file_name )
+{
+	FILE *fp = nullptr;
+	auto open_result = fopen_s( &fp, file_name.c_str(), "r" );
+	FATAL_ASSERT( fp != nullptr && open_result == 0 );
+
+	int fd = _fileno( fp );
+	FATAL_ASSERT( fd != -1 );
+
+	struct _stat file_stats;
+	auto result = _fstat( fd, &file_stats );	// Windows-specific
+	FATAL_ASSERT( result == 0 );
+
+	fclose(fp);
+
+	return std::chrono::system_clock::from_time_t(file_stats.st_mtime);
 }
 
 } // namespace Time

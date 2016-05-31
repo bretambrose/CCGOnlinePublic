@@ -17,20 +17,36 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#include <IPCore/Debug/DebugAssert.h>
 
-#include <stdint.h>
+#include <IPCore/System/WindowsWrapper.h>
 
-#define IP_UNREFERENCED_PARAM( x ) ( &reinterpret_cast< const int& >( x ) )
+namespace IP
+{
+namespace Debug
+{
+namespace Assert {
 
-#ifdef TRACK_MEMORY_ALLOCATIONS
+	bool Modal_Assert_Dialog(const char *dialog_title, const char *dialog_text, AssertDialogType dialog_type) {
+		DWORD flags = MB_ICONEXCLAMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_DEFBUTTON3;
+		switch (dialog_type) {
+			case AssertDialogType.Ok:
+				flags |= MB_OK;
+				break;
 
-#define TOSTRING2(x) #x
-#define TOSTRING(x) TOSTRING2( x )
-#define MEMORY_TAG __FILE__ ## ":" ## TOSTRING( __LINE__ )
+			case AssertDialogType.YesNo:
+				flags |= MB_YESNO;
+				break;
+		}
 
-#else
+		return ::MessageBox(nullptr, dialog_text, dialog_title, flags) == IDYES;
+	}
 
-#define MEMORY_TAG nullptr
+void Force_Debugger()
+{
+	DebugBreak();
+}
 
-#endif // TRACK_MEMORY_ALLOCATIONS
+}
+}
+}

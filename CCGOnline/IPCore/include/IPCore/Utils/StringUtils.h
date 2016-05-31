@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Memory/Stl/String.h>
 
 
@@ -29,34 +27,34 @@ namespace IP
 namespace StringUtils
 {
 
-	IPCORE_API void String_To_WideString( const IP::String &source, IP::WString &target );
-	IPCORE_API void String_To_WideString( const char *source, IP::WString &target );
+	void String_To_WideString( const IP::String &source, IP::WString &target );
+	void String_To_WideString( const char *source, IP::WString &target );
 
-	IPCORE_API void WideString_To_String( const IP::WString &source, IP::String &target );
-	IPCORE_API void WideString_To_String( const wchar_t *source, IP::String &target );
+	void WideString_To_String( const IP::WString &source, IP::String &target );
+	void WideString_To_String( const wchar_t *source, IP::String &target );
 
-	IPCORE_API void To_Upper_Case( const IP::String &source, IP::String &dest );
-	IPCORE_API void To_Upper_Case( const IP::WString &source, IP::WString &dest );
+	void To_Upper_Case( const IP::String &source, IP::String &dest );
+	void To_Upper_Case( const IP::WString &source, IP::WString &dest );
 
-	IPCORE_API bool Convert( const IP::String &source, int32_t &value );
-	IPCORE_API bool Convert( const IP::String &source, uint32_t &value );
-	IPCORE_API bool Convert( const IP::String &source, int64_t &value );
-	IPCORE_API bool Convert( const IP::String &source, uint64_t &value );
-	IPCORE_API bool Convert( const IP::String &source, IP::WString &value );
-	IPCORE_API bool Convert( const IP::String &source, IP::String &value );
-	IPCORE_API bool Convert( const IP::String &source, float &value );
-	IPCORE_API bool Convert( const IP::String &source, double &value );
-	IPCORE_API bool Convert( const IP::String &source, bool &value );
+	bool Convert( const IP::String &source, int32_t &value );
+	bool Convert( const IP::String &source, uint32_t &value );
+	bool Convert( const IP::String &source, int64_t &value );
+	bool Convert( const IP::String &source, uint64_t &value );
+	bool Convert( const IP::String &source, IP::WString &value );
+	bool Convert( const IP::String &source, IP::String &value );
+	bool Convert( const IP::String &source, float &value );
+	bool Convert( const IP::String &source, double &value );
+	bool Convert( const IP::String &source, bool &value );
 
-	IPCORE_API bool Convert_Raw( const char *source, int32_t &value );
-	IPCORE_API bool Convert_Raw( const char *source, uint32_t &value );
-	IPCORE_API bool Convert_Raw( const char *source, int64_t &value );
-	IPCORE_API bool Convert_Raw( const char *source, uint64_t &value );
-	IPCORE_API bool Convert_Raw( const char *source, IP::WString &value );
-	IPCORE_API bool Convert_Raw( const char *source, IP::String &value );
-	IPCORE_API bool Convert_Raw( const char *source, float &value );
-	IPCORE_API bool Convert_Raw( const char *source, double &value );
-	IPCORE_API bool Convert_Raw( const char *source, bool &value );
+	bool Convert_Raw( const char *source, int32_t &value );
+	bool Convert_Raw( const char *source, uint32_t &value );
+	bool Convert_Raw( const char *source, int64_t &value );
+	bool Convert_Raw( const char *source, uint64_t &value );
+	bool Convert_Raw( const char *source, IP::WString &value );
+	bool Convert_Raw( const char *source, IP::String &value );
+	bool Convert_Raw( const char *source, float &value );
+	bool Convert_Raw( const char *source, double &value );
+	bool Convert_Raw( const char *source, bool &value );
 
 } // namespace StringUtils
 } // namespace IP

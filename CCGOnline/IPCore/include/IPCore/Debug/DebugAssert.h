@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Memory/Stl/String.h>
 
 #include <functional>
@@ -34,11 +32,21 @@ namespace Assert
 
 	using DLogFunctionType = std::function< void(IP::String &) > ;
 
-	IPCORE_API void Initialize( const DLogFunctionType &log_function );
-	IPCORE_API void Shutdown( void );
+	void Initialize( const DLogFunctionType &log_function );
+	void Shutdown( void );
 
 	// all forms of condition checking go here on failure
-	IPCORE_API bool Assert_Handler( const char *expression_string, const char *file_name, uint32_t line_number, bool force_crash );
+	bool Assert_Handler( const char *expression_string, const char *file_name, uint32_t line_number, bool force_crash );
+
+
+	enum class AssertDialogType
+	{
+		Ok,
+		YesNo
+	};
+
+	bool Modal_Assert_Dialog( const char *dialog_title, const char *dialog_text, AssertDialogType dialog_type );
+	void Force_Debugger();
 
 } // namespace Assert
 } // namespace Debug

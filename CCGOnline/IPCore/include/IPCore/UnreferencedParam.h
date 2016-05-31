@@ -17,25 +17,7 @@
 
 **********************************************************************************************************************/
 
-#include <IPCore/Memory/Memory.h>
+#pragma once
 
-#include <IPCore/UnreferencedParam.h>
+#define IP_UNREFERENCED_PARAM( x ) ( &reinterpret_cast< const int& >( x ) )
 
-#include <tbb/scalable_allocator.h>
-
-namespace IP
-{
-
-void *Malloc( const char* tag, size_t memory_size )
-{
-	IP_UNREFERENCED_PARAM( tag );
-
-	return scalable_malloc( memory_size );
-}
-
-void Free( void *memory_ptr )
-{
-	scalable_free( memory_ptr );
-}
-
-} // namespace IP

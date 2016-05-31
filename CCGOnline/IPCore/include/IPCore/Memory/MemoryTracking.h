@@ -19,11 +19,14 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
+#ifdef TRACK_MEMORY_ALLOCATIONS
 
-#ifdef PLATFORM_WINDOWS
+#define TOSTRING2(x) #x
+#define TOSTRING(x) TOSTRING2( x )
+#define MEMORY_TAG __FILE__ ## ":" ## TOSTRING( __LINE__ )
 
-#define NOMINMAX
-#include <Windows.h>
+#else
 
-#endif // PLATFORM_WINDOWS
+#define MEMORY_TAG nullptr
+
+#endif // TRACK_MEMORY_ALLOCATIONS

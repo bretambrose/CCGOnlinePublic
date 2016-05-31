@@ -1,17 +1,6 @@
 # misc macros for copying loose artifacts
 # still unsure of what "install" should mean at this point, so do things manually
 
-macro(copyDlls exeName)
-    if(PLATFORM_WINDOWS AND BUILD_SHARED_LIBS)
-        foreach(arg ${ARGN})
-            add_custom_command(TARGET ${exeName}
-                                     POST_BUILD
-                                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                     "${CMAKE_BINARY_DIR}/${arg}/$<CONFIGURATION>/${arg}.dll"
-                                     ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIGURATION>/)
-        endforeach()
-    endif()
-endmacro()
 
 macro(copyTbbDlls exeName)
     if(PLATFORM_WINDOWS)

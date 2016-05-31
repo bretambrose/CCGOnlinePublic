@@ -17,25 +17,26 @@
 
 **********************************************************************************************************************/
 
-#include <IPCore/Memory/Memory.h>
+#include <IPCore/Utils/StringUtils.h>
 
-#include <IPCore/UnreferencedParam.h>
-
-#include <tbb/scalable_allocator.h>
+#include <cstring>
 
 namespace IP
 {
-
-void *Malloc( const char* tag, size_t memory_size )
+namespace StringUtils
 {
-	IP_UNREFERENCED_PARAM( tag );
 
-	return scalable_malloc( memory_size );
+
+bool Convert_Raw( const char *source, bool &value ) 
+{
+	value = false;
+	if ( strcasecmp( source, "TRUE" ) == 0 || strcasecmp( source, "YES" ) == 0 || strcasecmp( source, "1" ) == 0 )
+	{
+		value = true;
+	}
+
+	return true;
 }
 
-void Free( void *memory_ptr )
-{
-	scalable_free( memory_ptr );
-}
-
+} // namespace String
 } // namespace IP

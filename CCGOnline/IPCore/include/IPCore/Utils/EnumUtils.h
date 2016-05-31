@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
+#include <type_traits>
 
 namespace IP
 {

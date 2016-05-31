@@ -19,20 +19,17 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Memory/Stl/String.h>
-
 
 namespace IP
 {
 namespace Process
 {
 
-	IPCORE_API IP::String Get_Exe_Name( void );
-	IPCORE_API IP::String Get_Service_Name( void );
+	IP::String Get_Exe_Name( void );
+	IP::String Get_Service_Name( void );
 
-	IPCORE_API uint32_t Get_Self_PID( void );
+	uint32_t Get_Self_PID( void );
 
 } // namespace Process
 } // namespace IP

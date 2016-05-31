@@ -19,15 +19,15 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
+#include <IPCore/UnreferencedParam.h>
 
 #include <memory>
 
 namespace IP
 {
 
-IPCORE_API void *Malloc( const char* tag, size_t memory_size );
-IPCORE_API void Free( void *memory_ptr );
+void *Malloc( const char* tag, size_t memory_size );
+void Free( void *memory_ptr );
 
 template< typename T, typename ...Args >
 T *New( const char *tag, Args&&... args )
@@ -225,7 +225,7 @@ UniquePtr< T > Make_Unique(const char *tag, Args&&... args)
 template< typename T >
 UniquePtr< T > Make_Unique_Array(const char *tag, size_t array_size)
 {
-	return UniquePtr< T >( IP::NewArray< T >( tag, array_size ), IP::Deleter< T >( true ) );
+	return UniquePtr< T >( IP::New_Array< T >( tag, array_size ), IP::Deleter< T >( true ) );
 }
 
 template< typename T, typename U, typename ...Args >

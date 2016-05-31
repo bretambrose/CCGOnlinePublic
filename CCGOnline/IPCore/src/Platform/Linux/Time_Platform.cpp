@@ -17,22 +17,43 @@
 
 **********************************************************************************************************************/
 
-#pragma once
+#include <IPCore/System/Time.h>
 
-#include <IPCore/Always.h>
+#include <IPCore/Debug/DebugAssert.h>
 
-#ifdef PLATFORM_WINDOWS
-    #pragma warning(disable : 4251)
-    #ifdef USE_IMPORT_EXPORT
-        #ifdef IPCORE_EXPORTS
-            #define  IPCORE_API __declspec(dllexport)
-        #else
-            #define  IPCORE_API __declspec(dllimport)
-        #endif // IPCORE_EXPORTS 
-    #else
-        #define IPCORE_API
-    #endif // USE_IMPORT_EXPORT
-#else // PLATFORM_WINDOWS 
-    #define IPCORE_API
-#endif
+#include <sys/types.h>
+#include <sys/stat.h>
+
+namespace IP
+{
+namespace Time
+{
+
+std::tm Localtime(std::time_t time)
+{
+	std::tm tm_snapshot;
+	localtime_r(&time, &tm_snapshot);
+
+	return tm_snapshot;
+}
+
+SystemTimePoint Get_File_Last_Modified_Time( const IP::String &file_name )
+{
+	auto fp = fopen( file_name.c_str(), "r" );
+	FATAL_ASSERT( fp != nullptr );
+
+	int fd = fileno( fp );
+	FATAL_ASSERT( fd != -1 );
+
+	struct stat file_stats;
+	auto result = fstat( fd, &file_stats );	// Windows-specific
+	FATAL_ASSERT( result == 0 );
+
+	fclose(fp);
+
+	return std::chrono::system_clock::from_time_t(file_stats.st_mtime);
+}
+	
+} // namespace Time
+} // namespace IP
 

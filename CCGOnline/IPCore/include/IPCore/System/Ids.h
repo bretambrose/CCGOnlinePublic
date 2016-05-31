@@ -19,15 +19,13 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 
 namespace IP
 {
 namespace Ids
 {
 
-	IPCORE_API uint32_t Get_Semi_Unique_ID( void );
+	uint32_t Get_Semi_Unique_ID( void );
 
 } // namespace Ids
 } // namespace IP

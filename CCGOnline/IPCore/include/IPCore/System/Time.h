@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <IPCore/IPCore.h>
-
 #include <IPCore/Memory/Stl/String.h>
 
 #include <chrono>
@@ -36,15 +34,15 @@ namespace Time
 	using SystemDuration = std::chrono::system_clock::duration;
 
 	// Interface
-	IPCORE_API SystemTimePoint Get_Current_System_Time( void );
-	IPCORE_API SystemDuration Get_Elapsed_System_Time( void );
-	IPCORE_API SystemTimePoint Get_File_Last_Modified_Time( const IP::String &file_name );
+	SystemTimePoint Get_Current_System_Time( void );
+	SystemDuration Get_Elapsed_System_Time( void );
+	SystemTimePoint Get_File_Last_Modified_Time( const IP::String &file_name );
 
-	IPCORE_API double Convert_Duration_To_Seconds( SystemDuration duration );
+	double Convert_Duration_To_Seconds( SystemDuration duration );
 
-	IPCORE_API IP::String Format_System_Time( SystemTimePoint time_point );
+	IP::String Format_System_Time( SystemTimePoint time_point );
 
-	IPCORE_API std::tm Localtime(std::time_t time);
+	std::tm Localtime(std::time_t time);
 
 } // namespace Time
 } // namespace IP
