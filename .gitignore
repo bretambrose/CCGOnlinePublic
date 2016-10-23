@@ -1,9 +1,4 @@
-CCGOnline/external/
 CCGOnline/_build/
-CCGOnline/tbb_src/
-CCGOnline/loki_src/
-CCGOnline/gtest/
-
 CCGOnline/PackageManager/bin/
 CCGOnline/PackageManager/obj/
 CCGOnline/EnumReflector/bin/

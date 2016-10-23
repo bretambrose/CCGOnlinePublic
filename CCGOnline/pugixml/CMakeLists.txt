@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.8)
 project(pugixml)
 
 
@@ -17,9 +16,19 @@ endif(MSVC)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(pugixml ${LIBTYPE} ${PUGIXML_LIBRARY_SOURCE})
+set(WINDOWS_DLL_EXPORT "__declspec(dllexport)")
+set(WINDOWS_DLL_IMPORT "__declspec(dllimport)")
 
+if(PLATFORM_WINDOWS)
+    add_definitions("-DPUGIXML_API=${WINDOWS_DLL_EXPORT}")
+    add_definitions("-DPUGIXML_CLASS=${WINDOWS_DLL_IMPORT}")
+endif()
 
+add_library(pugixml SHARED ${PUGIXML_LIBRARY_SOURCE})
+
+if(PLATFORM_WINDOWS)
+    target_compile_definitions(pugixml PUBLIC -DPUGIXML_API=${WINDOWS_DLL_EXPORT})
+endif()
 
 
 

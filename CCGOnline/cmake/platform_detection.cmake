@@ -1,0 +1,40 @@
+SET(PLATFORM_WINDOWS 0)
+SET(PLATFORM_LINUX 0)
+SET(PLATFORM_APPLE 0)
+
+if(WIN32)
+	SET(PLATFORM_WINDOWS 1)
+elseif(APPLE)
+	SET(PLATFORM_APPLE 1)
+elseif(UNIX)
+	SET(PLATFORM_LINUX 1)
+else()
+	message(FATAL_ERROR "Unknown host OS; unable to determine platform compilation target")
+endif()
+
+if(PLATFORM_WINDOWS)
+    message(STATUS "Generating windows build config")
+    add_definitions("-DPLATFORM_WINDOWS")  # do not use in header files
+    set(PLATFORM_NAME windows)
+elseif(PLATFORM_LINUX)
+    message(STATUS "Generating linux build config")
+    add_definitions("-DPLATFORM_LINUX")  # do not use in header files
+    set(PLATFORM_NAME linux)
+elseif(PLATFORM_APPLE)
+    message(STATUS "Generating Mac OSX build config")
+    add_definitions("-DPLATFORM_APPLE")  # do not use in header files
+    set(PLATFORM_NAME apple)
+else()
+    message(FATAL_ERROR "Unknown target platform.  How did this happen?")
+endif()
+
+if(PLATFORM_WINDOWS)
+    SET(STATIC_LIBRARY_SUFFIX "lib")
+    SET(PLATFORM_LIBRARY_PREFIX "")
+    SET(DYNAMIC_LIBRARY_SUFFIX "dll")
+elseif(PLATFORM_LINUX OR PLATFORM_APPLE)
+    SET(STATIC_LIBRARY_SUFFIX "a")
+    SET(PLATFORM_LIBRARY_PREFIX "lib")
+    SET(DYNAMIC_LIBRARY_SUFFIX "so")
+endif()
+

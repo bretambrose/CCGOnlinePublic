@@ -1,10 +1,11 @@
 
-set(GTEST_SOURCE_DIR "${CMAKE_SOURCE_DIR}/gtest")
+set(GTEST_SOURCE_DIR "${CMAKE_BINARY_DIR}/gtest")
 
 set(GTEST_URL "https://github.com/google/googletest.git")
 
 
 if(PLATFORM_WINDOWS)
+    # TODO: add
 elseif(PLATFORM_LINUX)
 
     ExternalProject_Add( gtest
@@ -16,5 +17,7 @@ elseif(PLATFORM_LINUX)
                 -Dgtest_force_shared_crt=ON
             )
 elseif(PLATFORM_APPLE)
+    # TODO: add
 endif()
 
+set(GTEST_LIBS gtest gmock)
