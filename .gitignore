@@ -22,5 +22,6 @@ DB/SQLServer/DBSettings.txt
 CCGOnline/tmp/
 .idea
 
-
+*~
+*#
 

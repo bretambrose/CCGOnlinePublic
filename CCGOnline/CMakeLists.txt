@@ -50,15 +50,13 @@ add_definitions(-DTRACK_MEMORY_ALLOCATIONS)
 # directories
 set(CCGONLINE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
-set(EXTERNAL_PROJECT_SHARED_LIBRARY_DIR "${CMAKE_BINARY_DIR}/external/lib")
+set(EXTERNAL_PROJECT_DIR "${CMAKE_BINARY_DIR}/external")
 
 # external package setups
 include(ExternalProject)
-include(cmake/tbb.cmake)
-include(cmake/loki.cmake)
-include(cmake/gtest.cmake)
-
-link_directories(${EXTERNAL_PROJECT_SHARED_LIBRARY_DIR})
+include(cmake/tbb/tbb.cmake)
+include(cmake/loki/loki.cmake)
+include(cmake/gtest/gtest.cmake)
 
 include(cmake/compiler_options.cmake)
 
